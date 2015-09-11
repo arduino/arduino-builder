@@ -1,0 +1,26 @@
+#include <Arduino.h>
+#line 1
+#line 1 "sketch_with_config.ino"
+#include "config.h"
+
+#ifdef DEBUG
+#include "includes/de bug.h"
+#endif
+
+#ifdef UNDEF
+#error
+#endif
+
+#include <Bridge.h>
+
+void setup();
+void loop();
+#line 13
+void setup() {
+
+}
+
+void loop() {
+
+}
+

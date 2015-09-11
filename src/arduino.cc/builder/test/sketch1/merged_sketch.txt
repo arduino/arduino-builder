@@ -1,0 +1,14 @@
+#line 1 "sketch.ino"
+void setup() {
+
+}
+
+void loop() {
+
+}
+#line 1 "old.pde"
+
+#line 1 "other.ino"
+String hello() {
+  return "world";
+}

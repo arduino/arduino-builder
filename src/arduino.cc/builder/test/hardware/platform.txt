@@ -1,0 +1,12 @@
+# ctags
+# ------------------------------
+tools.ctags.path={runtime.tools.ctags.path}
+tools.ctags.cmd.path={path}/ctags
+tools.ctags.pattern="{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns "{source_file}"
+
+# coan
+# ------------------------------
+tools.coan.path={runtime.tools.coan.path}
+tools.coan.cmd.path={path}/coan
+tools.coan.pattern="{cmd.path}" source -m -E -P -kb {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} "{source_file}"
+

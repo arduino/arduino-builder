@@ -1,0 +1,8 @@
+    # comment
+
+    key   = value = 1
+
+which.os=dunno
+which.os.linux=is linux
+which.os.macosx=is macosx
+which.os.windows=is windows
