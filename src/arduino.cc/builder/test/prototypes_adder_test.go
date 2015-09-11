@@ -79,8 +79,6 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
 	require.Equal(t, "void setup();\nvoid loop();\nvoid process(YunClient client);\nvoid digitalCommand(YunClient client);\nvoid analogCommand(YunClient client);\nvoid modeCommand(YunClient client);\n#line 33\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
@@ -125,8 +123,6 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderBaladuino(t *testing.T) {
@@ -171,8 +167,6 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
@@ -217,8 +211,6 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
@@ -263,8 +255,6 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderLineContinuations(t *testing.T) {
@@ -309,8 +299,6 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderStringWithComment(t *testing.T) {
@@ -355,8 +343,6 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderSketchWithStruct(t *testing.T) {
@@ -401,8 +387,6 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }
 
 func TestPrototypesAdderSketchWithConfig(t *testing.T) {
@@ -450,6 +434,4 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	preprocessed := string(bytes)
 
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
-
-	NoError(t, DeleteAnyDotDFile())
 }

@@ -32,14 +32,11 @@ package test
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"fmt"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
-	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -76,20 +73,4 @@ func (s ByLibraryName) Swap(i, j int) {
 }
 func (s ByLibraryName) Less(i, j int) bool {
 	return s[i].Name < s[j].Name
-}
-
-func DeleteAnyDotDFile() error {
-	files, err := ioutil.ReadDir(".")
-	if err != nil {
-		return utils.WrapError(err)
-	}
-	for _, file := range files {
-		if !file.IsDir() && strings.HasSuffix(file.Name(), ".d") {
-			err := os.Remove(file.Name())
-			if err != nil {
-				return utils.WrapError(err)
-			}
-		}
-	}
-	return nil
 }
