@@ -36,6 +36,10 @@ This tool generates function prototypes and gathers library paths, providing `gc
 * `-version`: if specified, prints version and exits.
 
 Final mandatory parameter is the sketch to compile (of course).
+    
+### Using it for continuously verify your libraries or cores
+
+See [Doing continuous integration with arduino builder](https://github.com/arduino/arduino-builder/wiki/Doing-continuous-integration-with-arduino-builder/).
                
 ### Building from source
                
