@@ -40,13 +40,18 @@ type PrototypesAdder struct{}
 
 func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	source := context[constants.CTX_SOURCE].(string)
+	sourceRows := strings.Split(source, "\n")
 
 	if !utils.MapHas(context, constants.CTX_FIRST_FUNCTION_AT_LINE) {
 		return nil
 	}
 
 	firstFunctionLine := context[constants.CTX_FIRST_FUNCTION_AT_LINE].(int)
-	firstFunctionChar := len(strings.Join(strings.Split(source, "\n")[:firstFunctionLine-1], "\n")) + 1
+	if firstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
+		return nil
+	}
+
+	firstFunctionChar := len(strings.Join(sourceRows[:firstFunctionLine-1], "\n")) + 1
 	if firstFunctionLine > 1 {
 		firstFunctionLine -= context[constants.CTX_LINE_OFFSET].(int)
 	}
@@ -81,4 +86,8 @@ func composeIncludeArduinoSection() string {
 	str += "#line 1\n"
 
 	return str
+}
+
+func firstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) bool {
+	return firstFunctionLine > len(sourceRows)-1
 }
