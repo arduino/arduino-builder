@@ -43,12 +43,13 @@ const FIELD_RETURNTYPE = "returntype"
 const FIELD_CODE = "code"
 const FIELD_FUNCTION_NAME = "functionName"
 const FIELD_CLASS = "class"
+const FIELD_STRUCT = "struct"
 
 const KIND_PROTOTYPE = "prototype"
 
 const TEMPLATE = "template"
 
-var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signature": true, "returntype": true, "class": true}
+var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signature": true, "returntype": true, "class": true, "struct": true}
 var KNOWN_TAG_KINDS = map[string]bool{"prototype": true, "function": true}
 
 type CTagsParser struct {
@@ -66,7 +67,8 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	}
 
 	tags = filterOutUnknownTags(tags)
-	tags = filterOutTagsWithClass(tags)
+	tags = filterOutTagsWithField(tags, FIELD_CLASS)
+	tags = filterOutTagsWithField(tags, FIELD_STRUCT)
 	tags = addPrototypes(tags)
 	tags = removeDefinedProtypes(tags)
 	tags = removeDuplicate(tags)
@@ -140,10 +142,10 @@ func removeDuplicate(tags []map[string]string) []map[string]string {
 	return newTags
 }
 
-func filterOutTagsWithClass(tags []map[string]string) []map[string]string {
+func filterOutTagsWithField(tags []map[string]string, field string) []map[string]string {
 	var newTags []map[string]string
 	for _, tag := range tags {
-		if tag[FIELD_CLASS] == constants.EMPTY_STRING {
+		if tag[field] == constants.EMPTY_STRING {
 			newTags = append(newTags, tag)
 		}
 	}
