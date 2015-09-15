@@ -49,6 +49,7 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp")
+	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
 	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_INCLUDES, true, verbose, false, logger)
 	if err != nil {

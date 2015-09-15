@@ -52,7 +52,7 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
-	removingHyphenMDDFlagFromGCCCommandLine(properties)
+	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
@@ -64,8 +64,4 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(output)
 
 	return nil
-}
-
-func removingHyphenMDDFlagFromGCCCommandLine(properties map[string]string) {
-	properties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(properties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
 }

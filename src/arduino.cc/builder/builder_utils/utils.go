@@ -196,3 +196,7 @@ func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperti
 	bytes, err := command.Output()
 	return bytes, utils.WrapError(err)
 }
+
+func RemoveHyphenMDDFlagFromGCCCommandLine(properties map[string]string) {
+	properties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(properties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
+}
