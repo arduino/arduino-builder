@@ -118,6 +118,11 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 	require.Equal(t, "AVRISP mkII", avrPlatform.Programmers["avrispmkii"][constants.PROGRAMMER_NAME])
 
+	require.Equal(t, "-w -x c++ -M -MG -MP", avrPlatform.Properties["preproc.includes.flags"])
+	require.Equal(t, "-w -x c++ -E -CC", avrPlatform.Properties["preproc.macros.flags"])
+	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", avrPlatform.Properties["preproc.macros.compatibility_flags"])
+	require.Equal(t, "\"{compiler.path}{compiler.cpp.cmd}\" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} \"{source_file}\"", avrPlatform.Properties[constants.RECIPE_PREPROC_INCLUDES])
+
 	require.NotNil(t, packages["my_avr_platform"])
 	myAVRPlatform := packages["my_avr_platform"].Platforms["avr"]
 	require.Equal(t, "custom_yun", myAVRPlatform.Boards["custom_yun"].BoardId)
@@ -126,6 +131,9 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.Equal(t, "{runtime.tools.avrdude.path}", myAVRPlatform.Properties["tools.avrdude.path"])
 	require.Equal(t, "{path}/bin/avrdude", myAVRPlatform.Properties["tools.avrdude.cmd.path"])
 	require.Equal(t, "{path}/etc/avrdude.conf", myAVRPlatform.Properties["tools.avrdude.config.path"])
+
+	require.Equal(t, "-w -x c++ -M -MG -MP", myAVRPlatform.Properties["preproc.includes.flags"])
+	require.Equal(t, "-w -x c++ -E -CC", myAVRPlatform.Properties["preproc.macros.flags"])
 
 	if runtime.GOOS != "windows" {
 		require.NotNil(t, packages["my_symlinked_avr_platform"])

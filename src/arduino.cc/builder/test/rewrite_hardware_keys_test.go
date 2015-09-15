@@ -54,8 +54,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	context[constants.CTX_HARDWARE] = hardware
 
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
-	addition := types.KeyValuePair{Key: "tools.avrdude.path", Value: "{runtime.tools.avrdude.path}"}
-	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}, Additions: []types.KeyValuePair{addition}}
+	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
 	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
 
 	commands := []types.Command{
@@ -70,5 +69,4 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	}
 
 	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH])
-	require.Equal(t, "{runtime.tools.avrdude.path}", platform.Properties["tools.avrdude.path"])
 }

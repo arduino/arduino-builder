@@ -1,8 +1,6 @@
 old.0.compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
 new.0.compiler.path={runtime.tools.avr-gcc.path}/bin/
 
-added.tools.avrdude.path={runtime.tools.avrdude.path}
-
 old.1.tools.avrdude.cmd.path={runtime.ide.path}/hardware/tools/avr/bin/avrdude
 new.1.tools.avrdude.cmd.path={path}/bin/avrdude
 
@@ -17,13 +15,6 @@ new.4.tools.bossac.path={runtime.tools.bossac.path}
 
 old.5.recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mcpu={build.mcu} "-T{build.variant.path}/{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" "-L{build.path}" -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group "{build.path}/syscalls_sam3.c.o" {object_files} "{build.variant.path}/{build.variant_system_lib}" "{build.path}/{archive_file}" -Wl,--end-group -lm -gcc
 new.5.recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mcpu={build.mcu} "-T{build.variant.path}/{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" "-L{build.path}" -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group "{build.path}/core/syscalls_sam3.c.o" {object_files} "{build.variant.path}/{build.variant_system_lib}" "{build.path}/{archive_file}" -Wl,--end-group -lm -gcc
-
-added.preproc.includes.flags=-w -x c++ -M -MG -MP
-added.recipe.preproc.includes="{compiler.path}{compiler.c.cmd}" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} "{source_file}"
-
-added.preproc.macros.flags=-w -x c++ -E -CC
-added.preproc.macros.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}
-added.recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} "{source_file}"
 
 #specific to RedBearLab nRF51822 Boards
 old.6.recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu={build.mcu} -mthumb -Wl,--gc-sections --specs=nano.specs -Wl,--wrap,main -Wl,-Map={build.path}/{build.project_name}.map,--cref "-T{build.variant.path}/{build.ldscript}" -o "{build.path}/{build.project_name}.elf" -Wl,--start-group "{build.path}/system_nrf51.c.o" {object_files} "{build.path}/startup_NRF51822.s.o" "{build.path}/{archive_file}" -Wl,--end-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys

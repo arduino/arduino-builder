@@ -60,14 +60,6 @@ func (s *RewriteHardwareKeys) Run(context map[string]interface{}) error {
 					}
 				}
 			}
-			for _, addition := range platformKeysRewrite.Additions {
-				if platform.Properties[addition.Key] == constants.EMPTY_STRING {
-					platform.Properties[addition.Key] = addition.Value
-					if warn {
-						logger.Fprintln(os.Stderr, constants.MSG_WARNING_PLATFORM_MISSING_VALUE, platform.Properties[constants.PLATFORM_NAME], addition.Key, addition.Value)
-					}
-				}
-			}
 		}
 	}
 

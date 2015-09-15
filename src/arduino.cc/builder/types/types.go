@@ -128,8 +128,7 @@ func (library *Library) SupportsArchitectures(archs []string) bool {
 }
 
 type PlatforKeysRewrite struct {
-	Rewrites  []PlatforKeyRewrite
-	Additions []KeyValuePair
+	Rewrites []PlatforKeyRewrite
 }
 
 type PlatforKeyRewrite struct {

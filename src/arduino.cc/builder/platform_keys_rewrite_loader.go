@@ -55,7 +55,6 @@ func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}) error {
 
 	platformKeysRewrite := types.PlatforKeysRewrite{}
 	platformKeysRewrite.Rewrites = []types.PlatforKeyRewrite{}
-	platformKeysRewrite.Additions = []types.KeyValuePair{}
 
 	txt, err := props.Load(platformKeysRewriteTxtPath)
 	keys := utils.KeysOfMapOfString(txt)
@@ -69,11 +68,6 @@ func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}) error {
 			newValue := txt[constants.PLATFORM_REWRITE_NEW+"."+strings.Join(keyParts[1:], ".")]
 			platformKeyRewrite := types.PlatforKeyRewrite{Key: rewriteKey, OldValue: oldValue, NewValue: newValue}
 			platformKeysRewrite.Rewrites = append(platformKeysRewrite.Rewrites, platformKeyRewrite)
-		} else if keyParts[0] == constants.PLATFORM_REWRITE_ADDED {
-			additionalKey := strings.Join(keyParts[1:], ".")
-			additionalValue := txt[key]
-			platformKeyAddition := types.KeyValuePair{Key: additionalKey, Value: additionalValue}
-			platformKeysRewrite.Additions = append(platformKeysRewrite.Additions, platformKeyAddition)
 		}
 	}
 

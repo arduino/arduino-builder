@@ -64,18 +64,4 @@ func TestLoadPlatformKeysRewrite(t *testing.T) {
 	require.Equal(t, "recipe.c.combine.pattern", platformKeysRewrite.Rewrites[5].Key)
 	require.Equal(t, "\"{compiler.path}{compiler.c.elf.cmd}\" {compiler.c.elf.flags} -mcpu={build.mcu} \"-T{build.variant.path}/{build.ldscript}\" \"-Wl,-Map,{build.path}/{build.project_name}.map\" {compiler.c.elf.extra_flags} -o \"{build.path}/{build.project_name}.elf\" \"-L{build.path}\" -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group \"{build.path}/syscalls_sam3.c.o\" {object_files} \"{build.variant.path}/{build.variant_system_lib}\" \"{build.path}/{archive_file}\" -Wl,--end-group -lm -gcc", platformKeysRewrite.Rewrites[5].OldValue)
 	require.Equal(t, "\"{compiler.path}{compiler.c.elf.cmd}\" {compiler.c.elf.flags} -mcpu={build.mcu} \"-T{build.variant.path}/{build.ldscript}\" \"-Wl,-Map,{build.path}/{build.project_name}.map\" {compiler.c.elf.extra_flags} -o \"{build.path}/{build.project_name}.elf\" \"-L{build.path}\" -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group \"{build.path}/core/syscalls_sam3.c.o\" {object_files} \"{build.variant.path}/{build.variant_system_lib}\" \"{build.path}/{archive_file}\" -Wl,--end-group -lm -gcc", platformKeysRewrite.Rewrites[5].NewValue)
-
-	require.Equal(t, 6, len(platformKeysRewrite.Additions))
-	require.Equal(t, "preproc.includes.flags", platformKeysRewrite.Additions[0].Key)
-	require.Equal(t, "-w -x c++ -M -MG -MP", platformKeysRewrite.Additions[0].Value)
-	require.Equal(t, "preproc.macros.compatibility_flags", platformKeysRewrite.Additions[1].Key)
-	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", platformKeysRewrite.Additions[1].Value)
-	require.Equal(t, "preproc.macros.flags", platformKeysRewrite.Additions[2].Key)
-	require.Equal(t, "-w -x c++ -E -CC", platformKeysRewrite.Additions[2].Value)
-	require.Equal(t, constants.RECIPE_PREPROC_INCLUDES, platformKeysRewrite.Additions[3].Key)
-	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} \"{source_file}\"", platformKeysRewrite.Additions[3].Value)
-	require.Equal(t, constants.RECIPE_PREPROC_MACROS, platformKeysRewrite.Additions[4].Key)
-	require.Equal(t, "\"{compiler.path}{compiler.cpp.cmd}\" {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} \"{source_file}\"", platformKeysRewrite.Additions[4].Value)
-	require.Equal(t, "tools.avrdude.path", platformKeysRewrite.Additions[5].Key)
-	require.Equal(t, "{runtime.tools.avrdude.path}", platformKeysRewrite.Additions[5].Value)
 }
