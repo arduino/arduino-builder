@@ -53,7 +53,12 @@ func (h *slice) String() string {
 }
 
 func (h *slice) Set(csv string) error {
-	values := strings.Split(csv, ",")
+	var values []string
+	if strings.Contains(csv, string(os.PathListSeparator)) {
+		values = strings.Split(csv, string(os.PathListSeparator))
+	} else {
+		values = strings.Split(csv, ",")
+	}
 
 	for _, value := range values {
 		value = strings.TrimSpace(value)
@@ -81,10 +86,10 @@ var versionFlag *bool
 func init() {
 	compileFlag = flag.Bool("compile", false, "compiles the given sketch")
 	dumpPrefsFlag = flag.Bool("dump-prefs", false, "dumps build properties used when compiling")
-	flag.Var(&hardwareFoldersFlag, "hardware", "comma-separated list of 'hardware' folders")
-	flag.Var(&toolsFoldersFlag, "tools", "comma-separated list of 'tools' folders")
-	flag.Var(&librariesFoldersFlag, "libraries", "comma-separated list of 'libraries' folders")
-	flag.Var(&customBuildPropertiesFlag, "prefs", "comma-separated list of custom preferences")
+	flag.Var(&hardwareFoldersFlag, "hardware", "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
+	flag.Var(&toolsFoldersFlag, "tools", "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
+	flag.Var(&librariesFoldersFlag, "libraries", "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
+	flag.Var(&customBuildPropertiesFlag, "prefs", "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
 	fqbnFlag = flag.String("fqbn", "", "fully qualified board name")
 	ideVersionFlag = flag.String("ide-version", "10600", "fake IDE version")
 	buildPathFlag = flag.String("build-path", "", "build path")
