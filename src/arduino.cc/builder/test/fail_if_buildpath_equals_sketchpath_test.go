@@ -27,41 +27,31 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package test
 
 import (
+	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
-type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
+func TestFailIfBuildpathEqualsSketchPath(t *testing.T) {
+	context := make(map[string]interface{})
 
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]interface{}) error {
-	commands := []types.Command{
-		&AddAdditionalEntriesToContext{},
-		&FailIfBuildpathEqualsSketchPath{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
-		&HardwareLoader{},
-		&PlatformKeysRewriteLoader{},
-		&RewriteHardwareKeys{},
-		&ToolsLoader{},
-		&TargetBoardResolver{},
-		&AddBuildBoardPropertyIfMissing{},
-		&LibrariesLoader{},
-		&SketchLoader{},
-		&SetupBuildProperties{},
-		&LoadVIDPIDSpecificProperties{},
-		&SetCustomBuildProperties{},
-	}
+	context[constants.CTX_BUILD_PATH] = "buildPath"
+	context[constants.CTX_SKETCH_LOCATION] = "buildPath/sketch.ino"
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
-		if err != nil {
-			return utils.WrapError(err)
-		}
-	}
+	command := builder.FailIfBuildpathEqualsSketchPath{}
+	require.Error(t, command.Run(context))
+}
 
-	return nil
+func TestFailIfBuildpathEqualsSketchPathSketchPathDiffers(t *testing.T) {
+	context := make(map[string]interface{})
+
+	context[constants.CTX_BUILD_PATH] = "buildPath"
+	context[constants.CTX_SKETCH_LOCATION] = "sketchPath/sketch.ino"
+
+	command := builder.FailIfBuildpathEqualsSketchPath{}
+	NoError(t, command.Run(context))
 }

@@ -35,44 +35,31 @@ import (
 	"path/filepath"
 )
 
-type AddAdditionalEntriesToContext struct{}
+type FailIfBuildpathEqualsSketchPath struct{}
 
-func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}) error {
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
-		buildPath := context[constants.CTX_BUILD_PATH].(string)
-		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))
-		if err != nil {
-			return utils.WrapError(err)
-		}
-		sketchBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_SKETCH))
-		if err != nil {
-			return utils.WrapError(err)
-		}
-		librariesBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_LIBRARIES))
-		if err != nil {
-			return utils.WrapError(err)
-		}
-		coreBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_CORE))
-		if err != nil {
-			return utils.WrapError(err)
-		}
-
-		context[constants.CTX_PREPROC_PATH] = preprocPath
-		context[constants.CTX_SKETCH_BUILD_PATH] = sketchBuildPath
-		context[constants.CTX_LIBRARIES_BUILD_PATH] = librariesBuildPath
-		context[constants.CTX_CORE_BUILD_PATH] = coreBuildPath
+func (s *FailIfBuildpathEqualsSketchPath) Run(context map[string]interface{}) error {
+	if !utils.MapHas(context, constants.CTX_BUILD_PATH) || !utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
+		return nil
 	}
 
-	if !utils.MapHas(context, constants.CTX_WARNINGS_LEVEL) {
-		context[constants.CTX_WARNINGS_LEVEL] = DEFAULT_WARNINGS_LEVEL
+	buildPath, err := filepath.Abs(context[constants.CTX_BUILD_PATH].(string))
+	if err != nil {
+		return utils.WrapError(err)
 	}
 
-	if !utils.MapHas(context, constants.CTX_VERBOSE) {
-		context[constants.CTX_VERBOSE] = false
+	sketchPath, err := filepath.Abs(context[constants.CTX_SKETCH_LOCATION].(string))
+	if err != nil {
+		return utils.WrapError(err)
+	}
+	sketchPath = filepath.Dir(sketchPath)
+
+	rel, err := filepath.Rel(buildPath, sketchPath)
+	if err != nil {
+		return utils.WrapError(err)
 	}
 
-	if !utils.MapHas(context, constants.CTX_DEBUG_LEVEL) {
-		context[constants.CTX_DEBUG_LEVEL] = DEFAULT_DEBUG_LEVEL
+	if rel == "." {
+		return utils.Errorf(context, "Sketch cannot be located in build path. Please specify a different build path")
 	}
 
 	return nil
