@@ -68,7 +68,8 @@ func (s *Builder) Run(context map[string]interface{}) error {
 	commands := []types.Command{
 		&SetupHumanLoggerIfMissing{},
 
-		&CreateBuildPathIfMissing{},
+		&GenerateBuildPathIfMissing{},
+		&EnsureBuildPathExists{},
 
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -115,7 +116,12 @@ type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}) error {
 	commands := []types.Command{
+		&SetupHumanLoggerIfMissing{},
+
+		&GenerateBuildPathIfMissing{},
+
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
+
 		&DumpBuildProperties{},
 	}
 

@@ -31,42 +31,19 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
-	"crypto/md5"
-	"encoding/hex"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
-type CreateBuildPathIfMissing struct{}
+type EnsureBuildPathExists struct{}
 
-func (s *CreateBuildPathIfMissing) Run(context map[string]interface{}) error {
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) && context[constants.CTX_BUILD_PATH].(string) != constants.EMPTY_STRING {
-		return nil
-	}
+func (s *EnsureBuildPathExists) Run(context map[string]interface{}) error {
+	buildPath := context[constants.CTX_BUILD_PATH].(string)
 
-	sketchLocation := context[constants.CTX_SKETCH_LOCATION].(string)
-	md5sumBytes := md5.Sum([]byte(sketchLocation))
-	md5sum := hex.EncodeToString(md5sumBytes[:])
-
-	buildPath := filepath.Join(os.TempDir(), "arduino-sketch-"+strings.ToUpper(md5sum))
-	_, err := os.Stat(buildPath)
-	if err != nil && !os.IsNotExist(err) {
-		return utils.WrapError(err)
-	}
-	err = os.MkdirAll(buildPath, os.FileMode(0755))
+	err := os.MkdirAll(buildPath, os.FileMode(0755))
 	if err != nil {
 		return utils.WrapError(err)
 	}
-
-	if utils.DebugLevel(context) > 5 {
-		logger := context[constants.CTX_LOGGER].(i18n.Logger)
-		logger.Fprintln(os.Stderr, constants.MSG_SETTING_BUILD_PATH, buildPath)
-	}
-
-	context[constants.CTX_BUILD_PATH] = buildPath
 
 	return nil
 }
