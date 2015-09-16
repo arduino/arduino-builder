@@ -40,7 +40,7 @@ type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
 func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]interface{}) error {
 	commands := []types.Command{
 		&AddAdditionalEntriesToContext{},
-		&FailIfBuildpathEqualsSketchPath{},
+		&FailIfBuildPathEqualsSketchPath{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&HardwareLoader{},
 		&PlatformKeysRewriteLoader{},

@@ -35,9 +35,9 @@ import (
 	"path/filepath"
 )
 
-type FailIfBuildpathEqualsSketchPath struct{}
+type FailIfBuildPathEqualsSketchPath struct{}
 
-func (s *FailIfBuildpathEqualsSketchPath) Run(context map[string]interface{}) error {
+func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}) error {
 	if !utils.MapHas(context, constants.CTX_BUILD_PATH) || !utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
 		return nil
 	}
