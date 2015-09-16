@@ -54,7 +54,7 @@ func (s *FailIfBuildpathEqualsSketchPath) Run(context map[string]interface{}) er
 	sketchPath = filepath.Dir(sketchPath)
 
 	if buildPath == sketchPath {
-		return utils.Errorf(context, "Sketch cannot be located in build path. Please specify a different build path")
+		return utils.Errorf(context, constants.MSG_SKETCH_CANT_BE_IN_BUILDPATH)
 	}
 
 	return nil
