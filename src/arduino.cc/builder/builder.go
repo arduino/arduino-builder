@@ -75,6 +75,8 @@ func (s *Builder) Run(context map[string]interface{}) error {
 
 		&ContainerBuildOptions{},
 
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+
 		&ContainerMergeCopySketchFiles{},
 
 		&ContainerFindIncludes{},

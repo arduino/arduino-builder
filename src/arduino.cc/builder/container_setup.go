@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
@@ -41,7 +40,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]i
 	commands := []types.Command{
 		&AddAdditionalEntriesToContext{},
 		&FailIfBuildPathEqualsSketchPath{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&HardwareLoader{},
 		&PlatformKeysRewriteLoader{},
 		&RewriteHardwareKeys{},
