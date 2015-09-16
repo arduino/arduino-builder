@@ -59,7 +59,7 @@ func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
 
 	context[constants.CTX_BUILD_OPTIONS] = buildOptions
 
-	bytes, err := json.Marshal(buildOptions)
+	bytes, err := json.MarshalIndent(buildOptions, "", "  ")
 	if err != nil {
 		return utils.WrapError(err)
 	}

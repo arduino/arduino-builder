@@ -63,5 +63,12 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	require.Equal(t, "sketchLocation", buildOptions[constants.CTX_SKETCH_LOCATION])
 	require.Equal(t, "ideVersion", buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
 
-	require.Equal(t, "{\"fqbn\":\"fqbn\",\"hardwareFolders\":\"hardware,hardware2\",\"librariesFolders\":\"libraries\",\"runtime.ide.version\":\"ideVersion\",\"sketchLocation\":\"sketchLocation\",\"toolsFolders\":\"tools\"}", context[constants.CTX_BUILD_OPTIONS_JSON].(string))
+	require.Equal(t, "{\n"+
+		"  \"fqbn\": \"fqbn\",\n"+
+		"  \"hardwareFolders\": \"hardware,hardware2\",\n"+
+		"  \"librariesFolders\": \"libraries\",\n"+
+		"  \"runtime.ide.version\": \"ideVersion\",\n"+
+		"  \"sketchLocation\": \"sketchLocation\",\n"+
+		"  \"toolsFolders\": \"tools\"\n"+
+		"}", context[constants.CTX_BUILD_OPTIONS_JSON].(string))
 }

@@ -71,5 +71,12 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	bytes, err := ioutil.ReadFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE))
 	NoError(t, err)
 
-	require.Equal(t, "{\"fqbn\":\"fqbn\",\"hardwareFolders\":\"hardware\",\"librariesFolders\":\"libraries\",\"runtime.ide.version\":\"ideVersion\",\"sketchLocation\":\"sketchLocation\",\"toolsFolders\":\"tools\"}", string(bytes))
+	require.Equal(t, "{\n"+
+		"  \"fqbn\": \"fqbn\",\n"+
+		"  \"hardwareFolders\": \"hardware\",\n"+
+		"  \"librariesFolders\": \"libraries\",\n"+
+		"  \"runtime.ide.version\": \"ideVersion\",\n"+
+		"  \"sketchLocation\": \"sketchLocation\",\n"+
+		"  \"toolsFolders\": \"tools\"\n"+
+		"}", string(bytes))
 }
