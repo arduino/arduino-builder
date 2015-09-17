@@ -44,7 +44,7 @@ import (
 	"syscall"
 )
 
-const VERSION = "1.0.0-beta6"
+const VERSION = "1.0.0-beta7"
 
 type slice []string
 
