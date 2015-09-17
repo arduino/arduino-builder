@@ -86,25 +86,25 @@ func (s *Builder) Run(context map[string]interface{}) error {
 
 		&ContainerAddPrototypes{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH + constants.HOOKS_PREBUILD_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.SketchBuilder{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH + constants.HOOKS_POSTBUILD_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES + constants.HOOKS_PREBUILD_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.LibrariesBuilder{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES + constants.HOOKS_POSTBUILD_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE + constants.HOOKS_PREBUILD_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.CoreBuilder{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE + constants.HOOKS_POSTBUILD_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING + constants.HOOKS_PRELINK_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_PRELINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.Linker{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING + constants.HOOKS_POSTLINK_SUFFIX, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_POSTLINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_OBJCOPY + constants.HOOKS_PREOBJCOPY, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_OBJCOPY_PREOBJCOPY, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.objcopy.", Suffix: constants.HOOKS_PATTERN_SUFFIX},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_OBJCOPY + constants.HOOKS_POSTOBJCOPY, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_OBJCOPY_POSTOBJCOPY, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
 		&MergeSketchWithBootloader{},
 
