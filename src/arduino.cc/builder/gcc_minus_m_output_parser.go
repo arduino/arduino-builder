@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/utils"
 	"strings"
 )
 
@@ -54,7 +55,17 @@ func (s *GCCMinusMOutputParser) Run(context map[string]interface{}) error {
 		}
 	}
 
-	context[constants.CTX_INCLUDES] = includes
+	if !utils.MapHas(context, constants.CTX_INCLUDES) {
+		context[constants.CTX_INCLUDES] = includes
+		return nil
+	}
+
+	previousIncludes := utils.SliceToMapStringBool(context[constants.CTX_INCLUDES].([]string), true)
+	currentIncludes := utils.SliceToMapStringBool(includes, true)
+
+	mergedIncludes := utils.MergeMapsOfStringBool(previousIncludes, currentIncludes)
+
+	context[constants.CTX_INCLUDES] = utils.KeysOfMapOfStringBool(mergedIncludes)
 
 	return nil
 }

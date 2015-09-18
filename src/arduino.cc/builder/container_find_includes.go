@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
@@ -37,17 +38,20 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
-	commands := []types.Command{
-		&IncludesFinderWithGCC{},
-		&GCCMinusMOutputParser{},
-		&IncludesToIncludeFolders{},
-	}
+	wheelSpins := context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH].(int)
+	for i := 0; i < wheelSpins+1; i++ {
+		commands := []types.Command{
+			&IncludesFinderWithGCC{},
+			&GCCMinusMOutputParser{},
+			&IncludesToIncludeFolders{},
+		}
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
-		if err != nil {
-			return utils.WrapError(err)
+		for _, command := range commands {
+			PrintRingNameIfDebug(context, command)
+			err := command.Run(context)
+			if err != nil {
+				return utils.WrapError(err)
+			}
 		}
 	}
 

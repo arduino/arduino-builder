@@ -75,5 +75,9 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}) erro
 		context[constants.CTX_DEBUG_LEVEL] = DEFAULT_DEBUG_LEVEL
 	}
 
+	if !utils.MapHas(context, constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH) {
+		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = DEFAULT_LIBRARY_DISCOVERY_RECURSION_DEPTH
+	}
+
 	return nil
 }

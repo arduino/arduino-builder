@@ -51,6 +51,7 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
 	require.NotNil(t, context[constants.CTX_VERBOSE])
 	require.NotNil(t, context[constants.CTX_DEBUG_LEVEL])
+	require.NotNil(t, context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH])
 }
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
@@ -69,4 +70,5 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
 	require.NotNil(t, context[constants.CTX_VERBOSE])
 	require.NotNil(t, context[constants.CTX_DEBUG_LEVEL])
+	require.NotNil(t, context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH])
 }

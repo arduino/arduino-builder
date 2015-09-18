@@ -1,1 +1,1 @@
-#warn IRRemote included!
+#warning IRRemote included!

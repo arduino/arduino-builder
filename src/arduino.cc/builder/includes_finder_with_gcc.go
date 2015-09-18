@@ -36,6 +36,7 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
+	"strings"
 )
 
 type IncludesFinderWithGCC struct{}
@@ -47,8 +48,16 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
+	includesParams := ""
+	if utils.MapHas(context, constants.CTX_INCLUDE_FOLDERS) {
+		includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+		includes = utils.Map(includes, utils.WrapWithHyphenI)
+		includesParams = strings.Join(includes, " ")
+	}
+
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp")
+	properties[constants.BUILD_PROPERTIES_INCLUDES] = includesParams
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
 	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_INCLUDES, true, verbose, false, logger)

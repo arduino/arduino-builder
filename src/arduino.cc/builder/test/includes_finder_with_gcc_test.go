@@ -36,6 +36,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 )
 
@@ -61,8 +62,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 
 		&builder.ContainerMergeCopySketchFiles{},
 
-		&builder.IncludesFinderWithGCC{},
-		&builder.GCCMinusMOutputParser{},
+		&builder.ContainerFindIncludes{},
 	}
 
 	for _, command := range commands {
@@ -73,6 +73,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	require.NotNil(t, context[constants.CTX_INCLUDES])
 	includes := context[constants.CTX_INCLUDES].([]string)
 	require.Equal(t, 2, len(includes))
+	sort.Strings(includes)
 	require.Equal(t, filepath.Join(buildPath, constants.FOLDER_SKETCH, "empty_1.h"), includes[0])
 	require.Equal(t, filepath.Join(buildPath, constants.FOLDER_SKETCH, "empty_2.h"), includes[1])
 }
@@ -114,4 +115,57 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	require.Equal(t, filepath.Join(buildPath, constants.FOLDER_SKETCH, "config.h"), includes[0])
 	require.Equal(t, filepath.Join(buildPath, constants.FOLDER_SKETCH, "includes")+"/de bug.h", includes[1])
 	require.Equal(t, "Bridge.h", includes[2])
+}
+
+func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"dependent_libraries"}
+	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_dependend_libraries", "sketch.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_VERBOSE] = false
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.NotNil(t, context[constants.CTX_INCLUDES])
+	includes := context[constants.CTX_INCLUDES].([]string)
+	require.Equal(t, 6, len(includes))
+
+	sort.Strings(includes)
+	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library1", "library1.h")), includes[0])
+	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library2", "library2.h")), includes[1])
+	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library3", "library3.h")), includes[2])
+	require.Equal(t, "library1.h", includes[3])
+	require.Equal(t, "library2.h", includes[4])
+	require.Equal(t, "library3.h", includes[5])
+
+	require.NotNil(t, context[constants.CTX_IMPORTED_LIBRARIES])
+	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	require.Equal(t, 3, len(importedLibraries))
+
+	sort.Sort(ByLibraryName(importedLibraries))
+	require.Equal(t, "library1", importedLibraries[0].Name)
+	require.Equal(t, "library2", importedLibraries[1].Name)
+	require.Equal(t, "library3", importedLibraries[2].Name)
 }

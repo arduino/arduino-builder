@@ -42,6 +42,9 @@ import (
 type IncludesToIncludeFolders struct{}
 
 func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
+	if !utils.MapHas(context, constants.CTX_LIBRARIES) {
+		return nil
+	}
 	includes := context[constants.CTX_INCLUDES].([]string)
 	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
 	debugLevel := utils.DebugLevel(context)
@@ -49,7 +52,11 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 
-	importedLibraries, err := resolveLibraries(includes, headerToLibraries, []*types.Platform{actualPlatform, platform}, debugLevel, logger)
+	var previousImportedLibraries []*types.Library
+	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
+		previousImportedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	}
+	importedLibraries, err := resolveLibraries(includes, headerToLibraries, previousImportedLibraries, []*types.Platform{actualPlatform, platform}, debugLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -77,7 +84,8 @@ func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties m
 	return includeFolders
 }
 
-func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, platforms []*types.Platform, debugLevel int, logger i18n.Logger) ([]*types.Library, error) {
+//FIXME it's also resolving previously resolved libraries
+func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, previousImportedLibraries []*types.Library, platforms []*types.Platform, debugLevel int, logger i18n.Logger) ([]*types.Library, error) {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, header := range includes {
 		libraries := headerToLibraries[header]
@@ -85,9 +93,6 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 			if len(libraries) == 1 {
 				markImportedLibrary[libraries[0]] = true
 			} else {
-				if debugLevel > 0 {
-					logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-				}
 				var library *types.Library
 				for _, platform := range platforms {
 					if platform != nil && library == nil {
@@ -109,7 +114,8 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 				if library == nil {
 					library = libraries[0]
 				}
-				if debugLevel > 0 {
+				if debugLevel > 0 && !sliceContainsLibrary(previousImportedLibraries, library) {
+					logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
 					logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, library.Folder)
 					for _, notUsedLibrary := range libraries {
 						if library != notUsedLibrary {
@@ -231,4 +237,14 @@ func findLibWithNameContaining(name string, libraries []*types.Library) *types.L
 		}
 	}
 	return nil
+}
+
+// thank you golang for s***ing: I can't use/recycle/adapt utils.SliceContains
+func sliceContainsLibrary(slice []*types.Library, target *types.Library) bool {
+	for _, value := range slice {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }

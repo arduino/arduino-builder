@@ -51,7 +51,24 @@ func KeysOfMapOfString(input map[string]string) []string {
 	return keys
 }
 
+func KeysOfMapOfStringBool(input map[string]bool) []string {
+	var keys []string
+	for key, _ := range input {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
 func MergeMapsOfStrings(target map[string]string, sources ...map[string]string) map[string]string {
+	for _, source := range sources {
+		for key, value := range source {
+			target[key] = value
+		}
+	}
+	return target
+}
+
+func MergeMapsOfStringBool(target map[string]bool, sources ...map[string]bool) map[string]bool {
 	for _, source := range sources {
 		for key, value := range source {
 			target[key] = value
