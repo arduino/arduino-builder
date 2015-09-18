@@ -39,7 +39,7 @@ type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 	wheelSpins := context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH].(int)
-	for i := 0; i < wheelSpins+1; i++ {
+	for i := 0; i < wheelSpins; i++ {
 		commands := []types.Command{
 			&IncludesFinderWithGCC{},
 			&GCCMinusMOutputParser{},
