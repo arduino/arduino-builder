@@ -79,6 +79,7 @@ var ideVersionFlag *string
 var buildPathFlag *string
 var verboseFlag *bool
 var debugLevelFlag *int
+var libraryDiscoveryRecursionDepthFlag *int
 var warningsLevelFlag *string
 var loggerFlag *string
 var versionFlag *bool
@@ -97,6 +98,7 @@ func init() {
 	debugLevelFlag = flag.Int("debug-level", builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
 	warningsLevelFlag = flag.String("warnings", "", "Sets warnings level. Available values are 'none', 'default', 'more' and 'all'")
 	loggerFlag = flag.String("logger", "human", "Sets type of logger. Available values are 'human', 'machine'")
+	libraryDiscoveryRecursionDepthFlag = flag.Int("lib-discovery-recursion-depth", builder.DEFAULT_LIBRARY_DISCOVERY_RECURSION_DEPTH, "How deep should library discovery go down looking for included libraries")
 	versionFlag = flag.Bool("version", false, "prints version and exits")
 }
 
@@ -240,6 +242,10 @@ func main() {
 
 	if *debugLevelFlag > -1 {
 		context[constants.CTX_DEBUG_LEVEL] = *debugLevelFlag
+	}
+
+	if *libraryDiscoveryRecursionDepthFlag > 0 {
+		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = *libraryDiscoveryRecursionDepthFlag
 	}
 
 	if *loggerFlag == "machine" {

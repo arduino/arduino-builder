@@ -33,6 +33,8 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-logger`: Optional, can be "human" or "machine". Defaults to "human". If "machine", messages emitted will be in a format which the Arduino IDE understands and that it uses for I18N.
 
+* `-lib-discovery-recursion-depth`: Optional. Defaults to 3. How deep should library discovery go down looking for included libraries.
+
 * `-version`: if specified, prints version and exits.
 
 Final mandatory parameter is the sketch to compile (of course).
