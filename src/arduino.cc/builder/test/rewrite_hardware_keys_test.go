@@ -70,3 +70,39 @@ func TestRewriteHardwareKeys(t *testing.T) {
 
 	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH])
 }
+
+func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
+	context := make(map[string]interface{})
+
+	hardware := make(map[string]*types.Package)
+	aPackage := &types.Package{PackageId: "dummy"}
+	hardware["dummy"] = aPackage
+	aPackage.Platforms = make(map[string]*types.Platform)
+
+	platform := &types.Platform{PlatformId: "dummy"}
+	aPackage.Platforms["dummy"] = platform
+	platform.Properties = make(map[string]string)
+	platform.Properties[constants.PLATFORM_NAME] = "A test platform"
+	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
+	platform.Properties[constants.REWRITING] = constants.REWRITING_DISABLED
+
+	context[constants.CTX_HARDWARE] = hardware
+
+	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
+	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
+
+	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.AddAdditionalEntriesToContext{},
+		&builder.RewriteHardwareKeys{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH])
+}

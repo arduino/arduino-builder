@@ -52,11 +52,13 @@ func (s *RewriteHardwareKeys) Run(context map[string]interface{}) error {
 
 	for _, aPackage := range hardware {
 		for _, platform := range aPackage.Platforms {
-			for _, rewrite := range platformKeysRewrite.Rewrites {
-				if platform.Properties[rewrite.Key] != constants.EMPTY_STRING && platform.Properties[rewrite.Key] == rewrite.OldValue {
-					platform.Properties[rewrite.Key] = rewrite.NewValue
-					if warn {
-						logger.Fprintln(os.Stderr, constants.MSG_WARNING_PLATFORM_OLD_VALUES, platform.Properties[constants.PLATFORM_NAME], rewrite.Key+"="+rewrite.OldValue, rewrite.Key+"="+rewrite.NewValue)
+			if platform.Properties[constants.REWRITING] != constants.REWRITING_DISABLED {
+				for _, rewrite := range platformKeysRewrite.Rewrites {
+					if platform.Properties[rewrite.Key] != constants.EMPTY_STRING && platform.Properties[rewrite.Key] == rewrite.OldValue {
+						platform.Properties[rewrite.Key] = rewrite.NewValue
+						if warn {
+							logger.Fprintln(os.Stderr, constants.MSG_WARNING_PLATFORM_OLD_VALUES, platform.Properties[constants.PLATFORM_NAME], rewrite.Key+"="+rewrite.OldValue, rewrite.Key+"="+rewrite.NewValue)
+						}
 					}
 				}
 			}
