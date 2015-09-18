@@ -153,9 +153,9 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	require.Equal(t, 6, len(includes))
 
 	sort.Strings(includes)
-	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library1", "library1.h")), includes[0])
-	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library2", "library2.h")), includes[1])
-	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library3", "library3.h")), includes[2])
+	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library1"))+"/library1.h", includes[0])
+	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library2"))+"/library2.h", includes[1])
+	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library3"))+"/library3.h", includes[2])
 	require.Equal(t, "library1.h", includes[3])
 	require.Equal(t, "library2.h", includes[4])
 	require.Equal(t, "library3.h", includes[5])
