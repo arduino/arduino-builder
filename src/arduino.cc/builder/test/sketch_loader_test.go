@@ -117,7 +117,7 @@ func TestFailToLoadSketchFromFolder(t *testing.T) {
 
 func TestLoadSketchFromFolder(t *testing.T) {
 	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = "asketch"
+	context[constants.CTX_SKETCH_LOCATION] = "sketch_with_subfolders"
 
 	loggerCommand := builder.SetupHumanLoggerIfMissing{}
 	err := loggerCommand.Run(context)
@@ -130,7 +130,7 @@ func TestLoadSketchFromFolder(t *testing.T) {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	require.NotNil(t, sketch)
 
-	require.True(t, strings.Index(sketch.MainFile.Name, "asketch.ino") != -1)
+	require.True(t, strings.Index(sketch.MainFile.Name, "sketch_with_subfolders.ino") != -1)
 
 	require.Equal(t, 1, len(sketch.AdditionalFiles))
 	require.True(t, strings.Index(sketch.AdditionalFiles[0].Name, "other.cpp") != -1)
