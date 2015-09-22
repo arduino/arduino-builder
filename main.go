@@ -119,7 +119,7 @@ func main() {
 	dumpPrefs := *dumpPrefsFlag
 
 	if compile && dumpPrefs {
-		fmt.Println("You can either specify --compile or --dump-prefs, not both")
+		fmt.Fprintln(os.Stderr, "You can either specify --compile or --dump-prefs, not both")
 		defer os.Exit(1)
 		return
 	}
@@ -138,7 +138,7 @@ func main() {
 	}
 
 	if len(hardware) == 0 {
-		fmt.Println("Parameter 'hardware' is mandatory")
+		fmt.Fprintln(os.Stderr, "Parameter 'hardware' is mandatory")
 		flag.Usage()
 		defer os.Exit(1)
 		return
@@ -153,7 +153,7 @@ func main() {
 	}
 
 	if len(tools) == 0 {
-		fmt.Println("Parameter 'tools' is mandatory")
+		fmt.Fprintln(os.Stderr, "Parameter 'tools' is mandatory")
 		flag.Usage()
 		defer os.Exit(1)
 		return
@@ -184,7 +184,7 @@ func main() {
 	}
 
 	if fqbn == "" {
-		fmt.Println("Parameter 'fqbn' is mandatory")
+		fmt.Fprintln(os.Stderr, "Parameter 'fqbn' is mandatory")
 		flag.Usage()
 		defer os.Exit(1)
 		return
@@ -201,7 +201,7 @@ func main() {
 	if buildPath != "" {
 		_, err := os.Stat(buildPath)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			defer os.Exit(1)
 			return
 		}
@@ -216,7 +216,7 @@ func main() {
 	context[constants.CTX_BUILD_PATH] = buildPath
 
 	if compile && flag.NArg() == 0 {
-		fmt.Println("Last parameter must be the sketch to compile")
+		fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")
 		flag.Usage()
 		defer os.Exit(1)
 		return
@@ -264,10 +264,10 @@ func main() {
 	if err != nil {
 		err = utils.WrapError(err)
 
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 
 		if utils.DebugLevel(context) >= 10 {
-			fmt.Println(err.(*errors.Error).ErrorStack())
+			fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
 		}
 
 		exitCode = toExitCode(err)
@@ -299,5 +299,5 @@ func toSliceOfUnquoted(value slice) ([]string, error) {
 
 func printCompleteError(err error) {
 	err = utils.WrapError(err)
-	fmt.Println(err.(*errors.Error).ErrorStack())
+	fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
 }
