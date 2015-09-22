@@ -35,9 +35,11 @@ import (
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/go-errors/errors"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -45,6 +47,29 @@ import (
 )
 
 const VERSION = "1.0.0-beta9"
+
+const FLAG_COMPILE = "compile"
+const FLAG_DUMP_PREFS = "dump-prefs"
+const FLAG_BUILD_OPTIONS_FILE = "build-options-file"
+const FLAG_HARDWARE = "hardware"
+const FLAG_TOOLS = "tools"
+const FLAG_LIBRARIES = "libraries"
+const FLAG_PREFS = "prefs"
+const FLAG_FQBN = "fqbn"
+const FLAG_IDE_VERSION = "ide-version"
+const FLAG_BUILD_PATH = "build-path"
+const FLAG_VERBOSE = "verbose"
+const FLAG_DEBUG_LEVEL = "debug-level"
+const FLAG_WARNINGS = "warnings"
+const FLAG_WARNINGS_NONE = "none"
+const FLAG_WARNINGS_DEFAULT = "default"
+const FLAG_WARNINGS_MORE = "more"
+const FLAG_WARNINGS_ALL = "all"
+const FLAG_LOGGER = "logger"
+const FLAG_LOGGER_HUMAN = "human"
+const FLAG_LOGGER_MACHINE = "machine"
+const FLAG_LIB_DISCOVERY_RECURSION_PATH = "lib-discovery-recursion-depth"
+const FLAG_VERSION = "version"
 
 type slice []string
 
@@ -70,6 +95,7 @@ func (h *slice) Set(csv string) error {
 
 var compileFlag *bool
 var dumpPrefsFlag *bool
+var buildOptionsFileFlag *string
 var hardwareFoldersFlag slice
 var toolsFoldersFlag slice
 var librariesFoldersFlag slice
@@ -85,21 +111,22 @@ var loggerFlag *string
 var versionFlag *bool
 
 func init() {
-	compileFlag = flag.Bool("compile", false, "compiles the given sketch")
-	dumpPrefsFlag = flag.Bool("dump-prefs", false, "dumps build properties used when compiling")
-	flag.Var(&hardwareFoldersFlag, "hardware", "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
-	flag.Var(&toolsFoldersFlag, "tools", "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
-	flag.Var(&librariesFoldersFlag, "libraries", "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
-	flag.Var(&customBuildPropertiesFlag, "prefs", "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
-	fqbnFlag = flag.String("fqbn", "", "fully qualified board name")
-	ideVersionFlag = flag.String("ide-version", "10600", "fake IDE version")
-	buildPathFlag = flag.String("build-path", "", "build path")
-	verboseFlag = flag.Bool("verbose", false, "if 'true' prints lots of stuff")
-	debugLevelFlag = flag.Int("debug-level", builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
-	warningsLevelFlag = flag.String("warnings", "", "Sets warnings level. Available values are 'none', 'default', 'more' and 'all'")
-	loggerFlag = flag.String("logger", "human", "Sets type of logger. Available values are 'human', 'machine'")
-	libraryDiscoveryRecursionDepthFlag = flag.Int("lib-discovery-recursion-depth", builder.DEFAULT_LIBRARY_DISCOVERY_RECURSION_DEPTH, "How deep should library discovery go down looking for included libraries")
-	versionFlag = flag.Bool("version", false, "prints version and exits")
+	compileFlag = flag.Bool(FLAG_COMPILE, false, "compiles the given sketch")
+	dumpPrefsFlag = flag.Bool(FLAG_DUMP_PREFS, false, "dumps build properties used when compiling")
+	buildOptionsFileFlag = flag.String(FLAG_BUILD_OPTIONS_FILE, "", "Instead of specifying --"+FLAG_HARDWARE+", --"+FLAG_TOOLS+" etc every time, you can load all such options from a file")
+	flag.Var(&hardwareFoldersFlag, FLAG_HARDWARE, "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
+	flag.Var(&toolsFoldersFlag, FLAG_TOOLS, "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
+	flag.Var(&librariesFoldersFlag, FLAG_LIBRARIES, "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
+	flag.Var(&customBuildPropertiesFlag, FLAG_PREFS, "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
+	fqbnFlag = flag.String(FLAG_FQBN, "", "fully qualified board name")
+	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "fake IDE version")
+	buildPathFlag = flag.String(FLAG_BUILD_PATH, "", "build path")
+	verboseFlag = flag.Bool(FLAG_VERBOSE, false, "if 'true' prints lots of stuff")
+	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
+	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
+	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
+	libraryDiscoveryRecursionDepthFlag = flag.Int(FLAG_LIB_DISCOVERY_RECURSION_PATH, builder.DEFAULT_LIBRARY_DISCOVERY_RECURSION_DEPTH, "How deep should library discovery go down looking for included libraries")
+	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
 }
 
 func main() {
@@ -119,7 +146,7 @@ func main() {
 	dumpPrefs := *dumpPrefsFlag
 
 	if compile && dumpPrefs {
-		fmt.Fprintln(os.Stderr, "You can either specify --compile or --dump-prefs, not both")
+		fmt.Fprintln(os.Stderr, "You can either specify --"+FLAG_COMPILE+" or --"+FLAG_DUMP_PREFS+", not both")
 		defer os.Exit(1)
 		return
 	}
@@ -130,51 +157,53 @@ func main() {
 
 	context := make(map[string]interface{})
 
-	hardware, err := toSliceOfUnquoted(hardwareFoldersFlag)
+	buildOptions := make(map[string]string)
+	if *buildOptionsFileFlag != "" {
+		if _, err := os.Stat(*buildOptionsFileFlag); err == nil {
+			data, err := ioutil.ReadFile(*buildOptionsFileFlag)
+			if err != nil {
+				printCompleteError(err)
+				defer os.Exit(1)
+				return
+			}
+			err = json.Unmarshal(data, &buildOptions)
+			if err != nil {
+				printCompleteError(err)
+				defer os.Exit(1)
+				return
+			}
+		}
+	}
+
+	var err error
+	printStackTrace := false
+	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, hardwareFoldersFlag, buildOptions, constants.CTX_HARDWARE_FOLDERS, FLAG_HARDWARE, true)
 	if err != nil {
-		printCompleteError(err)
+		printError(err, printStackTrace)
 		defer os.Exit(1)
 		return
 	}
 
-	if len(hardware) == 0 {
-		fmt.Fprintln(os.Stderr, "Parameter 'hardware' is mandatory")
-		flag.Usage()
-		defer os.Exit(1)
-		return
-	}
-	context[constants.CTX_HARDWARE_FOLDERS] = hardware
-
-	tools, err := toSliceOfUnquoted(toolsFoldersFlag)
+	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, toolsFoldersFlag, buildOptions, constants.CTX_TOOLS_FOLDERS, FLAG_TOOLS, true)
 	if err != nil {
-		printCompleteError(err)
+		printError(err, printStackTrace)
 		defer os.Exit(1)
 		return
 	}
 
-	if len(tools) == 0 {
-		fmt.Fprintln(os.Stderr, "Parameter 'tools' is mandatory")
-		flag.Usage()
-		defer os.Exit(1)
-		return
-	}
-	context[constants.CTX_TOOLS_FOLDERS] = tools
-
-	libraries, err := toSliceOfUnquoted(librariesFoldersFlag)
+	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, librariesFoldersFlag, buildOptions, constants.CTX_LIBRARIES_FOLDERS, FLAG_LIBRARIES, false)
 	if err != nil {
-		printCompleteError(err)
+		printError(err, printStackTrace)
 		defer os.Exit(1)
 		return
 	}
-	context[constants.CTX_LIBRARIES_FOLDERS] = libraries
 
-	customBuildProperties, err := toSliceOfUnquoted(customBuildPropertiesFlag)
+	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, customBuildPropertiesFlag, buildOptions, constants.CTX_CUSTOM_BUILD_PROPERTIES, FLAG_PREFS, false)
 	if err != nil {
-		printCompleteError(err)
+		printError(err, printStackTrace)
 		defer os.Exit(1)
 		return
 	}
-	context[constants.CTX_CUSTOM_BUILD_PROPERTIES] = customBuildProperties
 
 	fqbn, err := gohasissues.Unquote(*fqbnFlag)
 	if err != nil {
@@ -184,8 +213,11 @@ func main() {
 	}
 
 	if fqbn == "" {
-		fmt.Fprintln(os.Stderr, "Parameter 'fqbn' is mandatory")
-		flag.Usage()
+		fqbn = buildOptions[constants.CTX_FQBN]
+	}
+
+	if fqbn == "" {
+		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_FQBN + "' is mandatory"))
 		defer os.Exit(1)
 		return
 	}
@@ -234,7 +266,14 @@ func main() {
 	}
 
 	context[constants.CTX_VERBOSE] = *verboseFlag
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = *ideVersionFlag
+
+	ideVersion := ""
+	if utils.MapStringStringHas(buildOptions, constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION) {
+		ideVersion = buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION]
+	} else {
+		ideVersion = *ideVersionFlag
+	}
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ideVersion
 
 	if *warningsLevelFlag != "" {
 		context[constants.CTX_WARNINGS_LEVEL] = *warningsLevelFlag
@@ -248,7 +287,7 @@ func main() {
 		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = *libraryDiscoveryRecursionDepthFlag
 	}
 
-	if *loggerFlag == "machine" {
+	if *loggerFlag == FLAG_LOGGER_MACHINE {
 		context[constants.CTX_LOGGER] = i18n.MachineLogger{}
 	} else {
 		context[constants.CTX_LOGGER] = i18n.HumanLogger{}
@@ -276,6 +315,25 @@ func main() {
 	defer os.Exit(exitCode)
 }
 
+func setContextSliceKeyOrLoadItFromOptions(context map[string]interface{}, cliFlag slice, buildOptions map[string]string, contextKey string, paramName string, mandatory bool) (error, bool) {
+	values, err := toSliceOfUnquoted(cliFlag)
+	if err != nil {
+		return err, true
+	}
+
+	if len(values) == 0 && len(buildOptions[contextKey]) > 0 {
+		values = strings.Split(buildOptions[contextKey], ",")
+	}
+
+	if mandatory && len(values) == 0 {
+		return errors.New("Parameter '" + paramName + "' is mandatory"), false
+	}
+
+	context[contextKey] = values
+
+	return nil, false
+}
+
 func toExitCode(err error) int {
 	if exiterr, ok := err.(*exec.ExitError); ok {
 		if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
@@ -297,7 +355,20 @@ func toSliceOfUnquoted(value slice) ([]string, error) {
 	return values, nil
 }
 
+func printError(err error, printStackTrace bool) {
+	if printStackTrace {
+		printCompleteError(err)
+	} else {
+		printErrorMessageAndFlagUsage(err)
+	}
+}
+
 func printCompleteError(err error) {
 	err = utils.WrapError(err)
 	fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
+}
+
+func printErrorMessageAndFlagUsage(err error) {
+	fmt.Fprintln(os.Stderr, err)
+	flag.Usage()
 }

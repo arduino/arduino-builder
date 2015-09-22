@@ -37,7 +37,15 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-version`: if specified, prints version and exits.
 
+* `-build-options-file`: it specifies path to a local `build.options.json` file (see paragraph below), which allows you to omit specifying params such as `-hardware`, `-tools`, `-libraries`, `-fqbn`, `-pref` and `-ide-version`.
+
 Final mandatory parameter is the sketch to compile (of course).
+
+### What is and how to use build.options.json file
+
+Every time you run this tool, it will create a `build.options.json` file in build path. It's used to understand if build options (such as hardware folders, fqbn and so on) were changed when compiling the same sketch.
+If they changed, the whole build path is wiped out. If they didn't change, previous compiled files will be reused if the corresponding source files didn't change as well.
+You can save this file locally and use it instead of specifying `-hardware`, `-tools`, `-libraries`, `-fqbn`, `-pref` and `-ide-version`.
     
 ### Using it for continuously verify your libraries or cores
 
