@@ -78,3 +78,11 @@ In jenkins, use
 ```
 go test -v ./src/arduino.cc/builder/test/... | bin/go-junit-report > report.xml
 ```
+
+### License and Copyright
+
+`arduino-builder` is licensed under General Public License version 2, as published bythe Free Software Foundation. See [LICENSE.txt](LICENSE.txt).
+
+Copyright (C) 2015 Arduino LLC and contributors
+
+See https://www.arduino.cc/ and https://github.com/arduino/arduino-builder/graphs/contributors
