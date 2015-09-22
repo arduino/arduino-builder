@@ -46,7 +46,7 @@ import (
 	"syscall"
 )
 
-const VERSION = "1.0.0-beta9"
+const VERSION = "1.0.0-beta10"
 
 const FLAG_COMPILE = "compile"
 const FLAG_DUMP_PREFS = "dump-prefs"
