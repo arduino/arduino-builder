@@ -51,7 +51,7 @@ func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
 		} else if kindOfValue == reflect.String {
 			value = originalValue.(string)
 		} else {
-			return utils.Errorf(context, constants.MSG_UNHANDlED_TYPE_IN_CONTEXT, kindOfValue.String(), key)
+			return utils.Errorf(context, constants.MSG_UNHANDLED_TYPE_IN_CONTEXT, kindOfValue.String(), key)
 		}
 
 		buildOptions[key] = value
