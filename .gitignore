@@ -1,7 +1,7 @@
 bin
 src/github.com
 src/golang.org
-go-arduino-compiler
+arduino-builder
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Go template
