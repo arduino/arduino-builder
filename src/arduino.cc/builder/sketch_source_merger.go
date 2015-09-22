@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"path/filepath"
 )
 
 type SketchSourceMerger struct{}
@@ -52,7 +51,7 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}) error {
 }
 
 func addPreprocLine(sketch *types.SketchFile) string {
-	source := "#line 1 \"" + filepath.Base(sketch.Name) + "\"\n"
+	source := "#line 1 \"" + sketch.Name + "\"\n"
 	source += sketch.Source
 	source += "\n"
 
