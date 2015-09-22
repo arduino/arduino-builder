@@ -35,6 +35,7 @@ import (
 	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type SetupBuildProperties struct{}
@@ -104,6 +105,12 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 		}
 		buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH] = sourcePath
 	}
+
+	now := time.Now()
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_UTC] = string(now.Unix())
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL] = string(utils.LocalUnix(now))
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = string(utils.TimezoneOffset())
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = string(utils.DaylightSavingsOffset(now))
 
 	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
 

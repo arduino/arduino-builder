@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
@@ -99,6 +100,11 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"])
 
 	require.Equal(t, Abs(t, filepath.Join("sketch1", "sketch.ino")), buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH])
+
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_UTC))
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL))
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE))
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_DST))
 }
 
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
