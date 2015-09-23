@@ -170,6 +170,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 	for _, objectFile := range objectFiles {
 		properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
 		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = filepath.Base(archiveFilePath)
+		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath
 		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile
 
 		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, verbose, verbose, logger)

@@ -93,6 +93,13 @@ func compileLibrary(objectFiles []string, library *types.Library, buildPath stri
 		if err != nil {
 			return nil, utils.WrapError(err)
 		}
+		if library.DotALinkage {
+			archiveFile, err := builder_utils.ArchiveCompiledFiles(libraryBuildPath, library.Name+".a", objectFiles, buildProperties, verbose, logger)
+			if err != nil {
+				return nil, utils.WrapError(err)
+			}
+			objectFiles = []string{archiveFile}
+		}
 	} else {
 		utilitySourcePath := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
 		_, utilitySourcePathErr := os.Stat(utilitySourcePath)
