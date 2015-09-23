@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #line 1
-#line 1 "sketch_with_config.ino"
+#line 1 "{{.sketch.MainFile.Name}}"
 #include "config.h"
 
 #ifdef DEBUG
