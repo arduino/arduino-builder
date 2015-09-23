@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -108,10 +109,10 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 	}
 
 	now := time.Now()
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_UTC] = string(now.Unix())
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL] = string(utils.LocalUnix(now))
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = string(utils.TimezoneOffset())
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = string(utils.DaylightSavingsOffset(now))
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_UTC] = strconv.FormatInt(now.Unix(), 10)
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL] = strconv.FormatInt(utils.LocalUnix(now), 10)
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = strconv.Itoa(utils.TimezoneOffset())
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = strconv.Itoa(utils.DaylightSavingsOffset(now))
 
 	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
 
