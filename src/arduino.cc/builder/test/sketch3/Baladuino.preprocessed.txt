@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #line 1
-#line 1 "Baladuino.ino"
+#line 1 "{{.sketch.MainFile.Name}}"
 /*
  * The code is released under the GNU General Public License.
  * Developed by Kristian Lauszus, TKJ Electronics 2013
