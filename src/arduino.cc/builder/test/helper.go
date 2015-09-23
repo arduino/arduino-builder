@@ -38,20 +38,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
-	"text/template"
-	"bytes"
 )
-
-func LoadAndInterpolate(t *testing.T, filename string, context map[string]interface{}) string {
-	tpl, err := template.ParseFiles(filename)
-	NoError(t, err)
-
-	var buf bytes.Buffer
-	err = tpl.Execute(&buf, context)
-	NoError(t, err)
-
-	return buf.String()
-}
 
 func Abs(t *testing.T, rel string) string {
 	toolPath, err := filepath.Abs(rel)

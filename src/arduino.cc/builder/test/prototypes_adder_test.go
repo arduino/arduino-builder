@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -116,7 +117,11 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch2", "SketchWithIfDef.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -156,7 +161,11 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch3", "Baladuino.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch3", "Baladuino.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -196,7 +205,11 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch4", "CharWithEscapedDoubleQuote.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch4", "CharWithEscapedDoubleQuote.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -236,7 +249,11 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch5", "IncludeBetweenMultilineComment.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch5", "IncludeBetweenMultilineComment.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -276,7 +293,11 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch6", "LineContinuations.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch6", "LineContinuations.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -316,7 +337,11 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch7", "StringWithComment.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch7", "StringWithComment.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -356,7 +381,11 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch8", "SketchWithStruct.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch8", "SketchWithStruct.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 
@@ -399,7 +428,11 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
 	require.Equal(t, "void setup();\nvoid loop();\n#line 13\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), context)
+	bytes, err := ioutil.ReadFile(filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"))
+	NoError(t, err)
+
+	preprocessed := string(bytes)
+
 	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }
 

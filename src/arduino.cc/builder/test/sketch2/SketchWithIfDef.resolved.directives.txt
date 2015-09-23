@@ -1,4 +1,4 @@
-#line 1 "{{.sketch.MainFile.Name}}"
+#line 1 "SketchWithIfDef.ino"
 #define DEBUG 1
 #define DISABLED 0
 

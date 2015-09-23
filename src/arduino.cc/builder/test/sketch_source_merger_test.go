@@ -34,11 +34,11 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"testing"
 )
-
 
 func TestMergeSketch(t *testing.T) {
 	context := make(map[string]interface{})
@@ -57,6 +57,9 @@ func TestMergeSketch(t *testing.T) {
 
 	source := context[constants.CTX_SOURCE].(string)
 
-	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), context)
+	bytes, err1 := ioutil.ReadFile(filepath.Join("sketch1", "merged_sketch.txt"))
+	NoError(t, err1)
+
+	expected_source := string(bytes)
 	require.Equal(t, expected_source, strings.Replace(source, "\r\n", "\n", -1))
 }
