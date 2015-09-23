@@ -32,7 +32,6 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -147,43 +146,4 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	require.Equal(t, "fake name", buildProperties["name"])
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "non existent path with space and a =", buildProperties["tools.avrdude.config.path"])
-}
-
-func TestSetupBuildPropertiesWithMissingCompilerPath(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	context := make(map[string]interface{})
-
-	buildPath := SetupBuildPath(t, context)
-	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-	context[constants.CTX_CUSTOM_BUILD_PROPERTIES] = []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
-
-	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
-		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.ToolsLoader{},
-		&builder.TargetBoardResolver{},
-		&builder.SketchLoader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(context)
-		NoError(t, err)
-	}
-
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	delete(targetPlatform.Properties, constants.BUILD_PROPERTIES_COMPILER_PATH)
-
-	command := builder.SetupBuildProperties{}
-	err := command.Run(context)
-	require.Error(t, err)
-
-	require.Equal(t, i18n.Format(constants.MSG_MISSING_COMPILER_PATH, "arduino", "avr"), err.Error())
 }

@@ -202,7 +202,6 @@ const MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS = "Library can't use both 'src
 const MSG_LIBRARY_INCOMPATIBLE_ARCH = "WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."
 const MSG_LOOKING_FOR_RECIPES = "Looking for recipes like {0}*{1}"
 const MSG_MISSING_BUILD_BOARD = "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: {3}"
-const MSG_MISSING_COMPILER_PATH = "Third-party platform.txt (package '{0}' platform '{1}') does not define compiler.path. Please report this to the third-party hardware maintainer."
 const MSG_MISSING_CORE_FOR_BOARD = "Selected board depends on '{0}' core (not installed)."
 const MSG_MUST_BE_A_FOLDER = "{0} must be a folder"
 const MSG_PACKAGE_UNKNOWN = "{0}: Unknown package"

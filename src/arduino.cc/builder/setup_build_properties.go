@@ -61,11 +61,6 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 	}
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.PlatformId)
 
-	if buildProperties[constants.BUILD_PROPERTIES_COMPILER_PATH] == constants.EMPTY_STRING {
-		targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
-		return utils.Errorf(context, constants.MSG_MISSING_COMPILER_PATH, targetPackage.PackageId, actualPlatform.PlatformId)
-	}
-
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = context[constants.CTX_BUILD_CORE].(string)
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
