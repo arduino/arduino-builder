@@ -1,0 +1,15 @@
+--- downloaded_hardware/arduino/avr/platform.txt	2015-09-10 17:14:15.137942087 +0200
++++ downloaded_hardware/arduino/avr/platform.txt	2015-09-23 10:27:19.522085331 +0200
+@@ -77,6 +77,12 @@
+ recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
+ recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
+ 
++## Preprocessor
++preproc.includes.flags=-w -x c++ -M -MG -MP
++recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.includes.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
++
++preproc.macros.flags=-w -x c++ -E -CC
++recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
+ 
+ # AVR Uploader/Programmers tools
+ # ------------------------------

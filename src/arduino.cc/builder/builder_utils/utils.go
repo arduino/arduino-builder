@@ -158,6 +158,29 @@ func objFileIsUpToDateWithSourceFile(sourceFileStat, objectFileStat os.FileInfo)
 	return objectFileStat != nil && sourceFileStat.ModTime().Before(objectFileStat.ModTime())
 }
 
+func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties map[string]string, verbose bool, logger i18n.Logger) (string, error) {
+	archiveFilePath := filepath.Join(buildPath, archiveFile)
+	if _, err := os.Stat(archiveFilePath); err == nil {
+		err = os.Remove(archiveFilePath)
+		if err != nil {
+			return "", utils.WrapError(err)
+		}
+	}
+
+	for _, objectFile := range objectFiles {
+		properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = filepath.Base(archiveFilePath)
+		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile
+
+		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, verbose, verbose, logger)
+		if err != nil {
+			return "", utils.WrapError(err)
+		}
+	}
+
+	return archiveFilePath, nil
+}
+
 func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
 	pattern := properties[recipe]
 	if pattern == constants.EMPTY_STRING {

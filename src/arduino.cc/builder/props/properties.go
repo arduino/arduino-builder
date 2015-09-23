@@ -91,7 +91,7 @@ func loadSingleLine(properties map[string]string, line string) {
 		key := strings.TrimSpace(lineParts[0])
 		value := strings.TrimSpace(lineParts[1])
 
-		key = strings.Replace(key, "."+OSNAME, "", 1)
+		key = strings.Replace(key, "."+OSNAME, constants.EMPTY_STRING, 1)
 		properties[key] = value
 	}
 }

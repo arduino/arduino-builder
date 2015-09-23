@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
+	"path/filepath"
 	"strings"
 )
 
@@ -42,19 +43,19 @@ type Linker struct{}
 func (s *Linker) Run(context map[string]interface{}) error {
 	objectFilesSketch := context[constants.CTX_OBJECT_FILES_SKETCH].([]string)
 	objectFilesLibraries := context[constants.CTX_OBJECT_FILES_LIBRARIES].([]string)
-	objectFilesCore := context[constants.CTX_OBJECT_FILES_CORE].([]string)
 
 	var objectFiles []string
 	objectFiles = append(objectFiles, objectFilesSketch...)
 	objectFiles = append(objectFiles, objectFilesLibraries...)
-	objectFiles = append(objectFiles, objectFilesCore...)
+
+	coreArchiveFilePath := context[constants.CTX_ARCHIVE_FILE_PATH_CORE].(string)
 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
-	err := link(objectFiles, buildProperties, verbose, warningsLevel, logger)
+	err := link(objectFiles, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -62,25 +63,30 @@ func (s *Linker) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func link(objectFiles []string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) error {
-	optRelax := constants.EMPTY_STRING
-	if buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU] == "atmega2560" {
-		optRelax = ",--relax"
-	}
+func link(objectFiles []string, coreArchiveFilePath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) error {
+	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	objectFiles = utils.Map(objectFiles, wrapWithDoubleQuotes)
 	objectFileList := strings.Join(objectFiles, constants.SPACE)
 
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
-	properties["compiler.c.elf.flags"] = properties["compiler.c.elf.flags"] + optRelax
-	properties["compiler.warning_flags"] = properties["compiler.warning_flags."+warningsLevel]
-	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = "core.a"
+	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = filepath.Base(coreArchiveFilePath)
+	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILES] = objectFileList
 
-	_, err := builder_utils.ExecRecipe(properties, "recipe.c.combine.pattern", false, verbose, verbose, logger)
+	_, err := builder_utils.ExecRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, verbose, verbose, logger)
 	return err
 }
 
 func wrapWithDoubleQuotes(value string) string {
 	return "\"" + value + "\""
+}
+
+func addRelaxTrickIfATMEGA2560(buildProperties map[string]string) string {
+	if buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU] == "atmega2560" {
+		return ",--relax"
+	}
+	return constants.EMPTY_STRING
 }

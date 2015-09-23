@@ -97,20 +97,21 @@ const (
 )
 
 type Library struct {
-	Folder     string
-	SrcFolder  string
-	Layout     LibraryLayout
-	Name       string
-	Archs      []string
-	IsLegacy   bool
-	Version    string
-	Author     string
-	Maintainer string
-	Sentence   string
-	Paragraph  string
-	URL        string
-	Category   string
-	License    string
+	Folder      string
+	SrcFolder   string
+	Layout      LibraryLayout
+	Name        string
+	Archs       []string
+	DotALinkage bool
+	IsLegacy    bool
+	Version     string
+	Author      string
+	Maintainer  string
+	Sentence    string
+	Paragraph   string
+	URL         string
+	Category    string
+	License     string
 }
 
 func (library *Library) SupportsArchitectures(archs []string) bool {

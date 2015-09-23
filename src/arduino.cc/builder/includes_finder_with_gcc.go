@@ -48,7 +48,7 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
-	includesParams := ""
+	includesParams := constants.EMPTY_STRING
 	if utils.MapHas(context, constants.CTX_INCLUDE_FOLDERS) {
 		includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 		includes = utils.Map(includes, utils.WrapWithHyphenI)

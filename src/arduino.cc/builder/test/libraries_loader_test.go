@@ -66,21 +66,27 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	sort.Sort(ByLibraryName(libraries))
 
-	require.Equal(t, "ANewLibrary-master", libraries[0].Name)
+	idx := 0
 
-	require.Equal(t, "Adafruit_PN532", libraries[1].Name)
-	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libraries[1].Folder)
-	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libraries[1].SrcFolder)
-	require.Equal(t, 1, len(libraries[1].Archs))
-	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libraries[1].Archs[0])
-	require.False(t, libraries[1].IsLegacy)
+	require.Equal(t, "ANewLibrary-master", libraries[idx].Name)
 
-	require.Equal(t, "Audio", libraries[2].Name)
+	idx++
+	require.Equal(t, "Adafruit_PN532", libraries[idx].Name)
+	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libraries[idx].Folder)
+	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libraries[idx].SrcFolder)
+	require.Equal(t, 1, len(libraries[idx].Archs))
+	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libraries[idx].Archs[0])
+	require.False(t, libraries[idx].IsLegacy)
 
-	require.Equal(t, "Balanduino", libraries[3].Name)
-	require.True(t, libraries[3].IsLegacy)
+	idx++
+	require.Equal(t, "Audio", libraries[idx].Name)
 
-	bridgeLib := libraries[4]
+	idx++
+	require.Equal(t, "Balanduino", libraries[idx].Name)
+	require.True(t, libraries[idx].IsLegacy)
+
+	idx++
+	bridgeLib := libraries[idx]
 	require.Equal(t, "Bridge", bridgeLib.Name)
 	require.Equal(t, Abs(t, "downloaded_libraries/Bridge"), bridgeLib.Folder)
 	require.Equal(t, Abs(t, "downloaded_libraries/Bridge/src"), bridgeLib.SrcFolder)
@@ -89,15 +95,24 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, "Arduino", bridgeLib.Author)
 	require.Equal(t, "Arduino <info@arduino.cc>", bridgeLib.Maintainer)
 
-	require.Equal(t, "CapacitiveSensor", libraries[5].Name)
-	require.Equal(t, "EEPROM", libraries[6].Name)
-	require.Equal(t, "FakeAudio", libraries[7].Name)
-	require.Equal(t, "IRremote", libraries[8].Name)
-	require.Equal(t, "Robot_IR_Remote", libraries[9].Name)
-	require.Equal(t, "SPI", libraries[10].Name)
-	require.Equal(t, "SPI", libraries[11].Name)
-	require.Equal(t, "SoftwareSerial", libraries[12].Name)
-	require.Equal(t, "Wire", libraries[13].Name)
+	idx++
+	require.Equal(t, "CapacitiveSensor", libraries[idx].Name)
+	idx++
+	require.Equal(t, "EEPROM", libraries[idx].Name)
+	idx++
+	require.Equal(t, "FakeAudio", libraries[idx].Name)
+	idx++
+	require.Equal(t, "IRremote", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Robot_IR_Remote", libraries[idx].Name)
+	idx++
+	require.Equal(t, "SPI", libraries[idx].Name)
+	idx++
+	require.Equal(t, "SPI", libraries[idx].Name)
+	idx++
+	require.Equal(t, "SoftwareSerial", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Wire", libraries[idx].Name)
 
 	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
 	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
@@ -144,18 +159,30 @@ func TestLoadLibrariesSAM(t *testing.T) {
 
 	sort.Sort(ByLibraryName(libraries))
 
-	require.Equal(t, "ANewLibrary-master", libraries[0].Name)
-	require.Equal(t, "Adafruit_PN532", libraries[1].Name)
-	require.Equal(t, "Audio", libraries[2].Name)
-	require.Equal(t, "Balanduino", libraries[3].Name)
-	require.Equal(t, "Bridge", libraries[4].Name)
-	require.Equal(t, "CapacitiveSensor", libraries[5].Name)
-	require.Equal(t, "FakeAudio", libraries[6].Name)
-	require.Equal(t, "IRremote", libraries[7].Name)
-	require.Equal(t, "Robot_IR_Remote", libraries[8].Name)
-	require.Equal(t, "SPI", libraries[9].Name)
-	require.Equal(t, "SPI", libraries[10].Name)
-	require.Equal(t, "Wire", libraries[11].Name)
+	idx := 0
+	require.Equal(t, "ANewLibrary-master", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Adafruit_PN532", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Audio", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Balanduino", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Bridge", libraries[idx].Name)
+	idx++
+	require.Equal(t, "CapacitiveSensor", libraries[idx].Name)
+	idx++
+	require.Equal(t, "FakeAudio", libraries[idx].Name)
+	idx++
+	require.Equal(t, "IRremote", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Robot_IR_Remote", libraries[idx].Name)
+	idx++
+	require.Equal(t, "SPI", libraries[idx].Name)
+	idx++
+	require.Equal(t, "SPI", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Wire", libraries[idx].Name)
 
 	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
 

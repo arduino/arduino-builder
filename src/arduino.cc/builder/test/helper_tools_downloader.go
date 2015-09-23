@@ -51,6 +51,7 @@ const HARDWARE_FOLDER = "downloaded_hardware"
 const BOARD_MANAGER_FOLDER = "downloaded_board_manager_stuff"
 const TOOLS_FOLDER = "downloaded_tools"
 const LIBRARIES_FOLDER = "downloaded_libraries"
+const PATCHES_FOLDER = "downloaded_stuff_patches"
 
 type Tool struct {
 	Name    string
@@ -67,6 +68,7 @@ type OsUrl struct {
 type Library struct {
 	Name    string
 	Version string
+	Url     string
 }
 
 type Core struct {
@@ -125,8 +127,30 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 		Library{Name: "Bridge", Version: "1.0.7"},
 		Library{Name: "CapacitiveSensor", Version: "0.5.0"},
 		Library{Name: "Robot IR Remote", Version: "1.0.2"},
+		//Library{Name: "HID", Version: "0.0.0", Url: "https://github.com/NicoHood/HID/archive/dev_2_4.zip"},
 	}
 
+	download(t, cores, boardsManagerCores, boardsManagerRedBearCores, tools, boardsManagerTools, boardsManagerRFduinoTools, libraries)
+
+	patch(t)
+}
+
+// FIXME: once patched cores are released, patching them will be unnecessary
+func patch(t *testing.T) {
+	files, err := ioutil.ReadDir(PATCHES_FOLDER)
+	NoError(t, err)
+
+	for _, file := range files {
+		if filepath.Ext(file.Name()) == ".patch" {
+			cmd := exec.Command("patch", "-N", "-p0", "-r", "-", "-i", filepath.Join(PATCHES_FOLDER, file.Name()))
+			cmd.CombinedOutput()
+			//output, _ := cmd.CombinedOutput()
+			//fmt.Println(string(output))
+		}
+	}
+}
+
+func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores []Core, tools, boardsManagerTools, boardsManagerRFduinoTools []Tool, libraries []Library) {
 	if allCoresAlreadyDownloadedAndUnpacked(HARDWARE_FOLDER, cores) &&
 		allBoardsManagerCoresAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerCores) &&
 		allBoardsManagerCoresAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerRedBearCores) &&
@@ -626,6 +650,9 @@ func downloadLibraries(libraries []Library, index map[string]interface{}) error 
 }
 
 func findLibraryUrl(index map[string]interface{}, library Library) (string, error) {
+	if library.Url != "" {
+		return library.Url, nil
+	}
 	libs := index["libraries"].([]interface{})
 	for _, l := range libs {
 		lib := l.(map[string]interface{})
