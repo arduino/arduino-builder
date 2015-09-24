@@ -82,7 +82,7 @@ func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string
 	if err != nil {
 		return nil, utils.WrapError(err)
 	}
-	return compileWithRecipe(objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+	return compileFilesWithRecipe(objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 }
 
 func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]string, error) {
@@ -113,45 +113,54 @@ func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]str
 	return sources, nil
 }
 
-func compileWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties map[string]string, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties map[string]string, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	for _, source := range sources {
-		properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
-		properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
-		properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
-		properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source
-		relativeSource, err := filepath.Rel(sourcePath, source)
-		if err != nil {
-			return nil, utils.WrapError(err)
-		}
-		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = filepath.Join(buildPath, relativeSource+".o")
-
-		err = os.MkdirAll(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]), os.FileMode(0755))
+		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, utils.WrapError(err)
 		}
 
-		sourceFileStat, err := os.Stat(properties[constants.BUILD_PROPERTIES_SOURCE_FILE])
-		if err != nil {
-			return nil, utils.WrapError(err)
-		}
-
-		objectFileStat, err := os.Stat(properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
-		if err != nil && !os.IsNotExist(err) {
-			return nil, utils.WrapError(err)
-		}
-
-		if !objFileIsUpToDateWithSourceFile(sourceFileStat, objectFileStat) {
-			_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
-			if err != nil {
-				return nil, utils.WrapError(err)
-			}
-		} else if verbose {
-			logger.Println(constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
-		}
-
-		objectFiles = append(objectFiles, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+		objectFiles = append(objectFiles, objectFile)
 	}
 	return objectFiles, nil
+}
+
+func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties map[string]string, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
+	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
+	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source
+	relativeSource, err := filepath.Rel(sourcePath, source)
+	if err != nil {
+		return "", utils.WrapError(err)
+	}
+	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = filepath.Join(buildPath, relativeSource+".o")
+
+	err = os.MkdirAll(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]), os.FileMode(0755))
+	if err != nil {
+		return "", utils.WrapError(err)
+	}
+
+	sourceFileStat, err := os.Stat(properties[constants.BUILD_PROPERTIES_SOURCE_FILE])
+	if err != nil {
+		return "", utils.WrapError(err)
+	}
+
+	objectFileStat, err := os.Stat(properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+	if err != nil && !os.IsNotExist(err) {
+		return "", utils.WrapError(err)
+	}
+
+	if !objFileIsUpToDateWithSourceFile(sourceFileStat, objectFileStat) {
+		_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
+		if err != nil {
+			return "", utils.WrapError(err)
+		}
+	} else if verbose {
+		logger.Println(constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+	}
+
+	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
 }
 
 func objFileIsUpToDateWithSourceFile(sourceFileStat, objectFileStat os.FileInfo) bool {
