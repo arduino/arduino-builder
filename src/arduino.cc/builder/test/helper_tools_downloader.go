@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"encoding/json"
 	"fmt"
@@ -80,7 +81,7 @@ type Core struct {
 
 func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	cores := []Core{
-		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.7"},
+		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.8"},
 		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.4"},
 	}
 
@@ -151,7 +152,9 @@ func patch(t *testing.T) {
 }
 
 func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores []Core, tools, boardsManagerTools, boardsManagerRFduinoTools []Tool, libraries []Library) {
-	if allCoresAlreadyDownloadedAndUnpacked(HARDWARE_FOLDER, cores) &&
+	allCoresDownloaded, err := allCoresAlreadyDownloadedAndUnpacked(HARDWARE_FOLDER, cores)
+	NoError(t, err)
+	if allCoresDownloaded &&
 		allBoardsManagerCoresAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerCores) &&
 		allBoardsManagerCoresAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerRedBearCores) &&
 		allBoardsManagerToolsAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerTools) &&
@@ -310,18 +313,37 @@ func boardManagerCoreAlreadyDownloadedAndUnpacked(targetPath string, core Core) 
 	return !os.IsNotExist(err)
 }
 
-func allCoresAlreadyDownloadedAndUnpacked(targetPath string, cores []Core) bool {
+func allCoresAlreadyDownloadedAndUnpacked(targetPath string, cores []Core) (bool, error) {
 	for _, core := range cores {
-		if !coreAlreadyDownloadedAndUnpacked(targetPath, core) {
-			return false
+		alreadyDownloaded, err := coreAlreadyDownloadedAndUnpacked(targetPath, core)
+		if err != nil {
+			return false, utils.WrapError(err)
+		}
+		if !alreadyDownloaded {
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
-func coreAlreadyDownloadedAndUnpacked(targetPath string, core Core) bool {
-	_, err := os.Stat(filepath.Join(targetPath, core.Maintainer, core.Arch))
-	return !os.IsNotExist(err)
+func coreAlreadyDownloadedAndUnpacked(targetPath string, core Core) (bool, error) {
+	corePath := filepath.Join(targetPath, core.Maintainer, core.Arch)
+
+	_, err := os.Stat(corePath)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	platform, err := props.Load(filepath.Join(corePath, "platform.txt"))
+	if err != nil {
+		return false, utils.WrapError(err)
+	}
+
+	if core.Version != platform["version"] {
+		err := os.RemoveAll(corePath)
+		return false, utils.WrapError(err)
+	}
+
+	return true, nil
 }
 
 func allBoardsManagerToolsAlreadyDownloadedAndUnpacked(targetPath string, tools []Tool) bool {
@@ -367,11 +389,15 @@ func libraryAlreadyDownloadedAndUnpacked(targetPath string, library Library) boo
 }
 
 func downloadAndUnpackCore(core Core, url string, targetPath string) error {
-	if coreAlreadyDownloadedAndUnpacked(targetPath, core) {
+	alreadyDownloaded, err := coreAlreadyDownloadedAndUnpacked(targetPath, core)
+	if err != nil {
+		return utils.WrapError(err)
+	}
+	if alreadyDownloaded {
 		return nil
 	}
 
-	targetPath, err := filepath.Abs(targetPath)
+	targetPath, err = filepath.Abs(targetPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}

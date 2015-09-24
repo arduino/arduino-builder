@@ -75,7 +75,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
 
 	require.Equal(t, "uno", buildProperties[constants.ID])
-	require.Equal(t, "Arduino Uno", buildProperties["name"])
+	require.Equal(t, "Arduino/Genuino Uno", buildProperties["name"])
 	require.Equal(t, "0x2341", buildProperties["vid.0"])
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
