@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -68,10 +67,7 @@ func TestCoanRunner(t *testing.T) {
 		NoError(t, err)
 	}
 
-	bytes, err1 := ioutil.ReadFile(filepath.Join("sketch2", "SketchWithIfDef.resolved.directives.txt"))
-	NoError(t, err1)
-	expectedSource := string(bytes)
-
+	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.resolved.directives.txt"), context)
 	require.Equal(t, expectedSource, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 
 }

@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #line 1
-#line 1 "CharWithEscapedDoubleQuote.ino"
+#line 1 "{{.sketch.MainFile.Name}}"
 #include <SoftwareSerial.h> // required to send and receive AT commands from the GPRS Shield
 #include <Wire.h> // required for I2C communication with the RTC
 

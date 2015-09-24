@@ -1,4 +1,4 @@
-#line 1 "sketch.ino"
+#line 1 "{{.sketch.MainFile.Name}}"
 void setup() {
 
 }
@@ -6,9 +6,9 @@ void setup() {
 void loop() {
 
 }
-#line 1 "old.pde"
+#line 1 "{{(index .sketch.OtherSketchFiles 0).Name}}"
 
-#line 1 "other.ino"
+#line 1 "{{(index .sketch.OtherSketchFiles 1).Name}}"
 String hello() {
   return "world";
 }
