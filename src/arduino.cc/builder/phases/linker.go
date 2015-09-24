@@ -60,7 +60,7 @@ func (s *Linker) Run(context map[string]interface{}) error {
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
-	err = link(objectFiles, coreDotARelPath, buildProperties, verbose, warningsLevel, logger)
+	err = link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -68,7 +68,7 @@ func (s *Linker) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func link(objectFiles []string, coreArchiveFilePath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	objectFiles = utils.Map(objectFiles, wrapWithDoubleQuotes)
@@ -77,7 +77,8 @@ func link(objectFiles []string, coreArchiveFilePath string, buildProperties map[
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
 	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
 	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
-	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreArchiveFilePath
+	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath
+	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILES] = objectFileList
 
 	_, err := builder_utils.ExecRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, verbose, verbose, logger)

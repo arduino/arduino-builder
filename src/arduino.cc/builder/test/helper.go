@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
+	"bytes"
 	"fmt"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +40,6 @@ import (
 	"path/filepath"
 	"testing"
 	"text/template"
-	"bytes"
 )
 
 func LoadAndInterpolate(t *testing.T, filename string, context map[string]interface{}) string {

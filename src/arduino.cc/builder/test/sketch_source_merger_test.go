@@ -39,7 +39,6 @@ import (
 	"testing"
 )
 
-
 func TestMergeSketch(t *testing.T) {
 	context := make(map[string]interface{})
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
