@@ -38,12 +38,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"testing"
 	"text/template"
 )
 
 func LoadAndInterpolate(t *testing.T, filename string, context map[string]interface{}) string {
-	tpl, err := template.ParseFiles(filename)
+	funcsMap := template.FuncMap{
+		"EscapeBackSlashes": func(s string) string {
+			return strings.Replace(s, "\\", "\\\\", -1)
+		},
+	}
+
+	tpl, err := template.New(filepath.Base(filename)).Funcs(funcsMap).ParseFiles(filename)
 	NoError(t, err)
 
 	var buf bytes.Buffer
