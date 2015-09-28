@@ -60,9 +60,15 @@ type Sketch struct {
 	AdditionalFiles  []SketchFile
 }
 
+type Packages struct {
+	Properties map[string]string
+	Packages   map[string]*Package
+}
+
 type Package struct {
-	PackageId string
-	Platforms map[string]*Platform
+	PackageId  string
+	Properties map[string]string
+	Platforms  map[string]*Platform
 }
 
 type Platform struct {

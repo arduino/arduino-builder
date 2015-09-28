@@ -44,13 +44,13 @@ func (s *RewriteHardwareKeys) Run(context map[string]interface{}) error {
 		return nil
 	}
 
-	hardware := context[constants.CTX_HARDWARE].(map[string]*types.Package)
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 	platformKeysRewrite := context[constants.CTX_PLATFORM_KEYS_REWRITE].(types.PlatforKeysRewrite)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
 	warn := utils.DebugLevel(context) > 0
 
-	for _, aPackage := range hardware {
+	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {
 			if platform.Properties[constants.REWRITING] != constants.REWRITING_DISABLED {
 				for _, rewrite := range platformKeysRewrite.Rewrites {

@@ -40,9 +40,10 @@ import (
 func TestRewriteHardwareKeys(t *testing.T) {
 	context := make(map[string]interface{})
 
-	hardware := make(map[string]*types.Package)
+	packages := &types.Packages{}
+	packages.Packages = make(map[string]*types.Package)
 	aPackage := &types.Package{PackageId: "dummy"}
-	hardware["dummy"] = aPackage
+	packages.Packages["dummy"] = aPackage
 	aPackage.Platforms = make(map[string]*types.Platform)
 
 	platform := &types.Platform{PlatformId: "dummy"}
@@ -51,7 +52,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	platform.Properties[constants.PLATFORM_NAME] = "A test platform"
 	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
 
-	context[constants.CTX_HARDWARE] = hardware
+	context[constants.CTX_HARDWARE] = packages
 
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
@@ -74,9 +75,10 @@ func TestRewriteHardwareKeys(t *testing.T) {
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	context := make(map[string]interface{})
 
-	hardware := make(map[string]*types.Package)
+	packages := &types.Packages{}
+	packages.Packages = make(map[string]*types.Package)
 	aPackage := &types.Package{PackageId: "dummy"}
-	hardware["dummy"] = aPackage
+	packages.Packages["dummy"] = aPackage
 	aPackage.Platforms = make(map[string]*types.Platform)
 
 	platform := &types.Platform{PlatformId: "dummy"}
@@ -86,7 +88,7 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
 	platform.Properties[constants.REWRITING] = constants.REWRITING_DISABLED
 
-	context[constants.CTX_HARDWARE] = hardware
+	context[constants.CTX_HARDWARE] = packages
 
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}

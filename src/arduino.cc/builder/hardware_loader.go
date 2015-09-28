@@ -43,7 +43,9 @@ type HardwareLoader struct{}
 func (s *HardwareLoader) Run(context map[string]interface{}) error {
 	mainHardwarePlatformTxt := make(map[string]string)
 
-	packages := make(map[string]*types.Package)
+	packages := &types.Packages{}
+	packages.Packages = make(map[string]*types.Package)
+	packages.Properties = make(map[string]string)
 
 	folders := context[constants.CTX_HARDWARE_FOLDERS].([]string)
 	folders, err := utils.AbsolutizePaths(folders)
@@ -91,7 +93,7 @@ func (s *HardwareLoader) Run(context map[string]interface{}) error {
 			if err != nil {
 				return utils.WrapError(err)
 			}
-			packages[packageId] = targetPackage
+			packages.Packages[packageId] = targetPackage
 		}
 	}
 
@@ -100,9 +102,9 @@ func (s *HardwareLoader) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func getOrCreatePackage(packages map[string]*types.Package, packageId string) *types.Package {
-	if _, ok := packages[packageId]; ok {
-		return packages[packageId]
+func getOrCreatePackage(packages *types.Packages, packageId string) *types.Package {
+	if _, ok := packages.Packages[packageId]; ok {
+		return packages.Packages[packageId]
 	}
 
 	targetPackage := types.Package{}

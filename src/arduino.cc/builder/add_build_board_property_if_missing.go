@@ -40,10 +40,10 @@ import (
 type AddBuildBoardPropertyIfMissing struct{}
 
 func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}) error {
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
-	for _, aPackage := range packages {
+	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {
 			for _, board := range platform.Boards {
 				if board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD] == constants.EMPTY_STRING {

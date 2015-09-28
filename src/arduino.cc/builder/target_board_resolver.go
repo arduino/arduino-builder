@@ -47,9 +47,9 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
 	targetPlatformName := fqbnParts[1]
 	targetBoardName := fqbnParts[2]
 
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 
-	targetPackage := packages[targetPackageName]
+	targetPackage := packages.Packages[targetPackageName]
 	if targetPackage == nil {
 		return utils.Errorf(context, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
 	}
@@ -81,11 +81,11 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
 	coreParts := strings.Split(core, ":")
 	if len(coreParts) > 1 {
 		core = coreParts[1]
-		if packages[coreParts[0]] == nil {
+		if packages.Packages[coreParts[0]] == nil {
 			return utils.Errorf(context, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
 
 		}
-		corePlatform = packages[coreParts[0]].Platforms[targetPlatform.PlatformId]
+		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatform.PlatformId]
 	}
 
 	var actualPlatform *types.Platform

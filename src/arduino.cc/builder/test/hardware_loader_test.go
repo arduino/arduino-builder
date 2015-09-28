@@ -47,22 +47,22 @@ func TestLoadHardware(t *testing.T) {
 	err := loader.Run(context)
 	NoError(t, err)
 
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
-	require.Equal(t, 1, len(packages))
-	require.NotNil(t, packages["arduino"])
-	require.Equal(t, 2, len(packages["arduino"].Platforms))
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	require.Equal(t, 1, len(packages.Packages))
+	require.NotNil(t, packages.Packages["arduino"])
+	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms))
 
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Boards["uno"].BoardId)
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Boards["uno"].Properties[constants.ID])
+	require.Equal(t, "uno", packages.Packages["arduino"].Platforms["avr"].Boards["uno"].BoardId)
+	require.Equal(t, "uno", packages.Packages["arduino"].Platforms["avr"].Boards["uno"].Properties[constants.ID])
 
-	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Boards["yun"].BoardId)
-	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Boards["yun"].Properties["upload.wait_for_upload_port"])
+	require.Equal(t, "yun", packages.Packages["arduino"].Platforms["avr"].Boards["yun"].BoardId)
+	require.Equal(t, "true", packages.Packages["arduino"].Platforms["avr"].Boards["yun"].Properties["upload.wait_for_upload_port"])
 
-	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Boards["robotMotor"].Properties["build.extra_flags"])
+	require.Equal(t, "{build.usb_flags}", packages.Packages["arduino"].Platforms["avr"].Boards["robotMotor"].Properties["build.extra_flags"])
 
-	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Boards["arduino_due_x"].BoardId)
+	require.Equal(t, "arduino_due_x", packages.Packages["arduino"].Platforms["sam"].Boards["arduino_due_x"].BoardId)
 
-	avrPlatform := packages["arduino"].Platforms["avr"]
+	avrPlatform := packages.Packages["arduino"].Platforms["avr"]
 	require.Equal(t, "Arduino AVR Boards", avrPlatform.Properties[constants.PLATFORM_NAME])
 	require.Equal(t, "-v", avrPlatform.Properties["tools.avrdude.bootloader.params.verbose"])
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Properties["tools.avrdude.cmd.path"])
@@ -89,29 +89,29 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
-		require.Equal(t, 2, len(packages))
+		require.Equal(t, 2, len(packages.Packages))
 	} else {
-		require.Equal(t, 3, len(packages))
+		require.Equal(t, 3, len(packages.Packages))
 	}
 
-	require.NotNil(t, packages["arduino"])
-	require.Equal(t, 2, len(packages["arduino"].Platforms))
+	require.NotNil(t, packages.Packages["arduino"])
+	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms))
 
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Boards["uno"].BoardId)
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Boards["uno"].Properties[constants.ID])
+	require.Equal(t, "uno", packages.Packages["arduino"].Platforms["avr"].Boards["uno"].BoardId)
+	require.Equal(t, "uno", packages.Packages["arduino"].Platforms["avr"].Boards["uno"].Properties[constants.ID])
 
-	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Boards["yun"].BoardId)
-	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Boards["yun"].Properties["upload.wait_for_upload_port"])
+	require.Equal(t, "yun", packages.Packages["arduino"].Platforms["avr"].Boards["yun"].BoardId)
+	require.Equal(t, "true", packages.Packages["arduino"].Platforms["avr"].Boards["yun"].Properties["upload.wait_for_upload_port"])
 
-	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Boards["robotMotor"].Properties["build.extra_flags"])
+	require.Equal(t, "{build.usb_flags}", packages.Packages["arduino"].Platforms["avr"].Boards["robotMotor"].Properties["build.extra_flags"])
 
-	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Boards["arduino_due_x"].BoardId)
+	require.Equal(t, "arduino_due_x", packages.Packages["arduino"].Platforms["sam"].Boards["arduino_due_x"].BoardId)
 
-	avrPlatform := packages["arduino"].Platforms["avr"]
+	avrPlatform := packages.Packages["arduino"].Platforms["avr"]
 	require.Equal(t, "Arduino AVR Boards", avrPlatform.Properties[constants.PLATFORM_NAME])
 	require.Equal(t, "-v", avrPlatform.Properties["tools.avrdude.bootloader.params.verbose"])
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Properties["tools.avrdude.cmd.path"])
@@ -123,13 +123,13 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", avrPlatform.Properties["preproc.macros.compatibility_flags"])
 	require.Equal(t, "\"{compiler.path}{compiler.cpp.cmd}\" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} \"{source_file}\"", avrPlatform.Properties[constants.RECIPE_PREPROC_INCLUDES])
 
-	require.NotNil(t, packages["my_avr_platform"])
-	myAVRPlatform := packages["my_avr_platform"].Platforms["avr"]
+	require.NotNil(t, packages.Packages["my_avr_platform"])
+	myAVRPlatform := packages.Packages["my_avr_platform"].Platforms["avr"]
 	require.Equal(t, "custom_yun", myAVRPlatform.Boards["custom_yun"].BoardId)
 
 	if runtime.GOOS != "windows" {
-		require.NotNil(t, packages["my_symlinked_avr_platform"])
-		require.NotNil(t, packages["my_symlinked_avr_platform"].Platforms["avr"])
+		require.NotNil(t, packages.Packages["my_symlinked_avr_platform"])
+		require.NotNil(t, packages.Packages["my_symlinked_avr_platform"].Platforms["avr"])
 	}
 }
 
@@ -141,16 +141,16 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	err := loader.Run(context)
 	NoError(t, err)
 
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
-	require.Equal(t, 3, len(packages))
-	require.NotNil(t, packages["arduino"])
-	require.Equal(t, 1, len(packages["arduino"].Platforms))
-	require.NotNil(t, packages["RedBearLab"])
-	require.Equal(t, 1, len(packages["RedBearLab"].Platforms))
-	require.NotNil(t, packages["RFduino"])
-	require.Equal(t, 0, len(packages["RFduino"].Platforms))
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	require.Equal(t, 3, len(packages.Packages))
+	require.NotNil(t, packages.Packages["arduino"])
+	require.Equal(t, 1, len(packages.Packages["arduino"].Platforms))
+	require.NotNil(t, packages.Packages["RedBearLab"])
+	require.Equal(t, 1, len(packages.Packages["RedBearLab"].Platforms))
+	require.NotNil(t, packages.Packages["RFduino"])
+	require.Equal(t, 0, len(packages.Packages["RFduino"].Platforms))
 
-	samdPlatform := packages["arduino"].Platforms["samd"]
+	samdPlatform := packages.Packages["arduino"].Platforms["samd"]
 	require.Equal(t, 2, len(samdPlatform.Boards))
 
 	require.Equal(t, "arduino_zero_edbg", samdPlatform.Boards["arduino_zero_edbg"].BoardId)
@@ -167,7 +167,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	require.Equal(t, "Atmel EDBG", samdPlatform.Programmers["edbg"][constants.PROGRAMMER_NAME])
 	require.Equal(t, "openocd", samdPlatform.Programmers["edbg"]["program.tool"])
 
-	avrRedBearPlatform := packages["RedBearLab"].Platforms["avr"]
+	avrRedBearPlatform := packages.Packages["RedBearLab"].Platforms["avr"]
 	require.Equal(t, 3, len(avrRedBearPlatform.Boards))
 
 	require.Equal(t, "blend", avrRedBearPlatform.Boards["blend"].BoardId)
@@ -185,28 +185,28 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	err := loader.Run(context)
 	NoError(t, err)
 
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
-		require.Equal(t, 4, len(packages))
+		require.Equal(t, 4, len(packages.Packages))
 	} else {
-		require.Equal(t, 5, len(packages))
+		require.Equal(t, 5, len(packages.Packages))
 	}
 
-	require.NotNil(t, packages["arduino"])
-	require.NotNil(t, packages["my_avr_platform"])
+	require.NotNil(t, packages.Packages["arduino"])
+	require.NotNil(t, packages.Packages["my_avr_platform"])
 
-	require.Equal(t, 3, len(packages["arduino"].Platforms))
-	require.Equal(t, 20, len(packages["arduino"].Platforms["avr"].Boards))
-	require.Equal(t, 2, len(packages["arduino"].Platforms["sam"].Boards))
-	require.Equal(t, 2, len(packages["arduino"].Platforms["samd"].Boards))
+	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms))
+	require.Equal(t, 20, len(packages.Packages["arduino"].Platforms["avr"].Boards))
+	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["sam"].Boards))
+	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["samd"].Boards))
 
-	require.Equal(t, 1, len(packages["my_avr_platform"].Platforms))
-	require.Equal(t, 2, len(packages["my_avr_platform"].Platforms["avr"].Boards))
+	require.Equal(t, 1, len(packages.Packages["my_avr_platform"].Platforms))
+	require.Equal(t, 2, len(packages.Packages["my_avr_platform"].Platforms["avr"].Boards))
 
 	if runtime.GOOS != "windows" {
-		require.Equal(t, 1, len(packages["my_symlinked_avr_platform"].Platforms))
-		require.Equal(t, 2, len(packages["my_symlinked_avr_platform"].Platforms["avr"].Boards))
+		require.Equal(t, 1, len(packages.Packages["my_symlinked_avr_platform"].Platforms))
+		require.Equal(t, 2, len(packages.Packages["my_symlinked_avr_platform"].Platforms["avr"].Boards))
 	}
 }

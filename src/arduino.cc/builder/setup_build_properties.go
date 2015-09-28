@@ -42,7 +42,7 @@ import (
 type SetupBuildProperties struct{}
 
 func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
-	packages := context[constants.CTX_HARDWARE].(map[string]*types.Package)
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 
 	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
@@ -77,7 +77,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 		var variantPlatform *types.Platform
 		variantParts := strings.Split(variant, ":")
 		if len(variantParts) > 1 {
-			variantPlatform = packages[variantParts[0]].Platforms[targetPlatform.PlatformId]
+			variantPlatform = packages.Packages[variantParts[0]].Platforms[targetPlatform.PlatformId]
 			variant = variantParts[1]
 		} else {
 			variantPlatform = targetPlatform
