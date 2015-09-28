@@ -37,6 +37,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-errors/errors"
+	"golang.org/x/codereview/patch"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -133,20 +134,24 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 
 	download(t, cores, boardsManagerCores, boardsManagerRedBearCores, tools, boardsManagerTools, boardsManagerRFduinoTools, libraries)
 
-	patch(t)
+	patchFiles(t)
 }
 
 // FIXME: once patched cores are released, patching them will be unnecessary
-func patch(t *testing.T) {
+func patchFiles(t *testing.T) {
 	files, err := ioutil.ReadDir(PATCHES_FOLDER)
 	NoError(t, err)
 
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".patch" {
-			cmd := exec.Command("patch", "-N", "-p0", "-r", "-", "-i", filepath.Join(PATCHES_FOLDER, file.Name()))
-			cmd.CombinedOutput()
-			//output, _ := cmd.CombinedOutput()
-			//fmt.Println(string(output))
+			data, err := ioutil.ReadFile(Abs(t, filepath.Join(PATCHES_FOLDER, file.Name())))
+			NoError(t, err)
+			patchSet, err := patch.Parse(data)
+			NoError(t, err)
+			operations, err := patchSet.Apply(ioutil.ReadFile)
+			for _, op := range operations {
+				ioutil.WriteFile(op.Dst, op.Data, os.FileMode(0644))
+			}
 		}
 	}
 }

@@ -1,6 +1,8 @@
---- downloaded_hardware/arduino/avr/platform.txt	2015-09-10 17:14:15.137942087 +0200
-+++ downloaded_hardware/arduino/avr/platform.txt	2015-09-23 10:27:19.522085331 +0200
-@@ -77,6 +77,12 @@
+diff --git a/downloaded_hardware/arduino/avr/platform.txt b/downloaded_hardware/arduino/avr/platform.txt
+index 537fcc5..4e526d9 100644
+--- a/downloaded_hardware/arduino/avr/platform.txt
++++ b/downloaded_hardware/arduino/avr/platform.txt
+@@ -81,6 +81,12 @@ recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
  recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
  recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
  
