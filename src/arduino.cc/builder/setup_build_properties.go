@@ -64,8 +64,8 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = context[constants.CTX_BUILD_CORE].(string)
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
-	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = actualPlatform.Folder
-	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(actualPlatform.Folder, "..")
+	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder
+	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(targetPlatform.Folder, "..")
 	buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION].(string)
 	buildProperties[constants.IDE_VERSION] = context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION].(string)
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS] = utils.PrettyOSName()

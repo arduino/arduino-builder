@@ -1,11 +1,14 @@
 custom_yun.name=Arduino Yún
 custom_yun.upload.via_ssh=true
 
+custom_yun.build.core=arduino:arduino
+custom_yun.bootloader.tool=arduino:avrdude
+custom_yun.upload.tool=arduino:avrdude
+
 custom_yun.vid.0=0x2341
 custom_yun.pid.0=0x0041
 custom_yun.vid.1=0x2341
 custom_yun.pid.1=0x8041
-custom_yun.upload.tool=avrdude
 custom_yun.upload.protocol=avr109
 custom_yun.upload.maximum_size=28672
 custom_yun.upload.maximum_data_size=2560
@@ -14,7 +17,6 @@ custom_yun.upload.disable_flushing=true
 custom_yun.upload.use_1200bps_touch=true
 custom_yun.upload.wait_for_upload_port=true
 
-custom_yun.bootloader.tool=avrdude
 custom_yun.bootloader.low_fuses=0xff
 custom_yun.bootloader.high_fuses=0xd8
 custom_yun.bootloader.extended_fuses=0xfb
@@ -28,7 +30,6 @@ custom_yun.build.vid=0x2341
 custom_yun.build.pid=0x8041
 custom_yun.build.usb_product="Arduino My"
 custom_yun.build.board=AVR_YUN
-custom_yun.build.core=arduino
 custom_yun.build.variant=yun
 custom_yun.build.extra_flags={build.usb_flags}
 

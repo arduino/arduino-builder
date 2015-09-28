@@ -56,7 +56,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		previousImportedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	}
-	importedLibraries, err := resolveLibraries(includes, headerToLibraries, previousImportedLibraries, []*types.Platform{actualPlatform, platform}, debugLevel, logger)
+	importedLibraries, err := resolveLibraries(includes, headerToLibraries, previousImportedLibraries, []*types.Platform{platform, actualPlatform}, debugLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}

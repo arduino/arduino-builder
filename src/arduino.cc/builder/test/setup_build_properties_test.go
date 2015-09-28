@@ -147,3 +147,42 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "non existent path with space and a =", buildProperties["tools.avrdude.config.path"])
 }
+
+func TestSetupBuildPropertiesUserHardware(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
+	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.AddAdditionalEntriesToContext{},
+		&builder.HardwareLoader{},
+		&builder.ToolsLoader{},
+		&builder.TargetBoardResolver{},
+		&builder.SketchLoader{},
+		&builder.SetupBuildProperties{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+
+	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
+
+	require.Equal(t, "custom_yun", buildProperties[constants.ID])
+	require.Equal(t, "caterina/Caterina-custom_yun.hex", buildProperties[constants.BUILD_PROPERTIES_BOOTLOADER_FILE])
+	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr")), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
+	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform")), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
+}

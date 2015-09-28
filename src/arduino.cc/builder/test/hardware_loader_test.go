@@ -126,14 +126,6 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.NotNil(t, packages["my_avr_platform"])
 	myAVRPlatform := packages["my_avr_platform"].Platforms["avr"]
 	require.Equal(t, "custom_yun", myAVRPlatform.Boards["custom_yun"].BoardId)
-	require.Equal(t, "{path}/ctags", myAVRPlatform.Properties["tools.ctags.cmd.path"])
-	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", myAVRPlatform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH])
-	require.Equal(t, "{runtime.tools.avrdude.path}", myAVRPlatform.Properties["tools.avrdude.path"])
-	require.Equal(t, "{path}/bin/avrdude", myAVRPlatform.Properties["tools.avrdude.cmd.path"])
-	require.Equal(t, "{path}/etc/avrdude.conf", myAVRPlatform.Properties["tools.avrdude.config.path"])
-
-	require.Equal(t, "-w -x c++ -M -MG -MP", myAVRPlatform.Properties["preproc.includes.flags"])
-	require.Equal(t, "-w -x c++ -E -CC", myAVRPlatform.Properties["preproc.macros.flags"])
 
 	if runtime.GOOS != "windows" {
 		require.NotNil(t, packages["my_symlinked_avr_platform"])
