@@ -41,8 +41,6 @@ import (
 type HardwareLoader struct{}
 
 func (s *HardwareLoader) Run(context map[string]interface{}) error {
-	mainHardwarePlatformTxt := make(map[string]string)
-
 	packages := &types.Packages{}
 	packages.Packages = make(map[string]*types.Package)
 	packages.Properties = make(map[string]string)
@@ -62,17 +60,11 @@ func (s *HardwareLoader) Run(context map[string]interface{}) error {
 			return utils.Errorf(context, constants.MSG_MUST_BE_A_FOLDER, folder)
 		}
 
-		if len(mainHardwarePlatformTxt) == 0 {
-			mainHardwarePlatformTxt, err = props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
-			if err != nil {
-				return utils.WrapError(err)
-			}
-		}
 		hardwarePlatformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 		if err != nil {
 			return utils.WrapError(err)
 		}
-		hardwarePlatformTxt = utils.MergeMapsOfStrings(make(map[string]string), mainHardwarePlatformTxt, hardwarePlatformTxt)
+		packages.Properties = utils.MergeMapsOfStrings(packages.Properties, hardwarePlatformTxt)
 
 		subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 		if err != nil {
@@ -89,7 +81,7 @@ func (s *HardwareLoader) Run(context map[string]interface{}) error {
 			}
 
 			targetPackage := getOrCreatePackage(packages, packageId)
-			err = loadPackage(targetPackage, subfolderPath, hardwarePlatformTxt)
+			err = loadPackage(targetPackage, subfolderPath)
 			if err != nil {
 				return utils.WrapError(err)
 			}
@@ -110,16 +102,17 @@ func getOrCreatePackage(packages *types.Packages, packageId string) *types.Packa
 	targetPackage := types.Package{}
 	targetPackage.PackageId = packageId
 	targetPackage.Platforms = make(map[string]*types.Platform)
+	targetPackage.Properties = make(map[string]string)
 
 	return &targetPackage
 }
 
-func loadPackage(targetPackage *types.Package, folder string, hardwarePlatformTxt map[string]string) error {
+func loadPackage(targetPackage *types.Package, folder string) error {
 	packagePlatformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	if err != nil {
 		return utils.WrapError(err)
 	}
-	packagePlatformTxt = utils.MergeMapsOfStrings(make(map[string]string), hardwarePlatformTxt, packagePlatformTxt)
+	targetPackage.Properties = utils.MergeMapsOfStrings(targetPackage.Properties, packagePlatformTxt)
 
 	subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 	if err != nil {
@@ -146,7 +139,7 @@ func loadPackage(targetPackage *types.Package, folder string, hardwarePlatformTx
 		}
 
 		platform := getOrCreatePlatform(platforms, platformId)
-		err = loadPlatform(platform, targetPackage.PackageId, subfolderPath, packagePlatformTxt)
+		err = loadPlatform(platform, targetPackage.PackageId, subfolderPath)
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -170,7 +163,7 @@ func getOrCreatePlatform(platforms map[string]*types.Platform, platformId string
 	return &targetPlatform
 }
 
-func loadPlatform(targetPlatform *types.Platform, packageId string, folder string, packagePlatformTxt map[string]string) error {
+func loadPlatform(targetPlatform *types.Platform, packageId string, folder string) error {
 	_, err := os.Stat(filepath.Join(folder, constants.FILE_BOARDS_TXT))
 	if err != nil && !os.IsNotExist(err) {
 		return utils.WrapError(err)
@@ -189,7 +182,7 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 
 	assignDefaultBoardToPlatform(targetPlatform)
 
-	platformProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
+	platformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -199,7 +192,7 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 		return utils.WrapError(err)
 	}
 
-	targetPlatform.Properties = utils.MergeMapsOfStrings(make(map[string]string), targetPlatform.Properties, packagePlatformTxt, platformProperties, localPlatformProperties)
+	targetPlatform.Properties = utils.MergeMapsOfStrings(make(map[string]string), targetPlatform.Properties, platformTxt, localPlatformProperties)
 
 	programmersProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PROGRAMMERS_TXT))
 	if err != nil {

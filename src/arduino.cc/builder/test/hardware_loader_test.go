@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
 	"runtime"
@@ -69,7 +70,10 @@ func TestLoadHardware(t *testing.T) {
 
 	require.Equal(t, "AVRISP mkII", avrPlatform.Programmers["avrispmkii"][constants.PROGRAMMER_NAME])
 
-	require.Equal(t, "{path}/ctags", avrPlatform.Properties["tools.ctags.cmd.path"])
+	require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties["tools.ctags.path"])
+	require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns \"{source_file}\"", packages.Properties["tools.ctags.pattern"])
+	require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties["tools.avrdude.path"])
+	require.Equal(t, "-w -x c++ -E -CC", packages.Properties["preproc.macros.flags"])
 }
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
@@ -120,12 +124,22 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 	require.Equal(t, "-w -x c++ -M -MG -MP", avrPlatform.Properties["preproc.includes.flags"])
 	require.Equal(t, "-w -x c++ -E -CC", avrPlatform.Properties["preproc.macros.flags"])
-	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", avrPlatform.Properties["preproc.macros.compatibility_flags"])
-	require.Equal(t, "\"{compiler.path}{compiler.cpp.cmd}\" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} \"{source_file}\"", avrPlatform.Properties[constants.RECIPE_PREPROC_INCLUDES])
+	require.Equal(t, "\"{compiler.path}{compiler.cpp.cmd}\" {compiler.cpp.flags} {preproc.includes.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} \"{source_file}\"", avrPlatform.Properties[constants.RECIPE_PREPROC_INCLUDES])
+	require.False(t, utils.MapStringStringHas(avrPlatform.Properties, "preproc.macros.compatibility_flags"))
 
 	require.NotNil(t, packages.Packages["my_avr_platform"])
-	myAVRPlatform := packages.Packages["my_avr_platform"].Platforms["avr"]
-	require.Equal(t, "custom_yun", myAVRPlatform.Boards["custom_yun"].BoardId)
+	myAVRPlatform := packages.Packages["my_avr_platform"]
+	require.Equal(t, "hello world", myAVRPlatform.Properties["example"])
+	myAVRPlatformAvrArch := myAVRPlatform.Platforms["avr"]
+	require.Equal(t, "custom_yun", myAVRPlatformAvrArch.Boards["custom_yun"].BoardId)
+
+	require.False(t, utils.MapStringStringHas(myAVRPlatformAvrArch.Properties, "preproc.includes.flags"))
+
+	require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties["tools.ctags.path"])
+	require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns \"{source_file}\"", packages.Properties["tools.ctags.pattern"])
+	require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties["tools.avrdude.path"])
+	require.Equal(t, "-w -x c++ -E -CC", packages.Properties["preproc.macros.flags"])
+	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", packages.Properties["preproc.macros.compatibility_flags"])
 
 	if runtime.GOOS != "windows" {
 		require.NotNil(t, packages.Packages["my_symlinked_avr_platform"])
@@ -173,7 +187,6 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	require.Equal(t, "blend", avrRedBearPlatform.Boards["blend"].BoardId)
 	require.Equal(t, "blend", avrRedBearPlatform.Boards["blend"].Properties[constants.ID])
 	require.Equal(t, "arduino:arduino", avrRedBearPlatform.Boards["blend"].Properties[constants.BUILD_PROPERTIES_BUILD_CORE])
-
 }
 
 func TestLoadLotsOfHardware(t *testing.T) {

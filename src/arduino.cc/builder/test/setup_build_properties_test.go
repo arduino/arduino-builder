@@ -80,10 +80,6 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
 
-	coanProps := props.SubTree(props.SubTree(buildProperties, constants.BUILD_PROPERTIES_TOOLS_KEY), constants.COAN)
-	require.Equal(t, "{path}/coan", coanProps["cmd.path"])
-	require.Equal(t, "\"{cmd.path}\" source -m -E -P -kb {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} \"{source_file}\"", coanProps[constants.BUILD_PROPERTIES_PATTERN])
-
 	require.Equal(t, Abs(t, "downloaded_hardware/arduino/avr"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
 	require.Equal(t, Abs(t, "downloaded_hardware/arduino"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
 	require.Equal(t, "10600", buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
@@ -185,4 +181,65 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	require.Equal(t, "caterina/Caterina-custom_yun.hex", buildProperties[constants.BUILD_PROPERTIES_BOOTLOADER_FILE])
 	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr")), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
 	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform")), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
+}
+
+func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
+	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+
+	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
+
+	require.Equal(t, "custom_yun", buildProperties[constants.ID])
+	require.Equal(t, "Arduino Yún", buildProperties["name"])
+	require.Equal(t, "0x2341", buildProperties["vid.0"])
+	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
+	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
+
+	coanProps := props.SubTree(props.SubTree(buildProperties, constants.BUILD_PROPERTIES_TOOLS_KEY), constants.COAN)
+	require.Equal(t, "{path}/coan", coanProps["cmd.path"])
+	require.Equal(t, "\"{cmd.path}\" source -m -E -P -kb {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} \"{source_file}\"", coanProps[constants.BUILD_PROPERTIES_PATTERN])
+
+	require.Equal(t, Abs(t, "user_hardware/my_avr_platform/avr"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
+	require.Equal(t, Abs(t, "user_hardware/my_avr_platform"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
+	require.Equal(t, "10600", buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
+	require.NotEmpty(t, buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS])
+
+	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc.path"])
+	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"])
+	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.3a-arduino"), buildProperties["runtime.tools.bossac-1.3a-arduino.path"])
+	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), buildProperties["runtime.tools.bossac-1.5-arduino.path"])
+	require.True(t, buildProperties["runtime.tools.bossac.path"] == Abs(t, "./downloaded_tools/bossac/1.3a-arduino") || buildProperties["runtime.tools.bossac.path"] == Abs(t, "./downloaded_tools/bossac/1.5-arduino"))
+	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), buildProperties["runtime.tools.avrdude.path"])
+	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), buildProperties["runtime.tools.avrdude-6.0.1-arduino5.path"])
+	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc.path"])
+	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"])
+
+	require.Equal(t, Abs(t, filepath.Join("sketch1", "sketch.ino")), buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH])
+
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_UTC))
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL))
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE))
+	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_DST))
 }

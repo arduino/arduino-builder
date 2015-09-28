@@ -30,37 +30,21 @@
 package builder
 
 import (
+	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
-type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
+type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
 
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]interface{}) error {
-	commands := []types.Command{
-		&AddAdditionalEntriesToContext{},
-		&FailIfBuildPathEqualsSketchPath{},
-		&HardwareLoader{},
-		&PlatformKeysRewriteLoader{},
-		&RewriteHardwareKeys{},
-		&ToolsLoader{},
-		&TargetBoardResolver{},
-		&AddBuildBoardPropertyIfMissing{},
-		&LibrariesLoader{},
-		&SketchLoader{},
-		&SetupBuildProperties{},
-		&LoadVIDPIDSpecificProperties{},
-		&SetCustomBuildProperties{},
-		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
-	}
+func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(context map[string]interface{}) error {
+	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
-		if err != nil {
-			return utils.WrapError(err)
-		}
-	}
+	buildProperties = utils.MergeMapsOfStrings(make(map[string]string), packages.Properties, targetPackage.Properties, buildProperties)
+
+	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
 
 	return nil
 }
