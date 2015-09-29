@@ -96,10 +96,7 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 				var library *types.Library
 				for _, platform := range platforms {
 					if platform != nil && library == nil {
-						librariesWithinSpecifiedPlatform, err := librariesWithinPlatform(libraries, platform)
-						if err != nil {
-							return nil, utils.WrapError(err)
-						}
+						librariesWithinSpecifiedPlatform := librariesWithinPlatform(libraries, platform)
 						library = findBestLibraryWithHeader(header, librariesWithinSpecifiedPlatform)
 					}
 				}
@@ -157,19 +154,17 @@ func librariesCompatibleWithPlatform(libraries []*types.Library, platform *types
 	return compatibleLibraries
 }
 
-func librariesWithinPlatform(libraries []*types.Library, platform *types.Platform) ([]*types.Library, error) {
+func librariesWithinPlatform(libraries []*types.Library, platform *types.Platform) []*types.Library {
 	var librariesWithinSpecifiedPlatform []*types.Library
 	for _, library := range libraries {
-		rel, err := filepath.Rel(platform.Folder, library.SrcFolder)
-		if err != nil {
-			return nil, utils.WrapError(err)
-		}
-		if !strings.Contains(rel, "..") {
+		cleanPlatformFolder := filepath.Clean(platform.Folder)
+		cleanLibraryFolder := filepath.Clean(library.SrcFolder)
+		if strings.Contains(cleanLibraryFolder, cleanPlatformFolder) {
 			librariesWithinSpecifiedPlatform = append(librariesWithinSpecifiedPlatform, library)
 		}
 	}
 
-	return librariesWithinSpecifiedPlatform, nil
+	return librariesWithinSpecifiedPlatform
 
 }
 
