@@ -10,7 +10,7 @@ import (
 )
 
 func sleep(t *testing.T) {
-	dur, err := time.ParseDuration("300ms")
+	dur, err := time.ParseDuration("1s")
 	NoError(t, err)
 	time.Sleep(dur)
 }
