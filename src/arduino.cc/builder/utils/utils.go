@@ -206,6 +206,18 @@ func Map(slice []string, fn mapFunc) []string {
 	return newSlice
 }
 
+type filterFunc func(string) bool
+
+func Filter(slice []string, fn filterFunc) []string {
+	newSlice := []string{}
+	for _, elem := range slice {
+		if fn(elem) {
+			newSlice = append(newSlice, elem)
+		}
+	}
+	return newSlice
+}
+
 func WrapWithHyphenI(value string) string {
 	return "\"-I" + value + "\""
 }

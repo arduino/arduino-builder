@@ -141,17 +141,12 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 		return "", utils.WrapError(err)
 	}
 
-	sourceFileStat, err := os.Stat(properties[constants.BUILD_PROPERTIES_SOURCE_FILE])
+	objIsUpToDate, err := ObjFileIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
 	if err != nil {
 		return "", utils.WrapError(err)
 	}
 
-	objectFileStat, err := os.Stat(properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
-	if err != nil && !os.IsNotExist(err) {
-		return "", utils.WrapError(err)
-	}
-
-	if !objFileIsUpToDateWithSourceFile(sourceFileStat, objectFileStat) {
+	if !objIsUpToDate {
 		_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
 		if err != nil {
 			return "", utils.WrapError(err)
@@ -163,8 +158,99 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
 }
 
-func objFileIsUpToDateWithSourceFile(sourceFileStat, objectFileStat os.FileInfo) bool {
-	return objectFileStat != nil && sourceFileStat.ModTime().Before(objectFileStat.ModTime())
+func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, error) {
+	sourceFile = filepath.Clean(sourceFile)
+	objectFile = filepath.Clean(objectFile)
+	dependencyFile = filepath.Clean(dependencyFile)
+
+	sourceFileStat, err := os.Stat(sourceFile)
+	if err != nil {
+		return false, utils.WrapError(err)
+	}
+
+	objectFileStat, err := os.Stat(objectFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, utils.WrapError(err)
+		}
+	}
+
+	dependencyFileStat, err := os.Stat(dependencyFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, utils.WrapError(err)
+		}
+	}
+
+	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
+		return false, nil
+	}
+	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
+		return false, nil
+	}
+
+	rows, err := utils.ReadFileToRows(dependencyFile)
+	if err != nil {
+		return false, utils.WrapError(err)
+	}
+
+	rows = utils.Map(rows, removeEndingBackSlash)
+	rows = utils.Map(rows, strings.TrimSpace)
+	rows = utils.Map(rows, unescapeDep)
+	rows = utils.Filter(rows, nonEmptyString)
+
+	if len(rows) == 0 {
+		return true, nil
+	}
+
+	firstRow := rows[0]
+	if !strings.HasSuffix(firstRow, ":") {
+		return false, nil
+	}
+	objFileInDepFile := firstRow[:len(firstRow)-1]
+	if objFileInDepFile != objectFile {
+		return false, nil
+	}
+
+	rows = rows[1:]
+	for _, row := range rows {
+		depStat, err := os.Stat(row)
+		if err != nil && !os.IsNotExist(err) {
+			return false, utils.WrapError(err)
+		}
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		if depStat.ModTime().After(objectFileStat.ModTime()) {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+func unescapeDep(s string) string {
+	s = strings.Replace(s, "\\ ", " ", -1)
+	s = strings.Replace(s, "\\\t", "\t", -1)
+	s = strings.Replace(s, "\\#", "#", -1)
+	s = strings.Replace(s, "$$", "$", -1)
+	s = strings.Replace(s, "\\\\", "\\", -1)
+	return s
+}
+
+func removeEndingBackSlash(s string) string {
+	if strings.HasSuffix(s, "\\") {
+		s = s[:len(s)-1]
+	}
+	return s
+}
+
+func nonEmptyString(s string) bool {
+	return s != constants.EMPTY_STRING
 }
 
 func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties map[string]string, verbose bool, logger i18n.Logger) (string, error) {
