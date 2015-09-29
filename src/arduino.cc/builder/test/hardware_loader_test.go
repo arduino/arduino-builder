@@ -63,6 +63,8 @@ func TestLoadHardware(t *testing.T) {
 
 	require.Equal(t, "arduino_due_x", packages.Packages["arduino"].Platforms["sam"].Boards["arduino_due_x"].BoardId)
 
+	require.Equal(t, "ATmega123", packages.Packages["arduino"].Platforms["avr"].Boards["diecimila"].Properties["menu.cpu.atmega123"])
+
 	avrPlatform := packages.Packages["arduino"].Platforms["avr"]
 	require.Equal(t, "Arduino AVR Boards", avrPlatform.Properties[constants.PLATFORM_NAME])
 	require.Equal(t, "-v", avrPlatform.Properties["tools.avrdude.bootloader.params.verbose"])

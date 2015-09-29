@@ -219,6 +219,13 @@ func loadBoards(boards map[string]*types.Board, packageId string, platformId str
 		return utils.WrapError(err)
 	}
 
+	localProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_BOARDS_LOCAL_TXT))
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
+	properties = utils.MergeMapsOfStrings(properties, localProperties)
+
 	propertiesByBoardId := props.FirstLevelOf(properties)
 	delete(propertiesByBoardId, constants.BOARD_PROPERTIES_MENU)
 
