@@ -206,3 +206,21 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 	require.Equal(t, "void setup();", prototypes[0])
 	require.Equal(t, "void loop();", prototypes[1])
 }
+
+func TestCTagsParserDefaultArguments(t *testing.T) {
+	context := make(map[string]interface{})
+
+	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserDefaultArguments.txt"))
+	NoError(t, err)
+
+	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+
+	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
+	ctagsParser.Run(context)
+
+	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+
+	require.Equal(t, 2, len(prototypes))
+	require.Equal(t, "void setup();", prototypes[0])
+	require.Equal(t, "void loop();", prototypes[1])
+}

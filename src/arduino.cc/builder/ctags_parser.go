@@ -44,6 +44,7 @@ const FIELD_CODE = "code"
 const FIELD_FUNCTION_NAME = "functionName"
 const FIELD_CLASS = "class"
 const FIELD_STRUCT = "struct"
+const FIELD_SKIP = "skipMe"
 
 const KIND_PROTOTYPE = "prototype"
 
@@ -69,6 +70,7 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	tags = filterOutUnknownTags(tags)
 	tags = filterOutTagsWithField(tags, FIELD_CLASS)
 	tags = filterOutTagsWithField(tags, FIELD_STRUCT)
+	tags = markTagsWithFunctionWithDefaultArgs(tags)
 	tags = addPrototypes(tags)
 	tags = removeDefinedProtypes(tags)
 	tags = removeDuplicate(tags)
@@ -83,7 +85,9 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 
 	var prototypes []string
 	for _, tag := range tags {
-		prototypes = append(prototypes, tag[KIND_PROTOTYPE])
+		if tag[FIELD_SKIP] != "true" {
+			prototypes = append(prototypes, tag[KIND_PROTOTYPE])
+		}
 	}
 
 	context[s.PrototypesField] = prototypes
@@ -140,6 +144,13 @@ func removeDuplicate(tags []map[string]string) []map[string]string {
 		}
 	}
 	return newTags
+}
+
+func markTagsWithFunctionWithDefaultArgs(tags []map[string]string) []map[string]string {
+	for _, tag := range tags {
+		tag[FIELD_SKIP] = strconv.FormatBool(strings.Contains(tag[FIELD_SIGNATURE], "="))
+	}
+	return tags
 }
 
 func filterOutTagsWithField(tags []map[string]string, field string) []map[string]string {
