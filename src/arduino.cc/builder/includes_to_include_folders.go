@@ -88,41 +88,7 @@ func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties m
 func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, previousImportedLibraries []*types.Library, platforms []*types.Platform, debugLevel int, logger i18n.Logger) ([]*types.Library, error) {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, header := range includes {
-		libraries := headerToLibraries[header]
-		if libraries != nil {
-			if len(libraries) == 1 {
-				markImportedLibrary[libraries[0]] = true
-			} else {
-				var library *types.Library
-				for _, platform := range platforms {
-					if platform != nil && library == nil {
-						librariesWithinSpecifiedPlatform := librariesWithinPlatform(libraries, platform)
-						library = findBestLibraryWithHeader(header, librariesWithinSpecifiedPlatform)
-					}
-				}
-				for _, platform := range platforms {
-					if platform != nil && library == nil {
-						library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libraries, platform))
-					}
-				}
-				if library == nil {
-					library = findBestLibraryWithHeader(header, libraries)
-				}
-				if library == nil {
-					library = libraries[0]
-				}
-				if debugLevel > 0 && !sliceContainsLibrary(previousImportedLibraries, library) {
-					logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-					logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, library.Folder)
-					for _, notUsedLibrary := range libraries {
-						if library != notUsedLibrary {
-							logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
-						}
-					}
-				}
-				markImportedLibrary[library] = true
-			}
-		}
+		resolveLibrary(header, headerToLibraries, markImportedLibrary, previousImportedLibraries, platforms, debugLevel, logger)
 	}
 
 	var importedLibraries []*types.Library
@@ -131,6 +97,53 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 	}
 
 	return importedLibraries, nil
+}
+
+func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, previousImportedLibraries []*types.Library, platforms []*types.Platform, debugLevel int, logger i18n.Logger) {
+	libraries := headerToLibraries[header]
+
+	if libraries == nil {
+		return
+	}
+
+	if len(libraries) == 1 {
+		markImportedLibrary[libraries[0]] = true
+		return
+	}
+
+	var library *types.Library
+
+	for _, platform := range platforms {
+		if platform != nil && library == nil {
+			librariesWithinSpecifiedPlatform := librariesWithinPlatform(libraries, platform)
+			library = findBestLibraryWithHeader(header, librariesWithinSpecifiedPlatform)
+		}
+	}
+
+	for _, platform := range platforms {
+		if platform != nil && library == nil {
+			library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libraries, platform))
+		}
+	}
+
+	if library == nil {
+		library = findBestLibraryWithHeader(header, libraries)
+	}
+
+	if library == nil {
+		library = libraries[0]
+	}
+
+	if debugLevel > 0 && !sliceContainsLibrary(previousImportedLibraries, library) {
+		logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
+		logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, library.Folder)
+		for _, notUsedLibrary := range libraries {
+			if library != notUsedLibrary {
+				logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
+			}
+		}
+	}
+	markImportedLibrary[library] = true
 }
 
 func libraryCompatibleWithPlatform(library *types.Library, platform *types.Platform) bool {
@@ -234,7 +247,7 @@ func findLibWithNameContaining(name string, libraries []*types.Library) *types.L
 	return nil
 }
 
-// thank you golang for s***ing: I can't use/recycle/adapt utils.SliceContains
+// thank you golang: I can not use/recycle/adapt utils.SliceContains
 func sliceContainsLibrary(slice []*types.Library, target *types.Library) bool {
 	for _, value := range slice {
 		if value == target {
