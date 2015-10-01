@@ -95,7 +95,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc.path"])
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"])
 
-	require.Equal(t, Abs(t, filepath.Join("sketch1", "sketch.ino")), buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH])
+	require.Equal(t, Abs(t, "sketch1"), buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH])
 
 	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_UTC))
 	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL))
@@ -236,7 +236,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc.path"])
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), buildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"])
 
-	require.Equal(t, Abs(t, filepath.Join("sketch1", "sketch.ino")), buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH])
+	require.Equal(t, Abs(t, "sketch1"), buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH])
 
 	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_UTC))
 	require.True(t, utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL))

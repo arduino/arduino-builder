@@ -100,6 +100,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 		if err != nil {
 			return err
 		}
+		sourcePath = filepath.Dir(sourcePath)
 		buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH] = sourcePath
 	}
 
