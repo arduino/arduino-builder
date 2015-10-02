@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
 	"testing"
@@ -52,6 +53,9 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	require.NotNil(t, context[constants.CTX_VERBOSE])
 	require.NotNil(t, context[constants.CTX_DEBUG_LEVEL])
 	require.NotNil(t, context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH])
+
+	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
+	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueStringQueue).Empty())
 }
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
@@ -71,4 +75,7 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	require.NotNil(t, context[constants.CTX_VERBOSE])
 	require.NotNil(t, context[constants.CTX_DEBUG_LEVEL])
 	require.NotNil(t, context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH])
+
+	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
+	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueStringQueue).Empty())
 }

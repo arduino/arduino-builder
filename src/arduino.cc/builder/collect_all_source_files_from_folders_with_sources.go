@@ -31,64 +31,31 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"path/filepath"
 )
 
-type ContainerFindIncludes struct{}
+type CollectAllSourceFilesFromFoldersWithSources struct{}
 
-func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
-	wheelSpins := context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH].(int)
-	for i := 0; i < wheelSpins; i++ {
-		commands := []types.Command{
-			&IncludesFinderWithGCC{SourceFile: filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp")},
-			&GCCMinusMOutputParser{},
-			&IncludesToIncludeFolders{},
-		}
-
-		for _, command := range commands {
-			PrintRingNameIfDebug(context, command)
-			err := command.Run(context)
-			if err != nil {
-				return utils.WrapError(err)
-			}
-		}
-	}
-
+func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]interface{}) error {
 	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueStringQueue)
-	foldersWithSources.Push(context[constants.CTX_SKETCH_BUILD_PATH])
-	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
-		for _, library := range context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library) {
-			foldersWithSources.Push(library.SrcFolder)
-		}
-	}
-
-	command := &CollectAllSourceFilesFromFoldersWithSources{}
-	err := command.Run(context)
-	if err != nil {
-		return utils.WrapError(err)
-	}
-
 	sourceFiles := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
 
-	for !sourceFiles.Empty() {
-		commands := []types.Command{
-			&IncludesFinderWithGCC{SourceFile: sourceFiles.Pop().(string)},
-			&GCCMinusMOutputParser{},
-			&IncludesToIncludeFolders{},
-			&CollectAllSourceFilesFromFoldersWithSources{},
+	filePaths := []string{}
+	for !foldersWithSources.Empty() {
+		checkExtensionFunc := func(ext string) bool {
+			return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
 		}
+		walkFunc := utils.CollectAllReadableFiles(&filePaths, checkExtensionFunc)
+		err := gohasissues.Walk(foldersWithSources.Pop().(string), walkFunc)
+		if err != nil {
+			return utils.WrapError(err)
+		}
+	}
 
-		for _, command := range commands {
-			PrintRingNameIfDebug(context, command)
-			err := command.Run(context)
-			if err != nil {
-				return utils.WrapError(err)
-			}
-		}
+	for _, filePath := range filePaths {
+		sourceFiles.Push(filePath)
 	}
 
 	return nil

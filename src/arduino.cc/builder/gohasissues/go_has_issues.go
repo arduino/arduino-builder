@@ -38,9 +38,7 @@ import (
 	"strings"
 )
 
-type WalkFunc func(path string, info os.FileInfo, err error) error
-
-func Walk(root string, walkFn WalkFunc) error {
+func Walk(root string, walkFn filepath.WalkFunc) error {
 	info, err := os.Stat(root)
 	if err != nil {
 		return walkFn(root, nil, err)
@@ -48,7 +46,7 @@ func Walk(root string, walkFn WalkFunc) error {
 	return walk(root, info, walkFn)
 }
 
-func walk(path string, info os.FileInfo, walkFn WalkFunc) error {
+func walk(path string, info os.FileInfo, walkFn filepath.WalkFunc) error {
 	err := walkFn(path, info, nil)
 	if err != nil {
 		if info.IsDir() && err == filepath.SkipDir {

@@ -27,43 +27,40 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package test
 
 import (
-	"arduino.cc/builder/builder_utils"
+	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/utils"
-	"strings"
+	"arduino.cc/builder/types"
+	"github.com/stretchr/testify/require"
+	"path/filepath"
+	"sort"
+	"testing"
 )
 
-type IncludesFinderWithGCC struct {
-	SourceFile string
-}
+func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
+	context := make(map[string]interface{})
 
-func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
-	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	sourceFiles := &types.UniqueStringQueue{}
+	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
+	foldersWithSources := &types.UniqueStringQueue{}
+	foldersWithSources.Push(Abs(t, "sketch_with_config"))
+	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
-	includesParams := constants.EMPTY_STRING
-	if utils.MapHas(context, constants.CTX_INCLUDE_FOLDERS) {
-		includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
-		includes = utils.Map(includes, utils.WrapWithHyphenI)
-		includesParams = strings.Join(includes, " ")
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = s.SourceFile
-	properties[constants.BUILD_PROPERTIES_INCLUDES] = includesParams
-	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
-
-	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_INCLUDES, true, verbose, false, logger)
-	if err != nil {
-		return utils.WrapError(err)
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
 	}
 
-	context[constants.CTX_GCC_MINUS_M_OUTPUT] = string(output)
+	require.Equal(t, 2, len(*sourceFiles))
+	sort.Strings(*sourceFiles)
 
-	return nil
+	require.Equal(t, Abs(t, filepath.Join("sketch_with_config", "includes", "de bug.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("sketch_with_config", "sketch_with_config.ino")), sourceFiles.Pop())
 }

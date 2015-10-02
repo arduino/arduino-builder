@@ -52,19 +52,29 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 
-	var previousImportedLibraries []*types.Library
+	var importedLibraries []*types.Library
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
-		previousImportedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	}
-	importedLibraries, err := resolveLibraries(includes, headerToLibraries, previousImportedLibraries, []*types.Platform{platform, actualPlatform}, debugLevel, logger)
+	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{platform, actualPlatform}, debugLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
+
+	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueStringQueue)
+
+	for _, newlyImportedLibrary := range newlyImportedLibraries {
+		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
+			importedLibraries = append(importedLibraries, newlyImportedLibrary)
+			foldersWithSources.Push(newlyImportedLibrary.SrcFolder)
+		}
+	}
+
 	context[constants.CTX_IMPORTED_LIBRARIES] = importedLibraries
 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
 	verbose := context[constants.CTX_VERBOSE].(bool)
-	includeFolders := resolveIncludeFolders(importedLibraries, buildProperties, verbose)
+	includeFolders := resolveIncludeFolders(newlyImportedLibraries, buildProperties, verbose)
 	context[constants.CTX_INCLUDE_FOLDERS] = includeFolders
 
 	return nil
@@ -250,7 +260,7 @@ func findLibWithNameContaining(name string, libraries []*types.Library) *types.L
 // thank you golang: I can not use/recycle/adapt utils.SliceContains
 func sliceContainsLibrary(slice []*types.Library, target *types.Library) bool {
 	for _, value := range slice {
-		if value == target {
+		if value.SrcFolder == target.SrcFolder {
 			return true
 		}
 	}

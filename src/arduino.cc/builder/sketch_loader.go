@@ -84,27 +84,10 @@ func (s *SketchLoader) Run(context map[string]interface{}) error {
 
 func collectAllSketchFiles(from string) ([]string, error) {
 	filePaths := []string{}
-	walkFunc := func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-		ext := strings.ToLower(filepath.Ext(currentPath))
-		if !MAIN_FILE_VALID_EXTENSIONS[ext] && !ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {
-			return nil
-		}
-		currentFile, err := os.Open(currentPath)
-		if err != nil {
-			return nil
-		}
-		currentFile.Close()
-
-		filePaths = append(filePaths, currentPath)
-		return nil
+	checkExtensionFunc := func(ext string) bool {
+		return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext]
 	}
+	walkFunc := utils.CollectAllReadableFiles(&filePaths, checkExtensionFunc)
 	err := gohasissues.Walk(from, walkFunc)
 	return filePaths, utils.WrapError(err)
 }

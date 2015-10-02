@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
@@ -78,6 +79,11 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}) erro
 	if !utils.MapHas(context, constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH) {
 		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = DEFAULT_LIBRARY_DISCOVERY_RECURSION_DEPTH
 	}
+
+	sourceFiles := &types.UniqueStringQueue{}
+	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
+	foldersWithSources := &types.UniqueStringQueue{}
+	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	return nil
 }

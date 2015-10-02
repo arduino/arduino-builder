@@ -27,43 +27,22 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package test
 
 import (
-	"arduino.cc/builder/builder_utils"
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/utils"
-	"strings"
+	"arduino.cc/builder/types"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
-type IncludesFinderWithGCC struct {
-	SourceFile string
-}
+func TestUniqueStringQueue(t *testing.T) {
+	queue := types.UniqueStringQueue{}
+	queue.Push("hello")
+	queue.Push("world")
+	queue.Push("hello")
+	queue.Push("world")
 
-func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
-	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-
-	includesParams := constants.EMPTY_STRING
-	if utils.MapHas(context, constants.CTX_INCLUDE_FOLDERS) {
-		includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
-		includes = utils.Map(includes, utils.WrapWithHyphenI)
-		includesParams = strings.Join(includes, " ")
-	}
-
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = s.SourceFile
-	properties[constants.BUILD_PROPERTIES_INCLUDES] = includesParams
-	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
-
-	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_INCLUDES, true, verbose, false, logger)
-	if err != nil {
-		return utils.WrapError(err)
-	}
-
-	context[constants.CTX_GCC_MINUS_M_OUTPUT] = string(output)
-
-	return nil
+	require.Equal(t, "hello", queue.Pop())
+	require.Equal(t, "world", queue.Pop())
+	require.True(t, queue.Empty())
 }
