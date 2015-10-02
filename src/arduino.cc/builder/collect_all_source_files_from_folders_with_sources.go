@@ -45,7 +45,7 @@ func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]int
 	filePaths := []string{}
 	for !foldersWithSources.Empty() {
 		checkExtensionFunc := func(ext string) bool {
-			return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
+			return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
 		}
 		walkFunc := utils.CollectAllReadableFiles(&filePaths, checkExtensionFunc)
 		err := gohasissues.Walk(foldersWithSources.Pop().(string), walkFunc)
