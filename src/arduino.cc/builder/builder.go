@@ -83,7 +83,6 @@ func (s *Builder) Run(context map[string]interface{}) error {
 
 		&ContainerFindIncludes{},
 
-		&PrintUsedLibrariesIfVerbose{},
 		&WarnAboutArchIncompatibleLibraries{},
 
 		&ContainerAddPrototypes{},
@@ -111,6 +110,10 @@ func (s *Builder) Run(context map[string]interface{}) error {
 		&MergeSketchWithBootloader{},
 
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+
+		&PrintUsedAndNotUsedLibraries{},
+
+		&PrintUsedLibrariesIfVerbose{},
 	}
 
 	return runCommands(context, commands)

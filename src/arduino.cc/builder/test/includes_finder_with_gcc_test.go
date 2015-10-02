@@ -165,7 +165,6 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	require.Equal(t, "library3.h", includes[5])
 	require.Equal(t, "library4.h", includes[6])
 
-	require.NotNil(t, context[constants.CTX_IMPORTED_LIBRARIES])
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	require.Equal(t, 4, len(importedLibraries))
 

@@ -156,36 +156,3 @@ type KeyValuePair struct {
 type Command interface {
 	Run(context map[string]interface{}) error
 }
-
-type UniqueStringQueue []string
-
-func (h UniqueStringQueue) Len() int           { return len(h) }
-func (h UniqueStringQueue) Less(i, j int) bool { return false }
-func (h UniqueStringQueue) Swap(i, j int)      { panic("Who called me?!?") }
-
-func (h *UniqueStringQueue) Push(x interface{}) {
-	if !SliceContains(*h, x.(string)) {
-		*h = append(*h, x.(string))
-	}
-}
-
-func (h *UniqueStringQueue) Pop() interface{} {
-	old := *h
-	x := old[0]
-	*h = old[1:]
-	return x
-}
-
-func (h *UniqueStringQueue) Empty() bool {
-	return h.Len() == 0
-}
-
-// duplication of utils.SliceContains! Thanks golang! Why? Because you can't have import cycles, so types cannot import from utils because utils already imports from types
-func SliceContains(slice []string, target string) bool {
-	for _, value := range slice {
-		if value == target {
-			return true
-		}
-	}
-	return false
-}

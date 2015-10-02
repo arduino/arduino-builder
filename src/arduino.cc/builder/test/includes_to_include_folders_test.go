@@ -71,7 +71,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_IMPORTED_LIBRARIES])
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
@@ -108,7 +107,8 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Nil(t, context[constants.CTX_IMPORTED_LIBRARIES])
+	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	require.Equal(t, 0, len(importedLibraries))
 }
 
 func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
@@ -142,7 +142,6 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_IMPORTED_LIBRARIES])
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 2, len(importedLibraries))
@@ -181,7 +180,6 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_IMPORTED_LIBRARIES])
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 2, len(importedLibraries))
@@ -220,7 +218,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_IMPORTED_LIBRARIES])
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))

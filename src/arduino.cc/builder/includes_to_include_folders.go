@@ -31,10 +31,8 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"os"
 	"path/filepath"
 	"strings"
 )
@@ -47,16 +45,15 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	}
 	includes := context[constants.CTX_INCLUDES].([]string)
 	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
-	debugLevel := utils.DebugLevel(context)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
+	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
 
-	var importedLibraries []*types.Library
+	importedLibraries := []*types.Library{}
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	}
-	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{platform, actualPlatform}, debugLevel, logger)
+	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, []*types.Platform{platform, actualPlatform}, libraryResolutionResults)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -95,10 +92,10 @@ func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties m
 }
 
 //FIXME it's also resolving previously resolved libraries
-func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, previousImportedLibraries []*types.Library, platforms []*types.Platform, debugLevel int, logger i18n.Logger) ([]*types.Library, error) {
+func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) ([]*types.Library, error) {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, header := range includes {
-		resolveLibrary(header, headerToLibraries, markImportedLibrary, previousImportedLibraries, platforms, debugLevel, logger)
+		resolveLibrary(header, headerToLibraries, markImportedLibrary, platforms, libraryResolutionResults)
 	}
 
 	var importedLibraries []*types.Library
@@ -109,7 +106,7 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 	return importedLibraries, nil
 }
 
-func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, previousImportedLibraries []*types.Library, platforms []*types.Platform, debugLevel int, logger i18n.Logger) {
+func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) {
 	libraries := headerToLibraries[header]
 
 	if libraries == nil {
@@ -144,16 +141,19 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 		library = libraries[0]
 	}
 
-	if debugLevel > 0 && !sliceContainsLibrary(previousImportedLibraries, library) {
-		logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-		logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, library.Folder)
-		for _, notUsedLibrary := range libraries {
-			if library != notUsedLibrary {
-				logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
-			}
+	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
+
+	markImportedLibrary[library] = true
+}
+
+func filterOutLibraryFrom(libraries []*types.Library, library *types.Library) []*types.Library {
+	filteredOutLibraries := []*types.Library{}
+	for _, lib := range libraries {
+		if lib != library {
+			filteredOutLibraries = append(filteredOutLibraries, lib)
 		}
 	}
-	markImportedLibrary[library] = true
+	return filteredOutLibraries
 }
 
 func libraryCompatibleWithPlatform(library *types.Library, platform *types.Platform) bool {
