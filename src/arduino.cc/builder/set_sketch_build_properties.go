@@ -24,7 +24,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2015 Steve Marple
  */
 
 package builder
@@ -32,50 +32,21 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/utils"
-	"encoding/json"
-	"reflect"
-	"strings"
 )
 
-type CreateBuildOptionsMap struct{}
+type SetSketchBuildProperties struct{}
 
-func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
-	buildOptions := make(map[string]interface{})
-	buildOptionsMapKeys := []string{
-		constants.CTX_HARDWARE_FOLDERS,
-		constants.CTX_TOOLS_FOLDERS,
-		constants.CTX_LIBRARIES_FOLDERS,
-		constants.CTX_FQBN,
-		constants.CTX_SKETCH_LOCATION,
-		constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION,
-		constants.CTX_SKETCH_BUILD_PROPERTIES,
-		constants.CTX_CUSTOM_BUILD_PROPERTIES,
+func (s *SetSketchBuildProperties) Run(context map[string]interface{}) error {
+	if !utils.MapHas(context, constants.CTX_SKETCH_BUILD_PROPERTIES) {
+		return nil
 	}
 
-	for _, key := range buildOptionsMapKeys {
-		if utils.MapHas(context, key) {
-			originalValue := context[key]
-			kindOfValue := reflect.TypeOf(originalValue).Kind()
-			if kindOfValue == reflect.Slice {
-				buildOptions[key] = strings.Join(originalValue.([]string), ",")
-			} else if kindOfValue == reflect.String {
-				buildOptions[key] = originalValue.(string)
-			} else if kindOfValue == reflect.TypeOf(make(map[string]string)).Kind() {
-				buildOptions[key] = originalValue
-			} else {
-				return utils.Errorf(context, constants.MSG_UNHANDLED_TYPE_IN_CONTEXT, kindOfValue.String(), key)
-			}
-		}
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+
+	sketchBuildProperties :=  context[constants.CTX_SKETCH_BUILD_PROPERTIES].(map[string]string)
+	for key, value := range sketchBuildProperties {
+		buildProperties[key] = value
 	}
-
-	context[constants.CTX_BUILD_OPTIONS] = buildOptions
-
-	bytes, err := json.MarshalIndent(buildOptions, "", "  ")
-	if err != nil {
-		return utils.WrapError(err)
-	}
-
-	context[constants.CTX_BUILD_OPTIONS_JSON] = string(bytes)
-
+	
 	return nil
 }

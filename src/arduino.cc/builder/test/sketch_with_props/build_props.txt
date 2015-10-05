@@ -1,0 +1,3 @@
+compiler.c.extra_flags=-D NDEBUG
+compiler.cpp.extra_flags=-D NDEBUG -D TESTLIBRARY_BUFSIZE=100 -D ARDUINO_URL="https://www.arduino.cc/"
+

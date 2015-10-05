@@ -24,44 +24,39 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2015 Steve Marple
  */
 
 package builder
 
 import (
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
+	"github.com/go-errors/errors"
+	"os"
+        "path/filepath"
 )
 
-type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
-
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]interface{}) error {
-	commands := []types.Command{
-		&AddAdditionalEntriesToContext{},
-		&FailIfBuildPathEqualsSketchPath{},
-		&HardwareLoader{},
-		&PlatformKeysRewriteLoader{},
-		&RewriteHardwareKeys{},
-		&ToolsLoader{},
-		&TargetBoardResolver{},
-		&AddBuildBoardPropertyIfMissing{},
-		&LibrariesLoader{},
-		&SketchLoader{},
-		&SetupBuildProperties{},
-		&LoadVIDPIDSpecificProperties{},
-		&SetSketchBuildProperties{},
-		&SetCustomBuildProperties{},
-		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
+func GetSketchBuildPropertiesFilename(context map[string]interface{}) (string, error) {
+	sketchLocation, ok := context[constants.CTX_SKETCH_LOCATION].(string)
+	if !ok {
+		return "", errors.New("Unknown sketch location")
 	}
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
-		if err != nil {
-			return utils.WrapError(err)
-		}
-	}
-
-	return nil
+	filename := filepath.Join(filepath.Dir(sketchLocation), constants.SKETCH_BUILD_OPTIONS_TXT)
+	return filename, nil
 }
+
+
+func GetSketchBuildProperties(context map[string]interface{}) (map[string]string, error) {
+	filename, err := GetSketchBuildPropertiesFilename(context)
+	if err != nil {
+		return nil, err
+	}
+	_, err = os.Stat(filename)
+	if err == nil {
+		return props.SafeLoad(filename)
+	}
+	return make(map[string]string), nil
+}
+
