@@ -25,6 +25,7 @@
  * the GNU General Public License.
  *
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2015 Matthijs Kooijman
  */
 
 package builder
