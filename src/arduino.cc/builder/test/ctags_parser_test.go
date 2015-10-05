@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"path/filepath"
@@ -49,14 +50,14 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 5, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
-	require.Equal(t, "void digitalCommand(YunClient client);", prototypes[2])
-	require.Equal(t, "void analogCommand(YunClient client);", prototypes[3])
-	require.Equal(t, "void modeCommand(YunClient client);", prototypes[4])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, "void digitalCommand(YunClient client);", prototypes[2].Prototype)
+	require.Equal(t, "void analogCommand(YunClient client);", prototypes[3].Prototype)
+	require.Equal(t, "void modeCommand(YunClient client);", prototypes[4].Prototype)
 }
 
 func TestCTagsParserShouldListTemplates(t *testing.T) {
@@ -70,12 +71,12 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 3, len(prototypes))
-	require.Equal(t, "template <typename T> T minimum (T a, T b);", prototypes[0])
-	require.Equal(t, "void setup();", prototypes[1])
-	require.Equal(t, "void loop();", prototypes[2])
+	require.Equal(t, "template <typename T> T minimum (T a, T b);", prototypes[0].Prototype)
+	require.Equal(t, "void setup();", prototypes[1].Prototype)
+	require.Equal(t, "void loop();", prototypes[2].Prototype)
 }
 
 func TestCTagsParserShouldListTemplates2(t *testing.T) {
@@ -89,13 +90,13 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 4, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
-	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", prototypes[2])
-	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", prototypes[3])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", prototypes[2].Prototype)
+	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", prototypes[3].Prototype)
 }
 
 func TestCTagsParserShouldDealWithClasses(t *testing.T) {
@@ -109,7 +110,7 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 0, len(prototypes))
 }
@@ -125,12 +126,12 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 3, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
-	require.Equal(t, "void dostuff(A_NEW_TYPE * bar);", prototypes[2])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, "void dostuff(A_NEW_TYPE * bar);", prototypes[2].Prototype)
 }
 
 func TestCTagsParserShouldDealWithMacros(t *testing.T) {
@@ -144,14 +145,14 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 5, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
-	require.Equal(t, "void debug();", prototypes[2])
-	require.Equal(t, "void disabledIsDefined();", prototypes[3])
-	require.Equal(t, "int useMyType(MyType type);", prototypes[4])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, "void debug();", prototypes[2].Prototype)
+	require.Equal(t, "void disabledIsDefined();", prototypes[3].Prototype)
+	require.Equal(t, "int useMyType(MyType type);", prototypes[4].Prototype)
 }
 
 func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
@@ -165,10 +166,10 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 1, len(prototypes))
-	require.Equal(t, "boolean getBytes( byte addr, int amount );", prototypes[0])
+	require.Equal(t, "boolean getBytes( byte addr, int amount );", prototypes[0].Prototype)
 }
 
 func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
@@ -182,11 +183,11 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 2, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
 }
 
 func TestCTagsParserStructWithFunctions(t *testing.T) {
@@ -200,11 +201,11 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 2, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
 }
 
 func TestCTagsParserDefaultArguments(t *testing.T) {
@@ -218,9 +219,9 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
 	ctagsParser.Run(context)
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]string)
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 2, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0])
-	require.Equal(t, "void loop();", prototypes[1])
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
 }

@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strconv"
 	"strings"
@@ -83,16 +84,22 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 		context[constants.CTX_FIRST_FUNCTION_AT_LINE] = line
 	}
 
-	var prototypes []string
-	for _, tag := range tags {
-		if tag[FIELD_SKIP] != "true" {
-			prototypes = append(prototypes, tag[KIND_PROTOTYPE])
-		}
-	}
+	prototypes := toPrototypes(tags)
 
 	context[s.PrototypesField] = prototypes
 
 	return nil
+}
+
+func toPrototypes(tags []map[string]string) []*types.Prototype {
+	prototypes := []*types.Prototype{}
+	for _, tag := range tags {
+		if tag[FIELD_SKIP] != "true" {
+			ctag := types.Prototype{FunctionName: tag[FIELD_FUNCTION_NAME], Prototype: tag[KIND_PROTOTYPE], Fields: tag}
+			prototypes = append(prototypes, &ctag)
+		}
+	}
+	return prototypes
 }
 
 func addPrototypes(tags []map[string]string) []map[string]string {

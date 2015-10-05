@@ -31,8 +31,6 @@ package types
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/utils"
 )
 
 type SketchFile struct {
@@ -80,10 +78,6 @@ type Platform struct {
 	Programmers  map[string]map[string]string
 }
 
-func (platform *Platform) GetTool(toolName string) map[string]string {
-	return props.SubTree(platform.Properties, toolName)
-}
-
 type Board struct {
 	BoardId    string
 	Properties map[string]string
@@ -125,12 +119,12 @@ func (library *Library) String() string {
 }
 
 func (library *Library) SupportsArchitectures(archs []string) bool {
-	if utils.SliceContains(archs, constants.LIBRARY_ALL_ARCHS) || utils.SliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
+	if sliceContains(archs, constants.LIBRARY_ALL_ARCHS) || sliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
 		return true
 	}
 
 	for _, libraryArch := range library.Archs {
-		if utils.SliceContains(archs, libraryArch) {
+		if sliceContains(archs, libraryArch) {
 			return true
 		}
 	}
@@ -155,4 +149,10 @@ type KeyValuePair struct {
 
 type Command interface {
 	Run(context map[string]interface{}) error
+}
+
+type Prototype struct {
+	FunctionName string
+	Prototype    string
+	Fields       map[string]string
 }

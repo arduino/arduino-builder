@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strconv"
 	"strings"
@@ -55,7 +56,7 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	if firstFunctionLine > 1 {
 		firstFunctionLine -= context[constants.CTX_LINE_OFFSET].(int)
 	}
-	prototypeSection := composePrototypeSection(firstFunctionLine, context[constants.CTX_PROTOTYPES].([]string))
+	prototypeSection := composePrototypeSection(firstFunctionLine, context[constants.CTX_PROTOTYPES].([]*types.Prototype))
 	context[constants.CTX_PROTOTYPE_SECTION] = prototypeSection
 	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
@@ -68,17 +69,25 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func composePrototypeSection(line int, prototypes []string) string {
+func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 	if len(prototypes) == 0 {
 		return constants.EMPTY_STRING
 	}
 
-	str := strings.Join(prototypes, "\n") + "\n"
+	str := joinPrototypes(prototypes)
 	str += "#line "
 	str += strconv.Itoa(line)
 	str += "\n"
 
 	return str
+}
+
+func joinPrototypes(prototypes []*types.Prototype) string {
+	join := ""
+	for _, proto := range prototypes {
+		join = join + proto.Prototype + "\n"
+	}
+	return join
 }
 
 func composeIncludeArduinoSection() string {

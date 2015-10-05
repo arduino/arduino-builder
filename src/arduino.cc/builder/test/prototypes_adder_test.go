@@ -537,7 +537,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_inline_function", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
-	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -561,4 +561,44 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
 	require.Equal(t, "void setup();\nvoid loop();\nshort unsigned int testInt();\nint8_t testInline();\nuint8_t testAttribute();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+}
+
+func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	_ = SetupBuildPath(t, context)
+	//defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_function_signature_inside_ifdef", "sketch.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+
+		&builder.ContainerAddPrototypes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "void setup();\nvoid loop();\nint8_t adalight();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 }

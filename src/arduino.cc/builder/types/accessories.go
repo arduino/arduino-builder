@@ -52,16 +52,6 @@ func (h *UniqueStringQueue) Empty() bool {
 	return h.Len() == 0
 }
 
-// duplication of utils.SliceContains! Thanks golang! Why? Because you can't have import cycles, so types cannot import from utils because utils already imports from types
-func sliceContains(slice []string, target string) bool {
-	for _, value := range slice {
-		if value == target {
-			return true
-		}
-	}
-	return false
-}
-
 type LibraryResolutionResult struct {
 	Library          *Library
 	NotUsedLibraries []*Library

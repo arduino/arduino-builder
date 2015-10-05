@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
@@ -190,6 +191,15 @@ func IsSCCSOrHiddenFile(file os.FileInfo) bool {
 func SliceContains(slice []string, target string) bool {
 	for _, value := range slice {
 		if value == target {
+			return true
+		}
+	}
+	return false
+}
+
+func SliceContainsPrototype(slice []*types.Prototype, target *types.Prototype) bool {
+	for _, value := range slice {
+		if value.FunctionName == target.FunctionName {
 			return true
 		}
 	}

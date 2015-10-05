@@ -27,28 +27,14 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package types
 
-import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
-)
-
-type ComparePrototypesFromSourceAndPreprocSource struct{}
-
-func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]interface{}) error {
-	prototypesOfSource := context[constants.CTX_PROTOTYPES_OF_SOURCE].([]*types.Prototype)
-	prototypesOfPreprocSource := context[constants.CTX_PROTOTYPES_OF_PREPROC_SOURCE].([]*types.Prototype)
-
-	actualPrototypes := []*types.Prototype{}
-	for _, prototypeOfPreprocSource := range prototypesOfPreprocSource {
-		if utils.SliceContainsPrototype(prototypesOfSource, prototypeOfPreprocSource) {
-			actualPrototypes = append(actualPrototypes, prototypeOfPreprocSource)
+// duplication of utils.SliceContains! Thanks golang! Why? Because with golang you can't have import cycles
+func sliceContains(slice []string, target string) bool {
+	for _, value := range slice {
+		if value == target {
+			return true
 		}
 	}
-
-	context[constants.CTX_PROTOTYPES] = actualPrototypes
-
-	return nil
+	return false
 }
