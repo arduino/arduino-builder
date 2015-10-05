@@ -106,12 +106,12 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 			OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/coan-5.2-i686-mingw32.zip"},
 			OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/coan-5.2-x86_64-apple-darwin.zip"},
 		}},
-		Tool{Name: "ctags", Version: "5.8-patched",
+		Tool{Name: "ctags", Version: "5.8-arduino1",
 			OsUrls: []OsUrl{
-				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-patched-i686-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-patched-x86_64-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-patched-i686-mingw32.zip"},
-				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-patched-x86_64-apple-darwin.zip"},
+				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino1-i686-pc-linux-gnu.tar.bz2"},
+				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino1-x86_64-pc-linux-gnu.tar.bz2"},
+				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino1-i686-mingw32.zip"},
+				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino1-x86_64-apple-darwin.zip"},
 			}},
 	}
 
@@ -535,6 +535,14 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath string) error {
 		return utils.WrapError(err)
 	}
 	defer os.RemoveAll(unpackFolder)
+
+	_, err = os.Stat(filepath.Join(targetPath, tool.Name))
+	if err == nil {
+		err = os.RemoveAll(filepath.Join(targetPath, tool.Name))
+		if err != nil {
+			return utils.WrapError(err)
+		}
+	}
 
 	if len(files) == 1 && files[0].IsDir() {
 		err = os.MkdirAll(filepath.Join(targetPath, tool.Name), os.FileMode(0755))
