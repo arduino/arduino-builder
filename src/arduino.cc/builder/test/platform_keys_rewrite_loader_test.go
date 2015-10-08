@@ -42,9 +42,15 @@ func TestLoadPlatformKeysRewrite(t *testing.T) {
 	context := make(map[string]interface{})
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"}
 
-	loader := builder.PlatformKeysRewriteLoader{}
-	err := loader.Run(context)
-	NoError(t, err)
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.PlatformKeysRewriteLoader{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
 
 	platformKeysRewrite := context[constants.CTX_PLATFORM_KEYS_REWRITE].(types.PlatforKeysRewrite)
 

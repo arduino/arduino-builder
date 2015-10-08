@@ -113,7 +113,7 @@ func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*typ
 }
 
 func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*types.Library, error) {
-	properties, err := props.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES))
+	properties, err := props.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES), logger)
 	if err != nil {
 		return nil, utils.WrapError(err)
 	}

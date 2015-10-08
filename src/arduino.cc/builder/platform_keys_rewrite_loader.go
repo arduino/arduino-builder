@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -43,6 +44,7 @@ import (
 type PlatformKeysRewriteLoader struct{}
 
 func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}) error {
+	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	folders := context[constants.CTX_HARDWARE_FOLDERS].([]string)
 
 	platformKeysRewriteTxtPath, err := findPlatformKeysRewriteTxt(folders)
@@ -56,7 +58,7 @@ func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}) error {
 	platformKeysRewrite := types.PlatforKeysRewrite{}
 	platformKeysRewrite.Rewrites = []types.PlatforKeyRewrite{}
 
-	txt, err := props.Load(platformKeysRewriteTxtPath)
+	txt, err := props.Load(platformKeysRewriteTxtPath, logger)
 	keys := utils.KeysOfMapOfString(txt)
 	sort.Strings(keys)
 

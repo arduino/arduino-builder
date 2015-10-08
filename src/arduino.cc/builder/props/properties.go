@@ -31,7 +31,9 @@ package props
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
+	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -54,7 +56,7 @@ func init() {
 	}
 }
 
-func Load(filepath string) (map[string]string, error) {
+func Load(filepath string, logger i18n.Logger) (map[string]string, error) {
 	bytes, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, utils.WrapError(err)
@@ -67,42 +69,53 @@ func Load(filepath string) (map[string]string, error) {
 	properties := make(map[string]string)
 
 	for _, line := range strings.Split(text, "\n") {
-		loadSingleLine(properties, line)
+		err := loadSingleLine(properties, line)
+		if err != nil {
+			return nil, utils.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES_FILE, line, filepath)
+		}
 	}
 
 	return properties, nil
 }
 
-func LoadFromSlice(lines []string) map[string]string {
+func LoadFromSlice(lines []string, logger i18n.Logger) (map[string]string, error) {
 	properties := make(map[string]string)
 
 	for _, line := range lines {
-		loadSingleLine(properties, line)
+		err := loadSingleLine(properties, line)
+		if err != nil {
+			return nil, utils.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES, line)
+		}
 	}
 
-	return properties
+	return properties, nil
 }
 
-func loadSingleLine(properties map[string]string, line string) {
+func loadSingleLine(properties map[string]string, line string) error {
 	line = strings.TrimSpace(line)
 
 	if len(line) > 0 && line[0] != '#' {
 		lineParts := strings.SplitN(line, "=", 2)
+		if len(lineParts) != 2 {
+			return errors.New("")
+		}
 		key := strings.TrimSpace(lineParts[0])
 		value := strings.TrimSpace(lineParts[1])
 
 		key = strings.Replace(key, "."+OSNAME, constants.EMPTY_STRING, 1)
 		properties[key] = value
 	}
+
+	return nil
 }
 
-func SafeLoad(filepath string) (map[string]string, error) {
+func SafeLoad(filepath string, logger i18n.Logger) (map[string]string, error) {
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
 		return make(map[string]string), nil
 	}
 
-	properties, err := Load(filepath)
+	properties, err := Load(filepath, logger)
 	if err != nil {
 		return nil, utils.WrapError(err)
 	}

@@ -44,6 +44,7 @@ func TestTargetBoardResolverUno(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:uno"
 
 	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -68,6 +69,7 @@ func TestTargetBoardResolverDue(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x"
 
 	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -92,6 +94,7 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:mega:cpu=atmega1280"
 
 	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -117,6 +120,7 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:mega:cpu=atmega2560"
 
 	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -142,6 +146,7 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
 
 	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}

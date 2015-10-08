@@ -31,6 +31,7 @@ package test
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
@@ -39,7 +40,7 @@ import (
 )
 
 func TestPropertiesBoardsTxt(t *testing.T) {
-	properties, err := props.Load(filepath.Join("props", "boards.txt"))
+	properties, err := props.Load(filepath.Join("props", "boards.txt"), i18n.HumanLogger{})
 
 	NoError(t, err)
 
@@ -52,7 +53,7 @@ func TestPropertiesBoardsTxt(t *testing.T) {
 }
 
 func TestPropertiesTestTxt(t *testing.T) {
-	properties, err := props.Load(filepath.Join("props", "test.txt"))
+	properties, err := props.Load(filepath.Join("props", "test.txt"), i18n.HumanLogger{})
 
 	NoError(t, err)
 
@@ -119,7 +120,7 @@ func TestDeleteUnexpandedPropsFromString2(t *testing.T) {
 }
 
 func TestPropertiesRedBeearLabBoardsTxt(t *testing.T) {
-	properties, err := props.Load(filepath.Join("props", "redbearlab_boards.txt"))
+	properties, err := props.Load(filepath.Join("props", "redbearlab_boards.txt"), i18n.HumanLogger{})
 
 	NoError(t, err)
 
@@ -130,4 +131,10 @@ func TestPropertiesRedBeearLabBoardsTxt(t *testing.T) {
 
 	ethernet := props.SubTree(properties, "blend")
 	require.Equal(t, "arduino:arduino", ethernet[constants.BUILD_PROPERTIES_BUILD_CORE])
+}
+
+func TestPropertiesBroken(t *testing.T) {
+	_, err := props.Load(filepath.Join("props", "broken.txt"), i18n.HumanLogger{})
+
+	require.Error(t, err)
 }

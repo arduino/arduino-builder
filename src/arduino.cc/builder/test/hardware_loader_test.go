@@ -44,9 +44,15 @@ func TestLoadHardware(t *testing.T) {
 	context := make(map[string]interface{})
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"}
 
-	loader := builder.HardwareLoader{}
-	err := loader.Run(context)
-	NoError(t, err)
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.HardwareLoader{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
 
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 	require.Equal(t, 1, len(packages.Packages))
@@ -153,9 +159,15 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	context := make(map[string]interface{})
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff"}
 
-	loader := builder.HardwareLoader{}
-	err := loader.Run(context)
-	NoError(t, err)
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.HardwareLoader{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
 
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 	require.Equal(t, 3, len(packages.Packages))
@@ -196,9 +208,15 @@ func TestLoadLotsOfHardware(t *testing.T) {
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
 
-	loader := builder.HardwareLoader{}
-	err := loader.Run(context)
-	NoError(t, err)
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.HardwareLoader{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
 
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 

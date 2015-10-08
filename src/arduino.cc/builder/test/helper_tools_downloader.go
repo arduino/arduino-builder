@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"encoding/json"
@@ -338,7 +339,7 @@ func coreAlreadyDownloadedAndUnpacked(targetPath string, core Core) (bool, error
 	if os.IsNotExist(err) {
 		return false, nil
 	}
-	platform, err := props.Load(filepath.Join(corePath, "platform.txt"))
+	platform, err := props.Load(filepath.Join(corePath, "platform.txt"), i18n.HumanLogger{})
 	if err != nil {
 		return false, utils.WrapError(err)
 	}
