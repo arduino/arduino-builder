@@ -77,6 +77,7 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	tags = addPrototypes(tags)
 	tags = removeDefinedProtypes(tags)
 	tags = removeDuplicate(tags)
+	tags = skipTagsWhere(tags, prototypeAndCodeDontMatch)
 
 	if len(tags) > 0 {
 		line, err := strconv.Atoi(tags[0][FIELD_LINE])
@@ -170,6 +171,24 @@ func skipTagsWhere(tags []map[string]string, skipFuncs ...skipFuncType) []map[st
 
 func signatureContainsDefaultArg(tag map[string]string) bool {
 	return strings.Contains(tag[FIELD_SIGNATURE], "=")
+}
+
+func prototypeAndCodeDontMatch(tag map[string]string) bool {
+	if tag[FIELD_SKIP] == "true" {
+		return true
+	}
+
+	code := removeSpacesAndTabs(tag[FIELD_CODE])
+	prototype := removeSpacesAndTabs(tag[KIND_PROTOTYPE])
+	prototype = prototype[0 : len(prototype)-1]
+
+	return strings.Index(code, prototype) == -1
+}
+
+func removeSpacesAndTabs(s string) string {
+	s = strings.Replace(s, " ", "", -1)
+	s = strings.Replace(s, "\t", "", -1)
+	return s
 }
 
 func filterOutTagsWithField(tags []map[string]string, field string) []map[string]string {
