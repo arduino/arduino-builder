@@ -569,8 +569,8 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 
 	context := make(map[string]interface{})
 
-	_ = SetupBuildPath(t, context)
-	//defer os.RemoveAll(buildPath)
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
