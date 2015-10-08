@@ -77,13 +77,15 @@ func TestLoadSketch(t *testing.T) {
 	context := make(map[string]interface{})
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context)
-	NoError(t, err)
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.SketchLoader{},
+	}
 
-	loader := builder.SketchLoader{}
-	err = loader.Run(context)
-	NoError(t, err)
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
 
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	require.NotNil(t, sketch)
@@ -119,13 +121,15 @@ func TestLoadSketchFromFolder(t *testing.T) {
 	context := make(map[string]interface{})
 	context[constants.CTX_SKETCH_LOCATION] = "sketch_with_subfolders"
 
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context)
-	NoError(t, err)
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.SketchLoader{},
+	}
 
-	loader := builder.SketchLoader{}
-	err = loader.Run(context)
-	NoError(t, err)
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
 
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	require.NotNil(t, sketch)
@@ -134,4 +138,27 @@ func TestLoadSketchFromFolder(t *testing.T) {
 
 	require.Equal(t, 1, len(sketch.AdditionalFiles))
 	require.True(t, strings.Index(sketch.AdditionalFiles[0].Name, "other.cpp") != -1)
+}
+
+func TestLoadSketchWithBackup(t *testing.T) {
+	context := make(map[string]interface{})
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_backup_files", "sketch.ino")
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.SketchLoader{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	require.NotNil(t, sketch)
+
+	require.True(t, strings.Index(sketch.MainFile.Name, "sketch.ino") != -1)
+
+	require.Equal(t, 0, len(sketch.AdditionalFiles))
+	require.Equal(t, 0, len(sketch.OtherSketchFiles))
 }

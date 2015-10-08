@@ -75,6 +75,9 @@ func (s *SketchLoader) Run(context map[string]interface{}) error {
 
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, logger)
+	if err != nil {
+		return utils.WrapError(err)
+	}
 
 	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
 	context[constants.CTX_SKETCH] = sketch
@@ -107,10 +110,13 @@ func makeSketch(sketchLocation string, allSketchFilePaths []string, logger i18n.
 
 	additionalFiles := []types.SketchFile{}
 	otherSketchFiles := []types.SketchFile{}
+	mainFileDir := filepath.Dir(mainFile.Name)
 	for _, sketchFile := range sketchFilesMap {
 		ext := strings.ToLower(filepath.Ext(sketchFile.Name))
 		if MAIN_FILE_VALID_EXTENSIONS[ext] {
-			otherSketchFiles = append(otherSketchFiles, sketchFile)
+			if filepath.Dir(sketchFile.Name) == mainFileDir {
+				otherSketchFiles = append(otherSketchFiles, sketchFile)
+			}
 		} else if ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {
 			additionalFiles = append(additionalFiles, sketchFile)
 		} else {

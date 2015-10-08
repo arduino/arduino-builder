@@ -265,6 +265,26 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestBuilderSketchWithBackup(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
+	context[constants.CTX_FQBN] = "arduino:avr:uno"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_backup_files", "sketch.ino")
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+
+	command := builder.Builder{}
+	err := command.Run(context)
+	NoError(t, err)
+}
+
 /*
 func TestBuilderALinkage(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
