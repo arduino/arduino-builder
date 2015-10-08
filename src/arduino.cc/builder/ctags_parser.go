@@ -189,9 +189,13 @@ func prototypeAndCodeDontMatch(tag map[string]string) bool {
 
 	code := removeSpacesAndTabs(tag[FIELD_CODE])
 	prototype := removeSpacesAndTabs(tag[KIND_PROTOTYPE])
-	prototype = prototype[0 : len(prototype)-1]
+	prototype = removeTralingSemicolon(prototype)
 
 	return strings.Index(code, prototype) == -1
+}
+
+func removeTralingSemicolon(s string) string {
+	return s[0 : len(s)-1]
 }
 
 func removeSpacesAndTabs(s string) string {
