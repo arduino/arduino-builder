@@ -71,7 +71,7 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	tags = filterOutUnknownTags(tags)
 	tags = filterOutTagsWithField(tags, FIELD_CLASS)
 	tags = filterOutTagsWithField(tags, FIELD_STRUCT)
-	tags = markTagsWithFunctionWithDefaultArgs(tags)
+	tags = skipTagsWhere(tags, signatureContainsDefaultArg)
 	tags = addPrototypes(tags)
 	tags = removeDefinedProtypes(tags)
 	tags = removeDuplicate(tags)
@@ -153,11 +153,21 @@ func removeDuplicate(tags []map[string]string) []map[string]string {
 	return newTags
 }
 
-func markTagsWithFunctionWithDefaultArgs(tags []map[string]string) []map[string]string {
+type skipFuncType func(tag map[string]string) bool
+
+func skipTagsWhere(tags []map[string]string, skipFuncs ...skipFuncType) []map[string]string {
 	for _, tag := range tags {
-		tag[FIELD_SKIP] = strconv.FormatBool(strings.Contains(tag[FIELD_SIGNATURE], "="))
+		skip := skipFuncs[0](tag)
+		for _, skipFunc := range skipFuncs[1:] {
+			skip = skip || skipFunc(tag)
+		}
+		tag[FIELD_SKIP] = strconv.FormatBool(skip)
 	}
 	return tags
+}
+
+func signatureContainsDefaultArg(tag map[string]string) bool {
+	return strings.Contains(tag[FIELD_SIGNATURE], "=")
 }
 
 func filterOutTagsWithField(tags []map[string]string, field string) []map[string]string {
