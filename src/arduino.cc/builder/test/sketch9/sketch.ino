@@ -2,5 +2,5 @@
 #include <IRremote.h>
 #include <IRremoteInt.h>
 
-void setup {}
-void main {}
+void setup() {}
+void loop() {}

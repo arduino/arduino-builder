@@ -67,20 +67,20 @@ func (s *LibrariesBuilder) Run(context map[string]interface{}) error {
 }
 
 func compileLibraries(libraries []*types.Library, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	var err error
-	var objectFiles []string
+	objectFiles := []string{}
 	for _, library := range libraries {
-		objectFiles, err = compileLibrary(objectFiles, library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, utils.WrapError(err)
 		}
+		objectFiles = append(objectFiles, libraryObjectFiles...)
 	}
 
 	return objectFiles, nil
 
 }
 
-func compileLibrary(objectFiles []string, library *types.Library, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibrary(library *types.Library, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	libraryBuildPath := filepath.Join(buildPath, library.Name)
 
 	err := os.MkdirAll(libraryBuildPath, os.FileMode(0755))
@@ -88,6 +88,7 @@ func compileLibrary(objectFiles []string, library *types.Library, buildPath stri
 		return nil, utils.WrapError(err)
 	}
 
+	objectFiles := []string{}
 	if library.Layout == types.LIBRARY_RECURSIVE {
 		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {

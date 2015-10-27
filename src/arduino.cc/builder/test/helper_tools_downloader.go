@@ -130,7 +130,6 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 		Library{Name: "Bridge", Version: "1.0.7"},
 		Library{Name: "CapacitiveSensor", Version: "0.5.0"},
 		Library{Name: "Robot IR Remote", Version: "1.0.2"},
-		//Library{Name: "HID", Version: "0.0.0", Url: "https://github.com/NicoHood/HID/archive/dev_2_4.zip"},
 	}
 
 	download(t, cores, boardsManagerCores, boardsManagerRedBearCores, tools, boardsManagerTools, boardsManagerRFduinoTools, libraries)
