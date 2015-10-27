@@ -62,7 +62,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	}
 
 	libraries := context[constants.CTX_LIBRARIES].([]*types.Library)
-	require.Equal(t, 14, len(libraries))
+	require.Equal(t, 15, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 
@@ -112,6 +112,8 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	require.Equal(t, "SoftwareSerial", libraries[idx].Name)
 	idx++
+	require.Equal(t, "USBHost", libraries[idx].Name)
+	idx++
 	require.Equal(t, "Wire", libraries[idx].Name)
 
 	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
@@ -155,7 +157,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	}
 
 	libraries := context[constants.CTX_LIBRARIES].([]*types.Library)
-	require.Equal(t, 12, len(libraries))
+	require.Equal(t, 13, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 
@@ -181,6 +183,8 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.Equal(t, "SPI", libraries[idx].Name)
 	idx++
 	require.Equal(t, "SPI", libraries[idx].Name)
+	idx++
+	require.Equal(t, "USBHost", libraries[idx].Name)
 	idx++
 	require.Equal(t, "Wire", libraries[idx].Name)
 

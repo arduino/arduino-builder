@@ -43,11 +43,11 @@ import (
 type LibrariesLoader struct{}
 
 func (s *LibrariesLoader) Run(context map[string]interface{}) error {
-	if !utils.MapHas(context, constants.CTX_LIBRARIES_FOLDERS) {
-		return nil
+	librariesFolders := []string{}
+	if utils.MapHas(context, constants.CTX_LIBRARIES_FOLDERS) {
+		librariesFolders = context[constants.CTX_LIBRARIES_FOLDERS].([]string)
 	}
 
-	librariesFolders := context[constants.CTX_LIBRARIES_FOLDERS].([]string)
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	debugLevel := utils.DebugLevel(context)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
@@ -57,11 +57,11 @@ func (s *LibrariesLoader) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	librariesFolders = appendPathToLibrariesFolders(librariesFolders, filepath.Join(platform.Folder, constants.FOLDER_LIBRARIES))
+	librariesFolders = prependPathToLibrariesFolders(librariesFolders, filepath.Join(platform.Folder, constants.FOLDER_LIBRARIES))
 
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 	if actualPlatform != platform {
-		librariesFolders = appendPathToLibrariesFolders(librariesFolders, filepath.Join(actualPlatform.Folder, constants.FOLDER_LIBRARIES))
+		librariesFolders = prependPathToLibrariesFolders(librariesFolders, filepath.Join(actualPlatform.Folder, constants.FOLDER_LIBRARIES))
 	}
 
 	librariesFolders, err = utils.AbsolutizePaths(librariesFolders)
@@ -208,7 +208,7 @@ func makeLegacyLibrary(libraryFolder string) (*types.Library, error) {
 	return library, nil
 }
 
-func appendPathToLibrariesFolders(librariesFolders []string, newLibrariesFolder string) []string {
+func prependPathToLibrariesFolders(librariesFolders []string, newLibrariesFolder string) []string {
 	if stat, err := os.Stat(newLibrariesFolder); os.IsNotExist(err) || !stat.IsDir() {
 		return librariesFolders
 	}
@@ -217,5 +217,5 @@ func appendPathToLibrariesFolders(librariesFolders []string, newLibrariesFolder 
 		return librariesFolders
 	}
 
-	return append(librariesFolders, newLibrariesFolder)
+	return append([]string{newLibrariesFolder}, librariesFolders...)
 }

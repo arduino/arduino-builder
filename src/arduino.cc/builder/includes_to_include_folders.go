@@ -53,7 +53,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	}
-	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, []*types.Platform{platform, actualPlatform}, libraryResolutionResults)
+	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{platform, actualPlatform}, libraryResolutionResults)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -92,29 +92,36 @@ func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties m
 }
 
 //FIXME it's also resolving previously resolved libraries
-func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) ([]*types.Library, error) {
+func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) ([]*types.Library, error) {
 	markImportedLibrary := make(map[*types.Library]bool)
+	for _, library := range importedLibraries {
+		markImportedLibrary[library] = true
+	}
 	for _, header := range includes {
 		resolveLibrary(header, headerToLibraries, markImportedLibrary, platforms, libraryResolutionResults)
 	}
 
-	var importedLibraries []*types.Library
+	var newlyImportedLibraries []*types.Library
 	for library, _ := range markImportedLibrary {
-		importedLibraries = append(importedLibraries, library)
+		newlyImportedLibraries = append(newlyImportedLibraries, library)
 	}
 
-	return importedLibraries, nil
+	return newlyImportedLibraries, nil
 }
 
 func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) {
 	libraries := headerToLibraries[header]
 
-	if libraries == nil {
+	if libraries == nil || len(libraries) == 0 {
 		return
 	}
 
 	if len(libraries) == 1 {
 		markImportedLibrary[libraries[0]] = true
+		return
+	}
+
+	if markedLibrariesContainOneOfCandidate(markImportedLibrary, libraries) {
 		return
 	}
 
@@ -138,12 +145,34 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 	}
 
 	if library == nil {
-		library = libraries[0]
+		library = libraries[len(libraries)-1]
 	}
+
+	library = useAlreadyImportedLibraryWithSameNameIfExists(library, markImportedLibrary)
 
 	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
 
 	markImportedLibrary[library] = true
+}
+
+func markedLibrariesContainOneOfCandidate(markImportedLibrary map[*types.Library]bool, libraries []*types.Library) bool {
+	for markedLibrary, _ := range markImportedLibrary {
+		for _, library := range libraries {
+			if markedLibrary == library {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, markImportedLibrary map[*types.Library]bool) *types.Library {
+	for lib, _ := range markImportedLibrary {
+		if lib.Name == library.Name {
+			return lib
+		}
+	}
+	return library
 }
 
 func filterOutLibraryFrom(libraries []*types.Library, library *types.Library) []*types.Library {
