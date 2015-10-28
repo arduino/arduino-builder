@@ -728,6 +728,14 @@ func downloadAndUnpackLibrary(library Library, url string, targetPath string) er
 	}
 	defer os.RemoveAll(unpackFolder)
 
+	_, err = os.Stat(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1)))
+	if err == nil {
+		err = os.RemoveAll(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1)))
+		if err != nil {
+			return utils.WrapError(err)
+		}
+	}
+
 	err = copyRecursive(filepath.Join(unpackFolder, files[0].Name()), filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1)))
 	if err != nil {
 		return utils.WrapError(err)
