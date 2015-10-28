@@ -77,13 +77,13 @@ func TestCTagsRunner(t *testing.T) {
 	}
 
 	ctagsTempFileName := context[constants.CTX_CTAGS_TEMP_FILE_NAME].(string)
-	expectedOutput := "server	" + ctagsTempFileName + "	/^YunServer server;$/;\"	kind:variable	line:32\n" +
+	expectedOutput := "server	" + ctagsTempFileName + "	/^BridgeServer server;$/;\"	kind:variable	line:32\n" +
 		"setup	" + ctagsTempFileName + "	/^void setup() {$/;\"	kind:function	line:34	signature:()	returntype:void\n" +
 		"loop	" + ctagsTempFileName + "	/^void loop() {$/;\"	kind:function	line:47	signature:()	returntype:void\n" +
-		"process	" + ctagsTempFileName + "	/^void process(YunClient client) {$/;\"	kind:function	line:63	signature:(YunClient client)	returntype:void\n" +
-		"digitalCommand	" + ctagsTempFileName + "	/^void digitalCommand(YunClient client) {$/;\"	kind:function	line:83	signature:(YunClient client)	returntype:void\n" +
-		"analogCommand	" + ctagsTempFileName + "	/^void analogCommand(YunClient client) {$/;\"	kind:function	line:111	signature:(YunClient client)	returntype:void\n" +
-		"modeCommand	" + ctagsTempFileName + "	/^void modeCommand(YunClient client) {$/;\"	kind:function	line:152	signature:(YunClient client)	returntype:void\n"
+		"process	" + ctagsTempFileName + "	/^void process(BridgeClient client) {$/;\"	kind:function	line:63	signature:(BridgeClient client)	returntype:void\n" +
+		"digitalCommand	" + ctagsTempFileName + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:83	signature:(BridgeClient client)	returntype:void\n" +
+		"analogCommand	" + ctagsTempFileName + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:110	signature:(BridgeClient client)	returntype:void\n" +
+		"modeCommand	" + ctagsTempFileName + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:150	signature:(BridgeClient client)	returntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }

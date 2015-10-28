@@ -78,7 +78,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "void setup();\nvoid loop();\nvoid process(YunClient client);\nvoid digitalCommand(YunClient client);\nvoid analogCommand(YunClient client);\nvoid modeCommand(YunClient client);\n#line 33\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+	require.Equal(t, "void setup();\nvoid loop();\nvoid process(BridgeClient client);\nvoid digitalCommand(BridgeClient client);\nvoid analogCommand(BridgeClient client);\nvoid modeCommand(BridgeClient client);\n#line 33\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 }
 
 func TestPrototypesAdderSketchWithIfDef(t *testing.T) {

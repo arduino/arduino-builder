@@ -85,17 +85,18 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, 8, len(*sourceFiles))
+	require.Equal(t, 9, len(*sourceFiles))
 	require.Equal(t, 0, len(*foldersWithSources))
 	sort.Strings(*sourceFiles)
 
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "Bridge.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "BridgeClient.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "BridgeServer.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "BridgeUdp.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "Console.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "FileIO.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "HttpClient.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "Mailbox.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "Process.cpp")), sourceFiles.Pop())
-	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "YunClient.cpp")), sourceFiles.Pop())
-	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "YunServer.cpp")), sourceFiles.Pop())
 	require.Equal(t, 0, len(*sourceFiles))
 }

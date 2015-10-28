@@ -69,9 +69,10 @@ type OsUrl struct {
 }
 
 type Library struct {
-	Name    string
-	Version string
-	Url     string
+	Name                   string
+	Version                string
+	VersionInLibProperties string
+	Url                    string
 }
 
 type Core struct {
@@ -125,10 +126,10 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	}
 
 	libraries := []Library{
-		Library{Name: "Audio", Version: "1.0.3"},
+		Library{Name: "Audio", Version: "1.0.4"},
 		Library{Name: "Adafruit PN532", Version: "1.0.0"},
-		Library{Name: "Bridge", Version: "1.0.7"},
-		Library{Name: "CapacitiveSensor", Version: "0.5.0"},
+		Library{Name: "Bridge", Version: "1.1.0"},
+		Library{Name: "CapacitiveSensor", Version: "0.5.0", VersionInLibProperties: "0.5"},
 		Library{Name: "Robot IR Remote", Version: "1.0.2"},
 	}
 
@@ -390,7 +391,15 @@ func allLibrariesAlreadyDownloadedAndUnpacked(targetPath string, libraries []Lib
 
 func libraryAlreadyDownloadedAndUnpacked(targetPath string, library Library) bool {
 	_, err := os.Stat(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1)))
-	return !os.IsNotExist(err)
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	libProps, err := props.Load(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1), "library.properties"), i18n.HumanLogger{})
+	if err != nil {
+		return false
+	}
+	return libProps["version"] == library.Version || libProps["version"] == library.VersionInLibProperties
 }
 
 func downloadAndUnpackCore(core Core, url string, targetPath string) error {
