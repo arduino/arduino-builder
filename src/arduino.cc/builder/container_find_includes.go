@@ -39,6 +39,11 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
+	err := runCommand(context, &IncludesToIncludeFolders{})
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 	wheelSpins := context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH].(int)
@@ -50,8 +55,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 		}
 
 		for _, command := range commands {
-			PrintRingNameIfDebug(context, command)
-			err := command.Run(context)
+			err := runCommand(context, command)
 			if err != nil {
 				return utils.WrapError(err)
 			}
@@ -66,8 +70,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 		}
 	}
 
-	command := &CollectAllSourceFilesFromFoldersWithSources{}
-	err := command.Run(context)
+	err = runCommand(context, &CollectAllSourceFilesFromFoldersWithSources{})
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -83,13 +86,21 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 		}
 
 		for _, command := range commands {
-			PrintRingNameIfDebug(context, command)
-			err := command.Run(context)
+			err := runCommand(context, command)
 			if err != nil {
 				return utils.WrapError(err)
 			}
 		}
 	}
 
+	return nil
+}
+
+func runCommand(context map[string]interface{}, command types.Command) error {
+	PrintRingNameIfDebug(context, command)
+	err := command.Run(context)
+	if err != nil {
+		return utils.WrapError(err)
+	}
 	return nil
 }

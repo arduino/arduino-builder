@@ -40,11 +40,15 @@ import (
 type IncludesToIncludeFolders struct{}
 
 func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
-	if !utils.MapHas(context, constants.CTX_LIBRARIES) {
-		return nil
+	includes := []string{}
+	if utils.MapHas(context, constants.CTX_INCLUDES) {
+		includes = context[constants.CTX_INCLUDES].([]string)
 	}
-	includes := context[constants.CTX_INCLUDES].([]string)
-	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
+	headerToLibraries := make(map[string][]*types.Library)
+	if utils.MapHas(context, constants.CTX_HEADER_TO_LIBRARIES) {
+		headerToLibraries = context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
+	}
+
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
