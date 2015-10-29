@@ -129,10 +129,13 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 		return
 	}
 
-	library := findLibraryOutsideAnyPlatform(header, libraries, platforms)
+	librariesInPlatforms := librariesInSomePlatform(libraries, platforms)
+	librariesOutsidePlatforms := filterOutLibrariesFrom(libraries, librariesInPlatforms)
+
+	library := findBestLibraryOutsideAnyPlatform(header, librariesOutsidePlatforms, platforms)
 
 	if library == nil {
-		library = findLibraryInPlatforms(header, libraries, platforms)
+		library = findBestLibraryInPlatforms(header, librariesInPlatforms, platforms)
 	}
 
 	if library == nil {
@@ -146,10 +149,10 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 	markImportedLibrary[library] = true
 }
 
-func findLibraryInPlatforms(header string, libraries []*types.Library, platforms []*types.Platform) *types.Library {
+func findBestLibraryInPlatforms(header string, librariesInPlatforms []*types.Library, platforms []*types.Platform) *types.Library {
 	for _, platform := range platforms {
 		if platform != nil {
-			librariesWithinSpecifiedPlatform := librariesWithinPlatform(libraries, platform)
+			librariesWithinSpecifiedPlatform := librariesWithinPlatform(librariesInPlatforms, platform)
 			library := findBestLibraryWithHeader(header, librariesWithinSpecifiedPlatform)
 			if library != nil {
 				return library
@@ -160,9 +163,7 @@ func findLibraryInPlatforms(header string, libraries []*types.Library, platforms
 	return nil
 }
 
-func findLibraryOutsideAnyPlatform(header string, libraries []*types.Library, platforms []*types.Platform) *types.Library {
-	librariesOutsidePlatforms := librariesOutsideAnyPlatform(libraries, platforms)
-
+func findBestLibraryOutsideAnyPlatform(header string, librariesOutsidePlatforms []*types.Library, platforms []*types.Platform) *types.Library {
 	for _, platform := range platforms {
 		if platform != nil {
 			library := findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(librariesOutsidePlatforms, platform))
@@ -175,25 +176,15 @@ func findLibraryOutsideAnyPlatform(header string, libraries []*types.Library, pl
 	return findBestLibraryWithHeader(header, librariesOutsidePlatforms)
 }
 
-func librariesOutsideAnyPlatform(libraries []*types.Library, platforms []*types.Platform) []*types.Library {
-	allLibsAsMap := make(map[*types.Library]bool)
-	for _, lib := range libraries {
-		allLibsAsMap[lib] = true
-	}
+func librariesInSomePlatform(libraries []*types.Library, platforms []*types.Platform) []*types.Library {
+	librariesInPlatforms := []*types.Library{}
 	for _, platform := range platforms {
 		if platform != nil {
 			librariesWithinSpecifiedPlatform := librariesWithinPlatform(libraries, platform)
-			for _, libraryWithinPlatform := range librariesWithinSpecifiedPlatform {
-				delete(allLibsAsMap, libraryWithinPlatform)
-			}
+			librariesInPlatforms = append(librariesInPlatforms, librariesWithinSpecifiedPlatform...)
 		}
 	}
-
-	librariesOutsidePlatforms := []*types.Library{}
-	for lib, _ := range allLibsAsMap {
-		librariesOutsidePlatforms = append(librariesOutsidePlatforms, lib)
-	}
-	return librariesOutsidePlatforms
+	return librariesInPlatforms
 }
 
 func markImportedLibraryContainsOneOfCandidates(markImportedLibrary map[*types.Library]bool, libraries []*types.Library) bool {
@@ -216,14 +207,33 @@ func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, markI
 	return library
 }
 
-func filterOutLibraryFrom(libraries []*types.Library, library *types.Library) []*types.Library {
+func filterOutLibraryFrom(libraries []*types.Library, libraryToRemove *types.Library) []*types.Library {
 	filteredOutLibraries := []*types.Library{}
 	for _, lib := range libraries {
-		if lib != library {
+		if lib != libraryToRemove {
 			filteredOutLibraries = append(filteredOutLibraries, lib)
 		}
 	}
 	return filteredOutLibraries
+}
+
+func filterOutLibrariesFrom(libraries []*types.Library, librariesToRemove []*types.Library) []*types.Library {
+	filteredOutLibraries := []*types.Library{}
+	for _, lib := range libraries {
+		if findLibraryIn(librariesToRemove, lib) == nil {
+			filteredOutLibraries = append(filteredOutLibraries, lib)
+		}
+	}
+	return filteredOutLibraries
+}
+
+func findLibraryIn(libraries []*types.Library, library *types.Library) *types.Library {
+	for _, lib := range libraries {
+		if lib == library {
+			return lib
+		}
+	}
+	return nil
 }
 
 func libraryCompatibleWithPlatform(library *types.Library, platform *types.Platform) bool {
