@@ -200,7 +200,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -223,6 +223,44 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI")), importedLibraries[0].SrcFolder)
+}
+
+func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"downloaded_libraries", "libraries"}
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	sort.Sort(ByLibraryName(importedLibraries))
+	require.Equal(t, 1, len(importedLibraries))
+	require.Equal(t, "SPI", importedLibraries[0].Name)
+	require.Equal(t, Abs(t, filepath.Join("libraries", "SPI")), importedLibraries[0].SrcFolder)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
