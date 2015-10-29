@@ -144,7 +144,8 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 
 	library = useAlreadyImportedLibraryWithSameNameIfExists(library, markImportedLibrary)
 
-	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
+	isLibraryFromPlatform := findLibraryIn(librariesInPlatforms, library) != nil
+	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, IsLibraryFromPlatform: isLibraryFromPlatform, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
 
 	markImportedLibrary[library] = true
 }

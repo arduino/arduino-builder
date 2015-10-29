@@ -53,6 +53,7 @@ func (h *UniqueStringQueue) Empty() bool {
 }
 
 type LibraryResolutionResult struct {
-	Library          *Library
-	NotUsedLibraries []*Library
+	Library               *Library
+	IsLibraryFromPlatform bool
+	NotUsedLibraries      []*Library
 }

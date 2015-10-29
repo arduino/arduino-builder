@@ -48,10 +48,12 @@ func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}) error
 	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
 
 	for header, libResResult := range libraryResolutionResults {
-		logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-		logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
-		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-			logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
+		if !libResResult.IsLibraryFromPlatform {
+			logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
+			logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
+			for _, notUsedLibrary := range libResResult.NotUsedLibraries {
+				logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
+			}
 		}
 	}
 
