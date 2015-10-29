@@ -54,6 +54,7 @@ const FLAG_DUMP_PREFS = "dump-prefs"
 const FLAG_BUILD_OPTIONS_FILE = "build-options-file"
 const FLAG_HARDWARE = "hardware"
 const FLAG_TOOLS = "tools"
+const FLAG_BUILT_IN_LIBRARIES = "built-in-libraries"
 const FLAG_LIBRARIES = "libraries"
 const FLAG_PREFS = "prefs"
 const FLAG_FQBN = "fqbn"
@@ -100,6 +101,7 @@ var dumpPrefsFlag *bool
 var buildOptionsFileFlag *string
 var hardwareFoldersFlag slice
 var toolsFoldersFlag slice
+var librariesBuiltInFoldersFlag slice
 var librariesFoldersFlag slice
 var customBuildPropertiesFlag slice
 var fqbnFlag *string
@@ -119,6 +121,7 @@ func init() {
 	buildOptionsFileFlag = flag.String(FLAG_BUILD_OPTIONS_FILE, "", "Instead of specifying --"+FLAG_HARDWARE+", --"+FLAG_TOOLS+" etc every time, you can load all such options from a file")
 	flag.Var(&hardwareFoldersFlag, FLAG_HARDWARE, "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
 	flag.Var(&toolsFoldersFlag, FLAG_TOOLS, "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
+	flag.Var(&librariesBuiltInFoldersFlag, FLAG_BUILT_IN_LIBRARIES, "Specify a built-in 'libraries' folder. These are low priority libraries. Can be added multiple times for specifying multiple built-in 'libraries' folders")
 	flag.Var(&librariesFoldersFlag, FLAG_LIBRARIES, "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
 	flag.Var(&customBuildPropertiesFlag, FLAG_PREFS, "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
 	fqbnFlag = flag.String(FLAG_FQBN, "", "fully qualified board name")
@@ -195,7 +198,14 @@ func main() {
 		return
 	}
 
-	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, librariesFoldersFlag, buildOptions, constants.CTX_LIBRARIES_FOLDERS, FLAG_LIBRARIES, false)
+	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, librariesFoldersFlag, buildOptions, constants.CTX_OTHER_LIBRARIES_FOLDERS, FLAG_LIBRARIES, false)
+	if err != nil {
+		printError(err, printStackTrace)
+		defer os.Exit(1)
+		return
+	}
+
+	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, librariesBuiltInFoldersFlag, buildOptions, constants.CTX_BUILT_IN_LIBRARIES_FOLDERS, FLAG_BUILT_IN_LIBRARIES, false)
 	if err != nil {
 		printError(err, printStackTrace)
 		defer os.Exit(1)

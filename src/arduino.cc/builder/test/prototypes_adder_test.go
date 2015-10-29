@@ -54,7 +54,8 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -94,7 +95,8 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch2", "SketchWithIfDef.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
@@ -134,7 +136,8 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch3", "Baladuino.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -174,7 +177,8 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch4", "CharWithEscapedDoubleQuote.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -214,7 +218,8 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x_dbg"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch5", "IncludeBetweenMultilineComment.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
@@ -254,7 +259,8 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch6", "/LineContinuations.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -294,7 +300,8 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch7", "StringWithComment.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -334,7 +341,8 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch8", "SketchWithStruct.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -374,7 +382,8 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_config", "sketch_with_config.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -417,7 +426,8 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_no_functions_two_files", "main.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
@@ -457,7 +467,8 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_no_functions", "main.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
@@ -497,7 +508,8 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_default_args", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -537,7 +549,8 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_inline_function", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -577,7 +590,8 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_function_signature_inside_ifdef", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
@@ -617,7 +631,8 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_usbcon", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{

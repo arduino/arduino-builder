@@ -406,3 +406,12 @@ func CollectAllReadableFiles(collector *[]string, test CheckFileExtensionFunc) f
 	}
 	return walkFunc
 }
+
+func AppendIfNotPresent(target []string, elements ...string) []string {
+	for _, element := range elements {
+		if !SliceContains(target, element) {
+			target = append(target, element)
+		}
+	}
+	return target
+}

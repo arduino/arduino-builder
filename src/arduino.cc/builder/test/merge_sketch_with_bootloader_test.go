@@ -52,7 +52,8 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
@@ -94,7 +95,8 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
@@ -136,7 +138,8 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 

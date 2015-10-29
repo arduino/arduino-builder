@@ -50,7 +50,8 @@ func TestBuilderEmptySketch(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:uno"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	//	context[constants.CTX_VERBOSE] = true
 	//	context[constants.CTX_DEBUG_LEVEL] = 10
@@ -83,7 +84,8 @@ func TestBuilderBridge(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
@@ -116,7 +118,8 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_config", "sketch_with_config.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
@@ -149,7 +152,8 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
@@ -186,7 +190,8 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x_dbg"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_WARNINGS_LEVEL] = "all"
 
@@ -224,7 +229,8 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
 	context[constants.CTX_FQBN] = "RedBearLab:avr:blend"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
@@ -257,7 +263,8 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
 	context[constants.CTX_FQBN] = "RedBearLab:avr:blend"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_no_functions", "main.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
@@ -277,7 +284,8 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
 	context[constants.CTX_FQBN] = "arduino:avr:uno"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_backup_files", "sketch.ino")
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}

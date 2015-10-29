@@ -53,7 +53,8 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -93,7 +94,8 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch2", "SketchWithIfDef.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -131,7 +133,8 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch9", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -174,7 +177,8 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch10", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"downloaded_libraries", "libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -217,7 +221,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -259,8 +263,9 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"downloaded_libraries", "libraries"}
-	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -301,7 +306,8 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:samd:arduino_zero_native"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_usbhost", "sketch_usbhost.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

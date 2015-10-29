@@ -89,7 +89,8 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"dependent_libraries", "downloaded_libraries", "libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"dependent_libraries", "libraries"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_config", "sketch_with_config.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
@@ -131,7 +132,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"dependent_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"dependent_libraries"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_dependend_libraries", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"

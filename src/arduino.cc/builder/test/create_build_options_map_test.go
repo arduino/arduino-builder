@@ -43,7 +43,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	context[constants.CTX_BUILD_PATH] = "buildPath"
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"hardware", "hardware2"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"tools"}
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_FQBN] = "fqbn"
 	context[constants.CTX_SKETCH_LOCATION] = "sketchLocation"
 	context[constants.CTX_VERBOSE] = true
@@ -58,7 +58,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	require.Equal(t, 6, len(utils.KeysOfMapOfString(buildOptions)))
 	require.Equal(t, "hardware,hardware2", buildOptions[constants.CTX_HARDWARE_FOLDERS])
 	require.Equal(t, "tools", buildOptions[constants.CTX_TOOLS_FOLDERS])
-	require.Equal(t, "libraries", buildOptions[constants.CTX_LIBRARIES_FOLDERS])
+	require.Equal(t, "libraries", buildOptions[constants.CTX_OTHER_LIBRARIES_FOLDERS])
 	require.Equal(t, "fqbn", buildOptions[constants.CTX_FQBN])
 	require.Equal(t, "sketchLocation", buildOptions[constants.CTX_SKETCH_LOCATION])
 	require.Equal(t, "ideVersion", buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
@@ -66,7 +66,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	require.Equal(t, "{\n"+
 		"  \"fqbn\": \"fqbn\",\n"+
 		"  \"hardwareFolders\": \"hardware,hardware2\",\n"+
-		"  \"librariesFolders\": \"libraries\",\n"+
+		"  \"otherLibrariesFolders\": \"libraries\",\n"+
 		"  \"runtime.ide.version\": \"ideVersion\",\n"+
 		"  \"sketchLocation\": \"sketchLocation\",\n"+
 		"  \"toolsFolders\": \"tools\"\n"+

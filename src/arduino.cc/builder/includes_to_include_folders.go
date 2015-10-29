@@ -57,7 +57,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	}
-	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{platform, actualPlatform}, libraryResolutionResults)
+	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -114,7 +114,7 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 }
 
 func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) {
-	libraries := headerToLibraries[header]
+	libraries := append([]*types.Library{}, headerToLibraries[header]...)
 
 	if libraries == nil || len(libraries) == 0 {
 		return
@@ -129,17 +129,24 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 		return
 	}
 
+	reverse(libraries)
+
 	librariesInPlatforms := librariesInSomePlatform(libraries, platforms)
-	librariesOutsidePlatforms := filterOutLibrariesFrom(libraries, librariesInPlatforms)
 
-	library := findBestLibraryOutsideAnyPlatform(header, librariesOutsidePlatforms, platforms)
+	var library *types.Library
 
-	if library == nil {
-		library = findBestLibraryInPlatforms(header, librariesInPlatforms, platforms)
+	for _, platform := range platforms {
+		if platform != nil && library == nil {
+			library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libraries, platform))
+		}
 	}
 
 	if library == nil {
-		library = libraries[len(libraries)-1]
+		library = findBestLibraryWithHeader(header, libraries)
+	}
+
+	if library == nil {
+		library = libraries[0]
 	}
 
 	library = useAlreadyImportedLibraryWithSameNameIfExists(library, markImportedLibrary)
@@ -150,31 +157,11 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 	markImportedLibrary[library] = true
 }
 
-func findBestLibraryInPlatforms(header string, librariesInPlatforms []*types.Library, platforms []*types.Platform) *types.Library {
-	for _, platform := range platforms {
-		if platform != nil {
-			librariesWithinSpecifiedPlatform := librariesWithinPlatform(librariesInPlatforms, platform)
-			library := findBestLibraryWithHeader(header, librariesWithinSpecifiedPlatform)
-			if library != nil {
-				return library
-			}
-		}
+//facepalm. sort.Reverse needs an Interface that implements Len/Less/Swap. It's a slice! What else for reversing it?!?
+func reverse(data []*types.Library) {
+	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+		data[i], data[j] = data[j], data[i]
 	}
-
-	return nil
-}
-
-func findBestLibraryOutsideAnyPlatform(header string, librariesOutsidePlatforms []*types.Library, platforms []*types.Platform) *types.Library {
-	for _, platform := range platforms {
-		if platform != nil {
-			library := findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(librariesOutsidePlatforms, platform))
-			if library != nil {
-				return library
-			}
-		}
-	}
-
-	return findBestLibraryWithHeader(header, librariesOutsidePlatforms)
 }
 
 func librariesInSomePlatform(libraries []*types.Library, platforms []*types.Platform) []*types.Library {
@@ -212,16 +199,6 @@ func filterOutLibraryFrom(libraries []*types.Library, libraryToRemove *types.Lib
 	filteredOutLibraries := []*types.Library{}
 	for _, lib := range libraries {
 		if lib != libraryToRemove {
-			filteredOutLibraries = append(filteredOutLibraries, lib)
-		}
-	}
-	return filteredOutLibraries
-}
-
-func filterOutLibrariesFrom(libraries []*types.Library, librariesToRemove []*types.Library) []*types.Library {
-	filteredOutLibraries := []*types.Library{}
-	for _, lib := range libraries {
-		if findLibraryIn(librariesToRemove, lib) == nil {
 			filteredOutLibraries = append(filteredOutLibraries, lib)
 		}
 	}

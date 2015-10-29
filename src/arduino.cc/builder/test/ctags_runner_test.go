@@ -53,7 +53,8 @@ func TestCTagsRunner(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -101,7 +102,8 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_class", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
@@ -147,7 +149,8 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_typename", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{

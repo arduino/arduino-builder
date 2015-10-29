@@ -45,7 +45,8 @@ func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
 	buildOptionsMapKeys := []string{
 		constants.CTX_HARDWARE_FOLDERS,
 		constants.CTX_TOOLS_FOLDERS,
-		constants.CTX_LIBRARIES_FOLDERS,
+		constants.CTX_BUILT_IN_LIBRARIES_FOLDERS,
+		constants.CTX_OTHER_LIBRARIES_FOLDERS,
 		constants.CTX_FQBN,
 		constants.CTX_SKETCH_LOCATION,
 		constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION,

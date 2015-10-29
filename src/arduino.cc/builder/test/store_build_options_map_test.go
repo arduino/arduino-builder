@@ -48,7 +48,8 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 
 	context[constants.CTX_HARDWARE_FOLDERS] = "hardware"
 	context[constants.CTX_TOOLS_FOLDERS] = "tools"
-	context[constants.CTX_LIBRARIES_FOLDERS] = "libraries"
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = "built-in libraries"
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = "libraries"
 	context[constants.CTX_FQBN] = "fqbn"
 	context[constants.CTX_SKETCH_LOCATION] = "sketchLocation"
 	context[constants.CTX_VERBOSE] = true
@@ -72,9 +73,10 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	NoError(t, err)
 
 	require.Equal(t, "{\n"+
+		"  \"builtInLibrariesFolders\": \"built-in libraries\",\n"+
 		"  \"fqbn\": \"fqbn\",\n"+
 		"  \"hardwareFolders\": \"hardware\",\n"+
-		"  \"librariesFolders\": \"libraries\",\n"+
+		"  \"otherLibrariesFolders\": \"libraries\",\n"+
 		"  \"runtime.ide.version\": \"ideVersion\",\n"+
 		"  \"sketchLocation\": \"sketchLocation\",\n"+
 		"  \"toolsFolders\": \"tools\"\n"+
