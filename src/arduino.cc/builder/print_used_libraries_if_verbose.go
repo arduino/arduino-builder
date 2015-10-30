@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
+	"time"
 )
 
 type PrintUsedLibrariesIfVerbose struct{}
@@ -58,6 +59,8 @@ func (s *PrintUsedLibrariesIfVerbose) Run(context map[string]interface{}) error 
 			logger.Println(constants.MSG_USING_LIBRARY_AT_VERSION, library.Name, library.Version, library.Folder, legacy)
 		}
 	}
+
+	time.Sleep(100 * time.Millisecond)
 
 	return nil
 }

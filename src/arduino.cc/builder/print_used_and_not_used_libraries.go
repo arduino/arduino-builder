@@ -35,6 +35,7 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
+	"time"
 )
 
 type PrintUsedAndNotUsedLibraries struct{}
@@ -56,6 +57,8 @@ func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}) error
 			}
 		}
 	}
+
+	time.Sleep(100 * time.Millisecond)
 
 	return nil
 }
