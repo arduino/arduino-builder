@@ -495,7 +495,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	require.Nil(t, context[constants.CTX_PROTOTYPE_SECTION])
 }
 
-func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
+func TestPrototypesAdderSketchComplexFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
@@ -506,7 +506,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_default_args", "sketch.ino")
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_complex_prototypes", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
@@ -533,48 +533,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "void setup();\nvoid loop();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
-}
-
-func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	context := make(map[string]interface{})
-
-	buildPath := SetupBuildPath(t, context)
-	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_inline_function", "sketch.ino")
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
-
-	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
-
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
-		&builder.ContainerMergeCopySketchFiles{},
-
-		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
-		&builder.ContainerAddPrototypes{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(context)
-		NoError(t, err)
-	}
-
-	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "void setup();\nvoid loop();\nshort unsigned int testInt();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+	require.Equal(t, "void setup();\nvoid loop();\nshort unsigned int testSimple();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 }
 
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
