@@ -16,3 +16,7 @@ __attribute__((always_inline)) uint8_t testAttribute() {
 void testDefault(int x = 1) {
 
 }
+
+static void testStatic() {
+
+}
