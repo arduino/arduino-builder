@@ -574,7 +574,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "void setup();\nvoid loop();\nshort unsigned int testInt();\nint8_t testInline();\nuint8_t testAttribute();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+	require.Equal(t, "void setup();\nvoid loop();\nshort unsigned int testInt();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 }
 
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
