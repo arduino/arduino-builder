@@ -38,6 +38,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -65,11 +66,16 @@ func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}) error {
 	for _, key := range keys {
 		keyParts := strings.Split(key, ".")
 		if keyParts[0] == constants.PLATFORM_REWRITE_OLD {
+			index, err := strconv.Atoi(keyParts[1])
+			if err != nil {
+				return utils.WrapError(err)
+			}
 			rewriteKey := strings.Join(keyParts[2:], ".")
 			oldValue := txt[key]
 			newValue := txt[constants.PLATFORM_REWRITE_NEW+"."+strings.Join(keyParts[1:], ".")]
 			platformKeyRewrite := types.PlatforKeyRewrite{Key: rewriteKey, OldValue: oldValue, NewValue: newValue}
-			platformKeysRewrite.Rewrites = append(platformKeysRewrite.Rewrites, platformKeyRewrite)
+			platformKeysRewrite.Rewrites = growSliceOfRewrites(platformKeysRewrite.Rewrites, index)
+			platformKeysRewrite.Rewrites[index] = platformKeyRewrite
 		}
 	}
 
@@ -91,4 +97,13 @@ func findPlatformKeysRewriteTxt(folders []string) (string, error) {
 	}
 
 	return constants.EMPTY_STRING, nil
+}
+
+func growSliceOfRewrites(originalSlice []types.PlatforKeyRewrite, maxIndex int) []types.PlatforKeyRewrite {
+	if cap(originalSlice) > maxIndex {
+		return originalSlice
+	}
+	newSlice := make([]types.PlatforKeyRewrite, maxIndex+1)
+	copy(newSlice, originalSlice)
+	return newSlice
 }
