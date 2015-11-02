@@ -292,3 +292,24 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	err := command.Run(context)
 	NoError(t, err)
 }
+
+func TestBuilderSketchWithOldLib(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "arduino:avr:uno"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_old_lib", "sketch.ino")
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+
+	command := builder.Builder{}
+	err := command.Run(context)
+	NoError(t, err)
+}

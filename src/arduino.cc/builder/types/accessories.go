@@ -31,25 +31,48 @@ package types
 
 type UniqueStringQueue []string
 
-func (h UniqueStringQueue) Len() int           { return len(h) }
-func (h UniqueStringQueue) Less(i, j int) bool { return false }
-func (h UniqueStringQueue) Swap(i, j int)      { panic("Who called me?!?") }
+func (queue UniqueStringQueue) Len() int           { return len(queue) }
+func (queue UniqueStringQueue) Less(i, j int) bool { return false }
+func (queue UniqueStringQueue) Swap(i, j int)      { panic("Who called me?!?") }
 
-func (h *UniqueStringQueue) Push(x interface{}) {
-	if !sliceContains(*h, x.(string)) {
-		*h = append(*h, x.(string))
+func (queue *UniqueStringQueue) Push(value string) {
+	if !sliceContains(*queue, value) {
+		*queue = append(*queue, value)
 	}
 }
 
-func (h *UniqueStringQueue) Pop() interface{} {
-	old := *h
+func (queue *UniqueStringQueue) Pop() interface{} {
+	old := *queue
 	x := old[0]
-	*h = old[1:]
+	*queue = old[1:]
 	return x
 }
 
-func (h *UniqueStringQueue) Empty() bool {
-	return h.Len() == 0
+func (queue *UniqueStringQueue) Empty() bool {
+	return queue.Len() == 0
+}
+
+type UniqueSourceFolderQueue []SourceFolder
+
+func (queue UniqueSourceFolderQueue) Len() int           { return len(queue) }
+func (queue UniqueSourceFolderQueue) Less(i, j int) bool { return false }
+func (queue UniqueSourceFolderQueue) Swap(i, j int)      { panic("Who called me?!?") }
+
+func (queue *UniqueSourceFolderQueue) Push(value SourceFolder) {
+	if !sliceContainsSourceFolder(*queue, value) {
+		*queue = append(*queue, value)
+	}
+}
+
+func (queue *UniqueSourceFolderQueue) Pop() interface{} {
+	old := *queue
+	x := old[0]
+	*queue = old[1:]
+	return x
+}
+
+func (queue *UniqueSourceFolderQueue) Empty() bool {
+	return queue.Len() == 0
 }
 
 type LibraryResolutionResult struct {

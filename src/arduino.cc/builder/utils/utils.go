@@ -415,3 +415,14 @@ func AppendIfNotPresent(target []string, elements ...string) []string {
 	}
 	return target
 }
+
+func LibraryToSourceFolder(library *types.Library) []types.SourceFolder {
+	sourceFolders := []types.SourceFolder{}
+	recurse := library.Layout == types.LIBRARY_RECURSIVE
+	sourceFolders = append(sourceFolders, types.SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
+	if library.Layout == types.LIBRARY_FLAT {
+		utility := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
+		sourceFolders = append(sourceFolders, types.SourceFolder{Folder: utility, Recurse: false})
+	}
+	return sourceFolders
+}

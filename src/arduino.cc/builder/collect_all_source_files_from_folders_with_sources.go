@@ -34,21 +34,27 @@ import (
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type CollectAllSourceFilesFromFoldersWithSources struct{}
 
 func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]interface{}) error {
-	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueStringQueue)
+	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
 	sourceFiles := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
 
 	filePaths := []string{}
 	for !foldersWithSources.Empty() {
-		checkExtensionFunc := func(ext string) bool {
-			return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
+		sourceFolder := foldersWithSources.Pop().(types.SourceFolder)
+		var err error
+		if sourceFolder.Recurse {
+			err = collectByWalk(&filePaths, sourceFolder.Folder)
+		} else {
+			err = collectByReadDir(&filePaths, sourceFolder.Folder)
 		}
-		walkFunc := utils.CollectAllReadableFiles(&filePaths, checkExtensionFunc)
-		err := gohasissues.Walk(foldersWithSources.Pop().(string), walkFunc)
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -58,5 +64,32 @@ func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]int
 		sourceFiles.Push(filePath)
 	}
 
+	return nil
+}
+
+func collectByWalk(filePaths *[]string, folder string) error {
+	checkExtensionFunc := func(ext string) bool {
+		return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
+	}
+	walkFunc := utils.CollectAllReadableFiles(filePaths, checkExtensionFunc)
+	err := gohasissues.Walk(folder, walkFunc)
+	return utils.WrapError(err)
+}
+
+func collectByReadDir(filePaths *[]string, folder string) error {
+	if _, err := os.Stat(folder); err != nil && os.IsNotExist(err) {
+		return nil
+	}
+
+	files, err := ioutil.ReadDir(folder)
+	if err != nil {
+		return utils.WrapError(err)
+	}
+	for _, file := range files {
+		ext := strings.ToLower(filepath.Ext(file.Name()))
+		if ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] {
+			*filePaths = append(*filePaths, filepath.Join(folder, file.Name()))
+		}
+	}
 	return nil
 }

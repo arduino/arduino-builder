@@ -82,7 +82,7 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}) erro
 
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
-	foldersWithSources := &types.UniqueStringQueue{}
+	foldersWithSources := &types.UniqueSourceFolderQueue{}
 	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	context[constants.CTX_LIBRARY_RESOLUTION_RESULTS] = make(map[string]types.LibraryResolutionResult)

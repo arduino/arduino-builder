@@ -44,8 +44,8 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
-	foldersWithSources := &types.UniqueStringQueue{}
-	foldersWithSources.Push(Abs(t, "sketch_with_config"))
+	foldersWithSources := &types.UniqueSourceFolderQueue{}
+	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, "sketch_with_config"), Recurse: true})
 	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	commands := []types.Command{
@@ -71,8 +71,8 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
-	foldersWithSources := &types.UniqueStringQueue{}
-	foldersWithSources.Push(Abs(t, filepath.Join("downloaded_libraries", "Bridge")))
+	foldersWithSources := &types.UniqueSourceFolderQueue{}
+	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("downloaded_libraries", "Bridge")), Recurse: true})
 	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	commands := []types.Command{
@@ -98,5 +98,35 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "HttpClient.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "Mailbox.cpp")), sourceFiles.Pop())
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries", "Bridge", "src", "Process.cpp")), sourceFiles.Pop())
+	require.Equal(t, 0, len(*sourceFiles))
+}
+
+func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
+	context := make(map[string]interface{})
+
+	sourceFiles := &types.UniqueStringQueue{}
+	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
+	foldersWithSources := &types.UniqueSourceFolderQueue{}
+	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs")), Recurse: false})
+	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs", "utility")), Recurse: false})
+	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, "non existent folder"), Recurse: false})
+	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.CollectAllSourceFilesFromFoldersWithSources{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.Equal(t, 2, len(*sourceFiles))
+	require.Equal(t, 0, len(*foldersWithSources))
+	sort.Strings(*sourceFiles)
+
+	require.Equal(t, Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs", "ShouldNotRecurseWithOldLibs.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs", "utility", "utils.cpp")), sourceFiles.Pop())
 	require.Equal(t, 0, len(*sourceFiles))
 }

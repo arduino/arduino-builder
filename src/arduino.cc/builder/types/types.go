@@ -156,3 +156,8 @@ type Prototype struct {
 	Prototype    string
 	Fields       map[string]string
 }
+
+type SourceFolder struct {
+	Folder  string
+	Recurse bool
+}

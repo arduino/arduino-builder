@@ -38,3 +38,12 @@ func sliceContains(slice []string, target string) bool {
 	}
 	return false
 }
+
+func sliceContainsSourceFolder(slice []SourceFolder, target SourceFolder) bool {
+	for _, elem := range slice {
+		if elem.Folder == target.Folder {
+			return true
+		}
+	}
+	return false
+}

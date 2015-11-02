@@ -62,12 +62,15 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueStringQueue)
+	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
 
 	for _, newlyImportedLibrary := range newlyImportedLibraries {
 		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
 			importedLibraries = append(importedLibraries, newlyImportedLibrary)
-			foldersWithSources.Push(newlyImportedLibrary.SrcFolder)
+			sourceFolders := utils.LibraryToSourceFolder(newlyImportedLibrary)
+			for _, sourceFolder := range sourceFolders {
+				foldersWithSources.Push(sourceFolder)
+			}
 		}
 	}
 
