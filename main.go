@@ -311,6 +311,15 @@ func main() {
 		context[constants.CTX_LOGGER] = i18n.HumanLogger{}
 	}
 
+	sketchBuildOptions, err := builder.GetSketchBuildProperties(context)
+	if err != nil {
+		printError(err, printStackTrace)
+		defer os.Exit(1)
+		return
+	}
+	context[constants.CTX_SKETCH_BUILD_PROPERTIES] = sketchBuildOptions
+
+
 	if compile {
 		err = builder.RunBuilder(context)
 	} else if dumpPrefs {

@@ -40,8 +40,7 @@ import (
 type CreateBuildOptionsMap struct{}
 
 func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
-	buildOptions := make(map[string]string)
-
+	buildOptions := make(map[string]interface{})
 	buildOptionsMapKeys := []string{
 		constants.CTX_HARDWARE_FOLDERS,
 		constants.CTX_TOOLS_FOLDERS,
@@ -50,23 +49,23 @@ func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
 		constants.CTX_FQBN,
 		constants.CTX_SKETCH_LOCATION,
 		constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION,
+		constants.CTX_SKETCH_BUILD_PROPERTIES,
 		constants.CTX_CUSTOM_BUILD_PROPERTIES,
 	}
 
 	for _, key := range buildOptionsMapKeys {
 		if utils.MapHas(context, key) {
 			originalValue := context[key]
-			value := constants.EMPTY_STRING
 			kindOfValue := reflect.TypeOf(originalValue).Kind()
 			if kindOfValue == reflect.Slice {
-				value = strings.Join(originalValue.([]string), ",")
+				buildOptions[key] = strings.Join(originalValue.([]string), ",")
 			} else if kindOfValue == reflect.String {
-				value = originalValue.(string)
+				buildOptions[key] = originalValue.(string)
+			} else if kindOfValue == reflect.TypeOf(make(map[string]string)).Kind() {
+				buildOptions[key] = originalValue
 			} else {
 				return utils.Errorf(context, constants.MSG_UNHANDLED_TYPE_IN_CONTEXT, kindOfValue.String(), key)
 			}
-
-			buildOptions[key] = value
 		}
 	}
 

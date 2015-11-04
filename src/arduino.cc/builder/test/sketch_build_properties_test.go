@@ -24,7 +24,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2015 Steve Marple
  */
 
 package test
@@ -32,57 +32,65 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
+	"path/filepath"
 	"testing"
 )
 
-func TestCreateBuildOptionsMap(t *testing.T) {
+func TestSketchWithNoBuildProps(t *testing.T) {
+	var err error
 	context := make(map[string]interface{})
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"hardware", "hardware2"}
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{"hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"tools"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_FQBN] = "fqbn"
-	context[constants.CTX_SKETCH_LOCATION] = "sketchLocation"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_no_props", "sketch.ino")
+
 	context[constants.CTX_VERBOSE] = true
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "ideVersion"
-	context[constants.CTX_SKETCH_BUILD_PROPERTIES] = map[string]string{
-		"compiler.c.extra_flags": "-D NDEBUG",
-		"compiler.cpp.extra_flags": "-D HOSTNAME=\"www.example.com\"",
-	}
+	context[constants.CTX_SKETCH_BUILD_PROPERTIES], err = builder.GetSketchBuildProperties(context)
+	NoError(t, err)
+
 	context[constants.CTX_DEBUG_LEVEL] = 5
 
 	create := builder.CreateBuildOptionsMap{}
-	err := create.Run(context)
+	err = create.Run(context)
 	NoError(t, err)
 
 	buildOptions := context[constants.CTX_BUILD_OPTIONS].(map[string]interface{})
-	require.Equal(t, 7, len(utils.KeysOfMapOfStringInterface(buildOptions)))
-	require.Equal(t, "hardware,hardware2", buildOptions[constants.CTX_HARDWARE_FOLDERS])
-	require.Equal(t, "tools", buildOptions[constants.CTX_TOOLS_FOLDERS])
-	require.Equal(t, "libraries", buildOptions[constants.CTX_OTHER_LIBRARIES_FOLDERS])
-	require.Equal(t, "fqbn", buildOptions[constants.CTX_FQBN])
-	require.Equal(t, "sketchLocation", buildOptions[constants.CTX_SKETCH_LOCATION])
-	require.Equal(t, "ideVersion", buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
+	sketchBuildProps := make(map[string]string)
+	require.Equal(t, sketchBuildProps, buildOptions[constants.CTX_SKETCH_BUILD_PROPERTIES])
+}
 
-	sketchBuildProps := map[string]string{
-		"compiler.c.extra_flags": "-D NDEBUG",
-		"compiler.cpp.extra_flags": "-D HOSTNAME=\"www.example.com\"",
-	}
+func TestSketchWithBuildProps(t *testing.T) {
+	var err error
+	context := make(map[string]interface{})
+
+	context[constants.CTX_BUILD_PATH] = "buildPath"
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{"hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"tools"}
+	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_FQBN] = "fqbn"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_props", "sketch.ino")
+
+	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "ideVersion"
+	context[constants.CTX_SKETCH_BUILD_PROPERTIES], err = builder.GetSketchBuildProperties(context)
+	NoError(t, err)
+
+	context[constants.CTX_DEBUG_LEVEL] = 5
+
+	create := builder.CreateBuildOptionsMap{}
+	err = create.Run(context)
+	NoError(t, err)
+
+	buildOptions := context[constants.CTX_BUILD_OPTIONS].(map[string]interface{})
+	sketchBuildProps := make(map[string]string)
+	sketchBuildProps["compiler.c.extra_flags"] = "-D NDEBUG"
+	sketchBuildProps["compiler.cpp.extra_flags"] = "-D NDEBUG -D TESTLIBRARY_BUFSIZE=100 -D ARDUINO_URL=\"https://www.arduino.cc/\""
+
 	require.Equal(t, sketchBuildProps, buildOptions[constants.CTX_SKETCH_BUILD_PROPERTIES])
 
-	require.Equal(t, "{\n"+
-		"  \"fqbn\": \"fqbn\",\n"+
-		"  \"hardwareFolders\": \"hardware,hardware2\",\n"+
-		"  \"otherLibrariesFolders\": \"libraries\",\n"+
-		"  \"runtime.ide.version\": \"ideVersion\",\n"+
-		"  \"sketchBuildProperties\": {\n" +
-		"    \"compiler.c.extra_flags\": \"-D NDEBUG\",\n"+
-		"    \"compiler.cpp.extra_flags\": \"-D HOSTNAME=\\\"www.example.com\\\"\"\n"+
-		"  },\n"+
-		"  \"sketchLocation\": \"sketchLocation\",\n"+
-		"  \"toolsFolders\": \"tools\"\n"+
-		"}", context[constants.CTX_BUILD_OPTIONS_JSON].(string))
 }

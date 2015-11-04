@@ -24,44 +24,29 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2015 Steve Marple
  */
 
 package builder
 
 import (
-	"arduino.cc/builder/types"
+	"arduino.cc/builder/constants"
 	"arduino.cc/builder/utils"
 )
 
-type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
+type SetSketchBuildProperties struct{}
 
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]interface{}) error {
-	commands := []types.Command{
-		&AddAdditionalEntriesToContext{},
-		&FailIfBuildPathEqualsSketchPath{},
-		&HardwareLoader{},
-		&PlatformKeysRewriteLoader{},
-		&RewriteHardwareKeys{},
-		&ToolsLoader{},
-		&TargetBoardResolver{},
-		&AddBuildBoardPropertyIfMissing{},
-		&LibrariesLoader{},
-		&SketchLoader{},
-		&SetupBuildProperties{},
-		&LoadVIDPIDSpecificProperties{},
-		&SetSketchBuildProperties{},
-		&SetCustomBuildProperties{},
-		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
+func (s *SetSketchBuildProperties) Run(context map[string]interface{}) error {
+	if !utils.MapHas(context, constants.CTX_SKETCH_BUILD_PROPERTIES) {
+		return nil
 	}
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
-		if err != nil {
-			return utils.WrapError(err)
-		}
-	}
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
 
+	sketchBuildProperties :=  context[constants.CTX_SKETCH_BUILD_PROPERTIES].(map[string]string)
+	for key, value := range sketchBuildProperties {
+		buildProperties[key] = value
+	}
+	
 	return nil
 }
