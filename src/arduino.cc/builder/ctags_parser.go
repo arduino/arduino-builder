@@ -45,13 +45,14 @@ const FIELD_CODE = "code"
 const FIELD_FUNCTION_NAME = "functionName"
 const FIELD_CLASS = "class"
 const FIELD_STRUCT = "struct"
+const FIELD_NAMESPACE = "namespace"
 const FIELD_SKIP = "skipMe"
 
 const KIND_PROTOTYPE = "prototype"
 
 const TEMPLATE = "template"
 
-var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signature": true, "returntype": true, "class": true, "struct": true}
+var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signature": true, "returntype": true, "class": true, "struct": true, "namespace": true}
 var KNOWN_TAG_KINDS = map[string]bool{"prototype": true, "function": true}
 
 type CTagsParser struct {
@@ -71,6 +72,7 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	tags = filterOutUnknownTags(tags)
 	tags = filterOutTagsWithField(tags, FIELD_CLASS)
 	tags = filterOutTagsWithField(tags, FIELD_STRUCT)
+	tags = filterOutTagsWithField(tags, FIELD_NAMESPACE)
 	tags = skipTagsWhere(tags, signatureContainsDefaultArg)
 	tags = addPrototypes(tags)
 	tags = removeDefinedProtypes(tags)

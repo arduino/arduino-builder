@@ -181,3 +181,48 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }
+
+func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_namespace", "sketch.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE},
+		&builder.CTagsRunner{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	ctagsTempFileName := context[constants.CTX_CTAGS_TEMP_FILE_NAME].(string)
+	expectedOutput := "value\t" + ctagsTempFileName + "\t/^\tint value() {$/;\"\tkind:function\tline:3\tnamespace:Test\tsignature:()\treturntype:int\n" +
+		"setup\t" + ctagsTempFileName + "\t/^void setup() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n" +
+		"loop\t" + ctagsTempFileName + "\t/^void loop() {}$/;\"\tkind:function\tline:9\tsignature:()\treturntype:void\n"
+
+	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
+}

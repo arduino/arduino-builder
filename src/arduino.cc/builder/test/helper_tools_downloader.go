@@ -108,12 +108,12 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 			OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/coan-5.2-i686-mingw32.zip"},
 			OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/coan-5.2-x86_64-apple-darwin.zip"},
 		}},
-		Tool{Name: "ctags", Version: "5.8-arduino2",
+		Tool{Name: "ctags", Version: "5.8-arduino3",
 			OsUrls: []OsUrl{
-				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino2-i686-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino2-x86_64-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino2-i686-mingw32.zip"},
-				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino2-x86_64-apple-darwin.zip"},
+				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino3-i686-pc-linux-gnu.tar.bz2"},
+				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino3-x86_64-pc-linux-gnu.tar.bz2"},
+				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino3-i686-mingw32.zip"},
+				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino3-x86_64-apple-darwin.zip"},
 			}},
 	}
 
