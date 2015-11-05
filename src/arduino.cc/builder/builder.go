@@ -128,6 +128,35 @@ func (s *Builder) Run(context map[string]interface{}) error {
 	return otherErr
 }
 
+type Preprocess struct{}
+
+func (s *Preprocess) Run(context map[string]interface{}) error {
+	commands := []types.Command{
+		&SetupHumanLoggerIfMissing{},
+
+		&GenerateBuildPathIfMissing{},
+		&EnsureBuildPathExists{},
+
+		&ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&ContainerBuildOptions{},
+
+		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+
+		&ContainerMergeCopySketchFiles{},
+
+		&ContainerFindIncludes{},
+
+		&WarnAboutArchIncompatibleLibraries{},
+
+		&ContainerAddPrototypes{},
+
+		&PrintPreprocessedSource{},
+	}
+
+	return runCommands(context, commands, true)
+}
+
 type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}) error {
@@ -188,5 +217,10 @@ func RunBuilder(context map[string]interface{}) error {
 
 func RunParseHardwareAndDumpBuildProperties(context map[string]interface{}) error {
 	command := ParseHardwareAndDumpBuildProperties{}
+	return command.Run(context)
+}
+
+func RunPreprocess(context map[string]interface{}) error {
+	command := Preprocess{}
 	return command.Run(context)
 }

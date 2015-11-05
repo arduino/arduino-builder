@@ -48,6 +48,16 @@ type Logger interface {
 	Name() string
 }
 
+type NoopLogger struct{}
+
+func (s NoopLogger) Fprintln(w io.Writer, format string, a ...interface{}) {}
+
+func (s NoopLogger) Println(format string, a ...interface{}) {}
+
+func (s NoopLogger) Name() string {
+	return "noop"
+}
+
 type HumanLogger struct{}
 
 func (s HumanLogger) Fprintln(w io.Writer, format string, a ...interface{}) {

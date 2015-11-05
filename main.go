@@ -49,8 +49,9 @@ import (
 
 const VERSION = "1.0.7"
 
-const FLAG_COMPILE = "compile"
-const FLAG_DUMP_PREFS = "dump-prefs"
+const FLAG_ACTION_COMPILE = "compile"
+const FLAG_ACTION_PREPROCESS = "preprocess"
+const FLAG_ACTION_DUMP_PREFS = "dump-prefs"
 const FLAG_BUILD_OPTIONS_FILE = "build-options-file"
 const FLAG_HARDWARE = "hardware"
 const FLAG_TOOLS = "tools"
@@ -61,6 +62,7 @@ const FLAG_FQBN = "fqbn"
 const FLAG_IDE_VERSION = "ide-version"
 const FLAG_BUILD_PATH = "build-path"
 const FLAG_VERBOSE = "verbose"
+const FLAG_QUITE = "quite"
 const FLAG_DEBUG_LEVEL = "debug-level"
 const FLAG_WARNINGS = "warnings"
 const FLAG_WARNINGS_NONE = "none"
@@ -97,6 +99,7 @@ func (h *slice) Set(csv string) error {
 }
 
 var compileFlag *bool
+var preprocessFlag *bool
 var dumpPrefsFlag *bool
 var buildOptionsFileFlag *string
 var hardwareFoldersFlag slice
@@ -108,6 +111,7 @@ var fqbnFlag *string
 var ideVersionFlag *string
 var buildPathFlag *string
 var verboseFlag *bool
+var quiteFlag *bool
 var debugLevelFlag *int
 var libraryDiscoveryRecursionDepthFlag *int
 var warningsLevelFlag *string
@@ -116,8 +120,9 @@ var versionFlag *bool
 var vidPidFlag *string
 
 func init() {
-	compileFlag = flag.Bool(FLAG_COMPILE, false, "compiles the given sketch")
-	dumpPrefsFlag = flag.Bool(FLAG_DUMP_PREFS, false, "dumps build properties used when compiling")
+	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
+	preprocessFlag = flag.Bool(FLAG_ACTION_PREPROCESS, false, "preprocess the given sketch")
+	dumpPrefsFlag = flag.Bool(FLAG_ACTION_DUMP_PREFS, false, "dumps build properties used when compiling")
 	buildOptionsFileFlag = flag.String(FLAG_BUILD_OPTIONS_FILE, "", "Instead of specifying --"+FLAG_HARDWARE+", --"+FLAG_TOOLS+" etc every time, you can load all such options from a file")
 	flag.Var(&hardwareFoldersFlag, FLAG_HARDWARE, "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
 	flag.Var(&toolsFoldersFlag, FLAG_TOOLS, "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
@@ -128,6 +133,7 @@ func init() {
 	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "fake IDE version")
 	buildPathFlag = flag.String(FLAG_BUILD_PATH, "", "build path")
 	verboseFlag = flag.Bool(FLAG_VERBOSE, false, "if 'true' prints lots of stuff")
+	quiteFlag = flag.Bool(FLAG_QUITE, false, "if 'true' doesn't print any warnings or progress or whatever")
 	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
 	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
@@ -147,19 +153,6 @@ func main() {
 		fmt.Println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
 		defer os.Exit(0)
 		return
-	}
-
-	compile := *compileFlag
-	dumpPrefs := *dumpPrefsFlag
-
-	if compile && dumpPrefs {
-		fmt.Fprintln(os.Stderr, "You can either specify --"+FLAG_COMPILE+" or --"+FLAG_DUMP_PREFS+", not both")
-		defer os.Exit(1)
-		return
-	}
-
-	if !compile && !dumpPrefs {
-		compile = true
 	}
 
 	context := make(map[string]interface{})
@@ -265,13 +258,6 @@ func main() {
 		context[constants.CTX_VIDPID] = *vidPidFlag
 	}
 
-	if compile && flag.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")
-		flag.Usage()
-		defer os.Exit(1)
-		return
-	}
-
 	if flag.NArg() > 0 {
 		sketchLocation := flag.Arg(0)
 		sketchLocation, err := gohasissues.Unquote(sketchLocation)
@@ -281,6 +267,11 @@ func main() {
 			return
 		}
 		context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	}
+
+	if *verboseFlag && *quiteFlag {
+		*verboseFlag = false
+		*quiteFlag = false
 	}
 
 	context[constants.CTX_VERBOSE] = *verboseFlag
@@ -305,16 +296,26 @@ func main() {
 		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = *libraryDiscoveryRecursionDepthFlag
 	}
 
-	if *loggerFlag == FLAG_LOGGER_MACHINE {
+	if *quiteFlag {
+		context[constants.CTX_LOGGER] = i18n.NoopLogger{}
+	} else if *loggerFlag == FLAG_LOGGER_MACHINE {
 		context[constants.CTX_LOGGER] = i18n.MachineLogger{}
 	} else {
 		context[constants.CTX_LOGGER] = i18n.HumanLogger{}
 	}
 
-	if compile {
-		err = builder.RunBuilder(context)
-	} else if dumpPrefs {
+	if *dumpPrefsFlag {
 		err = builder.RunParseHardwareAndDumpBuildProperties(context)
+	} else if *preprocessFlag {
+		err = builder.RunPreprocess(context)
+	} else {
+		if flag.NArg() == 0 {
+			fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")
+			flag.Usage()
+			defer os.Exit(1)
+			return
+		}
+		err = builder.RunBuilder(context)
 	}
 
 	exitCode := 0
