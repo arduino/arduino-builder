@@ -9,7 +9,7 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 ### Usage
 
-* `-compile` or `-dump-prefs`: Optional. If omitted, defaults to `-compile`. `-dump-prefs` will just print all build preferences used, `-compile` will use those preferences to run the actual compiler.
+* `-compile` or `-dump-prefs` or `-preprocess`: Optional. If omitted, defaults to `-compile`. `-dump-prefs` will just print all build preferences used, `-compile` will use those preferences to run the actual compiler, `-preprocess` will only print preprocessed code to stdout.
 
 * `-hardware`: Mandatory. Folder containing Arduino platforms. An example is the `hardware` folder shipped with the Arduino IDE, or the `packages` folder created by Arduino Boards Manager. Can be specified multiple times. If conflicting hardware definitions are specified, the last one wins.
 
@@ -26,6 +26,8 @@ This tool generates function prototypes and gathers library paths, providing `gc
 * `-warnings`: Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell `gcc` which warning level to use (`-W` flag).
 
 * `-verbose`: Optional, turns on verbose mode.
+
+* `-quite`: Optional, supresses almost every output.
 
 * `-debug-level`: Optional, defaults to "5". Used for debugging. Set it to 10 when submitting an issue.
 
