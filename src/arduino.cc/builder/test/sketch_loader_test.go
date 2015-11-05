@@ -136,8 +136,9 @@ func TestLoadSketchFromFolder(t *testing.T) {
 
 	require.True(t, strings.Index(sketch.MainFile.Name, "sketch_with_subfolders.ino") != -1)
 
-	require.Equal(t, 1, len(sketch.AdditionalFiles))
+	require.Equal(t, 2, len(sketch.AdditionalFiles))
 	require.True(t, strings.Index(sketch.AdditionalFiles[0].Name, "other.cpp") != -1)
+	require.True(t, strings.Index(sketch.AdditionalFiles[1].Name, "other.h") != -1)
 }
 
 func TestLoadSketchWithBackup(t *testing.T) {

@@ -54,7 +54,7 @@ func (s *SketchBuilder) Run(context map[string]interface{}) error {
 	}
 
 	var objectFiles []string
-	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, false, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, true, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
