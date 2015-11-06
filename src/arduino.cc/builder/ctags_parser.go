@@ -51,6 +51,7 @@ const FIELD_SKIP = "skipMe"
 const KIND_PROTOTYPE = "prototype"
 
 const TEMPLATE = "template"
+const STATIC = "static"
 
 var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signature": true, "returntype": true, "class": true, "struct": true, "namespace": true}
 var KNOWN_TAG_KINDS = map[string]bool{"prototype": true, "function": true}
@@ -120,8 +121,13 @@ func addPrototype(tag map[string]string) {
 			code = code[:strings.LastIndex(code, ")")+1]
 		}
 		tag[KIND_PROTOTYPE] = code + ";"
-	} else {
-		tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
+		return
+	}
+
+	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
+
+	if strings.Index(tag[FIELD_CODE], STATIC+" ") != -1 {
+		tag[KIND_PROTOTYPE] = STATIC + " " + tag[KIND_PROTOTYPE]
 	}
 }
 

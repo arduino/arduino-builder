@@ -243,3 +243,22 @@ func TestCTagsParserNamespace(t *testing.T) {
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 }
+
+func TestCTagsParserStatic(t *testing.T) {
+	context := make(map[string]interface{})
+
+	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStatic.txt"))
+	NoError(t, err)
+
+	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+
+	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
+	ctagsParser.Run(context)
+
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+
+	require.Equal(t, 3, len(prototypes))
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, "static void doStuff();", prototypes[2].Prototype)
+}
