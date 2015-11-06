@@ -68,13 +68,13 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
 	context[constants.CTX_TARGET_PLATFORM] = targetPlatform
 	context[constants.CTX_TARGET_BOARD] = targetBoard
 
+	if len(fqbnParts) > 3 {
+		addAdditionalPropertiesToTargetBoard(targetBoard, fqbnParts[3])
+	}
+
 	core := targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_CORE]
 	if core == constants.EMPTY_STRING {
 		core = DEFAULT_BUILD_CORE
-	}
-
-	if len(fqbnParts) > 3 {
-		addAdditionalPropertiesToTargetBoard(targetBoard, fqbnParts[3])
 	}
 
 	var corePlatform *types.Platform

@@ -165,3 +165,29 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 	require.Equal(t, "atmega32u4", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_YUN", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
+
+func TestTargetBoardResolverCustomCore(t *testing.T) {
+	context := make(map[string]interface{})
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
+	context[constants.CTX_FQBN] = "watterott:avr:attiny841:core=spencekonde,info=info"
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.HardwareLoader{},
+		&builder.TargetBoardResolver{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	require.Equal(t, "watterott", targetPackage.PackageId)
+	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	require.Equal(t, "avr", targetPlatform.PlatformId)
+	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	require.Equal(t, "attiny841", targetBoard.BoardId)
+	require.Equal(t, "tiny841", context[constants.CTX_BUILD_CORE].(string))
+	require.Equal(t, "tiny14", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_VARIANT])
+}

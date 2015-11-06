@@ -55,7 +55,7 @@ func TestLoadHardware(t *testing.T) {
 	}
 
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
-	require.Equal(t, 1, len(packages.Packages))
+	require.Equal(t, 2, len(packages.Packages))
 	require.NotNil(t, packages.Packages["arduino"])
 	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms))
 
@@ -105,9 +105,9 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
-		require.Equal(t, 2, len(packages.Packages))
-	} else {
 		require.Equal(t, 3, len(packages.Packages))
+	} else {
+		require.Equal(t, 4, len(packages.Packages))
 	}
 
 	require.NotNil(t, packages.Packages["arduino"])
@@ -222,9 +222,9 @@ func TestLoadLotsOfHardware(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
-		require.Equal(t, 4, len(packages.Packages))
-	} else {
 		require.Equal(t, 5, len(packages.Packages))
+	} else {
+		require.Equal(t, 6, len(packages.Packages))
 	}
 
 	require.NotNil(t, packages.Packages["arduino"])
