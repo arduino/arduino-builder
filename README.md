@@ -27,7 +27,7 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-verbose`: Optional, turns on verbose mode.
 
-* `-quite`: Optional, supresses almost every output.
+* `-quiet`: Optional, supresses almost every output.
 
 * `-debug-level`: Optional, defaults to "5". Used for debugging. Set it to 10 when submitting an issue.
 

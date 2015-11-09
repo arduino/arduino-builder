@@ -62,7 +62,7 @@ const FLAG_FQBN = "fqbn"
 const FLAG_IDE_VERSION = "ide-version"
 const FLAG_BUILD_PATH = "build-path"
 const FLAG_VERBOSE = "verbose"
-const FLAG_QUITE = "quite"
+const FLAG_QUIET = "quiet"
 const FLAG_DEBUG_LEVEL = "debug-level"
 const FLAG_WARNINGS = "warnings"
 const FLAG_WARNINGS_NONE = "none"
@@ -111,7 +111,7 @@ var fqbnFlag *string
 var ideVersionFlag *string
 var buildPathFlag *string
 var verboseFlag *bool
-var quiteFlag *bool
+var quietFlag *bool
 var debugLevelFlag *int
 var libraryDiscoveryRecursionDepthFlag *int
 var warningsLevelFlag *string
@@ -133,7 +133,7 @@ func init() {
 	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "fake IDE version")
 	buildPathFlag = flag.String(FLAG_BUILD_PATH, "", "build path")
 	verboseFlag = flag.Bool(FLAG_VERBOSE, false, "if 'true' prints lots of stuff")
-	quiteFlag = flag.Bool(FLAG_QUITE, false, "if 'true' doesn't print any warnings or progress or whatever")
+	quietFlag = flag.Bool(FLAG_QUIET, false, "if 'true' doesn't print any warnings or progress or whatever")
 	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
 	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
@@ -269,9 +269,9 @@ func main() {
 		context[constants.CTX_SKETCH_LOCATION] = sketchLocation
 	}
 
-	if *verboseFlag && *quiteFlag {
+	if *verboseFlag && *quietFlag {
 		*verboseFlag = false
-		*quiteFlag = false
+		*quietFlag = false
 	}
 
 	context[constants.CTX_VERBOSE] = *verboseFlag
@@ -296,7 +296,7 @@ func main() {
 		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = *libraryDiscoveryRecursionDepthFlag
 	}
 
-	if *quiteFlag {
+	if *quietFlag {
 		context[constants.CTX_LOGGER] = i18n.NoopLogger{}
 	} else if *loggerFlag == FLAG_LOGGER_MACHINE {
 		context[constants.CTX_LOGGER] = i18n.MachineLogger{}
