@@ -68,21 +68,26 @@ func TestLoadTools(t *testing.T) {
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
-	require.Equal(t, "arm-none-eabi-gcc", tools[0].Name)
-	require.Equal(t, "4.8.3-2014q1", tools[0].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[0].Folder)
-	require.Equal(t, "avr-gcc", tools[1].Name)
-	require.Equal(t, "4.8.1-arduino5", tools[1].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[1].Folder)
-	require.Equal(t, "avrdude", tools[2].Name)
-	require.Equal(t, "6.0.1-arduino5", tools[2].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[2].Folder)
-	require.Equal(t, "bossac", tools[3].Name)
-	require.Equal(t, "1.3a-arduino", tools[3].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.3a-arduino"), tools[3].Folder)
-	require.Equal(t, "bossac", tools[4].Name)
-	require.Equal(t, "1.5-arduino", tools[4].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), tools[4].Folder)
+	idx := 0
+	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
+	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "avr-gcc", tools[idx].Name)
+	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "avrdude", tools[idx].Name)
+	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "bossac", tools[idx].Name)
+	require.Equal(t, "1.5-arduino", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "bossac", tools[idx].Name)
+	require.Equal(t, "1.6.1-arduino", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
 }
 
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {

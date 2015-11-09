@@ -84,22 +84,25 @@ type Core struct {
 
 func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	cores := []Core{
-		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.8"},
-		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.4"},
+		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.9"},
+		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.5"},
 	}
 
 	boardsManagerCores := []Core{
-		Core{Maintainer: "arduino", Arch: "samd", Version: "1.6.1"},
+		Core{Maintainer: "arduino", Arch: "samd", Version: "1.6.2"},
 	}
 
 	boardsManagerRedBearCores := []Core{
 		Core{Maintainer: "RedBearLab", Arch: "avr", Version: "1.0.0", Url: "https://redbearlab.github.io/arduino/Blend/blend_boards.zip"},
 	}
 
+	toolsMultipleVersions := []Tool{
+		Tool{Name: "bossac", Version: "1.6.1-arduino"},
+		Tool{Name: "bossac", Version: "1.5-arduino"},
+	}
+
 	tools := []Tool{
 		Tool{Name: "avrdude", Version: "6.0.1-arduino5"},
-		Tool{Name: "bossac", Version: "1.3a-arduino"},
-		Tool{Name: "bossac", Version: "1.5-arduino"},
 		Tool{Name: "avr-gcc", Version: "4.8.1-arduino5"},
 		Tool{Name: "arm-none-eabi-gcc", Version: "4.8.3-2014q1"},
 		Tool{Name: "coan", Version: "5.2", OsUrls: []OsUrl{
@@ -133,7 +136,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 		Library{Name: "Robot IR Remote", Version: "1.0.2"},
 	}
 
-	download(t, cores, boardsManagerCores, boardsManagerRedBearCores, tools, boardsManagerTools, boardsManagerRFduinoTools, libraries)
+	download(t, cores, boardsManagerCores, boardsManagerRedBearCores, tools, toolsMultipleVersions, boardsManagerTools, boardsManagerRFduinoTools, libraries)
 
 	patchFiles(t)
 }
@@ -157,7 +160,7 @@ func patchFiles(t *testing.T) {
 	}
 }
 
-func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores []Core, tools, boardsManagerTools, boardsManagerRFduinoTools []Tool, libraries []Library) {
+func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores []Core, tools, toolsMultipleVersions, boardsManagerTools, boardsManagerRFduinoTools []Tool, libraries []Library) {
 	allCoresDownloaded, err := allCoresAlreadyDownloadedAndUnpacked(HARDWARE_FOLDER, cores)
 	NoError(t, err)
 	if allCoresDownloaded &&
@@ -166,6 +169,7 @@ func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores
 		allBoardsManagerToolsAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerTools) &&
 		allBoardsManagerToolsAlreadyDownloadedAndUnpacked(BOARD_MANAGER_FOLDER, boardsManagerRFduinoTools) &&
 		allToolsAlreadyDownloadedAndUnpacked(TOOLS_FOLDER, tools) &&
+		allToolsAlreadyDownloadedAndUnpacked(TOOLS_FOLDER, toolsMultipleVersions) &&
 		allLibrariesAlreadyDownloadedAndUnpacked(LIBRARIES_FOLDER, libraries) {
 		return
 	}
@@ -180,6 +184,9 @@ func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores
 	NoError(t, err)
 
 	err = downloadTools(tools, index)
+	NoError(t, err)
+
+	err = downloadToolsMultipleVersions(toolsMultipleVersions, index)
 	NoError(t, err)
 
 	err = downloadBoardsManagerTools(boardsManagerTools, index)
@@ -279,7 +286,36 @@ func downloadTools(tools []Tool, index map[string]interface{}) error {
 		if err != nil {
 			return utils.WrapError(err)
 		}
-		err = downloadAndUnpackTool(tool, url, TOOLS_FOLDER)
+		err = downloadAndUnpackTool(tool, url, TOOLS_FOLDER, true)
+		if err != nil {
+			return utils.WrapError(err)
+		}
+	}
+
+	return nil
+}
+
+func downloadToolsMultipleVersions(tools []Tool, index map[string]interface{}) error {
+	host := translateGOOSGOARCHToPackageIndexValue()
+
+	for _, tool := range tools {
+		if !toolAlreadyDownloadedAndUnpacked(TOOLS_FOLDER, tool) {
+			_, err := os.Stat(filepath.Join(TOOLS_FOLDER, tool.Name))
+			if err == nil {
+				err = os.RemoveAll(filepath.Join(TOOLS_FOLDER, tool.Name))
+				if err != nil {
+					return utils.WrapError(err)
+				}
+			}
+		}
+	}
+
+	for _, tool := range tools {
+		url, err := findToolUrl(index, tool, host)
+		if err != nil {
+			return utils.WrapError(err)
+		}
+		err = downloadAndUnpackTool(tool, url, TOOLS_FOLDER, false)
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -422,6 +458,14 @@ func downloadAndUnpackCore(core Core, url string, targetPath string) error {
 	}
 	defer os.RemoveAll(unpackFolder)
 
+	_, err = os.Stat(filepath.Join(targetPath, core.Maintainer, core.Arch))
+	if err == nil {
+		err = os.RemoveAll(filepath.Join(targetPath, core.Maintainer, core.Arch))
+		if err != nil {
+			return utils.WrapError(err)
+		}
+	}
+
 	if len(files) == 1 && files[0].IsDir() {
 		err = os.MkdirAll(filepath.Join(targetPath, core.Maintainer), os.FileMode(0755))
 		if err != nil {
@@ -462,6 +506,14 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath string)
 		return utils.WrapError(err)
 	}
 	defer os.RemoveAll(unpackFolder)
+
+	_, err = os.Stat(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch))
+	if err == nil {
+		err = os.RemoveAll(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch))
+		if err != nil {
+			return utils.WrapError(err)
+		}
+	}
 
 	if len(files) == 1 && files[0].IsDir() {
 		err = os.MkdirAll(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch), os.FileMode(0755))
@@ -529,7 +581,7 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath string
 	return nil
 }
 
-func downloadAndUnpackTool(tool Tool, url string, targetPath string) error {
+func downloadAndUnpackTool(tool Tool, url string, targetPath string, deleteIfMissing bool) error {
 	if toolAlreadyDownloadedAndUnpacked(targetPath, tool) {
 		return nil
 	}
@@ -545,11 +597,13 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath string) error {
 	}
 	defer os.RemoveAll(unpackFolder)
 
-	_, err = os.Stat(filepath.Join(targetPath, tool.Name))
-	if err == nil {
-		err = os.RemoveAll(filepath.Join(targetPath, tool.Name))
-		if err != nil {
-			return utils.WrapError(err)
+	if deleteIfMissing {
+		_, err = os.Stat(filepath.Join(targetPath, tool.Name))
+		if err == nil {
+			err = os.RemoveAll(filepath.Join(targetPath, tool.Name))
+			if err != nil {
+				return utils.WrapError(err)
+			}
 		}
 	}
 

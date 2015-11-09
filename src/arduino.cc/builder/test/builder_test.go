@@ -201,7 +201,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "syscalls_sam3.c.o"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "USB", "HID.cpp.o"))
+	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "USB", "PluggableUSB.cpp.o"))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "avr", "dtostrf.c.d"))
 	NoError(t, err)
