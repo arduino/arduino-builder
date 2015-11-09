@@ -158,6 +158,10 @@ type Prototype struct {
 	Fields       map[string]string
 }
 
+func (proto *Prototype) String() string {
+	return proto.Modifiers + " " + proto.Prototype
+}
+
 type SourceFolder struct {
 	Folder  string
 	Recurse bool

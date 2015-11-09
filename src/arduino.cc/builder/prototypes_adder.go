@@ -43,11 +43,11 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	source := context[constants.CTX_SOURCE].(string)
 	sourceRows := strings.Split(source, "\n")
 
-	if !utils.MapHas(context, constants.CTX_FIRST_FUNCTION_AT_LINE) {
+	if !utils.MapHas(context, constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES) {
 		return nil
 	}
 
-	firstFunctionLine := context[constants.CTX_FIRST_FUNCTION_AT_LINE].(int)
+	firstFunctionLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
 	if firstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
 		return nil
 	}

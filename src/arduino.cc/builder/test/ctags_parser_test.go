@@ -58,6 +58,9 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 	require.Equal(t, "void digitalCommand(YunClient client);", prototypes[2].Prototype)
 	require.Equal(t, "void analogCommand(YunClient client);", prototypes[3].Prototype)
 	require.Equal(t, "void modeCommand(YunClient client);", prototypes[4].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 33, prototypeLine)
 }
 
 func TestCTagsParserShouldListTemplates(t *testing.T) {
@@ -77,6 +80,9 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 	require.Equal(t, "template <typename T> T minimum (T a, T b);", prototypes[0].Prototype)
 	require.Equal(t, "void setup();", prototypes[1].Prototype)
 	require.Equal(t, "void loop();", prototypes[2].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 2, prototypeLine)
 }
 
 func TestCTagsParserShouldListTemplates2(t *testing.T) {
@@ -97,6 +103,9 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", prototypes[2].Prototype)
 	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", prototypes[3].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 1, prototypeLine)
 }
 
 func TestCTagsParserShouldDealWithClasses(t *testing.T) {
@@ -113,6 +122,9 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
 	require.Equal(t, 0, len(prototypes))
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 8, prototypeLine)
 }
 
 func TestCTagsParserShouldDealWithStructs(t *testing.T) {
@@ -132,6 +144,9 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void dostuff(A_NEW_TYPE * bar);", prototypes[2].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 9, prototypeLine)
 }
 
 func TestCTagsParserShouldDealWithMacros(t *testing.T) {
@@ -153,6 +168,9 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 	require.Equal(t, "void debug();", prototypes[2].Prototype)
 	require.Equal(t, "void disabledIsDefined();", prototypes[3].Prototype)
 	require.Equal(t, "int useMyType(MyType type);", prototypes[4].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 18, prototypeLine)
 }
 
 func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
@@ -170,6 +188,9 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 
 	require.Equal(t, 1, len(prototypes))
 	require.Equal(t, "boolean getBytes( byte addr, int amount );", prototypes[0].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 5031, prototypeLine)
 }
 
 func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
@@ -188,6 +209,9 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 14, prototypeLine)
 }
 
 func TestCTagsParserStructWithFunctions(t *testing.T) {
@@ -206,6 +230,9 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 16, prototypeLine)
 }
 
 func TestCTagsParserDefaultArguments(t *testing.T) {
@@ -224,6 +251,9 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 2, prototypeLine)
 }
 
 func TestCTagsParserNamespace(t *testing.T) {
@@ -242,6 +272,9 @@ func TestCTagsParserNamespace(t *testing.T) {
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 8, prototypeLine)
 }
 
 func TestCTagsParserStatic(t *testing.T) {
@@ -262,6 +295,31 @@ func TestCTagsParserStatic(t *testing.T) {
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void doStuff();", prototypes[2].Prototype)
 	require.Equal(t, "static", prototypes[2].Modifiers)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 2, prototypeLine)
+}
+
+func TestCTagsParserFunctionPointer(t *testing.T) {
+	context := make(map[string]interface{})
+
+	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointer.txt"))
+	NoError(t, err)
+
+	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+
+	ctagsParser := builder.CTagsParser{PrototypesField: constants.CTX_PROTOTYPES}
+	ctagsParser.Run(context)
+
+	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+
+	require.Equal(t, 3, len(prototypes))
+	require.Equal(t, "void t1Callback();", prototypes[0].Prototype)
+	require.Equal(t, "void setup();", prototypes[1].Prototype)
+	require.Equal(t, "void loop();", prototypes[2].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 2, prototypeLine)
 }
 
 func TestCTagsParserFunctionPointers(t *testing.T) {
@@ -280,4 +338,7 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
+
+	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	require.Equal(t, 2, prototypeLine)
 }
