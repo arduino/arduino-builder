@@ -75,7 +75,7 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 	}
 
 	str := joinPrototypes(prototypes)
-	str += "#line "
+	str += "\n#line "
 	str += strconv.Itoa(line)
 	str += "\n"
 
@@ -83,11 +83,16 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 }
 
 func joinPrototypes(prototypes []*types.Prototype) string {
-	join := ""
+	prototypesSlice := []string{}
 	for _, proto := range prototypes {
-		join = join + proto.Prototype + "\n"
+		prototypeParts := []string{}
+		if proto.Modifiers != "" {
+			prototypeParts = append(prototypeParts, proto.Modifiers)
+		}
+		prototypeParts = append(prototypeParts, proto.Prototype)
+		prototypesSlice = append(prototypesSlice, strings.Join(prototypeParts, " "))
 	}
-	return join
+	return strings.Join(prototypesSlice, "\n")
 }
 
 func composeIncludeArduinoSection() string {

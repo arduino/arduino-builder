@@ -260,5 +260,6 @@ func TestCTagsParserStatic(t *testing.T) {
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
-	require.Equal(t, "static void doStuff();", prototypes[2].Prototype)
+	require.Equal(t, "void doStuff();", prototypes[2].Prototype)
+	require.Equal(t, "static", prototypes[2].Modifiers)
 }

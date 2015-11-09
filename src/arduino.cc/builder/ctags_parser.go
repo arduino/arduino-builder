@@ -49,6 +49,7 @@ const FIELD_NAMESPACE = "namespace"
 const FIELD_SKIP = "skipMe"
 
 const KIND_PROTOTYPE = "prototype"
+const KIND_PROTOTYPE_MODIFIERS = "prototype_modifiers"
 
 const TEMPLATE = "template"
 const STATIC = "static"
@@ -98,7 +99,7 @@ func toPrototypes(tags []map[string]string) []*types.Prototype {
 	prototypes := []*types.Prototype{}
 	for _, tag := range tags {
 		if tag[FIELD_SKIP] != "true" {
-			ctag := types.Prototype{FunctionName: tag[FIELD_FUNCTION_NAME], Prototype: tag[KIND_PROTOTYPE], Fields: tag}
+			ctag := types.Prototype{FunctionName: tag[FIELD_FUNCTION_NAME], Prototype: tag[KIND_PROTOTYPE], Modifiers: tag[KIND_PROTOTYPE_MODIFIERS], Fields: tag}
 			prototypes = append(prototypes, &ctag)
 		}
 	}
@@ -126,9 +127,11 @@ func addPrototype(tag map[string]string) {
 
 	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
 
+	tag[KIND_PROTOTYPE_MODIFIERS] = ""
 	if strings.Index(tag[FIELD_CODE], STATIC+" ") != -1 {
-		tag[KIND_PROTOTYPE] = STATIC + " " + tag[KIND_PROTOTYPE]
+		tag[KIND_PROTOTYPE_MODIFIERS] = tag[KIND_PROTOTYPE_MODIFIERS] + " " + STATIC
 	}
+	tag[KIND_PROTOTYPE_MODIFIERS] = strings.TrimSpace(tag[KIND_PROTOTYPE_MODIFIERS])
 }
 
 func removeDefinedProtypes(tags []map[string]string) []map[string]string {

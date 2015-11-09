@@ -154,6 +154,7 @@ type Command interface {
 type Prototype struct {
 	FunctionName string
 	Prototype    string
+	Modifiers    string
 	Fields       map[string]string
 }
 
