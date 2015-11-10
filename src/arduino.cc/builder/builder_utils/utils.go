@@ -35,6 +35,7 @@ import (
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -278,6 +279,10 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 }
 
 func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
+	return ExecRecipeSpecifyStdOutStdErr(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger, os.Stdout, os.Stderr)
+}
+
+func ExecRecipeSpecifyStdOutStdErr(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger, stdout io.Writer, stderr io.Writer) ([]byte, error) {
 	pattern := properties[recipe]
 	if pattern == constants.EMPTY_STRING {
 		return nil, utils.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
@@ -302,10 +307,10 @@ func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperti
 	}
 
 	if echoOutput {
-		command.Stdout = os.Stdout
+		command.Stdout = stdout
 	}
 
-	command.Stderr = os.Stderr
+	command.Stderr = stderr
 
 	if echoOutput {
 		err := command.Run()
