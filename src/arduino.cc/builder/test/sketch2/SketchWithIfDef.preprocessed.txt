@@ -16,10 +16,15 @@ typedef MyType int;
 
 #include "empty_2.h"
 
+#line 16
 void setup();
+#line 21
 void loop();
+#line 33
 void debug();
+#line 44
 void disabledIsDefined();
+#line 48
 int useMyType(MyType type);
 #line 16
 void setup() {

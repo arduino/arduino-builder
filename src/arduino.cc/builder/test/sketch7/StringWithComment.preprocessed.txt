@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #line 1
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 1
 void setup();
+#line 10
 void loop();
 #line 1
 void setup() {

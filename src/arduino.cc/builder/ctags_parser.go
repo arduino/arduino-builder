@@ -31,8 +31,6 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"strconv"
 	"strings"
 )
@@ -42,7 +40,6 @@ const FIELD_LINE = "line"
 const FIELD_SIGNATURE = "signature"
 const FIELD_RETURNTYPE = "returntype"
 const FIELD_CODE = "code"
-const FIELD_FUNCTION_NAME = "functionName"
 const FIELD_CLASS = "class"
 const FIELD_STRUCT = "struct"
 const FIELD_NAMESPACE = "namespace"
@@ -61,7 +58,7 @@ var KNOWN_TAG_KINDS = map[string]bool{"prototype": true, "function": true}
 var FIELDS_MARKING_UNHANDLED_TAGS = []string{FIELD_CLASS, FIELD_STRUCT, FIELD_NAMESPACE}
 
 type CTagsParser struct {
-	PrototypesField string
+	CTagsField string
 }
 
 func (s *CTagsParser) Run(context map[string]interface{}) error {
@@ -82,90 +79,9 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	removeDuplicate(tags)
 	skipTagsWhere(tags, prototypeAndCodeDontMatch)
 
-	lineWhereToInsertPrototypes, err := findLineWhereToInsertPrototypes(tags)
-	if err != nil {
-		return utils.WrapError(err)
-	}
-	if lineWhereToInsertPrototypes != -1 {
-		context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES] = lineWhereToInsertPrototypes
-	}
-
-	prototypes := toPrototypes(tags)
-
-	context[s.PrototypesField] = prototypes
+	context[s.CTagsField] = tags
 
 	return nil
-}
-
-func findLineWhereToInsertPrototypes(tags []map[string]string) (int, error) {
-	firstFunctionLine, err := firstFunctionAtLine(tags)
-	if err != nil {
-		return -1, utils.WrapError(err)
-	}
-	firstFunctionPointerAsArgument, err := firstFunctionPointerUsedAsArgument(tags)
-	if err != nil {
-		return -1, utils.WrapError(err)
-	}
-	if firstFunctionLine != -1 && firstFunctionPointerAsArgument != -1 {
-		if firstFunctionLine < firstFunctionPointerAsArgument {
-			return firstFunctionLine, nil
-		} else {
-			return firstFunctionPointerAsArgument, nil
-		}
-	} else if firstFunctionLine == -1 {
-		return firstFunctionPointerAsArgument, nil
-	} else {
-		return firstFunctionLine, nil
-	}
-}
-
-func firstFunctionPointerUsedAsArgument(tags []map[string]string) (int, error) {
-	functionNames := collectFunctionNames(tags)
-	for _, tag := range tags {
-		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
-			return strconv.Atoi(tag[FIELD_LINE])
-		}
-	}
-	return -1, nil
-}
-
-func functionNameUsedAsFunctionPointerIn(tag map[string]string, functionNames []string) bool {
-	for _, functionName := range functionNames {
-		if strings.Index(tag[FIELD_CODE], "&"+functionName) != -1 {
-			return true
-		}
-	}
-	return false
-}
-
-func collectFunctionNames(tags []map[string]string) []string {
-	names := []string{}
-	for _, tag := range tags {
-		if tag[FIELD_KIND] == KIND_FUNCTION {
-			names = append(names, tag[FIELD_FUNCTION_NAME])
-		}
-	}
-	return names
-}
-
-func firstFunctionAtLine(tags []map[string]string) (int, error) {
-	for _, tag := range tags {
-		if !tagIsUnknown(tag) && !tagHasAtLeastOneField(tag, FIELDS_MARKING_UNHANDLED_TAGS) && tag[FIELD_KIND] == KIND_FUNCTION {
-			return strconv.Atoi(tag[FIELD_LINE])
-		}
-	}
-	return -1, nil
-}
-
-func toPrototypes(tags []map[string]string) []*types.Prototype {
-	prototypes := []*types.Prototype{}
-	for _, tag := range tags {
-		if tag[FIELD_SKIP] != TRUE {
-			ctag := types.Prototype{FunctionName: tag[FIELD_FUNCTION_NAME], Prototype: tag[KIND_PROTOTYPE], Modifiers: tag[KIND_PROTOTYPE_MODIFIERS], Fields: tag}
-			prototypes = append(prototypes, &ctag)
-		}
-	}
-	return prototypes
 }
 
 func addPrototypes(tags []map[string]string) {
@@ -188,7 +104,7 @@ func addPrototype(tag map[string]string) {
 		return
 	}
 
-	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
+	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[constants.CTAGS_FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
 
 	tag[KIND_PROTOTYPE_MODIFIERS] = ""
 	if strings.Index(tag[FIELD_CODE], STATIC+" ") != -1 {
@@ -289,7 +205,7 @@ func parseTag(row string) map[string]string {
 	tag := make(map[string]string)
 	parts := strings.Split(row, "\t")
 
-	tag[FIELD_FUNCTION_NAME] = parts[0]
+	tag[constants.CTAGS_FIELD_FUNCTION_NAME] = parts[0]
 	parts = parts[1:]
 
 	for _, part := range parts {

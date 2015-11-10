@@ -39,26 +39,47 @@ Code Exclusively for GPRS shield:
 //  Default set of instructions for GPRS Shield power control
 //
 
+#line 39
 void setPowerStateTo( int newState );
+#line 64
 int getPowerState();
+#line 75
 void powerUpOrDown();
+#line 90
 void clearBufferArray();
+#line 96
 void makeMissedCall( char num[] );
+#line 111
 void sendTextMessage( char number[], char messg[] );
+#line 129
 void analise(byte incoming[], int length);
+#line 179
 byte decToBcd( byte b );
+#line 184
 boolean getBit( byte addr, int pos );
+#line 190
 void setBit( byte addr, int pos, boolean newBit );
+#line 204
 byte getByte( byte addr );
+#line 213
 boolean getBytes( byte addr, int amount );
+#line 230
 void setByte( byte addr, byte newByte );
+#line 235
 void setBytes( byte addr, byte newBytes[], int amount );
+#line 244
 void getTime();
+#line 260
 void setTime( byte newTime[ 7 ] );
+#line 267
 void getRTCTemperature();
+#line 277
 void gprsListen();
+#line 294
 void printTime();
+#line 317
 void setup();
+#line 334
 void loop();
 #line 39
 void setPowerStateTo( int newState )

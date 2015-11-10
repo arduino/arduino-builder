@@ -155,11 +155,12 @@ type Prototype struct {
 	FunctionName string
 	Prototype    string
 	Modifiers    string
+	Line         string
 	Fields       map[string]string
 }
 
 func (proto *Prototype) String() string {
-	return proto.Modifiers + " " + proto.Prototype
+	return proto.Modifiers + " " + proto.Prototype + " @ " + proto.Line
 }
 
 type SourceFolder struct {

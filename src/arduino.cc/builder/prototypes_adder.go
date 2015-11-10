@@ -52,10 +52,7 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 		return nil
 	}
 
-	firstFunctionChar := len(strings.Join(sourceRows[:firstFunctionLine-1], "\n")) + 1
-	if firstFunctionLine > 1 {
-		firstFunctionLine -= context[constants.CTX_LINE_OFFSET].(int)
-	}
+	firstFunctionChar := len(strings.Join(sourceRows[:firstFunctionLine+context[constants.CTX_LINE_OFFSET].(int)-1], "\n")) + 1
 	prototypeSection := composePrototypeSection(firstFunctionLine, context[constants.CTX_PROTOTYPES].([]*types.Prototype))
 	context[constants.CTX_PROTOTYPE_SECTION] = prototypeSection
 	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
@@ -85,6 +82,7 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 func joinPrototypes(prototypes []*types.Prototype) string {
 	prototypesSlice := []string{}
 	for _, proto := range prototypes {
+		prototypesSlice = append(prototypesSlice, "#line "+proto.Line)
 		prototypeParts := []string{}
 		if proto.Modifiers != "" {
 			prototypeParts = append(prototypeParts, proto.Modifiers)

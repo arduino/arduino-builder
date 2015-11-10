@@ -7,7 +7,9 @@ world\n";
 
 //" delete this comment line and the IDE parser will crash
 
+#line 7
 void setup();
+#line 11
 void loop();
 #line 7
 void setup()

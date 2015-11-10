@@ -205,9 +205,9 @@ func SliceContains(slice []string, target string) bool {
 	return false
 }
 
-func SliceContainsPrototype(slice []*types.Prototype, target *types.Prototype) bool {
+func SliceContainsCTag(slice []map[string]string, target map[string]string) bool {
 	for _, value := range slice {
-		if value.FunctionName == target.FunctionName {
+		if value[constants.CTAGS_FIELD_FUNCTION_NAME] == target[constants.CTAGS_FIELD_FUNCTION_NAME] {
 			return true
 		}
 	}

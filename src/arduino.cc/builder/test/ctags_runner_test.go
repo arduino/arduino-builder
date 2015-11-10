@@ -48,10 +48,11 @@ func TestCTagsRunner(t *testing.T) {
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
+	sketchLocation := Abs(t, filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
+	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
@@ -68,7 +69,7 @@ func TestCTagsRunner(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE},
+		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, Filename: constants.FILE_CTAGS_TARGET},
 		&builder.CTagsRunner{},
 	}
 
@@ -77,14 +78,13 @@ func TestCTagsRunner(t *testing.T) {
 		NoError(t, err)
 	}
 
-	ctagsTempFileName := context[constants.CTX_CTAGS_TEMP_FILE_NAME].(string)
-	expectedOutput := "server	" + ctagsTempFileName + "	/^BridgeServer server;$/;\"	kind:variable	line:32\n" +
-		"setup	" + ctagsTempFileName + "	/^void setup() {$/;\"	kind:function	line:34	signature:()	returntype:void\n" +
-		"loop	" + ctagsTempFileName + "	/^void loop() {$/;\"	kind:function	line:47	signature:()	returntype:void\n" +
-		"process	" + ctagsTempFileName + "	/^void process(BridgeClient client) {$/;\"	kind:function	line:63	signature:(BridgeClient client)	returntype:void\n" +
-		"digitalCommand	" + ctagsTempFileName + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:83	signature:(BridgeClient client)	returntype:void\n" +
-		"analogCommand	" + ctagsTempFileName + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:110	signature:(BridgeClient client)	returntype:void\n" +
-		"modeCommand	" + ctagsTempFileName + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:150	signature:(BridgeClient client)	returntype:void\n"
+	expectedOutput := "server	" + sketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
+		"setup	" + sketchLocation + "	/^void setup() {$/;\"	kind:function	line:33	signature:()	returntype:void\n" +
+		"loop	" + sketchLocation + "	/^void loop() {$/;\"	kind:function	line:46	signature:()	returntype:void\n" +
+		"process	" + sketchLocation + "	/^void process(BridgeClient client) {$/;\"	kind:function	line:62	signature:(BridgeClient client)	returntype:void\n" +
+		"digitalCommand	" + sketchLocation + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:82	signature:(BridgeClient client)	returntype:void\n" +
+		"analogCommand	" + sketchLocation + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:109	signature:(BridgeClient client)	returntype:void\n" +
+		"modeCommand	" + sketchLocation + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:149	signature:(BridgeClient client)	returntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }
@@ -97,10 +97,11 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
+	sketchLocation := Abs(t, filepath.Join("sketch_with_class", "sketch.ino"))
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_class", "sketch.ino")
+	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
@@ -117,7 +118,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE},
+		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, Filename: constants.FILE_CTAGS_TARGET},
 		&builder.CTagsRunner{},
 	}
 
@@ -126,12 +127,11 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		NoError(t, err)
 	}
 
-	ctagsTempFileName := context[constants.CTX_CTAGS_TEMP_FILE_NAME].(string)
-	expectedOutput := "set_values\t" + ctagsTempFileName + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:5\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
-		"area\t" + ctagsTempFileName + "\t/^    int area() {return width*height;}$/;\"\tkind:function\tline:6\tclass:Rectangle\tsignature:()\treturntype:int\n" +
-		"set_values\t" + ctagsTempFileName + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:9\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
-		"setup\t" + ctagsTempFileName + "\t/^void setup() {$/;\"\tkind:function\tline:14\tsignature:()\treturntype:void\n" +
-		"loop\t" + ctagsTempFileName + "\t/^void loop() {$/;\"\tkind:function\tline:18\tsignature:()\treturntype:void\n"
+	expectedOutput := "set_values\t" + sketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
+		"area\t" + sketchLocation + "\t/^    int area() {return width*height;}$/;\"\tkind:function\tline:5\tclass:Rectangle\tsignature:()\treturntype:int\n" +
+		"set_values\t" + sketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
+		"setup\t" + sketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
+		"loop\t" + sketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }
@@ -144,14 +144,15 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
+	sketchLocation := Abs(t, filepath.Join("sketch_with_typename", "sketch.ino"))
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_typename", "sketch.ino")
+	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -164,7 +165,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE},
+		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, Filename: constants.FILE_CTAGS_TARGET},
 		&builder.CTagsRunner{},
 	}
 
@@ -173,11 +174,10 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		NoError(t, err)
 	}
 
-	ctagsTempFileName := context[constants.CTX_CTAGS_TEMP_FILE_NAME].(string)
-	expectedOutput := "Foo\t" + ctagsTempFileName + "\t/^  struct Foo{$/;\"\tkind:struct\tline:3\n" +
-		"setup\t" + ctagsTempFileName + "\t/^void setup() {$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
-		"loop\t" + ctagsTempFileName + "\t/^void loop() {}$/;\"\tkind:function\tline:11\tsignature:()\treturntype:void\n" +
-		"func\t" + ctagsTempFileName + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:13\tsignature:()\treturntype:Foo::Bar\n"
+	expectedOutput := "Foo\t" + sketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
+		"setup\t" + sketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
+		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
+		"func\t" + sketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }
@@ -190,14 +190,15 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
+	sketchLocation := Abs(t, filepath.Join("sketch_with_namespace", "sketch.ino"))
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_namespace", "sketch.ino")
+	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_VERBOSE] = false
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -210,7 +211,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE},
+		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, Filename: constants.FILE_CTAGS_TARGET},
 		&builder.CTagsRunner{},
 	}
 
@@ -219,10 +220,9 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		NoError(t, err)
 	}
 
-	ctagsTempFileName := context[constants.CTX_CTAGS_TEMP_FILE_NAME].(string)
-	expectedOutput := "value\t" + ctagsTempFileName + "\t/^\tint value() {$/;\"\tkind:function\tline:3\tnamespace:Test\tsignature:()\treturntype:int\n" +
-		"setup\t" + ctagsTempFileName + "\t/^void setup() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n" +
-		"loop\t" + ctagsTempFileName + "\t/^void loop() {}$/;\"\tkind:function\tline:9\tsignature:()\treturntype:void\n"
+	expectedOutput := "value\t" + sketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
+		"setup\t" + sketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
+		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }

@@ -31,24 +31,23 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
 type ComparePrototypesFromSourceAndPreprocSource struct{}
 
 func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]interface{}) error {
-	prototypesOfSource := context[constants.CTX_PROTOTYPES_OF_SOURCE].([]*types.Prototype)
-	prototypesOfPreprocSource := context[constants.CTX_PROTOTYPES_OF_PREPROC_SOURCE].([]*types.Prototype)
+	ctagsOfSource := context[constants.CTX_CTAGS_OF_SOURCE].([]map[string]string)
+	ctagsOfPreprocSource := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]map[string]string)
 
-	actualPrototypes := []*types.Prototype{}
-	for _, prototypeOfPreprocSource := range prototypesOfPreprocSource {
-		if utils.SliceContainsPrototype(prototypesOfSource, prototypeOfPreprocSource) {
-			actualPrototypes = append(actualPrototypes, prototypeOfPreprocSource)
+	actualCTags := []map[string]string{}
+	for _, ctagOfPreprocSource := range ctagsOfPreprocSource {
+		if utils.SliceContainsCTag(ctagsOfSource, ctagOfPreprocSource) {
+			actualCTags = append(actualCTags, ctagOfPreprocSource)
 		}
 	}
 
-	context[constants.CTX_PROTOTYPES] = actualPrototypes
+	context[constants.CTX_COLLECTED_CTAGS] = actualCTags
 
 	return nil
 }

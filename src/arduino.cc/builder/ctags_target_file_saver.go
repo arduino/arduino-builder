@@ -39,6 +39,7 @@ import (
 
 type CTagsTargetFileSaver struct {
 	SourceField string
+	Filename    string
 }
 
 func (s *CTagsTargetFileSaver) Run(context map[string]interface{}) error {
@@ -50,7 +51,7 @@ func (s *CTagsTargetFileSaver) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	ctagsTargetFileName := filepath.Join(preprocPath, constants.FILE_CTAGS_TARGET)
+	ctagsTargetFileName := filepath.Join(preprocPath, s.Filename)
 	err = ioutil.WriteFile(ctagsTargetFileName, []byte(source), os.FileMode(0644))
 	if err != nil {
 		return utils.WrapError(err)

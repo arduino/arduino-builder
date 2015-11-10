@@ -9,8 +9,11 @@ struct A_NEW_TYPE {
   int c;
 } foo;
 
+#line 9
 void setup();
+#line 13
 void loop();
+#line 17
 void dostuff(A_NEW_TYPE * bar);
 #line 9
 void setup() {

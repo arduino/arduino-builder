@@ -13,7 +13,9 @@
 
 #include <Bridge.h>
 
+#line 13
 void setup();
+#line 17
 void loop();
 #line 13
 void setup() {

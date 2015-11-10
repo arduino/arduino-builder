@@ -88,7 +88,9 @@ WII Wii(&Btd); // The Wii library can communicate with Wiimotes and the Nunchuck
 // This can also be done using the Android or Processing application
 #endif
 
+#line 88
 void setup();
+#line 204
 void loop();
 #line 88
 void setup() {

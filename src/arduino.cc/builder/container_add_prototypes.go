@@ -40,13 +40,14 @@ type ContainerAddPrototypes struct{}
 func (s *ContainerAddPrototypes) Run(context map[string]interface{}) error {
 	commands := []types.Command{
 		&GCCPreprocRunner{},
-		&CTagsTargetFileSaver{SourceField: constants.CTX_GCC_MINUS_E_SOURCE},
+		&CTagsTargetFileSaver{SourceField: constants.CTX_GCC_MINUS_E_SOURCE, Filename: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&CTagsRunner{},
-		&CTagsParser{PrototypesField: constants.CTX_PROTOTYPES_OF_PREPROC_SOURCE},
-		&CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE},
+		&CTagsParser{CTagsField: constants.CTX_CTAGS_OF_PREPROC_SOURCE},
+		&CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, Filename: constants.FILE_CTAGS_TARGET},
 		&CTagsRunner{},
-		&CTagsParser{PrototypesField: constants.CTX_PROTOTYPES_OF_SOURCE},
+		&CTagsParser{CTagsField: constants.CTX_CTAGS_OF_SOURCE},
 		&ComparePrototypesFromSourceAndPreprocSource{},
+		&CTagsToPrototypes{},
 		&PrototypesAdder{},
 		&SketchSaver{},
 	}
