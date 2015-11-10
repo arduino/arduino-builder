@@ -78,6 +78,7 @@ func TestCTagsRunner(t *testing.T) {
 		NoError(t, err)
 	}
 
+	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
 	expectedOutput := "server	" + sketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
 		"setup	" + sketchLocation + "	/^void setup() {$/;\"	kind:function	line:33	signature:()	returntype:void\n" +
 		"loop	" + sketchLocation + "	/^void loop() {$/;\"	kind:function	line:46	signature:()	returntype:void\n" +
@@ -127,6 +128,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		NoError(t, err)
 	}
 
+	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
 	expectedOutput := "set_values\t" + sketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
 		"area\t" + sketchLocation + "\t/^    int area() {return width*height;}$/;\"\tkind:function\tline:5\tclass:Rectangle\tsignature:()\treturntype:int\n" +
 		"set_values\t" + sketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
@@ -174,6 +176,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		NoError(t, err)
 	}
 
+	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
 	expectedOutput := "Foo\t" + sketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
 		"setup\t" + sketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
 		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
@@ -220,6 +223,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		NoError(t, err)
 	}
 
+	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
 	expectedOutput := "value\t" + sketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
 		"setup\t" + sketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
 		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
