@@ -34,7 +34,7 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
-	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -327,31 +327,16 @@ func PrepareCommandForRecipe(properties map[string]string, recipe string, remove
 	return command, nil
 }
 
-func ExecRecipeCollectStdErr(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error, error) {
+func ExecRecipeCollectStdErr(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
 	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
 	if err != nil {
-		return "", nil, utils.WrapError(err)
+		return "", utils.WrapError(err)
 	}
 
-	stderr, err := command.StderrPipe()
-	if err != nil {
-		return "", nil, utils.WrapError(err)
-	}
-
-	err = command.Start()
-	if err != nil {
-		return "", nil, utils.WrapError(err)
-	}
-
-	collectedStdErr := ""
-	sc := bufio.NewScanner(stderr)
-	for sc.Scan() {
-		collectedStdErr += sc.Text() + "\n"
-	}
-
-	err = command.Wait()
-
-	return collectedStdErr, err, nil
+	buffer := &bytes.Buffer{}
+	command.Stderr = buffer
+	command.Run()
+	return string(buffer.Bytes()), nil
 }
 
 func RemoveHyphenMDDFlagFromGCCCommandLine(properties map[string]string) {
