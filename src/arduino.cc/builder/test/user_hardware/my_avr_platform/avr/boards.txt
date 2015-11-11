@@ -30,7 +30,7 @@ custom_yun.build.vid=0x2341
 custom_yun.build.pid=0x8041
 custom_yun.build.usb_product="Arduino My"
 custom_yun.build.board=AVR_YUN
-custom_yun.build.variant=yun
+custom_yun.build.variant=arduino:yun
 custom_yun.build.extra_flags={build.usb_flags}
 
 mymega.name=Arduino Mega or Mega 2560

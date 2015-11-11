@@ -42,17 +42,9 @@ import (
 type GCCPreprocRunner struct{}
 
 func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
-	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
-
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp")
-
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
-	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
-	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
+	properties := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
@@ -64,4 +56,37 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(output)
 
 	return nil
+}
+
+type GCCPreprocRunnerForDiscoveringIncludes struct {
+	SourceFile string
+}
+
+func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}) error {
+	properties := prepareGCCPreprocRecipeProperties(context, s.SourceFile)
+
+	verbose := context[constants.CTX_VERBOSE].(bool)
+	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	output, _, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
+	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(output)
+
+	return nil
+}
+
+func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFile string) map[string]string {
+	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
+	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+
+	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFile
+
+	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+	includes = utils.Map(includes, utils.WrapWithHyphenI)
+	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
+	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
+
+	return properties
 }

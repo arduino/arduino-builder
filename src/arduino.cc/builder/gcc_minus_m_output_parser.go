@@ -60,12 +60,7 @@ func (s *GCCMinusMOutputParser) Run(context map[string]interface{}) error {
 		return nil
 	}
 
-	previousIncludes := utils.SliceToMapStringBool(context[constants.CTX_INCLUDES].([]string), true)
-	currentIncludes := utils.SliceToMapStringBool(includes, true)
-
-	mergedIncludes := utils.MergeMapsOfStringBool(previousIncludes, currentIncludes)
-
-	context[constants.CTX_INCLUDES] = utils.KeysOfMapOfStringBool(mergedIncludes)
+	context[constants.CTX_INCLUDES] = utils.AddStringsToStringsSet(context[constants.CTX_INCLUDES].([]string), includes)
 
 	return nil
 }

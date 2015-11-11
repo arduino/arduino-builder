@@ -56,7 +56,7 @@ func TestCTagsRunner(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -106,7 +106,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -154,7 +154,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -201,7 +201,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

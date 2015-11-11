@@ -36,3 +36,10 @@ new.10.recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} 
 
 old.11.recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} "{build.path}/{archive_file}" "-L{build.path}" -lm
 new.11.recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} "{archive_file_path}" "-L{build.path}" -lm
+
+#generic again
+old.12.preproc.includes.flags=-w -x c++ -M -MG -MP
+new.12.preproc.includes.flags=-w -x c++ -M -MG -MP -include Arduino.h
+
+old.13.preproc.macros.flags=-w -x c++ -E -CC
+new.13.preproc.macros.flags=-w -x c++ -E -CC -include Arduino.h

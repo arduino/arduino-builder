@@ -54,7 +54,7 @@ func TestCoanRunner(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch2", "SketchWithIfDef.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

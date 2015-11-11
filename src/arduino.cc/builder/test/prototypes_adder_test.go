@@ -56,7 +56,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -97,7 +97,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -138,7 +138,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -179,7 +179,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -220,7 +220,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -261,7 +261,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -302,7 +302,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -343,7 +343,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -384,7 +384,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -428,7 +428,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -469,7 +469,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -510,7 +510,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -551,7 +551,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -592,7 +592,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -633,7 +633,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -673,7 +673,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_typename", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -714,7 +714,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

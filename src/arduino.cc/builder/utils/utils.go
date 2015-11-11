@@ -426,3 +426,12 @@ func LibraryToSourceFolder(library *types.Library) []types.SourceFolder {
 	}
 	return sourceFolders
 }
+
+func AddStringsToStringsSet(accumulator []string, stringsToAdd []string) []string {
+	previousStringsSet := SliceToMapStringBool(accumulator, true)
+	stringsSetToAdd := SliceToMapStringBool(stringsToAdd, true)
+
+	newStringsSet := MergeMapsOfStringBool(previousStringsSet, stringsSetToAdd)
+
+	return KeysOfMapOfStringBool(newStringsSet)
+}

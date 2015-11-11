@@ -122,6 +122,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 
 	boardsManagerTools := []Tool{
 		Tool{Name: "openocd", Version: "0.9.0-arduino", Package: "arduino"},
+		Tool{Name: "CMSIS", Version: "4.0.0-atmel", Package: "arduino"},
 	}
 
 	boardsManagerRFduinoTools := []Tool{

@@ -31,24 +31,34 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/utils"
 	"regexp"
 	"strings"
 )
 
 var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#include\\s*[<\"](\\S+)[\">]")
 
-type IncludesFinderWithRegExp struct{}
+type IncludesFinderWithRegExp struct {
+	ContextField string
+}
 
 func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}) error {
-	source := context[constants.CTX_SOURCE].(string)
+	source := context[s.ContextField].(string)
 
 	matches := INCLUDE_REGEXP.FindAllStringSubmatch(source, -1)
-	var includes []string
+	includes := []string{}
 	for _, match := range matches {
 		includes = append(includes, strings.TrimSpace(match[1]))
 	}
 
-	context[constants.CTX_INCLUDES] = includes
+	context[constants.CTX_INCLUDES_JUST_FOUND] = includes
+
+	if !utils.MapHas(context, constants.CTX_INCLUDES) {
+		context[constants.CTX_INCLUDES] = includes
+		return nil
+	}
+
+	context[constants.CTX_INCLUDES] = utils.AddStringsToStringsSet(context[constants.CTX_INCLUDES].([]string), includes)
 
 	return nil
 }

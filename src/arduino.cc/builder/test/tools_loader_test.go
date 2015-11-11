@@ -101,17 +101,18 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	NoError(t, err)
 
 	tools := context[constants.CTX_TOOLS].([]*types.Tool)
-	require.Equal(t, 2, len(tools))
+	require.Equal(t, 3, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
-	require.Equal(t, "arm-none-eabi-gcc", tools[0].Name)
-	require.Equal(t, "4.8.3-2014q1", tools[0].Version)
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[0].Folder)
+	require.Equal(t, "CMSIS", tools[0].Name)
+	require.Equal(t, "arm-none-eabi-gcc", tools[1].Name)
+	require.Equal(t, "4.8.3-2014q1", tools[1].Version)
+	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[1].Folder)
 
-	require.Equal(t, "openocd", tools[1].Name)
-	require.Equal(t, "0.9.0-arduino", tools[1].Version)
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[1].Folder)
+	require.Equal(t, "openocd", tools[2].Name)
+	require.Equal(t, "0.9.0-arduino", tools[2].Version)
+	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[2].Folder)
 }
 
 func TestLoadLotsOfTools(t *testing.T) {
@@ -125,12 +126,13 @@ func TestLoadLotsOfTools(t *testing.T) {
 	NoError(t, err)
 
 	tools := context[constants.CTX_TOOLS].([]*types.Tool)
-	require.Equal(t, 8, len(tools))
+	require.Equal(t, 9, len(tools))
 
 	require.Equal(t, "arm-none-eabi-gcc", tools[0].Name)
 	require.Equal(t, "4.8.3-2014q1", tools[0].Version)
 
-	require.Equal(t, "openocd", tools[7].Name)
-	require.Equal(t, "0.9.0-arduino", tools[7].Version)
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[7].Folder)
+	require.Equal(t, "CMSIS", tools[7].Name)
+	require.Equal(t, "openocd", tools[8].Name)
+	require.Equal(t, "0.9.0-arduino", tools[8].Version)
+	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[8].Folder)
 }

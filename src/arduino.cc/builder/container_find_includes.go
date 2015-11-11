@@ -44,22 +44,11 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
-	wheelSpins := context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH].(int)
-	for i := 0; i < wheelSpins; i++ {
-		commands := []types.Command{
-			&IncludesFinderWithGCC{SourceFile: filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp")},
-			&GCCMinusMOutputParser{},
-			&IncludesToIncludeFolders{},
-		}
-
-		for _, command := range commands {
-			err := runCommand(context, command)
-			if err != nil {
-				return utils.WrapError(err)
-			}
-		}
+	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	err = findIncludesUntilDone(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
+	if err != nil {
+		return utils.WrapError(err)
 	}
 
 	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
@@ -81,18 +70,13 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 	sourceFiles := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
 
 	for !sourceFiles.Empty() {
-		commands := []types.Command{
-			&IncludesFinderWithGCC{SourceFile: sourceFiles.Pop().(string)},
-			&GCCMinusMOutputParser{},
-			&IncludesToIncludeFolders{},
-			&CollectAllSourceFilesFromFoldersWithSources{},
+		err = findIncludesUntilDone(context, sourceFiles.Pop().(string))
+		if err != nil {
+			return utils.WrapError(err)
 		}
-
-		for _, command := range commands {
-			err := runCommand(context, command)
-			if err != nil {
-				return utils.WrapError(err)
-			}
+		err := runCommand(context, &CollectAllSourceFilesFromFoldersWithSources{})
+		if err != nil {
+			return utils.WrapError(err)
 		}
 	}
 
@@ -104,6 +88,33 @@ func runCommand(context map[string]interface{}, command types.Command) error {
 	err := command.Run(context)
 	if err != nil {
 		return utils.WrapError(err)
+	}
+	return nil
+}
+
+func findIncludesUntilDone(context map[string]interface{}, sourceFile string) error {
+	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	done := false
+	for !done {
+		commands := []types.Command{
+			&GCCPreprocRunnerForDiscoveringIncludes{SourceFile: sourceFile},
+			&IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_SOURCE},
+			&IncludesToIncludeFolders{},
+		}
+		for _, command := range commands {
+			err := runCommand(context, command)
+			if err != nil {
+				return utils.WrapError(err)
+			}
+		}
+		if len(context[constants.CTX_INCLUDES_JUST_FOUND].([]string)) == 0 {
+			done = true
+		} else if len(context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)) == len(importedLibraries) {
+			err := runCommand(context, &GCCPreprocRunner{})
+			return utils.WrapError(err)
+		}
+		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+		context[constants.CTX_INCLUDES_JUST_FOUND] = []string{}
 	}
 	return nil
 }

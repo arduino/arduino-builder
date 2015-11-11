@@ -54,7 +54,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch2", "SketchWithIfDef.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -71,12 +71,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
-	require.Equal(t, 2, len(includes))
-	sort.Strings(includes)
-	require.Equal(t, filepath.Join(buildPath, constants.FOLDER_SKETCH, "empty_1.h"), includes[0])
-	require.Equal(t, filepath.Join(buildPath, constants.FOLDER_SKETCH, "empty_2.h"), includes[1])
+	require.Nil(t, context[constants.CTX_INCLUDES])
 }
 
 func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
@@ -94,7 +89,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_config", "sketch_with_config.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -113,8 +108,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
 	includes := context[constants.CTX_INCLUDES].([]string)
-	require.True(t, utils.SliceContains(includes, filepath.Join(buildPath, constants.FOLDER_SKETCH, "config.h")))
-	require.True(t, utils.SliceContains(includes, filepath.Join(buildPath, constants.FOLDER_SKETCH, "includes")+"/de bug.h"))
+	require.Equal(t, 1, len(includes))
 	require.True(t, utils.SliceContains(includes, "Bridge.h"))
 
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
@@ -136,7 +130,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_dependend_libraries", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -155,16 +149,13 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
 	includes := context[constants.CTX_INCLUDES].([]string)
-	require.Equal(t, 7, len(includes))
+	require.Equal(t, 4, len(includes))
 
 	sort.Strings(includes)
-	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library1"))+"/library1.h", includes[0])
-	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library2"))+"/library2.h", includes[1])
-	require.Equal(t, Abs(t, filepath.Join("dependent_libraries", "library3"))+"/library3.h", includes[2])
-	require.Equal(t, "library1.h", includes[3])
-	require.Equal(t, "library2.h", includes[4])
-	require.Equal(t, "library3.h", includes[5])
-	require.Equal(t, "library4.h", includes[6])
+	require.Equal(t, "library1.h", includes[0])
+	require.Equal(t, "library2.h", includes[1])
+	require.Equal(t, "library3.h", includes[2])
+	require.Equal(t, "library4.h", includes[3])
 
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	require.Equal(t, 4, len(importedLibraries))
@@ -174,4 +165,92 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	require.Equal(t, "library2", importedLibraries[1].Name)
 	require.Equal(t, "library3", importedLibraries[2].Name)
 	require.Equal(t, "library4", importedLibraries[3].Name)
+}
+
+func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"dependent_libraries", "libraries"}
+	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_that_checks_if_SPI_has_transactions", "sketch.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.NotNil(t, context[constants.CTX_INCLUDES])
+	includes := context[constants.CTX_INCLUDES].([]string)
+	require.Equal(t, 1, len(includes))
+	require.Equal(t, "SPI.h", includes[0])
+
+	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	require.Equal(t, 1, len(importedLibraries))
+	require.Equal(t, "SPI", importedLibraries[0].Name)
+}
+
+func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"dependent_libraries", "libraries"}
+	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	command := &builder.ContainerFindIncludes{}
+	err := command.Run(context)
+	require.Error(t, err)
+
+	require.NotNil(t, context[constants.CTX_INCLUDES])
+	includes := context[constants.CTX_INCLUDES].([]string)
+	require.Equal(t, 2, len(includes))
+	sort.Strings(includes)
+	require.Equal(t, "Ethernet.h", includes[0])
+	require.Equal(t, "SPI.h", includes[1])
+
+	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	require.Equal(t, 1, len(importedLibraries))
+	require.Equal(t, "SPI", importedLibraries[0].Name)
 }

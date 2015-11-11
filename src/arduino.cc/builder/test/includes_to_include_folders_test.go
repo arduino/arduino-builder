@@ -55,7 +55,7 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -96,7 +96,7 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -135,7 +135,7 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -179,7 +179,7 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -222,7 +222,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -265,7 +265,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = false
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -308,6 +308,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

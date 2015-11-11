@@ -34,9 +34,10 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
+	"bufio"
 	"fmt"
-	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -279,10 +280,27 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 }
 
 func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
-	return ExecRecipeSpecifyStdOutStdErr(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger, os.Stdout, os.Stderr)
+	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+	if err != nil {
+		return nil, utils.WrapError(err)
+	}
+
+	if echoOutput {
+		command.Stdout = os.Stdout
+	}
+
+	command.Stderr = os.Stderr
+
+	if echoOutput {
+		err := command.Run()
+		return nil, utils.WrapError(err)
+	}
+
+	bytes, err := command.Output()
+	return bytes, utils.WrapError(err)
 }
 
-func ExecRecipeSpecifyStdOutStdErr(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger, stdout io.Writer, stderr io.Writer) ([]byte, error) {
+func PrepareCommandForRecipe(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
 	pattern := properties[recipe]
 	if pattern == constants.EMPTY_STRING {
 		return nil, utils.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
@@ -306,19 +324,34 @@ func ExecRecipeSpecifyStdOutStdErr(properties map[string]string, recipe string, 
 		fmt.Println(commandLine)
 	}
 
-	if echoOutput {
-		command.Stdout = stdout
+	return command, nil
+}
+
+func ExecRecipeCollectStdErr(properties map[string]string, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error, error) {
+	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+	if err != nil {
+		return "", nil, utils.WrapError(err)
 	}
 
-	command.Stderr = stderr
-
-	if echoOutput {
-		err := command.Run()
-		return nil, utils.WrapError(err)
+	stderr, err := command.StderrPipe()
+	if err != nil {
+		return "", nil, utils.WrapError(err)
 	}
 
-	bytes, err := command.Output()
-	return bytes, utils.WrapError(err)
+	err = command.Start()
+	if err != nil {
+		return "", nil, utils.WrapError(err)
+	}
+
+	collectedStdErr := ""
+	sc := bufio.NewScanner(stderr)
+	for sc.Scan() {
+		collectedStdErr += sc.Text() + "\n"
+	}
+
+	err = command.Wait()
+
+	return collectedStdErr, err, nil
 }
 
 func RemoveHyphenMDDFlagFromGCCCommandLine(properties map[string]string) {
