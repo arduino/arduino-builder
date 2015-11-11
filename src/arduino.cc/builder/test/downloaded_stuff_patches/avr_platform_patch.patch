@@ -1,5 +1,7 @@
---- a/downloaded_hardware/arduino/avr/platform.txt.orig	2015-11-11 17:20:47.731372477 +0100
-+++ b/downloaded_hardware/arduino/avr/platform.txt	2015-11-11 17:21:21.463373279 +0100
+diff --git a/downloaded_hardware/arduino/avr/platform.txt b/downloaded_hardware/arduino/avr/platform.txt
+index 537fcc5..4e526d9 100644
+--- a/downloaded_hardware/arduino/avr/platform.txt
++++ b/downloaded_hardware/arduino/avr/platform.txt
 @@ -88,6 +88,9 @@
  preproc.macros.flags=-w -x c++ -E -CC
  recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
