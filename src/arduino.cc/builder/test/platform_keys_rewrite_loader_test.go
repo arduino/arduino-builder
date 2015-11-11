@@ -54,7 +54,7 @@ func TestLoadPlatformKeysRewrite(t *testing.T) {
 
 	platformKeysRewrite := context[constants.CTX_PLATFORM_KEYS_REWRITE].(types.PlatforKeysRewrite)
 
-	require.Equal(t, 14, len(platformKeysRewrite.Rewrites))
+	require.Equal(t, 13, len(platformKeysRewrite.Rewrites))
 	require.Equal(t, constants.BUILD_PROPERTIES_COMPILER_PATH, platformKeysRewrite.Rewrites[0].Key)
 	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platformKeysRewrite.Rewrites[0].OldValue)
 	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platformKeysRewrite.Rewrites[0].NewValue)

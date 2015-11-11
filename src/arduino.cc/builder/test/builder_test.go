@@ -89,6 +89,7 @@ func TestBuilderBridge(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_VERBOSE] = true
 
 	command := builder.Builder{}
 	err := command.Run(context)

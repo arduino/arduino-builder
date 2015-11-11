@@ -81,7 +81,8 @@ func TestLoadHardware(t *testing.T) {
 	require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties["tools.ctags.path"])
 	require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties["tools.ctags.pattern"])
 	require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties["tools.avrdude.path"])
-	require.Equal(t, "-w -x c++ -E -CC -include Arduino.h", packages.Properties["preproc.macros.flags"])
+	require.Equal(t, "-w -x c++ -E -CC -include Arduino.h", packages.Properties["preproc.final.flags"])
+	require.Equal(t, "-w -x c++ -E -CC -dM -include Arduino.h", packages.Properties["preproc.macros.flags"])
 }
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
@@ -130,8 +131,8 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 	require.Equal(t, "AVRISP mkII", avrPlatform.Programmers["avrispmkii"][constants.PROGRAMMER_NAME])
 
-	require.Equal(t, "-w -x c++ -M -MG -MP -include Arduino.h", avrPlatform.Properties["preproc.includes.flags"])
-	require.Equal(t, "-w -x c++ -E -CC -include Arduino.h", avrPlatform.Properties["preproc.macros.flags"])
+	require.Equal(t, "-w -x c++ -M -MG -MP", avrPlatform.Properties["preproc.includes.flags"])
+	require.Equal(t, "-w -x c++ -E -CC -dM -include Arduino.h", avrPlatform.Properties["preproc.macros.flags"])
 	require.Equal(t, "\"{compiler.path}{compiler.cpp.cmd}\" {compiler.cpp.flags} {preproc.includes.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} \"{source_file}\"", avrPlatform.Properties[constants.RECIPE_PREPROC_INCLUDES])
 	require.False(t, utils.MapStringStringHas(avrPlatform.Properties, "preproc.macros.compatibility_flags"))
 
@@ -146,7 +147,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties["tools.ctags.path"])
 	require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties["tools.ctags.pattern"])
 	require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties["tools.avrdude.path"])
-	require.Equal(t, "-w -x c++ -E -CC -include Arduino.h", packages.Properties["preproc.macros.flags"])
+	require.Equal(t, "-w -x c++ -E -CC -dM -include Arduino.h", packages.Properties["preproc.macros.flags"])
 	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", packages.Properties["preproc.macros.compatibility_flags"])
 
 	if runtime.GOOS != "windows" {

@@ -1,9 +1,3 @@
-# ctags
-# ------------------------------
-tools.ctags.path={runtime.tools.ctags.path}
-tools.ctags.cmd.path={path}/ctags
-tools.ctags.pattern="{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"
-
 # coan
 # ------------------------------
 tools.coan.path={runtime.tools.coan.path}

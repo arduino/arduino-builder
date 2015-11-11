@@ -48,7 +48,7 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_FINAL, true, verbose, false, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
