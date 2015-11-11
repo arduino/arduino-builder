@@ -36,6 +36,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 )
 
@@ -132,6 +133,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	require.NotNil(t, context[constants.CTX_INCLUDES])
 	includes := context[constants.CTX_INCLUDES].([]string)
 	require.Equal(t, 2, len(includes))
-	require.Equal(t, "test.h", includes[0])
-	require.Equal(t, "SPI.h", includes[1])
+	sort.Strings(includes)
+	require.Equal(t, "SPI.h", includes[0])
+	require.Equal(t, "test.h", includes[1])
 }
