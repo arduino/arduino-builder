@@ -138,7 +138,7 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 	}
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = filepath.Join(buildPath, relativeSource+".o")
 
-	err = os.MkdirAll(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]), os.FileMode(0755))
+	err = utils.EnsureFolderExists(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]))
 	if err != nil {
 		return "", utils.WrapError(err)
 	}

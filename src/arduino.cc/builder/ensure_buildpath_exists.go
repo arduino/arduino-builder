@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/utils"
-	"os"
 )
 
 type EnsureBuildPathExists struct{}
@@ -40,7 +39,7 @@ type EnsureBuildPathExists struct{}
 func (s *EnsureBuildPathExists) Run(context map[string]interface{}) error {
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 
-	err := os.MkdirAll(buildPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(buildPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}

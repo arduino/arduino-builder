@@ -35,8 +35,6 @@ import (
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"regexp"
 )
@@ -51,13 +49,13 @@ func (s *CoanRunner) Run(context map[string]interface{}) error {
 	verbose := context[constants.CTX_VERBOSE].(bool)
 
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
-	err := os.MkdirAll(preprocPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
 	coanTargetFileName := filepath.Join(preprocPath, constants.FILE_COAN_TARGET)
-	err = ioutil.WriteFile(coanTargetFileName, []byte(source), os.FileMode(0644))
+	err = utils.WriteFile(coanTargetFileName, source)
 	if err != nil {
 		return utils.WrapError(err)
 	}

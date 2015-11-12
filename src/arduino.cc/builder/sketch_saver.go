@@ -33,8 +33,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -45,11 +43,11 @@ func (s *SketchSaver) Run(context map[string]interface{}) error {
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 	source := context[constants.CTX_SOURCE].(string)
 
-	err := os.MkdirAll(sketchBuildPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
-	err = ioutil.WriteFile(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), []byte(source), os.FileMode(0644))
+	err = utils.WriteFile(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), source)
 	return utils.WrapError(err)
 }

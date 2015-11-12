@@ -435,3 +435,19 @@ func AddStringsToStringsSet(accumulator []string, stringsToAdd []string) []strin
 
 	return KeysOfMapOfStringBool(newStringsSet)
 }
+
+func EnsureFolderExists(folder string) error {
+	return os.MkdirAll(folder, os.FileMode(0755))
+}
+
+func WriteFileBytes(targetFilePath string, data []byte) error {
+	return ioutil.WriteFile(targetFilePath, data, os.FileMode(0644))
+}
+
+func WriteFile(targetFilePath string, data string) error {
+	return WriteFileBytes(targetFilePath, []byte(data))
+}
+
+func TouchFile(targetFilePath string) error {
+	return WriteFileBytes(targetFilePath, []byte{})
+}

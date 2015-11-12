@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -46,7 +45,7 @@ func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	err := ioutil.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), []byte("test"), os.FileMode(0644))
+	err := utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), "test")
 	NoError(t, err)
 
 	command := builder.LoadPreviousBuildOptionsMap{}

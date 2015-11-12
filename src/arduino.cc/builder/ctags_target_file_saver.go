@@ -32,8 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/utils"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -46,13 +44,13 @@ func (s *CTagsTargetFileSaver) Run(context map[string]interface{}) error {
 	source := context[s.SourceField].(string)
 
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
-	err := os.MkdirAll(preprocPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
 	ctagsTargetFileName := filepath.Join(preprocPath, s.Filename)
-	err = ioutil.WriteFile(ctagsTargetFileName, []byte(source), os.FileMode(0644))
+	err = utils.WriteFile(ctagsTargetFileName, source)
 	if err != nil {
 		return utils.WrapError(err)
 	}

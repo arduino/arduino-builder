@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
-	"os"
 )
 
 type CoreBuilder struct{}
@@ -46,7 +45,7 @@ func (s *CoreBuilder) Run(context map[string]interface{}) error {
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
-	err := os.MkdirAll(coreBuildPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(coreBuildPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}

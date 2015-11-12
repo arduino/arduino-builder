@@ -245,7 +245,7 @@ func main() {
 			return
 		}
 
-		err = os.MkdirAll(buildPath, os.FileMode(0755))
+		err = utils.EnsureFolderExists(buildPath)
 		if err != nil {
 			printCompleteError(err)
 			defer os.Exit(1)

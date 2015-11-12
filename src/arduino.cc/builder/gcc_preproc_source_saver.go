@@ -32,8 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/utils"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -41,13 +39,13 @@ type GCCPreprocSourceSaver struct{}
 
 func (s *GCCPreprocSourceSaver) Run(context map[string]interface{}) error {
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
-	err := os.MkdirAll(preprocPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
 	source := context[constants.CTX_SOURCE].(string)
 
-	err = ioutil.WriteFile(filepath.Join(preprocPath, constants.FILE_GCC_PREPROC_TARGET), []byte(source), os.FileMode(0644))
+	err = utils.WriteFile(filepath.Join(preprocPath, constants.FILE_GCC_PREPROC_TARGET), source)
 	return utils.WrapError(err)
 }

@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -101,5 +100,5 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 		sketch = append(sketch, row)
 	}
 
-	return ioutil.WriteFile(mergedSketchPath, []byte(strings.Join(sketch, "\n")), os.FileMode(0644))
+	return utils.WriteFile(mergedSketchPath, strings.Join(sketch, "\n"))
 }

@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -44,7 +43,7 @@ func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}) error 
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 
-	err := os.MkdirAll(sketchBuildPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -58,14 +57,17 @@ func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}) error 
 		}
 
 		targetFilePath := filepath.Join(sketchBuildPath, relativePath)
-		os.MkdirAll(filepath.Dir(targetFilePath), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Dir(targetFilePath))
+		if err != nil {
+			return utils.WrapError(err)
+		}
 
 		bytes, err := ioutil.ReadFile(file.Name)
 		if err != nil {
 			return utils.WrapError(err)
 		}
 
-		ioutil.WriteFile(targetFilePath, bytes, os.FileMode(0644))
+		utils.WriteFileBytes(targetFilePath, bytes)
 	}
 
 	return nil

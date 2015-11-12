@@ -31,8 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"io/ioutil"
-	"os"
+	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
@@ -42,7 +41,7 @@ func (s *StoreBuildOptionsMap) Run(context map[string]interface{}) error {
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
 
-	ioutil.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), []byte(buildOptionsJson), os.FileMode(0644))
+	utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), buildOptionsJson)
 
 	return nil
 }

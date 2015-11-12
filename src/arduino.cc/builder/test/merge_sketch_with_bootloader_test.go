@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -57,12 +58,12 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
-	err := os.MkdirAll(filepath.Join(buildPath, "sketch"), os.FileMode(0755))
+	err := utils.EnsureFolderExists(filepath.Join(buildPath, "sketch"))
 	NoError(t, err)
 
 	fakeSketchHex := "row 1\n" +
 		"row 2\n"
-	err = ioutil.WriteFile(filepath.Join(buildPath, "sketch", "sketch.ino.hex"), []byte(fakeSketchHex), os.FileMode(0644))
+	err = utils.WriteFile(filepath.Join(buildPath, "sketch", "sketch.ino.hex"), fakeSketchHex)
 	NoError(t, err)
 
 	commands := []types.Command{
@@ -100,12 +101,12 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
-	err := os.MkdirAll(filepath.Join(buildPath, "sketch"), os.FileMode(0755))
+	err := utils.EnsureFolderExists(filepath.Join(buildPath, "sketch"))
 	NoError(t, err)
 
 	fakeSketchHex := "row 1\n" +
 		"row 2\n"
-	err = ioutil.WriteFile(filepath.Join(buildPath, "sketch.ino.hex"), []byte(fakeSketchHex), os.FileMode(0644))
+	err = utils.WriteFile(filepath.Join(buildPath, "sketch.ino.hex"), fakeSketchHex)
 	NoError(t, err)
 
 	commands := []types.Command{

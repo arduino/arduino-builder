@@ -34,8 +34,8 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -50,7 +50,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "old"
 	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
 
-	ioutil.WriteFile(filepath.Join(buildPath, "should_be_deleted.txt"), []byte{}, os.FileMode(0644))
+	utils.TouchFile(filepath.Join(buildPath, "should_be_deleted.txt"))
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -81,7 +81,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 
 	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
 
-	ioutil.WriteFile(filepath.Join(buildPath, "should_not_be_deleted.txt"), []byte{}, os.FileMode(0644))
+	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -113,7 +113,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "options"
 	context[constants.CTX_BUILD_OPTIONS_JSON] = "options"
 
-	ioutil.WriteFile(filepath.Join(buildPath, "should_not_be_deleted.txt"), []byte{}, os.FileMode(0644))
+	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

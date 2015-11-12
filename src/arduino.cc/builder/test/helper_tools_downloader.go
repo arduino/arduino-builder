@@ -155,7 +155,7 @@ func patchFiles(t *testing.T) {
 			NoError(t, err)
 			operations, err := patchSet.Apply(ioutil.ReadFile)
 			for _, op := range operations {
-				ioutil.WriteFile(op.Dst, op.Data, os.FileMode(0644))
+				utils.WriteFileBytes(op.Dst, op.Data)
 			}
 		}
 	}
@@ -468,7 +468,7 @@ func downloadAndUnpackCore(core Core, url string, targetPath string) error {
 	}
 
 	if len(files) == 1 && files[0].IsDir() {
-		err = os.MkdirAll(filepath.Join(targetPath, core.Maintainer), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, core.Maintainer))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -477,7 +477,7 @@ func downloadAndUnpackCore(core Core, url string, targetPath string) error {
 			return utils.WrapError(err)
 		}
 	} else {
-		err = os.MkdirAll(filepath.Join(targetPath, core.Maintainer, core.Arch), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, core.Maintainer, core.Arch))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -517,7 +517,7 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath string)
 	}
 
 	if len(files) == 1 && files[0].IsDir() {
-		err = os.MkdirAll(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -526,7 +526,7 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath string)
 			return utils.WrapError(err)
 		}
 	} else {
-		err = os.MkdirAll(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch, core.Version), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, core.Maintainer, "hardware", core.Arch, core.Version))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -558,7 +558,7 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath string
 	defer os.RemoveAll(unpackFolder)
 
 	if len(files) == 1 && files[0].IsDir() {
-		err = os.MkdirAll(filepath.Join(targetPath, tool.Package, constants.FOLDER_TOOLS, tool.Name), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, tool.Package, constants.FOLDER_TOOLS, tool.Name))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -567,7 +567,7 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath string
 			return utils.WrapError(err)
 		}
 	} else {
-		err = os.MkdirAll(filepath.Join(targetPath, tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -609,7 +609,7 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath string, deleteIfMis
 	}
 
 	if len(files) == 1 && files[0].IsDir() {
-		err = os.MkdirAll(filepath.Join(targetPath, tool.Name), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, tool.Name))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -618,7 +618,7 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath string, deleteIfMis
 			return utils.WrapError(err)
 		}
 	} else {
-		err = os.MkdirAll(filepath.Join(targetPath, tool.Name, tool.Version), os.FileMode(0755))
+		err = utils.EnsureFolderExists(filepath.Join(targetPath, tool.Name, tool.Version))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -656,7 +656,7 @@ func downloadAndUnpack(url string) (string, []os.FileInfo, error) {
 	}
 	res.Body.Close()
 
-	ioutil.WriteFile(archiveFilePath, bytes, os.FileMode(0644))
+	utils.WriteFileBytes(archiveFilePath, bytes)
 
 	cmd := buildUnpackCmd(archiveFilePath)
 	out, err := cmd.CombinedOutput()

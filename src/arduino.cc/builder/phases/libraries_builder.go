@@ -51,7 +51,7 @@ func (s *LibrariesBuilder) Run(context map[string]interface{}) error {
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
-	err := os.MkdirAll(librariesBuildPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(librariesBuildPath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -83,7 +83,7 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 func compileLibrary(library *types.Library, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	libraryBuildPath := filepath.Join(buildPath, library.Name)
 
-	err := os.MkdirAll(libraryBuildPath, os.FileMode(0755))
+	err := utils.EnsureFolderExists(libraryBuildPath)
 	if err != nil {
 		return nil, utils.WrapError(err)
 	}

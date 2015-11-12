@@ -31,6 +31,7 @@ package test
 
 import (
 	"arduino.cc/builder/builder_utils"
+	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -119,7 +120,7 @@ func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
 	headerFile := tempFile(t, "header")
 	defer os.RemoveAll(headerFile)
 
-	ioutil.WriteFile(depFile, []byte(objFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile), os.FileMode(0644))
+	utils.WriteFile(depFile, objFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile)
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
@@ -140,7 +141,7 @@ func TestObjFileIsUpToDateDepIsOlder(t *testing.T) {
 	depFile := tempFile(t, "dep")
 	defer os.RemoveAll(depFile)
 
-	ioutil.WriteFile(depFile, []byte(objFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile), os.FileMode(0644))
+	utils.WriteFile(depFile, objFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile)
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
@@ -163,7 +164,7 @@ func TestObjFileIsUpToDateDepIsWrong(t *testing.T) {
 	headerFile := tempFile(t, "header")
 	defer os.RemoveAll(headerFile)
 
-	ioutil.WriteFile(depFile, []byte(sourceFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile), os.FileMode(0644))
+	utils.WriteFile(depFile, sourceFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile)
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
