@@ -39,47 +39,47 @@ Code Exclusively for GPRS shield:
 //  Default set of instructions for GPRS Shield power control
 //
 
-#line 39
+#line 39 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setPowerStateTo( int newState );
-#line 64
+#line 64 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 int getPowerState();
-#line 75
+#line 75 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void powerUpOrDown();
-#line 90
+#line 90 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void clearBufferArray();
-#line 96
+#line 96 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void makeMissedCall( char num[] );
-#line 111
+#line 111 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void sendTextMessage( char number[], char messg[] );
-#line 129
+#line 129 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void analise(byte incoming[], int length);
-#line 179
+#line 179 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 byte decToBcd( byte b );
-#line 184
+#line 184 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 boolean getBit( byte addr, int pos );
-#line 190
+#line 190 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setBit( byte addr, int pos, boolean newBit );
-#line 204
+#line 204 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 byte getByte( byte addr );
-#line 213
+#line 213 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 boolean getBytes( byte addr, int amount );
-#line 230
+#line 230 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setByte( byte addr, byte newByte );
-#line 235
+#line 235 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setBytes( byte addr, byte newBytes[], int amount );
-#line 244
+#line 244 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void getTime();
-#line 260
+#line 260 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setTime( byte newTime[ 7 ] );
-#line 267
+#line 267 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void getRTCTemperature();
-#line 277
+#line 277 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void gprsListen();
-#line 294
+#line 294 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void printTime();
-#line 317
+#line 317 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup();
-#line 334
+#line 334 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
 #line 39
 void setPowerStateTo( int newState )

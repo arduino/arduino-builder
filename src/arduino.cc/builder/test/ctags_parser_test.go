@@ -53,29 +53,37 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 
 	require.Equal(t, 8, len(ctags))
 	idx := 0
-	require.Equal(t, "server", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "server", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "process", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "process", ctags[idx]["functionName"])
 	require.Equal(t, "prototype", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "process", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "process", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "digitalCommand", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "digitalCommand", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "analogCommand", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "analogCommand", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 	idx++
-	require.Equal(t, "modeCommand", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "modeCommand", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx]["filename"])
 }
 
 func TestCTagsParserShouldListTemplates(t *testing.T) {
@@ -93,14 +101,14 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
-	require.Equal(t, "minimum", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "minimum", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "(T a, T b)", ctags[idx]["signature"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -119,17 +127,17 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 
 	require.Equal(t, 4, len(ctags))
 	idx := 0
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "SRAM_writeAnything", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "SRAM_writeAnything", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "(int ee, const T& value)", ctags[idx]["signature"])
 	idx++
-	require.Equal(t, "SRAM_readAnything", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "SRAM_readAnything", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "(int ee, T& value)", ctags[idx]["signature"])
 }
@@ -149,10 +157,10 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 
 	require.Equal(t, 2, len(ctags))
 	idx := 0
-	require.Equal(t, "SleepCycle", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "SleepCycle", ctags[idx]["functionName"])
 	require.Equal(t, "prototype", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "SleepCycle", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "SleepCycle", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -171,20 +179,20 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 
 	require.Equal(t, 5, len(ctags))
 	idx := 0
-	require.Equal(t, "A_NEW_TYPE", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "A_NEW_TYPE", ctags[idx]["functionName"])
 	require.Equal(t, "struct", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "foo", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "foo", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
 	require.Equal(t, "struct:A_NEW_TYPE", ctags[idx]["typeref"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "dostuff", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "dostuff", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -203,28 +211,28 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 
 	require.Equal(t, 8, len(ctags))
 	idx := 0
-	require.Equal(t, "DEBUG", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "DEBUG", ctags[idx]["functionName"])
 	require.Equal(t, "macro", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "DISABLED", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "DISABLED", ctags[idx]["functionName"])
 	require.Equal(t, "macro", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "hello", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "hello", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "debug", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "debug", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "disabledIsDefined", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "disabledIsDefined", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "useMyType", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "useMyType", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -243,13 +251,13 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
-	require.Equal(t, "getBytes", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "getBytes", ctags[idx]["functionName"])
 	require.Equal(t, "prototype", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "getBytes", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "getBytes", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "getBytes", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "getBytes", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -268,22 +276,22 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 
 	require.Equal(t, 5, len(ctags))
 	idx := 0
-	require.Equal(t, "set_values", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "set_values", ctags[idx]["functionName"])
 	require.Equal(t, "prototype", ctags[idx]["kind"])
 	require.Equal(t, "Rectangle", ctags[idx]["class"])
 	idx++
-	require.Equal(t, "area", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "area", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "Rectangle", ctags[idx]["class"])
 	idx++
-	require.Equal(t, "set_values", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "set_values", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "Rectangle", ctags[idx]["class"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -302,30 +310,30 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 
 	require.Equal(t, 8, len(ctags))
 	idx := 0
-	require.Equal(t, "sensorData", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "sensorData", ctags[idx]["functionName"])
 	require.Equal(t, "struct", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "sensorData", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "sensorData", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "sensorData", ctags[idx]["struct"])
 	idx++
-	require.Equal(t, "sensorData", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "sensorData", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "sensorData", ctags[idx]["struct"])
 	idx++
-	require.Equal(t, "sensors", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "sensors", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "sensor1", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "sensor1", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "sensor2", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "sensor2", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -344,14 +352,14 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
-	require.Equal(t, "test", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "test", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "(int x = 1)", ctags[idx]["signature"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -370,14 +378,14 @@ func TestCTagsParserNamespace(t *testing.T) {
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
-	require.Equal(t, "value", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "value", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "Test", ctags[idx]["namespace"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -396,13 +404,13 @@ func TestCTagsParserStatic(t *testing.T) {
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "doStuff", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "doStuff", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -421,16 +429,16 @@ func TestCTagsParserFunctionPointer(t *testing.T) {
 
 	require.Equal(t, 4, len(ctags))
 	idx := 0
-	require.Equal(t, "t1Callback", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "t1Callback", ctags[idx]["functionName"])
 	require.Equal(t, "variable", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "t1Callback", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "t1Callback", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 }
 
@@ -449,20 +457,20 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 
 	require.Equal(t, 5, len(ctags))
 	idx := 0
-	require.Equal(t, "setup", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "setup", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "loop", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "loop", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "func", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "func", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	idx++
-	require.Equal(t, "funcArr", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "funcArr", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "()", ctags[idx]["signature"])
 	idx++
-	require.Equal(t, "funcCombo", ctags[idx][constants.CTAGS_FIELD_FUNCTION_NAME])
+	require.Equal(t, "funcCombo", ctags[idx]["functionName"])
 	require.Equal(t, "function", ctags[idx]["kind"])
 	require.Equal(t, "(void (*(&in)[5])(int))", ctags[idx]["signature"])
 

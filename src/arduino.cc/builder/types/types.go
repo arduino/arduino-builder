@@ -153,6 +153,7 @@ type Command interface {
 
 type Prototype struct {
 	FunctionName string
+	File         string
 	Prototype    string
 	Modifiers    string
 	Line         string

@@ -61,6 +61,7 @@ func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void digitalCommand(YunClient client);", prototypes[2].Prototype)
 	require.Equal(t, "void analogCommand(YunClient client);", prototypes[3].Prototype)
@@ -92,6 +93,7 @@ func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "template <typename T> T minimum (T a, T b);", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/sketch8398023134925534708.cpp", prototypes[0].File)
 	require.Equal(t, "void setup();", prototypes[1].Prototype)
 	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
@@ -121,6 +123,7 @@ func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
 
 	require.Equal(t, 4, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/sketch463160524247569568.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", prototypes[2].Prototype)
 	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", prototypes[3].Prototype)
@@ -177,6 +180,7 @@ func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/sketch8930345717354294915.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void dostuff(A_NEW_TYPE * bar);", prototypes[2].Prototype)
 
@@ -206,6 +210,7 @@ func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
 
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/sketch5976699731718729500.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void debug();", prototypes[2].Prototype)
 	require.Equal(t, "void disabledIsDefined();", prototypes[3].Prototype)
@@ -237,6 +242,7 @@ func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T
 
 	require.Equal(t, 1, len(prototypes))
 	require.Equal(t, "boolean getBytes( byte addr, int amount );", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test260613593/preproc/ctags_target.cpp", prototypes[0].File)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
 	require.Equal(t, 5031, prototypeLine)
@@ -264,6 +270,7 @@ func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test834438754/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
@@ -292,6 +299,7 @@ func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
@@ -320,6 +328,7 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test179252494/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
@@ -348,6 +357,7 @@ func TestCTagsToPrototypesNamespace(t *testing.T) {
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test030883150/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
@@ -376,6 +386,7 @@ func TestCTagsToPrototypesStatic(t *testing.T) {
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test542833488/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void doStuff();", prototypes[2].Prototype)
 	require.Equal(t, "static", prototypes[2].Modifiers)
@@ -406,6 +417,7 @@ func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void t1Callback();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test547238273/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void setup();", prototypes[1].Prototype)
 	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
@@ -435,6 +447,7 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test907446433/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)

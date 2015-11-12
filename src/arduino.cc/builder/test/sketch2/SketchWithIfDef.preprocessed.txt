@@ -16,15 +16,15 @@ typedef MyType int;
 
 #include "empty_2.h"
 
-#line 16
+#line 16 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup();
-#line 21
+#line 21 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
-#line 33
+#line 33 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void debug();
-#line 44
+#line 44 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void disabledIsDefined();
-#line 48
+#line 48 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 int useMyType(MyType type);
 #line 16
 void setup() {

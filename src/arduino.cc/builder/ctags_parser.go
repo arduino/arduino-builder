@@ -43,7 +43,9 @@ const FIELD_CODE = "code"
 const FIELD_CLASS = "class"
 const FIELD_STRUCT = "struct"
 const FIELD_NAMESPACE = "namespace"
+const FIELD_FILENAME = "filename"
 const FIELD_SKIP = "skipMe"
+const FIELD_FUNCTION_NAME = "functionName"
 
 const KIND_PROTOTYPE = "prototype"
 const KIND_FUNCTION = "function"
@@ -104,7 +106,7 @@ func addPrototype(tag map[string]string) {
 		return
 	}
 
-	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[constants.CTAGS_FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
+	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
 
 	tag[KIND_PROTOTYPE_MODIFIERS] = ""
 	if strings.Index(tag[FIELD_CODE], STATIC+" ") != -1 {
@@ -205,8 +207,10 @@ func parseTag(row string) map[string]string {
 	tag := make(map[string]string)
 	parts := strings.Split(row, "\t")
 
-	tag[constants.CTAGS_FIELD_FUNCTION_NAME] = parts[0]
-	parts = parts[1:]
+	tag[FIELD_FUNCTION_NAME] = parts[0]
+	tag[FIELD_FILENAME] = parts[1]
+
+	parts = parts[2:]
 
 	for _, part := range parts {
 		if strings.Contains(part, ":") {

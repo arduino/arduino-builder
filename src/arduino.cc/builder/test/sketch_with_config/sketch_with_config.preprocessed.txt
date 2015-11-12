@@ -13,9 +13,9 @@
 
 #include <Bridge.h>
 
-#line 13
+#line 13 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup();
-#line 17
+#line 17 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
 #line 13
 void setup() {

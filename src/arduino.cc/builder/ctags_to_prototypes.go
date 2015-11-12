@@ -101,7 +101,7 @@ func collectFunctionNames(tags []map[string]string) []string {
 	names := []string{}
 	for _, tag := range tags {
 		if tag[FIELD_KIND] == KIND_FUNCTION {
-			names = append(names, tag[constants.CTAGS_FIELD_FUNCTION_NAME])
+			names = append(names, tag[FIELD_FUNCTION_NAME])
 		}
 	}
 	return names
@@ -120,8 +120,8 @@ func toPrototypes(tags []map[string]string) []*types.Prototype {
 	prototypes := []*types.Prototype{}
 	for _, tag := range tags {
 		if tag[FIELD_SKIP] != TRUE {
-			ctag := types.Prototype{FunctionName: tag[constants.CTAGS_FIELD_FUNCTION_NAME], Prototype: tag[KIND_PROTOTYPE], Modifiers: tag[KIND_PROTOTYPE_MODIFIERS], Line: tag[FIELD_LINE], Fields: tag}
-			prototypes = append(prototypes, &ctag)
+			prototype := &types.Prototype{FunctionName: tag[FIELD_FUNCTION_NAME], File: tag[FIELD_FILENAME], Prototype: tag[KIND_PROTOTYPE], Modifiers: tag[KIND_PROTOTYPE_MODIFIERS], Line: tag[FIELD_LINE], Fields: tag}
+			prototypes = append(prototypes, prototype)
 		}
 	}
 	return prototypes

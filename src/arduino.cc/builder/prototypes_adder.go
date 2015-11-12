@@ -78,7 +78,7 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 func joinPrototypes(prototypes []*types.Prototype) string {
 	prototypesSlice := []string{}
 	for _, proto := range prototypes {
-		prototypesSlice = append(prototypesSlice, "#line "+proto.Line)
+		prototypesSlice = append(prototypesSlice, "#line "+proto.Line+" \""+proto.File+"\"")
 		prototypeParts := []string{}
 		if proto.Modifiers != "" {
 			prototypeParts = append(prototypeParts, proto.Modifiers)

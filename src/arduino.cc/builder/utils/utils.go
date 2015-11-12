@@ -205,15 +205,6 @@ func SliceContains(slice []string, target string) bool {
 	return false
 }
 
-func SliceContainsCTag(slice []map[string]string, target map[string]string) bool {
-	for _, value := range slice {
-		if value[constants.CTAGS_FIELD_FUNCTION_NAME] == target[constants.CTAGS_FIELD_FUNCTION_NAME] {
-			return true
-		}
-	}
-	return false
-}
-
 type mapFunc func(string) string
 
 func Map(slice []string, fn mapFunc) []string {

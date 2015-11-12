@@ -5,15 +5,15 @@
 void ifBranch() {
 }
 #else
-#line 5
+#line 5 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void elseBranch();
-#line 9
+#line 9 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void f1();
-#line 10
+#line 10 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void f2();
-#line 12
+#line 12 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup();
-#line 14
+#line 14 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
 #line 5
 void elseBranch() {
