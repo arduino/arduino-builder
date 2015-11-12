@@ -1,6 +1,4 @@
-#include <Bridge.h>
-
-#if false
+#if __SAM3X8E__
 void ifBranch() {
 }
 #else

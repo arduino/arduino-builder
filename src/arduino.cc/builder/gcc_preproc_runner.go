@@ -39,54 +39,71 @@ import (
 	"strings"
 )
 
-type GCCPreprocRunner struct{}
+type GCCPreprocRunner struct {
+	TargetFileName string
+}
 
 func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	properties := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
-
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_FINAL, true, verbose, false, logger)
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
-	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(output)
+	verbose := context[constants.CTX_VERBOSE].(bool)
+	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
+	context[constants.CTX_FILE_PATH_TO_READ] = targetFilePath
 
 	return nil
 }
 
 type GCCPreprocRunnerForDiscoveringIncludes struct {
-	SourceFile string
+	SourceFilePath string
+	TargetFileName string
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}) error {
-	properties := prepareGCCPreprocRecipeProperties(context, s.SourceFile)
-
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	output, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFileName)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
-	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(output)
+	verbose := context[constants.CTX_VERBOSE].(bool)
+	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
+	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(stderr)
 
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFile string) map[string]string {
+func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFileName string) (map[string]string, string, error) {
+	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+	err := utils.EnsureFolderExists(preprocPath)
+	if err != nil {
+		return nil, "", utils.WrapError(err)
+	}
+	targetFilePath := filepath.Join(preprocPath, targetFileName)
+
 	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
 
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFile
+	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
+	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
 
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
-	return properties
+	return properties, targetFilePath, nil
 }

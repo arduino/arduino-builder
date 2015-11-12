@@ -41,21 +41,32 @@ type SketchSourceMerger struct{}
 func (s *SketchSourceMerger) Run(context map[string]interface{}) error {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 
-	source := addPreprocLine(&sketch.MainFile)
+	includeSection := composeIncludeArduinoSection()
+	context[constants.CTX_INCLUDE_SECTION] = includeSection
+
+	source := includeSection
+	source += addSourceWrappedWithLineDirective(&sketch.MainFile)
 	for _, file := range sketch.OtherSketchFiles {
-		source += addPreprocLine(&file)
+		source += addSourceWrappedWithLineDirective(&file)
 	}
 
-	context[constants.CTX_LINE_OFFSET] = 1
+	context[constants.CTX_LINE_OFFSET] = 3
 	context[constants.CTX_SOURCE] = source
 
 	return nil
 }
 
-func addPreprocLine(sketch *types.SketchFile) string {
+func addSourceWrappedWithLineDirective(sketch *types.SketchFile) string {
 	source := "#line 1 \"" + strings.Replace(sketch.Name, "\\", "\\\\", -1) + "\"\n"
 	source += sketch.Source
 	source += "\n"
 
 	return source
+}
+
+func composeIncludeArduinoSection() string {
+	str := "#include <Arduino.h>\n"
+	str += "#line 1\n"
+
+	return str
 }

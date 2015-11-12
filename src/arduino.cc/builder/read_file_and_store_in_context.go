@@ -31,44 +31,21 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
-	"fmt"
+	"io/ioutil"
 )
 
-type CTagsRunner struct{}
+type ReadFileAndStoreInContext struct {
+	TargetField string
+}
 
-func (s *CTagsRunner) Run(context map[string]interface{}) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
-	ctagsTargetFilePath := context[constants.CTX_CTAGS_TEMP_FILE_PATH].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties, props.SubTree(props.SubTree(buildProperties, constants.BUILD_PROPERTIES_TOOLS_KEY), constants.CTAGS))
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = ctagsTargetFilePath
-
-	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
-	if pattern == constants.EMPTY_STRING {
-		return utils.Errorf(context, constants.MSG_PATTERN_MISSING, constants.CTAGS)
-	}
-
-	commandLine := props.ExpandPropsInString(properties, pattern)
-	command, err := utils.PrepareCommand(commandLine, logger)
+func (s *ReadFileAndStoreInContext) Run(context map[string]interface{}) error {
+	bytes, err := ioutil.ReadFile(context[constants.CTX_FILE_PATH_TO_READ].(string))
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	if verbose {
-		fmt.Println(commandLine)
-	}
-
-	sourceBytes, err := command.Output()
-	if err != nil {
-		return utils.WrapError(err)
-	}
-
-	context[constants.CTX_CTAGS_OUTPUT] = string(sourceBytes)
+	context[s.TargetField] = string(bytes)
 
 	return nil
 }

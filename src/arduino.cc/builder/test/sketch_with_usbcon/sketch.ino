@@ -1,4 +1,6 @@
-#include <Arduino.h>
+#if !defined(USBCON)
+#error "Where's my USBCON?"
+#endif
 #if defined(USBCON)
 void ciao() {
 

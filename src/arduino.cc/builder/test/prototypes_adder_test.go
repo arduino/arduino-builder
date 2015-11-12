@@ -450,7 +450,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Nil(t, context[constants.CTX_INCLUDE_SECTION])
+	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
 	require.Nil(t, context[constants.CTX_PROTOTYPE_SECTION])
 }
 
@@ -491,7 +491,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Nil(t, context[constants.CTX_INCLUDE_SECTION])
+	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
 	require.Nil(t, context[constants.CTX_PROTOTYPE_SECTION])
 }
 
@@ -656,7 +656,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "#line 3\nvoid ciao();\n#line 8\nvoid setup();\n#line 13\nvoid loop();\n#line 3\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+	require.Equal(t, "#line 5\nvoid ciao();\n#line 10\nvoid setup();\n#line 15\nvoid loop();\n#line 5\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 }
 
 func TestPrototypesAdderSketchWithTypename(t *testing.T) {
@@ -737,8 +737,52 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "#line 7\nvoid elseBranch();\n#line 11\nvoid f1();\n#line 12\nvoid f2();\n#line 14\nvoid setup();\n#line 16\nvoid loop();\n#line 7\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+	require.Equal(t, "#line 5\nvoid elseBranch();\n#line 9\nvoid f1();\n#line 10\nvoid f2();\n#line 12\nvoid setup();\n#line 14\nvoid loop();\n#line 5\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.txt"), context)
+	require.Equal(t, expectedSource, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
+}
+
+func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	_ = SetupBuildPath(t, context)
+	//defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x_dbg"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_ifdef", "sketch.ino")
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+
+		&builder.ContainerAddPrototypes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#line 2\nvoid ifBranch();\n#line 9\nvoid f1();\n#line 10\nvoid f2();\n#line 12\nvoid setup();\n#line 14\nvoid loop();\n#line 2\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+
+	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), context)
 	require.Equal(t, expectedSource, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 }

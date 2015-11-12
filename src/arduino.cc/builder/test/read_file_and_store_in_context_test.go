@@ -27,48 +27,29 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package test
 
 import (
+	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
-	"fmt"
+	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"testing"
 )
 
-type CTagsRunner struct{}
+func TestReadFileAndStoreInContext(t *testing.T) {
+	file, err := ioutil.TempFile("", "test")
+	NoError(t, err)
 
-func (s *CTagsRunner) Run(context map[string]interface{}) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
-	ctagsTargetFilePath := context[constants.CTX_CTAGS_TEMP_FILE_PATH].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	utils.WriteFile(file.Name(), "test test\nciao")
 
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties, props.SubTree(props.SubTree(buildProperties, constants.BUILD_PROPERTIES_TOOLS_KEY), constants.CTAGS))
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = ctagsTargetFilePath
+	context := make(map[string]interface{})
+	context[constants.CTX_FILE_PATH_TO_READ] = file.Name()
 
-	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
-	if pattern == constants.EMPTY_STRING {
-		return utils.Errorf(context, constants.MSG_PATTERN_MISSING, constants.CTAGS)
-	}
+	command := &builder.ReadFileAndStoreInContext{TargetField: constants.CTX_GCC_MINUS_E_SOURCE}
+	err = command.Run(context)
+	NoError(t, err)
 
-	commandLine := props.ExpandPropsInString(properties, pattern)
-	command, err := utils.PrepareCommand(commandLine, logger)
-	if err != nil {
-		return utils.WrapError(err)
-	}
-
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	if verbose {
-		fmt.Println(commandLine)
-	}
-
-	sourceBytes, err := command.Output()
-	if err != nil {
-		return utils.WrapError(err)
-	}
-
-	context[constants.CTX_CTAGS_OUTPUT] = string(sourceBytes)
-
-	return nil
+	require.Equal(t, "test test\nciao", context[constants.CTX_GCC_MINUS_E_SOURCE].(string))
 }

@@ -57,10 +57,6 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	context[constants.CTX_PROTOTYPE_SECTION] = prototypeSection
 	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
-	includeSection := composeIncludeArduinoSection()
-	context[constants.CTX_INCLUDE_SECTION] = includeSection
-	source = includeSection + source
-
 	context[constants.CTX_SOURCE] = source
 
 	return nil
@@ -91,13 +87,6 @@ func joinPrototypes(prototypes []*types.Prototype) string {
 		prototypesSlice = append(prototypesSlice, strings.Join(prototypeParts, " "))
 	}
 	return strings.Join(prototypesSlice, "\n")
-}
-
-func composeIncludeArduinoSection() string {
-	str := "#include <Arduino.h>\n"
-	str += "#line 1\n"
-
-	return str
 }
 
 func firstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) bool {

@@ -33,7 +33,9 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"math/rand"
 	"path/filepath"
+	"strconv"
 )
 
 type ContainerFindIncludes struct{}
@@ -67,10 +69,10 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	sourceFiles := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
+	sourceFilePaths := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
 
-	for !sourceFiles.Empty() {
-		err = findIncludesUntilDone(context, sourceFiles.Pop().(string))
+	for !sourceFilePaths.Empty() {
+		err = findIncludesUntilDone(context, sourceFilePaths.Pop().(string))
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -92,12 +94,13 @@ func runCommand(context map[string]interface{}, command types.Command) error {
 	return nil
 }
 
-func findIncludesUntilDone(context map[string]interface{}, sourceFile string) error {
+func findIncludesUntilDone(context map[string]interface{}, sourceFilePath string) error {
+	targetFileName := filepath.Base(sourceFilePath) + "_" + strconv.Itoa(rand.Int()) + "_preprocessed.cpp"
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	done := false
 	for !done {
 		commands := []types.Command{
-			&GCCPreprocRunnerForDiscoveringIncludes{SourceFile: sourceFile},
+			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFileName: targetFileName},
 			&IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_SOURCE},
 			&IncludesToIncludeFolders{},
 		}
@@ -110,7 +113,7 @@ func findIncludesUntilDone(context map[string]interface{}, sourceFile string) er
 		if len(context[constants.CTX_INCLUDES_JUST_FOUND].([]string)) == 0 {
 			done = true
 		} else if len(context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)) == len(importedLibraries) {
-			err := runCommand(context, &GCCPreprocRunner{})
+			err := runCommand(context, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return utils.WrapError(err)
 		}
 		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)

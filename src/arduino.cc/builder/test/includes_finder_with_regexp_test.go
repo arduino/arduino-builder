@@ -74,9 +74,10 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
 	includes := context[constants.CTX_INCLUDES].([]string)
-	require.Equal(t, 2, len(includes))
-	require.Equal(t, "empty_1.h", includes[0])
-	require.Equal(t, "empty_2.h", includes[1])
+	require.Equal(t, 3, len(includes))
+	require.Equal(t, "Arduino.h", includes[0])
+	require.Equal(t, "empty_1.h", includes[1])
+	require.Equal(t, "empty_2.h", includes[2])
 }
 
 func TestIncludesFinderWithRegExp(t *testing.T) {

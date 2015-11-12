@@ -2,11 +2,8 @@
 #line 1
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #if __SAM3X8E__
-void ifBranch() {
-}
-#else
-#line 5
-void elseBranch();
+#line 2
+void ifBranch();
 #line 9
 void f1();
 #line 10
@@ -15,7 +12,10 @@ void f2();
 void setup();
 #line 14
 void loop();
-#line 5
+#line 2
+void ifBranch() {
+}
+#else
 void elseBranch() {
 }
 #endif
