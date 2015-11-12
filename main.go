@@ -47,7 +47,7 @@ import (
 	"syscall"
 )
 
-const VERSION = "1.1.3"
+const VERSION = "1.2.0"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
