@@ -36,11 +36,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"testing"
+	"os"
 )
 
 func TestReadFileAndStoreInContext(t *testing.T) {
 	file, err := ioutil.TempFile("", "test")
 	NoError(t, err)
+	defer os.RemoveAll(file.Name())
 
 	utils.WriteFile(file.Name(), "test test\nciao")
 
