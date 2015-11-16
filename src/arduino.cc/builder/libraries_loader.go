@@ -149,7 +149,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		library.Layout = types.LIBRARY_RECURSIVE
 		library.SrcFolder = filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)
 		if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_UTILITY)); err == nil && stat.IsDir() {
-			return nil, utils.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS)
+			return nil, utils.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, libraryFolder)
 		}
 	} else {
 		library.Layout = types.LIBRARY_FLAT
