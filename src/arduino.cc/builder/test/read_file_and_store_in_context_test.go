@@ -35,8 +35,8 @@ import (
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
-	"testing"
 	"os"
+	"testing"
 )
 
 func TestReadFileAndStoreInContext(t *testing.T) {
