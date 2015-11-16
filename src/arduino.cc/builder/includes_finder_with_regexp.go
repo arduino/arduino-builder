@@ -36,7 +36,7 @@ import (
 	"strings"
 )
 
-var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#include\\s*[<\"](\\S+)[\">]")
+var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
 
 type IncludesFinderWithRegExp struct {
 	ContextField string

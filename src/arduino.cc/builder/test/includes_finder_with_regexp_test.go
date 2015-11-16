@@ -83,7 +83,7 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 func TestIncludesFinderWithRegExp(t *testing.T) {
 	context := make(map[string]interface{})
 
-	output := "/home/federico/materiale/works_Arduino/arduino-builder/src/arduino.cc/builder/test/sketch_that_checks_if_SPI_has_transactions/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
+	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
@@ -120,7 +120,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 
 	context[constants.CTX_INCLUDES] = []string{"test.h"}
 
-	output := "/home/federico/materiale/works_Arduino/arduino-builder/src/arduino.cc/builder/test/sketch_that_checks_if_SPI_has_transactions/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
+	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
@@ -137,4 +137,48 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
 	require.Equal(t, "test.h", includes[1])
+}
+
+func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
+	context := make(map[string]interface{})
+
+	context[constants.CTX_INCLUDES] = []string{}
+
+	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
+		" #               include <Wire.h>\n" +
+		"                                 ^\n" +
+		"compilation terminated.\n"
+	context["source"] = output
+
+	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	err := parser.Run(context)
+	NoError(t, err)
+
+	require.NotNil(t, context[constants.CTX_INCLUDES])
+	includes := context[constants.CTX_INCLUDES].([]string)
+	require.Equal(t, 1, len(includes))
+	sort.Strings(includes)
+	require.Equal(t, "Wire.h", includes[0])
+}
+
+func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
+	context := make(map[string]interface{})
+
+	context[constants.CTX_INCLUDES] = []string{}
+
+	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
+		" #\t\t\tinclude <Wire.h>\n" +
+		"                                 ^\n" +
+		"compilation terminated.\n"
+	context["source"] = output
+
+	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	err := parser.Run(context)
+	NoError(t, err)
+
+	require.NotNil(t, context[constants.CTX_INCLUDES])
+	includes := context[constants.CTX_INCLUDES].([]string)
+	require.Equal(t, 1, len(includes))
+	sort.Strings(includes)
+	require.Equal(t, "Wire.h", includes[0])
 }
