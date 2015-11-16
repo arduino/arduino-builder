@@ -41,16 +41,19 @@ type SketchSourceMerger struct{}
 func (s *SketchSourceMerger) Run(context map[string]interface{}) error {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 
+	lineOffset := 0
 	includeSection := composeIncludeArduinoSection()
+	lineOffset += 2
 	context[constants.CTX_INCLUDE_SECTION] = includeSection
 
 	source := includeSection
 	source += addSourceWrappedWithLineDirective(&sketch.MainFile)
+	lineOffset += 1
 	for _, file := range sketch.OtherSketchFiles {
 		source += addSourceWrappedWithLineDirective(&file)
 	}
 
-	context[constants.CTX_LINE_OFFSET] = 3
+	context[constants.CTX_LINE_OFFSET] = lineOffset
 	context[constants.CTX_SOURCE] = source
 
 	return nil
