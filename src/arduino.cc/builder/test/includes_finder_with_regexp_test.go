@@ -87,9 +87,9 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
-	context[constants.CTX_GCC_MINUS_E_STDERR] = output
+	context["source"] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_STDERR}
+	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
 	err := parser.Run(context)
 	NoError(t, err)
 
@@ -104,9 +104,9 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 
 	output := ""
 
-	context[constants.CTX_GCC_MINUS_E_STDERR] = output
+	context["source"] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_STDERR}
+	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
 	err := parser.Run(context)
 	NoError(t, err)
 
@@ -125,9 +125,9 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 		"^\n" +
 		"compilation terminated."
 
-	context[constants.CTX_GCC_MINUS_E_STDERR] = output
+	context["source"] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_STDERR}
+	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
 	err := parser.Run(context)
 	NoError(t, err)
 
