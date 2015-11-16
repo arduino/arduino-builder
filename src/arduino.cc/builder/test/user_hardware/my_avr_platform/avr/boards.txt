@@ -62,9 +62,10 @@ mymega.menu.cpu.atmega2560.upload.protocol=wiring
 mymega.menu.cpu.atmega2560.upload.maximum_size=253952
 mymega.menu.cpu.atmega2560.upload.speed=115200
 
+mymega.menu.cpu.atmega2560.bootloader._folder=stk500v2
 mymega.menu.cpu.atmega2560.bootloader.high_fuses=0xD8
 mymega.menu.cpu.atmega2560.bootloader.extended_fuses=0xFD
-mymega.menu.cpu.atmega2560.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+mymega.menu.cpu.atmega2560.bootloader.file={bootloader._folder}/stk500boot_v2_mega2560.hex
 
 mymega.menu.cpu.atmega2560.build.mcu=atmega2560
 mymega.menu.cpu.atmega2560.build.board=AVR_MEGA2560
@@ -75,9 +76,10 @@ mymega.menu.cpu.atmega1280.upload.protocol=arduino
 mymega.menu.cpu.atmega1280.upload.maximum_size=126976
 mymega.menu.cpu.atmega1280.upload.speed=57600
 
+mymega.menu.cpu.atmega1280.bootloader._folder=atmega
 mymega.menu.cpu.atmega1280.bootloader.high_fuses=0xDA
 mymega.menu.cpu.atmega1280.bootloader.extended_fuses=0xF5
-mymega.menu.cpu.atmega1280.bootloader.file=atmega/ATmegaBOOT_168_atmega1280.hex
+mymega.menu.cpu.atmega1280.bootloader.file={bootloader._folder}/ATmegaBOOT_168_atmega1280.hex
 
 mymega.menu.cpu.atmega1280.build.mcu=atmega1280
 mymega.menu.cpu.atmega1280.build.board=AVR_MEGA

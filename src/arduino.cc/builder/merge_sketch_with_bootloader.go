@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
@@ -70,6 +71,7 @@ func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
 	} else {
 		bootloader = buildProperties[constants.BUILD_PROPERTIES_BOOTLOADER_FILE]
 	}
+	bootloader = props.ExpandPropsInString(buildProperties, bootloader)
 
 	bootloaderPath := filepath.Join(buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH], constants.FOLDER_BOOTLOADERS, bootloader)
 	if _, err := os.Stat(bootloaderPath); err != nil {
