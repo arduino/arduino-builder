@@ -62,8 +62,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET))
-	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "sketch.ino.cpp.o"))
@@ -96,8 +94,6 @@ func TestBuilderBridge(t *testing.T) {
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
-	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
 	NoError(t, err)
@@ -132,8 +128,6 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
-	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
 	NoError(t, err)
@@ -172,8 +166,6 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
-	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
 	NoError(t, err)
@@ -214,8 +206,6 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "avr", "dtostrf.c.d"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET))
-	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "Bridge.ino.cpp.o"))
@@ -249,8 +239,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
-	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
 	NoError(t, err)

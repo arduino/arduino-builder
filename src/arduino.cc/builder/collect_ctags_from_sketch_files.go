@@ -35,28 +35,29 @@ import (
 	"arduino.cc/builder/utils"
 )
 
-type ContainerAddPrototypes struct{}
+type CollectCTagsFromSketchFiles struct{}
 
-func (s *ContainerAddPrototypes) Run(context map[string]interface{}) error {
-	commands := []types.Command{
-		&GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
-		&ReadFileAndStoreInContext{TargetField: constants.CTX_GCC_MINUS_E_SOURCE},
-		&CTagsTargetFileSaver{SourceField: constants.CTX_GCC_MINUS_E_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
-		&CTagsRunner{},
-		&CTagsParser{CTagsField: constants.CTX_CTAGS_OF_PREPROC_SOURCE},
-		&CollectCTagsFromSketchFiles{},
-		&CTagsToPrototypes{},
-		&PrototypesAdder{},
-		&SketchSaver{},
-	}
+func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}) error {
+	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketchFileNames := collectSketchFileNamesFrom(sketch)
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
-		if err != nil {
-			return utils.WrapError(err)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]map[string]string)
+	ctagsOfSketch := []map[string]string{}
+	for _, ctag := range ctags {
+		if utils.SliceContains(sketchFileNames, ctag[FIELD_FILENAME]) {
+			ctagsOfSketch = append(ctagsOfSketch, ctag)
 		}
 	}
 
+	context[constants.CTX_COLLECTED_CTAGS] = ctagsOfSketch
+
 	return nil
+}
+
+func collectSketchFileNamesFrom(sketch *types.Sketch) []string {
+	fileNames := []string{sketch.MainFile.Name}
+	for _, file := range sketch.OtherSketchFiles {
+		fileNames = append(fileNames, file.Name)
+	}
+	return fileNames
 }
