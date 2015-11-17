@@ -112,6 +112,7 @@ type Library struct {
 	URL         string
 	Category    string
 	License     string
+	Properties  map[string]string
 }
 
 func (library *Library) String() string {

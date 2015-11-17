@@ -82,6 +82,11 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 		}
 	}
 
+	err = runCommand(context, &FailIfImportedLibraryIsWrong{})
+	if err != nil {
+		return utils.WrapError(err)
+	}
+
 	return nil
 }
 

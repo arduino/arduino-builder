@@ -129,15 +129,6 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		properties[constants.LIBRARY_MAINTAINER] = properties[constants.LIBRARY_EMAIL]
 	}
 
-	if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_ARCH)); err == nil && stat.IsDir() {
-		return nil, utils.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
-	}
-
-	for _, propName := range LIBRARY_MANDATORY_PROPERTIES {
-		if _, ok := properties[propName]; !ok {
-			return nil, utils.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, libraryFolder)
-		}
-	}
 	for _, propName := range LIBRARY_NOT_SO_MANDATORY_PROPERTIES {
 		if properties[propName] == constants.EMPTY_STRING {
 			properties[propName] = "-"
@@ -148,9 +139,6 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)); err == nil && stat.IsDir() {
 		library.Layout = types.LIBRARY_RECURSIVE
 		library.SrcFolder = filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)
-		if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_UTILITY)); err == nil && stat.IsDir() {
-			return nil, utils.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, libraryFolder)
-		}
 	} else {
 		library.Layout = types.LIBRARY_FLAT
 		library.SrcFolder = libraryFolder
@@ -199,6 +187,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library.URL = strings.TrimSpace(properties[constants.LIBRARY_URL])
 	library.IsLegacy = false
 	library.DotALinkage = strings.TrimSpace(properties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
+	library.Properties = properties
 
 	return library, nil
 }
