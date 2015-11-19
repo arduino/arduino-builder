@@ -109,7 +109,8 @@ func collectFunctionNames(tags []map[string]string) []string {
 
 func firstFunctionAtLine(tags []map[string]string) (int, error) {
 	for _, tag := range tags {
-		if !tagIsUnknown(tag) && !tagHasAtLeastOneField(tag, FIELDS_MARKING_UNHANDLED_TAGS) && tag[FIELD_KIND] == KIND_FUNCTION {
+		_, tagHasAtLeastOneField := utils.TagHasAtLeastOneField(tag, FIELDS_MARKING_UNHANDLED_TAGS)
+		if !tagIsUnknown(tag) && !tagHasAtLeastOneField && tag[FIELD_KIND] == KIND_FUNCTION {
 			return strconv.Atoi(tag[FIELD_LINE])
 		}
 	}

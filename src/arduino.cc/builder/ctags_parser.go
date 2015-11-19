@@ -31,6 +31,10 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/utils"
+	"os"
+	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -71,13 +75,13 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 		tags = append(tags, parseTag(row))
 	}
 
-	skipTagsWhere(tags, tagIsUnknown)
-	skipTagsWithField(tags, FIELDS_MARKING_UNHANDLED_TAGS)
-	skipTagsWhere(tags, signatureContainsDefaultArg)
+	skipTagsWhere(tags, tagIsUnknown, context)
+	skipTagsWithField(tags, FIELDS_MARKING_UNHANDLED_TAGS, context)
+	skipTagsWhere(tags, signatureContainsDefaultArg, context)
 	addPrototypes(tags)
-	removeDefinedProtypes(tags)
+	removeDefinedProtypes(tags, context)
 	removeDuplicate(tags)
-	skipTagsWhere(tags, prototypeAndCodeDontMatch)
+	skipTagsWhere(tags, prototypeAndCodeDontMatch, context)
 
 	context[constants.CTX_CTAGS_OF_PREPROC_SOURCE] = tags
 
@@ -113,7 +117,7 @@ func addPrototype(tag map[string]string) {
 	tag[KIND_PROTOTYPE_MODIFIERS] = strings.TrimSpace(tag[KIND_PROTOTYPE_MODIFIERS])
 }
 
-func removeDefinedProtypes(tags []map[string]string) {
+func removeDefinedProtypes(tags []map[string]string, context map[string]interface{}) {
 	definedPrototypes := make(map[string]bool)
 	for _, tag := range tags {
 		if tag[FIELD_KIND] == KIND_PROTOTYPE {
@@ -123,6 +127,9 @@ func removeDefinedProtypes(tags []map[string]string) {
 
 	for _, tag := range tags {
 		if definedPrototypes[tag[KIND_PROTOTYPE]] {
+			if utils.DebugLevel(context) >= 10 {
+				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag[FIELD_FUNCTION_NAME])
+			}
 			tag[FIELD_SKIP] = TRUE
 		}
 	}
@@ -142,12 +149,12 @@ func removeDuplicate(tags []map[string]string) {
 
 type skipFuncType func(tag map[string]string) bool
 
-func skipTagsWhere(tags []map[string]string, skipFuncs ...skipFuncType) {
+func skipTagsWhere(tags []map[string]string, skipFunc skipFuncType, context map[string]interface{}) {
 	for _, tag := range tags {
 		if tag[FIELD_SKIP] != TRUE {
-			skip := skipFuncs[0](tag)
-			for _, skipFunc := range skipFuncs[1:] {
-				skip = skip || skipFunc(tag)
+			skip := skipFunc(tag)
+			if skip && utils.DebugLevel(context) >= 10 {
+				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_WITH_REASON, tag[FIELD_FUNCTION_NAME], runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
 			}
 			tag[FIELD_SKIP] = strconv.FormatBool(skip)
 		}
@@ -180,21 +187,15 @@ func removeSpacesAndTabs(s string) string {
 	return s
 }
 
-func skipTagsWithField(tags []map[string]string, fields []string) {
+func skipTagsWithField(tags []map[string]string, fields []string, context map[string]interface{}) {
 	for _, tag := range tags {
-		if tagHasAtLeastOneField(tag, fields) {
+		if field, skip := utils.TagHasAtLeastOneField(tag, fields); skip {
+			if utils.DebugLevel(context) >= 10 {
+				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_BECAUSE_HAS_FIELD, field)
+			}
 			tag[FIELD_SKIP] = TRUE
 		}
 	}
-}
-
-func tagHasAtLeastOneField(tag map[string]string, fields []string) bool {
-	for _, field := range fields {
-		if tag[field] != constants.EMPTY_STRING {
-			return true
-		}
-	}
-	return false
 }
 
 func tagIsUnknown(tag map[string]string) bool {
