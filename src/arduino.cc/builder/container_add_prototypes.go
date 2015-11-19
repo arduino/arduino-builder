@@ -43,7 +43,7 @@ func (s *ContainerAddPrototypes) Run(context map[string]interface{}) error {
 		&ReadFileAndStoreInContext{TargetField: constants.CTX_GCC_MINUS_E_SOURCE},
 		&CTagsTargetFileSaver{SourceField: constants.CTX_GCC_MINUS_E_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&CTagsRunner{},
-		&CTagsParser{CTagsField: constants.CTX_CTAGS_OF_PREPROC_SOURCE},
+		&CTagsParser{},
 		&CollectCTagsFromSketchFiles{},
 		&CTagsToPrototypes{},
 		&PrototypesAdder{},

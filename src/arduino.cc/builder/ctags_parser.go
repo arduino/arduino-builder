@@ -59,9 +59,7 @@ var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signa
 var KNOWN_TAG_KINDS = map[string]bool{"prototype": true, "function": true}
 var FIELDS_MARKING_UNHANDLED_TAGS = []string{FIELD_CLASS, FIELD_STRUCT, FIELD_NAMESPACE}
 
-type CTagsParser struct {
-	CTagsField string
-}
+type CTagsParser struct{}
 
 func (s *CTagsParser) Run(context map[string]interface{}) error {
 	rows := strings.Split(context[constants.CTX_CTAGS_OUTPUT].(string), "\n")
@@ -81,7 +79,7 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	removeDuplicate(tags)
 	skipTagsWhere(tags, prototypeAndCodeDontMatch)
 
-	context[s.CTagsField] = tags
+	context[constants.CTX_CTAGS_OF_PREPROC_SOURCE] = tags
 
 	return nil
 }

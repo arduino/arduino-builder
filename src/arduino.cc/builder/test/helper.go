@@ -95,3 +95,13 @@ func (s ByLibraryName) Swap(i, j int) {
 func (s ByLibraryName) Less(i, j int) bool {
 	return s[i].Name < s[j].Name
 }
+
+type CopyContextKeys struct {
+	From string
+	To   string
+}
+
+func (s *CopyContextKeys) Run(context map[string]interface{}) error {
+	context[s.To] = context[s.From]
+	return nil
+}
