@@ -102,7 +102,6 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -144,7 +143,6 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -186,7 +184,6 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -228,7 +225,6 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -270,7 +266,6 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -312,7 +307,6 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -354,7 +348,6 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -399,7 +392,6 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -444,7 +436,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -486,7 +477,6 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -531,7 +521,6 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -576,7 +565,6 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -621,7 +609,6 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -666,7 +653,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -710,7 +696,6 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_LIBRARIES_FOLDERS] = []string{"libraries", "downloaded_libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -755,7 +740,6 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -803,7 +787,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -830,4 +813,48 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), context)
 	require.Equal(t, expectedSource, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
+}
+
+func TestPrototypesAdderSketchWithConst(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	sketchLocation := filepath.Join("sketch_with_const", "sketch.ino")
+	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "arduino:avr:uno"
+	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_VERBOSE] = true
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+
+		&builder.ContainerAddPrototypes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#line 1 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 2 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 4 \""+absoluteSketchLocation+"\"\nconst __FlashStringHelper* test();\n#line 6 \""+absoluteSketchLocation+"\"\nconst int test3();\n#line 8 \""+absoluteSketchLocation+"\"\nvolatile __FlashStringHelper* test2();\n#line 10 \""+absoluteSketchLocation+"\"\nvolatile int test4();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
 }
