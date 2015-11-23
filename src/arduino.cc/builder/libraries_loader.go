@@ -152,7 +152,9 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	if debugLevel > 0 {
 		for _, subFolder := range subFolders {
 			if utils.IsSCCSOrHiddenFile(subFolder) {
-				logger.Fprintln(os.Stderr, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), properties[constants.LIBRARY_NAME])
+				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
+					logger.Fprintln(os.Stderr, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), properties[constants.LIBRARY_NAME])
+				}
 			}
 		}
 	}
