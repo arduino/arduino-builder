@@ -31,42 +31,37 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"os"
 )
 
-type RewriteHardwareKeys struct{}
+type WarnAboutPlatformRewrites struct{}
 
-func (s *RewriteHardwareKeys) Run(context map[string]interface{}) error {
-	if !utils.MapHas(context, constants.CTX_PLATFORM_KEYS_REWRITE) {
+func (s *WarnAboutPlatformRewrites) Run(context map[string]interface{}) error {
+	warn := utils.DebugLevel(context) > 0
+	if !warn {
 		return nil
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
-	platformKeysRewrite := context[constants.CTX_PLATFORM_KEYS_REWRITE].(types.PlatforKeysRewrite)
+	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	hardwareRewriteResults := context[constants.CTX_HARDWARE_REWRITE_RESULTS].(map[*types.Platform][]types.PlatforKeyRewrite)
+	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 
-	for _, aPackage := range packages.Packages {
-		for _, platform := range aPackage.Platforms {
-			if platform.Properties[constants.REWRITING] != constants.REWRITING_DISABLED {
-				for _, rewrite := range platformKeysRewrite.Rewrites {
-					if platform.Properties[rewrite.Key] != constants.EMPTY_STRING && platform.Properties[rewrite.Key] == rewrite.OldValue {
-						platform.Properties[rewrite.Key] = rewrite.NewValue
-						appliedRewrites := rewritesAppliedToPlatform(platform, hardwareRewriteResults)
-						appliedRewrites = append(appliedRewrites, rewrite)
-						hardwareRewriteResults[platform] = appliedRewrites
-					}
-				}
+	platforms := []*types.Platform{targetPlatform}
+	if actualPlatform != targetPlatform {
+		platforms = append(platforms, actualPlatform)
+	}
+
+	for _, platform := range platforms {
+		if hardwareRewriteResults[platform] != nil {
+			for _, rewrite := range hardwareRewriteResults[platform] {
+				logger.Fprintln(os.Stderr, constants.MSG_WARNING_PLATFORM_OLD_VALUES, platform.Properties[constants.PLATFORM_NAME], rewrite.Key+"="+rewrite.OldValue, rewrite.Key+"="+rewrite.NewValue)
 			}
 		}
 	}
 
 	return nil
-}
-
-func rewritesAppliedToPlatform(platform *types.Platform, hardwareRewriteResults map[*types.Platform][]types.PlatforKeyRewrite) []types.PlatforKeyRewrite {
-	if hardwareRewriteResults[platform] == nil {
-		hardwareRewriteResults[platform] = []types.PlatforKeyRewrite{}
-	}
-	return hardwareRewriteResults[platform]
 }
