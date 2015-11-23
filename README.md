@@ -35,8 +35,6 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-logger`: Optional, can be "human" or "machine". Defaults to "human". If "machine", messages emitted will be in a format which the Arduino IDE understands and that it uses for I18N.
 
-* `-lib-discovery-recursion-depth`: Optional. Defaults to 4. How deep should library discovery go down looking for included libraries.
-
 * `-version`: if specified, prints version and exits.
 
 * `-build-options-file`: it specifies path to a local `build.options.json` file (see paragraph below), which allows you to omit specifying params such as `-hardware`, `-tools`, `-libraries`, `-fqbn`, `-pref` and `-ide-version`.

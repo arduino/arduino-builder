@@ -72,7 +72,6 @@ const FLAG_WARNINGS_ALL = "all"
 const FLAG_LOGGER = "logger"
 const FLAG_LOGGER_HUMAN = "human"
 const FLAG_LOGGER_MACHINE = "machine"
-const FLAG_LIB_DISCOVERY_RECURSION_PATH = "lib-discovery-recursion-depth"
 const FLAG_VERSION = "version"
 const FLAG_VID_PID = "vid-pid"
 
@@ -113,7 +112,6 @@ var buildPathFlag *string
 var verboseFlag *bool
 var quietFlag *bool
 var debugLevelFlag *int
-var libraryDiscoveryRecursionDepthFlag *int
 var warningsLevelFlag *string
 var loggerFlag *string
 var versionFlag *bool
@@ -137,7 +135,6 @@ func init() {
 	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
 	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
-	libraryDiscoveryRecursionDepthFlag = flag.Int(FLAG_LIB_DISCOVERY_RECURSION_PATH, builder.DEFAULT_LIBRARY_DISCOVERY_RECURSION_DEPTH, "How deep should library discovery go down looking for included libraries")
 	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
 }
@@ -290,10 +287,6 @@ func main() {
 
 	if *debugLevelFlag > -1 {
 		context[constants.CTX_DEBUG_LEVEL] = *debugLevelFlag
-	}
-
-	if *libraryDiscoveryRecursionDepthFlag > 0 {
-		context[constants.CTX_LIBRARY_DISCOVERY_RECURSION_DEPTH] = *libraryDiscoveryRecursionDepthFlag
 	}
 
 	if *quietFlag {
