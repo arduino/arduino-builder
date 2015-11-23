@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"strings"
 )
 
@@ -41,10 +40,7 @@ type CTagsToPrototypes struct{}
 func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
 	tags := context[constants.CTX_COLLECTED_CTAGS].([]*CTag)
 
-	lineWhereToInsertPrototypes, err := findLineWhereToInsertPrototypes(tags)
-	if err != nil {
-		return utils.WrapError(err)
-	}
+	lineWhereToInsertPrototypes := findLineWhereToInsertPrototypes(tags)
 	if lineWhereToInsertPrototypes != -1 {
 		context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES] = lineWhereToInsertPrototypes
 	}
@@ -55,36 +51,30 @@ func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func findLineWhereToInsertPrototypes(tags []*CTag) (int, error) {
-	firstFunctionLine, err := firstFunctionAtLine(tags)
-	if err != nil {
-		return -1, utils.WrapError(err)
-	}
-	firstFunctionPointerAsArgument, err := firstFunctionPointerUsedAsArgument(tags)
-	if err != nil {
-		return -1, utils.WrapError(err)
-	}
+func findLineWhereToInsertPrototypes(tags []*CTag) int {
+	firstFunctionLine := firstFunctionAtLine(tags)
+	firstFunctionPointerAsArgument := firstFunctionPointerUsedAsArgument(tags)
 	if firstFunctionLine != -1 && firstFunctionPointerAsArgument != -1 {
 		if firstFunctionLine < firstFunctionPointerAsArgument {
-			return firstFunctionLine, nil
+			return firstFunctionLine
 		} else {
-			return firstFunctionPointerAsArgument, nil
+			return firstFunctionPointerAsArgument
 		}
 	} else if firstFunctionLine == -1 {
-		return firstFunctionPointerAsArgument, nil
+		return firstFunctionPointerAsArgument
 	} else {
-		return firstFunctionLine, nil
+		return firstFunctionLine
 	}
 }
 
-func firstFunctionPointerUsedAsArgument(tags []*CTag) (int, error) {
+func firstFunctionPointerUsedAsArgument(tags []*CTag) int {
 	functionNames := collectFunctionNames(tags)
 	for _, tag := range tags {
 		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
-			return tag.Line, nil
+			return tag.Line
 		}
 	}
-	return -1, nil
+	return -1
 }
 
 func functionNameUsedAsFunctionPointerIn(tag *CTag, functionNames []string) bool {
@@ -106,13 +96,13 @@ func collectFunctionNames(tags []*CTag) []string {
 	return names
 }
 
-func firstFunctionAtLine(tags []*CTag) (int, error) {
+func firstFunctionAtLine(tags []*CTag) int {
 	for _, tag := range tags {
 		if !tagIsUnknown(tag) && tag.IsHandled() && tag.Kind == KIND_FUNCTION {
-			return tag.Line, nil
+			return tag.Line
 		}
 	}
-	return -1, nil
+	return -1
 }
 
 func toPrototypes(tags []*CTag) []*types.Prototype {
