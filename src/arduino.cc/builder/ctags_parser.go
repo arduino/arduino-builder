@@ -39,44 +39,52 @@ import (
 	"strings"
 )
 
-const FIELD_KIND = "kind"
-const FIELD_LINE = "line"
-const FIELD_SIGNATURE = "signature"
-const FIELD_RETURNTYPE = "returntype"
-const FIELD_CODE = "code"
-const FIELD_CLASS = "class"
-const FIELD_STRUCT = "struct"
-const FIELD_NAMESPACE = "namespace"
-const FIELD_FILENAME = "filename"
-const FIELD_SKIP = "skipMe"
-const FIELD_FUNCTION_NAME = "functionName"
-
 const KIND_PROTOTYPE = "prototype"
 const KIND_FUNCTION = "function"
-const KIND_PROTOTYPE_MODIFIERS = "prototype_modifiers"
+
+//const KIND_PROTOTYPE_MODIFIERS = "prototype_modifiers"
 
 const TEMPLATE = "template"
 const STATIC = "static"
-const TRUE = "true"
 
-var FIELDS = map[string]bool{"kind": true, "line": true, "typeref": true, "signature": true, "returntype": true, "class": true, "struct": true, "namespace": true}
-var KNOWN_TAG_KINDS = map[string]bool{"prototype": true, "function": true}
-var FIELDS_MARKING_UNHANDLED_TAGS = []string{FIELD_CLASS, FIELD_STRUCT, FIELD_NAMESPACE}
+var KNOWN_TAG_KINDS = map[string]bool{
+	"prototype": true,
+	"function":  true,
+}
 
 type CTagsParser struct{}
+
+type CTag struct {
+	FunctionName string
+	Kind         string
+	Line         int
+	Signature    string
+	Returntype   string
+	Code         string
+	Class        string
+	Struct       string
+	Namespace    string
+	Filename     string
+	Typeref      string
+	SkipMe       bool
+
+	Prototype          string
+	Function           string
+	PrototypeModifiers string
+}
 
 func (s *CTagsParser) Run(context map[string]interface{}) error {
 	rows := strings.Split(context[constants.CTX_CTAGS_OUTPUT].(string), "\n")
 
 	rows = removeEmpty(rows)
 
-	var tags []map[string]string
+	var tags []*CTag
 	for _, row := range rows {
 		tags = append(tags, parseTag(row))
 	}
 
 	skipTagsWhere(tags, tagIsUnknown, context)
-	skipTagsWithField(tags, FIELDS_MARKING_UNHANDLED_TAGS, context)
+	skipTagsWhere(tags, tagIsUnhandled, context)
 	skipTagsWhere(tags, signatureContainsDefaultArg, context)
 	addPrototypes(tags)
 	removeDefinedProtypes(tags, context)
@@ -88,90 +96,90 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func addPrototypes(tags []map[string]string) {
+func addPrototypes(tags []*CTag) {
 	for _, tag := range tags {
-		if tag[FIELD_SKIP] != TRUE {
-			addPrototype(tag)
+		if !tag.SkipMe {
+			tag.AddPrototype()
 		}
 	}
 }
 
-func addPrototype(tag map[string]string) {
-	if strings.Index(tag[FIELD_RETURNTYPE], TEMPLATE) == 0 || strings.Index(tag[FIELD_CODE], TEMPLATE) == 0 {
-		code := tag[FIELD_CODE]
+func (tag *CTag) AddPrototype() {
+	if strings.Index(tag.Returntype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
+		code := tag.Code
 		if strings.Contains(code, "{") {
 			code = code[:strings.Index(code, "{")]
 		} else {
 			code = code[:strings.LastIndex(code, ")")+1]
 		}
-		tag[KIND_PROTOTYPE] = code + ";"
+		tag.Prototype = code + ";"
 		return
 	}
 
-	tag[KIND_PROTOTYPE] = tag[FIELD_RETURNTYPE] + " " + tag[FIELD_FUNCTION_NAME] + tag[FIELD_SIGNATURE] + ";"
+	tag.Prototype = tag.Returntype + " " + tag.FunctionName + tag.Signature + ";"
 
-	tag[KIND_PROTOTYPE_MODIFIERS] = ""
-	if strings.Index(tag[FIELD_CODE], STATIC+" ") != -1 {
-		tag[KIND_PROTOTYPE_MODIFIERS] = tag[KIND_PROTOTYPE_MODIFIERS] + " " + STATIC
+	tag.PrototypeModifiers = ""
+	if strings.Index(tag.Code, STATIC+" ") != -1 {
+		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + STATIC
 	}
-	tag[KIND_PROTOTYPE_MODIFIERS] = strings.TrimSpace(tag[KIND_PROTOTYPE_MODIFIERS])
+	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
-func removeDefinedProtypes(tags []map[string]string, context map[string]interface{}) {
+func removeDefinedProtypes(tags []*CTag, context map[string]interface{}) {
 	definedPrototypes := make(map[string]bool)
 	for _, tag := range tags {
-		if tag[FIELD_KIND] == KIND_PROTOTYPE {
-			definedPrototypes[tag[KIND_PROTOTYPE]] = true
+		if tag.Kind == KIND_PROTOTYPE {
+			definedPrototypes[tag.Prototype] = true
 		}
 	}
 
 	for _, tag := range tags {
-		if definedPrototypes[tag[KIND_PROTOTYPE]] {
+		if definedPrototypes[tag.Prototype] {
 			if utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag[FIELD_FUNCTION_NAME])
+				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
 			}
-			tag[FIELD_SKIP] = TRUE
+			tag.SkipMe = true
 		}
 	}
 }
 
-func removeDuplicate(tags []map[string]string) {
+func removeDuplicate(tags []*CTag) {
 	definedPrototypes := make(map[string]bool)
 
 	for _, tag := range tags {
-		if !definedPrototypes[tag[KIND_PROTOTYPE]] {
-			definedPrototypes[tag[KIND_PROTOTYPE]] = true
+		if !definedPrototypes[tag.Prototype] {
+			definedPrototypes[tag.Prototype] = true
 		} else {
-			tag[FIELD_SKIP] = TRUE
+			tag.SkipMe = true
 		}
 	}
 }
 
-type skipFuncType func(tag map[string]string) bool
+type skipFuncType func(tag *CTag) bool
 
-func skipTagsWhere(tags []map[string]string, skipFunc skipFuncType, context map[string]interface{}) {
+func skipTagsWhere(tags []*CTag, skipFunc skipFuncType, context map[string]interface{}) {
 	for _, tag := range tags {
-		if tag[FIELD_SKIP] != TRUE {
+		if !tag.SkipMe {
 			skip := skipFunc(tag)
 			if skip && utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_WITH_REASON, tag[FIELD_FUNCTION_NAME], runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
+				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
 			}
-			tag[FIELD_SKIP] = strconv.FormatBool(skip)
+			tag.SkipMe = skip
 		}
 	}
 }
 
-func signatureContainsDefaultArg(tag map[string]string) bool {
-	return strings.Contains(tag[FIELD_SIGNATURE], "=")
+func signatureContainsDefaultArg(tag *CTag) bool {
+	return strings.Contains(tag.Signature, "=")
 }
 
-func prototypeAndCodeDontMatch(tag map[string]string) bool {
-	if tag[FIELD_SKIP] == TRUE {
+func prototypeAndCodeDontMatch(tag *CTag) bool {
+	if tag.SkipMe {
 		return true
 	}
 
-	code := removeSpacesAndTabs(tag[FIELD_CODE])
-	prototype := removeSpacesAndTabs(tag[KIND_PROTOTYPE])
+	code := removeSpacesAndTabs(tag.Code)
+	prototype := removeSpacesAndTabs(tag.Prototype)
 	prototype = removeTralingSemicolon(prototype)
 
 	return strings.Index(code, prototype) == -1
@@ -187,41 +195,66 @@ func removeSpacesAndTabs(s string) string {
 	return s
 }
 
-func skipTagsWithField(tags []map[string]string, fields []string, context map[string]interface{}) {
-	for _, tag := range tags {
-		if field, skip := utils.TagHasAtLeastOneField(tag, fields); skip {
-			if utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_BECAUSE_HAS_FIELD, field)
-			}
-			tag[FIELD_SKIP] = TRUE
-		}
+func tagIsUnhandled(tag *CTag) bool {
+	return !tag.IsHandled()
+}
+
+func (tag *CTag) IsHandled() bool {
+	if tag.Class != "" {
+		return false
 	}
+	if tag.Struct != "" {
+		return false
+	}
+	if tag.Namespace != "" {
+		return false
+	}
+	return true
 }
 
-func tagIsUnknown(tag map[string]string) bool {
-	return !KNOWN_TAG_KINDS[tag[FIELD_KIND]]
+func tagIsUnknown(tag *CTag) bool {
+	return !KNOWN_TAG_KINDS[tag.Kind]
 }
 
-func parseTag(row string) map[string]string {
-	tag := make(map[string]string)
+func parseTag(row string) *CTag {
+	tag := &CTag{}
 	parts := strings.Split(row, "\t")
 
-	tag[FIELD_FUNCTION_NAME] = parts[0]
-	tag[FIELD_FILENAME] = parts[1]
+	tag.FunctionName = parts[0]
+	tag.Filename = parts[1]
 
 	parts = parts[2:]
 
 	for _, part := range parts {
 		if strings.Contains(part, ":") {
-			field := part[:strings.Index(part, ":")]
-			if FIELDS[field] {
-				tag[field] = strings.TrimSpace(part[strings.Index(part, ":")+1:])
+			colon := strings.Index(part, ":")
+			field := part[:colon]
+			value := strings.TrimSpace(part[colon+1:])
+			switch field {
+			case "kind":
+				tag.Kind = value
+			case "line":
+				val, _ := strconv.Atoi(value)
+				// TODO: Check err from strconv.Atoi
+				tag.Line = val
+			case "typeref":
+				tag.Typeref = value
+			case "signature":
+				tag.Signature = value
+			case "returntype":
+				tag.Returntype = value
+			case "class":
+				tag.Class = value
+			case "struct":
+				tag.Struct = value
+			case "namespace":
+				tag.Namespace = value
 			}
 		}
 	}
 
 	if strings.Contains(row, "/^") && strings.Contains(row, "$/;") {
-		tag[FIELD_CODE] = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]
+		tag.Code = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]
 	}
 
 	return tag

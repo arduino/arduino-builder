@@ -456,15 +456,6 @@ func TouchFile(targetFilePath string) error {
 	return WriteFileBytes(targetFilePath, []byte{})
 }
 
-func TagHasAtLeastOneField(tag map[string]string, fields []string) (string, bool) {
-	for _, field := range fields {
-		if tag[field] != constants.EMPTY_STRING {
-			return field, true
-		}
-	}
-	return "", false
-}
-
 func NULLFile() string {
 	if runtime.GOOS == "windows" {
 		return "nul"

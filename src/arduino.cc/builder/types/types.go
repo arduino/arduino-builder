@@ -31,6 +31,7 @@ package types
 
 import (
 	"arduino.cc/builder/constants"
+	"strconv"
 )
 
 type SketchFile struct {
@@ -157,12 +158,11 @@ type Prototype struct {
 	File         string
 	Prototype    string
 	Modifiers    string
-	Line         string
-	Fields       map[string]string
+	Line         int
 }
 
 func (proto *Prototype) String() string {
-	return proto.Modifiers + " " + proto.Prototype + " @ " + proto.Line
+	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
 }
 
 type SourceFolder struct {

@@ -36,10 +36,10 @@ import (
 type ComparePrototypesFromSourceAndPreprocSource struct{}
 
 func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]interface{}) error {
-	ctagsOfSource := context[constants.CTX_CTAGS_OF_SOURCE].([]map[string]string)
-	ctagsOfPreprocSource := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]map[string]string)
+	ctagsOfSource := context[constants.CTX_CTAGS_OF_SOURCE].([]*CTag)
+	ctagsOfPreprocSource := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*CTag)
 
-	actualCTags := []map[string]string{}
+	actualCTags := []*CTag{}
 	for _, ctagOfPreprocSource := range ctagsOfPreprocSource {
 		if sliceContainsCTag(ctagsOfSource, ctagOfPreprocSource) {
 			actualCTags = append(actualCTags, ctagOfPreprocSource)
@@ -51,9 +51,9 @@ func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]int
 	return nil
 }
 
-func sliceContainsCTag(slice []map[string]string, target map[string]string) bool {
+func sliceContainsCTag(slice []*CTag, target *CTag) bool {
 	for _, value := range slice {
-		if value[FIELD_FUNCTION_NAME] == target[FIELD_FUNCTION_NAME] {
+		if value.FunctionName == target.FunctionName {
 			return true
 		}
 	}

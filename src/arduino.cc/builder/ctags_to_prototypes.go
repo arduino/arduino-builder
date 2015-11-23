@@ -33,14 +33,13 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"strconv"
 	"strings"
 )
 
 type CTagsToPrototypes struct{}
 
 func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
-	tags := context[constants.CTX_COLLECTED_CTAGS].([]map[string]string)
+	tags := context[constants.CTX_COLLECTED_CTAGS].([]*CTag)
 
 	lineWhereToInsertPrototypes, err := findLineWhereToInsertPrototypes(tags)
 	if err != nil {
@@ -56,7 +55,7 @@ func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func findLineWhereToInsertPrototypes(tags []map[string]string) (int, error) {
+func findLineWhereToInsertPrototypes(tags []*CTag) (int, error) {
 	firstFunctionLine, err := firstFunctionAtLine(tags)
 	if err != nil {
 		return -1, utils.WrapError(err)
@@ -78,50 +77,56 @@ func findLineWhereToInsertPrototypes(tags []map[string]string) (int, error) {
 	}
 }
 
-func firstFunctionPointerUsedAsArgument(tags []map[string]string) (int, error) {
+func firstFunctionPointerUsedAsArgument(tags []*CTag) (int, error) {
 	functionNames := collectFunctionNames(tags)
 	for _, tag := range tags {
 		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
-			return strconv.Atoi(tag[FIELD_LINE])
+			return tag.Line, nil
 		}
 	}
 	return -1, nil
 }
 
-func functionNameUsedAsFunctionPointerIn(tag map[string]string, functionNames []string) bool {
+func functionNameUsedAsFunctionPointerIn(tag *CTag, functionNames []string) bool {
 	for _, functionName := range functionNames {
-		if strings.Index(tag[FIELD_CODE], "&"+functionName) != -1 {
+		if strings.Index(tag.Code, "&"+functionName) != -1 {
 			return true
 		}
 	}
 	return false
 }
 
-func collectFunctionNames(tags []map[string]string) []string {
+func collectFunctionNames(tags []*CTag) []string {
 	names := []string{}
 	for _, tag := range tags {
-		if tag[FIELD_KIND] == KIND_FUNCTION {
-			names = append(names, tag[FIELD_FUNCTION_NAME])
+		if tag.Kind == KIND_FUNCTION {
+			names = append(names, tag.FunctionName)
 		}
 	}
 	return names
 }
 
-func firstFunctionAtLine(tags []map[string]string) (int, error) {
+func firstFunctionAtLine(tags []*CTag) (int, error) {
 	for _, tag := range tags {
-		_, tagHasAtLeastOneField := utils.TagHasAtLeastOneField(tag, FIELDS_MARKING_UNHANDLED_TAGS)
-		if !tagIsUnknown(tag) && !tagHasAtLeastOneField && tag[FIELD_KIND] == KIND_FUNCTION {
-			return strconv.Atoi(tag[FIELD_LINE])
+		if !tagIsUnknown(tag) && tag.IsHandled() && tag.Kind == KIND_FUNCTION {
+			return tag.Line, nil
 		}
 	}
 	return -1, nil
 }
 
-func toPrototypes(tags []map[string]string) []*types.Prototype {
+func toPrototypes(tags []*CTag) []*types.Prototype {
 	prototypes := []*types.Prototype{}
 	for _, tag := range tags {
-		if tag[FIELD_SKIP] != TRUE {
-			prototype := &types.Prototype{FunctionName: tag[FIELD_FUNCTION_NAME], File: tag[FIELD_FILENAME], Prototype: tag[KIND_PROTOTYPE], Modifiers: tag[KIND_PROTOTYPE_MODIFIERS], Line: tag[FIELD_LINE], Fields: tag}
+		if !tag.SkipMe {
+			prototype := &types.Prototype{
+				FunctionName: tag.FunctionName,
+				File:         tag.Filename,
+				Prototype:    tag.Prototype,
+				Modifiers:    tag.PrototypeModifiers,
+				Line:         tag.Line,
+				//Fields:       tag,
+			}
 			prototypes = append(prototypes, prototype)
 		}
 	}
