@@ -35,7 +35,6 @@ import (
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -90,15 +89,15 @@ func TestLoadSketch(t *testing.T) {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	require.NotNil(t, sketch)
 
-	require.True(t, strings.Index(sketch.MainFile.Name, "sketch.ino") != -1)
+	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
 
 	require.Equal(t, 2, len(sketch.OtherSketchFiles))
-	require.True(t, strings.Index(sketch.OtherSketchFiles[0].Name, "old.pde") != -1)
-	require.True(t, strings.Index(sketch.OtherSketchFiles[1].Name, "other.ino") != -1)
+	require.Contains(t, sketch.OtherSketchFiles[0].Name, "old.pde")
+	require.Contains(t, sketch.OtherSketchFiles[1].Name, "other.ino")
 
 	require.Equal(t, 2, len(sketch.AdditionalFiles))
-	require.True(t, strings.Index(sketch.AdditionalFiles[0].Name, "header.h") != -1)
-	require.True(t, strings.Index(sketch.AdditionalFiles[1].Name, "helper.h") != -1)
+	require.Contains(t, sketch.AdditionalFiles[0].Name, "header.h")
+	require.Contains(t, sketch.AdditionalFiles[1].Name, "helper.h")
 }
 
 func TestFailToLoadSketchFromFolder(t *testing.T) {
@@ -134,13 +133,13 @@ func TestLoadSketchFromFolder(t *testing.T) {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	require.NotNil(t, sketch)
 
-	require.True(t, strings.Index(sketch.MainFile.Name, "sketch_with_subfolders.ino") != -1)
+	require.Contains(t, sketch.MainFile.Name, "sketch_with_subfolders.ino")
 
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))
 
 	require.Equal(t, 2, len(sketch.AdditionalFiles))
-	require.True(t, strings.Index(sketch.AdditionalFiles[0].Name, "other.cpp") != -1)
-	require.True(t, strings.Index(sketch.AdditionalFiles[1].Name, "other.h") != -1)
+	require.Contains(t, sketch.AdditionalFiles[0].Name, "other.cpp")
+	require.Contains(t, sketch.AdditionalFiles[1].Name, "other.h")
 }
 
 func TestLoadSketchWithBackup(t *testing.T) {
@@ -160,7 +159,7 @@ func TestLoadSketchWithBackup(t *testing.T) {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	require.NotNil(t, sketch)
 
-	require.True(t, strings.Index(sketch.MainFile.Name, "sketch.ino") != -1)
+	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
 
 	require.Equal(t, 0, len(sketch.AdditionalFiles))
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))
