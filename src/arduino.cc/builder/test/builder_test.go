@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"github.com/stretchr/testify/require"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 )
@@ -216,6 +217,11 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge", "Mailbox.cpp.o"))
 	NoError(t, err)
+
+	cmd := exec.Command(filepath.Join("downloaded_tools", "arm-none-eabi-gcc", "4.8.3-2014q1", "bin", "arm-none-eabi-objdump"), "-f", filepath.Join(buildPath, constants.FOLDER_CORE, "core.a"))
+	bytes, err := cmd.CombinedOutput()
+	NoError(t, err)
+	require.NotContains(t, string(bytes), "variant.cpp.o")
 }
 
 func TestBuilderBridgeRedBearLab(t *testing.T) {

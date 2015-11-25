@@ -50,21 +50,22 @@ func (s *CoreBuilder) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	archiveFile, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, logger)
+	archiveFile, objectFiles, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
 
 	context[constants.CTX_ARCHIVE_FILE_PATH_CORE] = archiveFile
+	context[constants.CTX_OBJECT_FILES_CORE] = objectFiles
 
 	return nil
 }
 
-func compileCore(buildPath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
+func compileCore(buildPath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
 
-	var includes []string
+	includes := []string{}
 	includes = append(includes, coreFolder)
 	if variantFolder != constants.EMPTY_STRING {
 		includes = append(includes, variantFolder)
@@ -73,25 +74,23 @@ func compileCore(buildPath string, buildProperties map[string]string, verbose bo
 
 	var err error
 
-	var variantObjectFiles []string
+	variantObjectFiles := []string{}
 	if variantFolder != constants.EMPTY_STRING {
 		variantObjectFiles, err = builder_utils.CompileFiles(variantObjectFiles, variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return "", utils.WrapError(err)
+			return "", nil, utils.WrapError(err)
 		}
 	}
 
 	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return "", utils.WrapError(err)
+		return "", nil, utils.WrapError(err)
 	}
 
-	objectFiles := append(coreObjectFiles, variantObjectFiles...)
-
-	archiveFile, err := builder_utils.ArchiveCompiledFiles(buildPath, "core.a", objectFiles, buildProperties, verbose, logger)
+	archiveFile, err := builder_utils.ArchiveCompiledFiles(buildPath, "core.a", coreObjectFiles, buildProperties, verbose, logger)
 	if err != nil {
-		return "", utils.WrapError(err)
+		return "", nil, utils.WrapError(err)
 	}
 
-	return archiveFile, nil
+	return archiveFile, variantObjectFiles, nil
 }

@@ -43,10 +43,12 @@ type Linker struct{}
 func (s *Linker) Run(context map[string]interface{}) error {
 	objectFilesSketch := context[constants.CTX_OBJECT_FILES_SKETCH].([]string)
 	objectFilesLibraries := context[constants.CTX_OBJECT_FILES_LIBRARIES].([]string)
+	objectFilesCore := context[constants.CTX_OBJECT_FILES_CORE].([]string)
 
 	var objectFiles []string
 	objectFiles = append(objectFiles, objectFilesSketch...)
 	objectFiles = append(objectFiles, objectFilesLibraries...)
+	objectFiles = append(objectFiles, objectFilesCore...)
 
 	coreArchiveFilePath := context[constants.CTX_ARCHIVE_FILE_PATH_CORE].(string)
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
