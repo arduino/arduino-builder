@@ -37,6 +37,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
@@ -207,7 +208,7 @@ func printProgressIfProgressEnabledAndMachineLogger(progressEnabled bool, contex
 
 func PrintRingNameIfDebug(context map[string]interface{}, command types.Command) {
 	if utils.DebugLevel(context) >= 10 {
-		utils.Logger(context).Fprintln(os.Stderr, constants.MSG_RUNNING_COMMAND, reflect.Indirect(reflect.ValueOf(command)).Type().Name())
+		utils.Logger(context).Fprintln(os.Stderr, constants.MSG_RUNNING_COMMAND, time.Now().Unix(), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 	}
 }
 
