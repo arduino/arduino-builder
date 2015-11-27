@@ -462,3 +462,10 @@ func TagHasAtLeastOneField(tag map[string]string, fields []string) (string, bool
 	}
 	return "", false
 }
+
+func NULLFile() string {
+	if runtime.GOOS == "windows" {
+		return "nul"
+	}
+	return "/dev/null"
+}

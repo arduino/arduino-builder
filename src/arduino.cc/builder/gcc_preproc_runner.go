@@ -65,11 +65,11 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 
 type GCCPreprocRunnerForDiscoveringIncludes struct {
 	SourceFilePath string
-	TargetFileName string
+	TargetFilePath string
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}) error {
-	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFileName)
+	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFilePath)
 	if err != nil {
 		return utils.WrapError(err)
 	}
@@ -86,13 +86,15 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFileName string) (map[string]string, string, error) {
-	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
-	err := utils.EnsureFolderExists(preprocPath)
-	if err != nil {
-		return nil, "", utils.WrapError(err)
+func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFilePath string) (map[string]string, string, error) {
+	if !filepath.IsAbs(targetFilePath) {
+		preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+		err := utils.EnsureFolderExists(preprocPath)
+		if err != nil {
+			return nil, "", utils.WrapError(err)
+		}
+		targetFilePath = filepath.Join(preprocPath, targetFilePath)
 	}
-	targetFilePath := filepath.Join(preprocPath, targetFileName)
 
 	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)

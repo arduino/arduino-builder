@@ -33,9 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"math/rand"
 	"path/filepath"
-	"strconv"
 )
 
 type ContainerFindIncludes struct{}
@@ -100,12 +98,12 @@ func runCommand(context map[string]interface{}, command types.Command) error {
 }
 
 func findIncludesUntilDone(context map[string]interface{}, sourceFilePath string) error {
-	targetFileName := filepath.Base(sourceFilePath) + "_" + strconv.Itoa(rand.Int()) + "_preprocessed.cpp"
+	targetFilePath := utils.NULLFile()
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 	done := false
 	for !done {
 		commands := []types.Command{
-			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFileName: targetFileName},
+			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFilePath: targetFilePath},
 			&IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_SOURCE},
 			&IncludesToIncludeFolders{},
 		}
