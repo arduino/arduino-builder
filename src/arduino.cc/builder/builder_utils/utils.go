@@ -40,6 +40,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
@@ -116,15 +117,47 @@ func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]str
 }
 
 func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties map[string]string, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	for _, source := range sources {
-		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
-		if err != nil {
-			return nil, utils.WrapError(err)
-		}
-
-		objectFiles = append(objectFiles, objectFile)
+	if len(sources) == 0 {
+		return objectFiles, nil
 	}
-	return objectFiles, nil
+	objectFilesChan := make(chan string)
+	errorsChan := make(chan error)
+	doneChan := make(chan struct{})
+
+	var wg sync.WaitGroup
+	wg.Add(len(sources))
+
+	for _, source := range sources {
+		go func(source string) {
+			defer wg.Done()
+			objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+			if err != nil {
+				errorsChan <- err
+			} else {
+				objectFilesChan <- objectFile
+			}
+		}(source)
+	}
+
+	go func() {
+		wg.Wait()
+		doneChan <- struct{}{}
+	}()
+
+	for {
+		select {
+		case objectFile := <-objectFilesChan:
+			objectFiles = append(objectFiles, objectFile)
+		case err := <-errorsChan:
+			return nil, utils.WrapError(err)
+		case <-doneChan:
+			close(objectFilesChan)
+			for objectFile := range objectFilesChan {
+				objectFiles = append(objectFiles, objectFile)
+			}
+			return objectFiles, nil
+		}
+	}
 }
 
 func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties map[string]string, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {

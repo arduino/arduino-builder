@@ -36,11 +36,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
 func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -75,6 +77,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 
 func TestBuilderBridge(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -110,6 +113,7 @@ func TestBuilderBridge(t *testing.T) {
 
 func TestBuilderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -144,6 +148,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 
 func TestBuilderBridgeTwice(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -182,6 +187,7 @@ func TestBuilderBridgeTwice(t *testing.T) {
 
 func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -226,6 +232,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 
 func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -260,6 +267,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 
 func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -281,6 +289,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 
 func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -302,6 +311,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -323,6 +333,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	context := make(map[string]interface{})
 
@@ -369,4 +380,27 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	require.True(t, os.IsNotExist(err))
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge"))
 	NoError(t, err)
+}
+
+func TestBuilderSketchWithSyntaxError(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
+	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
+	context[constants.CTX_FQBN] = "arduino:avr:uno"
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_syntax_error", "sketch.ino")
+	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
+	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_VERBOSE] = true
+
+	command := builder.Builder{}
+	err := command.Run(context)
+	require.Error(t, err)
 }
