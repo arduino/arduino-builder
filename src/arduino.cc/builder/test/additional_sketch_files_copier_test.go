@@ -78,11 +78,12 @@ func TestCopyOtherFiles(t *testing.T) {
 
 	files, err1 := gohasissues.ReadDir(filepath.Join(buildPath, constants.FOLDER_SKETCH))
 	NoError(t, err1)
-	require.Equal(t, 2, len(files))
+	require.Equal(t, 3, len(files))
 
 	sort.Sort(ByFileInfoName(files))
 	require.Equal(t, "header.h", files[0].Name())
-	require.Equal(t, "subfolder", files[1].Name())
+	require.Equal(t, "s_file.S", files[1].Name())
+	require.Equal(t, "subfolder", files[2].Name())
 
 	files, err1 = gohasissues.ReadDir(filepath.Join(buildPath, constants.FOLDER_SKETCH, "subfolder"))
 	NoError(t, err1)

@@ -95,9 +95,10 @@ func TestLoadSketch(t *testing.T) {
 	require.Contains(t, sketch.OtherSketchFiles[0].Name, "old.pde")
 	require.Contains(t, sketch.OtherSketchFiles[1].Name, "other.ino")
 
-	require.Equal(t, 2, len(sketch.AdditionalFiles))
+	require.Equal(t, 3, len(sketch.AdditionalFiles))
 	require.Contains(t, sketch.AdditionalFiles[0].Name, "header.h")
-	require.Contains(t, sketch.AdditionalFiles[1].Name, "helper.h")
+	require.Contains(t, sketch.AdditionalFiles[1].Name, "s_file.S")
+	require.Contains(t, sketch.AdditionalFiles[2].Name, "helper.h")
 }
 
 func TestFailToLoadSketchFromFolder(t *testing.T) {
