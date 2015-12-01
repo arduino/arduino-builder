@@ -75,3 +75,30 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	err := cmd.Run(context)
 	NoError(t, err)
 }
+
+func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
+	temp, err := ioutil.TempDir("", "test")
+	NoError(t, err)
+	defer os.RemoveAll(temp)
+
+	NoError(t, os.MkdirAll(filepath.Join(temp, "SPI"), os.FileMode(0755)))
+	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
+	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
+
+	context := make(map[string]interface{})
+	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
+	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{}
+
+	cmd := builder.UnusedCompiledLibrariesRemover{}
+	err = cmd.Run(context)
+	NoError(t, err)
+
+	_, err = os.Stat(filepath.Join(temp, "SPI"))
+	require.Error(t, err)
+	require.True(t, os.IsNotExist(err))
+	_, err = os.Stat(filepath.Join(temp, "Bridge"))
+	require.Error(t, err)
+	require.True(t, os.IsNotExist(err))
+	_, err = os.Stat(filepath.Join(temp, "dummy_file"))
+	NoError(t, err)
+}

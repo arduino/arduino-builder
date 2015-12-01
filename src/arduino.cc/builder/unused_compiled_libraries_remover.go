@@ -44,10 +44,6 @@ func (s *UnusedCompiledLibrariesRemover) Run(context map[string]interface{}) err
 	librariesBuildPath := context[constants.CTX_LIBRARIES_BUILD_PATH].(string)
 	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 
-	if len(libraries) == 0 {
-		return nil
-	}
-
 	_, err := os.Stat(librariesBuildPath)
 	if err != nil && os.IsNotExist(err) {
 		return nil
