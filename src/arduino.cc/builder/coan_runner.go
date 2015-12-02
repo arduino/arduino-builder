@@ -34,7 +34,7 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
-	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 )
@@ -74,7 +74,7 @@ func (s *CoanRunner) Run(context map[string]interface{}) error {
 	command, err := utils.PrepareCommandFilteredArgs(commandLine, filterAllowedArg, logger)
 
 	if verbose {
-		fmt.Println(commandLine)
+		logger.UnformattedFprintln(os.Stdout, commandLine)
 	}
 
 	sourceBytes, _ := command.Output()

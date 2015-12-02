@@ -33,9 +33,9 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"bytes"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -319,10 +319,18 @@ func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperti
 	}
 
 	if echoOutput {
-		command.Stdout = os.Stdout
+		printToStdOut := func(s string) {
+			logger.UnformattedFprintln(os.Stdout, s)
+		}
+		stdout := &types.BufferedUntilNewLineWriter{PrintFunc: printToStdOut, Buffer: bytes.Buffer{}}
+		command.Stdout = stdout
 	}
 
-	command.Stderr = os.Stderr
+	printToStdErr := func(s string) {
+		logger.UnformattedFprintln(os.Stderr, s)
+	}
+	stderr := &types.BufferedUntilNewLineWriter{PrintFunc: printToStdErr, Buffer: bytes.Buffer{}}
+	command.Stderr = stderr
 
 	if echoOutput {
 		err := command.Run()
@@ -354,7 +362,7 @@ func PrepareCommandForRecipe(properties map[string]string, recipe string, remove
 	}
 
 	if echoCommandLine {
-		fmt.Println(commandLine)
+		logger.UnformattedFprintln(os.Stdout, commandLine)
 	}
 
 	return command, nil

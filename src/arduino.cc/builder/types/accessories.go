@@ -29,6 +29,11 @@
 
 package types
 
+import (
+	"bytes"
+	"sync"
+)
+
 type UniqueStringQueue []string
 
 func (queue UniqueStringQueue) Len() int           { return len(queue) }
@@ -73,4 +78,30 @@ func (queue *UniqueSourceFolderQueue) Pop() interface{} {
 
 func (queue *UniqueSourceFolderQueue) Empty() bool {
 	return queue.Len() == 0
+}
+
+type BufferedUntilNewLineWriter struct {
+	PrintFunc PrintFunc
+	Buffer    bytes.Buffer
+	lock      sync.Mutex
+}
+
+type PrintFunc func(string)
+
+func (w *BufferedUntilNewLineWriter) Write(p []byte) (n int, err error) {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+
+	writtenToBuffer, err := w.Buffer.Write(p)
+	if err != nil {
+		return writtenToBuffer, err
+	}
+
+	bytesUntilNewLine, err := w.Buffer.ReadBytes('\n')
+	if err != nil && len(bytesUntilNewLine) > 0 {
+		bytesUntilNewLine = bytesUntilNewLine[:len(bytesUntilNewLine)-1]
+		w.PrintFunc(string(bytesUntilNewLine))
+	}
+
+	return writtenToBuffer, err
 }

@@ -34,7 +34,7 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
-	"fmt"
+	"os"
 )
 
 type CTagsRunner struct{}
@@ -60,7 +60,7 @@ func (s *CTagsRunner) Run(context map[string]interface{}) error {
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	if verbose {
-		fmt.Println(commandLine)
+		logger.UnformattedFprintln(os.Stdout, commandLine)
 	}
 
 	sourceBytes, err := command.Output()
