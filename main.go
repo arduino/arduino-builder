@@ -48,7 +48,7 @@ import (
 	"syscall"
 )
 
-const VERSION = "1.3.8"
+const VERSION = "1.3.8-dev-parallel"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
