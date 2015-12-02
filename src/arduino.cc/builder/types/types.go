@@ -169,3 +169,9 @@ type SourceFolder struct {
 	Folder  string
 	Recurse bool
 }
+
+type LibraryResolutionResult struct {
+	Library               *Library
+	IsLibraryFromPlatform bool
+	NotUsedLibraries      []*Library
+}

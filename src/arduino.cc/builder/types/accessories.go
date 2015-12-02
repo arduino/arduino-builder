@@ -74,9 +74,3 @@ func (queue *UniqueSourceFolderQueue) Pop() interface{} {
 func (queue *UniqueSourceFolderQueue) Empty() bool {
 	return queue.Len() == 0
 }
-
-type LibraryResolutionResult struct {
-	Library               *Library
-	IsLibraryFromPlatform bool
-	NotUsedLibraries      []*Library
-}
