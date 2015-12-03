@@ -87,7 +87,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 }
 
 func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFilePath string) (map[string]string, string, error) {
-	if !filepath.IsAbs(targetFilePath) {
+	if targetFilePath != utils.NULLFile() {
 		preprocPath := context[constants.CTX_PREPROC_PATH].(string)
 		err := utils.EnsureFolderExists(preprocPath)
 		if err != nil {
