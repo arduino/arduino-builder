@@ -46,6 +46,7 @@ var PLACEHOLDER = regexp.MustCompile("{(\\d)}")
 type Logger interface {
 	Fprintln(w io.Writer, level string, format string, a ...interface{})
 	UnformattedFprintln(w io.Writer, s string)
+	UnformattedWrite(w io.Writer, data []byte)
 	Println(level string, format string, a ...interface{})
 	Name() string
 }
@@ -55,6 +56,8 @@ type NoopLogger struct{}
 func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
 
 func (s NoopLogger) UnformattedFprintln(w io.Writer, str string) {}
+
+func (s NoopLogger) UnformattedWrite(w io.Writer, data []byte) {}
 
 func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
 
@@ -74,6 +77,10 @@ func (s HumanLogger) UnformattedFprintln(w io.Writer, str string) {
 
 func (s HumanLogger) Println(format string, level string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, Format(format, a...))
+}
+
+func (s HumanLogger) UnformattedWrite(w io.Writer, data []byte) {
+	write(w, data)
 }
 
 func (s HumanLogger) Name() string {
@@ -98,6 +105,10 @@ func (s MachineLogger) Name() string {
 	return "machine"
 }
 
+func (s MachineLogger) UnformattedWrite(w io.Writer, data []byte) {
+	write(w, data)
+}
+
 func printMachineFormattedLogLine(w io.Writer, level string, format string, a []interface{}) {
 	a = append([]interface{}(nil), a...)
 	for idx, value := range a {
@@ -115,6 +126,12 @@ func fprintln(w io.Writer, s string) {
 	lock.Lock()
 	defer lock.Unlock()
 	fmt.Fprintln(w, s)
+}
+
+func write(w io.Writer, data []byte) {
+	lock.Lock()
+	defer lock.Unlock()
+	w.Write(data)
 }
 
 func fprintf(w io.Writer, format string, a ...interface{}) {

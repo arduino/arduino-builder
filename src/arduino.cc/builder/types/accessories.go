@@ -86,7 +86,7 @@ type BufferedUntilNewLineWriter struct {
 	lock      sync.Mutex
 }
 
-type PrintFunc func(string)
+type PrintFunc func([]byte)
 
 func (w *BufferedUntilNewLineWriter) Write(p []byte) (n int, err error) {
 	w.lock.Lock()
@@ -98,10 +98,22 @@ func (w *BufferedUntilNewLineWriter) Write(p []byte) (n int, err error) {
 	}
 
 	bytesUntilNewLine, err := w.Buffer.ReadBytes('\n')
-	if err != nil && len(bytesUntilNewLine) > 0 {
-		bytesUntilNewLine = bytesUntilNewLine[:len(bytesUntilNewLine)-1]
-		w.PrintFunc(string(bytesUntilNewLine))
+	if err == nil {
+		w.PrintFunc(bytesUntilNewLine)
 	}
 
 	return writtenToBuffer, err
+}
+
+func (w *BufferedUntilNewLineWriter) Flush() {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+
+	remainingBytes := w.Buffer.Bytes()
+	if len(remainingBytes) > 0 {
+		if remainingBytes[len(remainingBytes)-1] != '\n' {
+			remainingBytes = append(remainingBytes, '\n')
+		}
+		w.PrintFunc(remainingBytes)
+	}
 }

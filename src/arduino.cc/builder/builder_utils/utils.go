@@ -319,17 +319,19 @@ func ExecRecipe(properties map[string]string, recipe string, removeUnsetProperti
 	}
 
 	if echoOutput {
-		printToStdOut := func(s string) {
-			logger.UnformattedFprintln(os.Stdout, s)
+		printToStdOut := func(data []byte) {
+			logger.UnformattedWrite(os.Stdout, data)
 		}
 		stdout := &types.BufferedUntilNewLineWriter{PrintFunc: printToStdOut, Buffer: bytes.Buffer{}}
+		defer stdout.Flush()
 		command.Stdout = stdout
 	}
 
-	printToStdErr := func(s string) {
-		logger.UnformattedFprintln(os.Stderr, s)
+	printToStdErr := func(data []byte) {
+		logger.UnformattedWrite(os.Stderr, data)
 	}
 	stderr := &types.BufferedUntilNewLineWriter{PrintFunc: printToStdErr, Buffer: bytes.Buffer{}}
+	defer stderr.Flush()
 	command.Stderr = stderr
 
 	if echoOutput {

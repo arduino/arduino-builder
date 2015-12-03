@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
@@ -92,6 +93,7 @@ func TestBuilderBridge(t *testing.T) {
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_LOGGER] = i18n.MachineLogger{}
 
 	command := builder.Builder{}
 	err := command.Run(context)
@@ -127,6 +129,8 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
 	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
+	context[constants.CTX_VERBOSE] = true
+	context[constants.CTX_LOGGER] = i18n.NoopLogger{}
 
 	command := builder.Builder{}
 	err := command.Run(context)
