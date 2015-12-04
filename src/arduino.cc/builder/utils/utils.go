@@ -34,6 +34,8 @@ import (
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
+	"crypto/md5"
+	"encoding/hex"
 	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
@@ -468,4 +470,9 @@ func NULLFile() string {
 		return "nul"
 	}
 	return "/dev/null"
+}
+
+func MD5Sum(data []byte) string {
+	md5sumBytes := md5.Sum(data)
+	return hex.EncodeToString(md5sumBytes[:])
 }

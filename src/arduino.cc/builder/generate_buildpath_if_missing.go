@@ -33,8 +33,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
-	"crypto/md5"
-	"encoding/hex"
 	"os"
 	"path/filepath"
 	"strings"
@@ -48,8 +46,7 @@ func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}) error {
 	}
 
 	sketchLocation := context[constants.CTX_SKETCH_LOCATION].(string)
-	md5sumBytes := md5.Sum([]byte(sketchLocation))
-	md5sum := hex.EncodeToString(md5sumBytes[:])
+	md5sum := utils.MD5Sum([]byte(sketchLocation))
 
 	buildPath := filepath.Join(os.TempDir(), "arduino-sketch-"+strings.ToUpper(md5sum))
 	_, err := os.Stat(buildPath)
