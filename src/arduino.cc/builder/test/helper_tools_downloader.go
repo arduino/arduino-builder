@@ -142,7 +142,6 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	patchFiles(t)
 }
 
-// FIXME: once patched cores are released, patching them will be unnecessary
 func patchFiles(t *testing.T) {
 	files, err := ioutil.ReadDir(PATCHES_FOLDER)
 	NoError(t, err)
