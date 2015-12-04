@@ -39,6 +39,7 @@ import (
 	"path/filepath"
 	"sort"
 	"testing"
+	"time"
 )
 
 type ByFileInfoName []os.FileInfo
@@ -89,4 +90,44 @@ func TestCopyOtherFiles(t *testing.T) {
 	NoError(t, err1)
 	require.Equal(t, 1, len(files))
 	require.Equal(t, "helper.h", files[0].Name())
+}
+
+func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
+	context := make(map[string]interface{})
+
+	buildPath := SetupBuildPath(t, context)
+	defer os.RemoveAll(buildPath)
+
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.AddAdditionalEntriesToContext{},
+		&builder.SketchLoader{},
+		&builder.AdditionalSketchFilesCopier{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	headerStatBefore, err := os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "header.h"))
+	NoError(t, err)
+
+	time.Sleep(2 * time.Second)
+
+	context = make(map[string]interface{})
+	context[constants.CTX_BUILD_PATH] = buildPath
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	headerStatAfter, err := os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "header.h"))
+	NoError(t, err)
+
+	require.Equal(t, headerStatBefore.ModTime().Unix(), headerStatAfter.ModTime().Unix())
 }
