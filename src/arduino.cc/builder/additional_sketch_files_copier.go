@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"bytes"
 	"io/ioutil"
 	"path/filepath"
 )
@@ -67,8 +68,22 @@ func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}) error 
 			return utils.WrapError(err)
 		}
 
-		utils.WriteFileBytes(targetFilePath, bytes)
+		if targetFileChanged(bytes, targetFilePath) {
+			err := utils.WriteFileBytes(targetFilePath, bytes)
+			if err != nil {
+				return utils.WrapError(err)
+			}
+		}
 	}
 
 	return nil
+}
+
+func targetFileChanged(currentBytes []byte, targetFilePath string) bool {
+	oldBytes, err := ioutil.ReadFile(targetFilePath)
+	if err != nil {
+		return true
+	}
+
+	return bytes.Compare(currentBytes, oldBytes) != 0
 }
