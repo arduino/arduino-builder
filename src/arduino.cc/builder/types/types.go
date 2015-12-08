@@ -180,8 +180,6 @@ type CTag struct {
 	FunctionName string
 	Kind         string
 	Line         int
-	Signature    string
-	Returntype   string
 	Code         string
 	Class        string
 	Struct       string

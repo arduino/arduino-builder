@@ -104,13 +104,15 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 	idx := 0
 	require.Equal(t, "minimum", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "(T a, T b)", ctags[idx].Signature)
+	require.Equal(t, "template <typename T> T minimum (T a, T b);", ctags[idx].Prototype)
 	idx++
 	require.Equal(t, "setup", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "void setup();", ctags[idx].Prototype)
 	idx++
 	require.Equal(t, "loop", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "void loop();", ctags[idx].Prototype)
 }
 
 func TestCTagsParserShouldListTemplates2(t *testing.T) {
@@ -136,11 +138,11 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 	idx++
 	require.Equal(t, "SRAM_writeAnything", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "(int ee, const T& value)", ctags[idx].Signature)
+	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", ctags[idx].Prototype)
 	idx++
 	require.Equal(t, "SRAM_readAnything", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "(int ee, T& value)", ctags[idx].Signature)
+	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", ctags[idx].Prototype)
 }
 
 func TestCTagsParserShouldDealWithClasses(t *testing.T) {
@@ -355,7 +357,7 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 	idx := 0
 	require.Equal(t, "test", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "(int x = 1)", ctags[idx].Signature)
+	require.Equal(t, "void test(int x = 1);", ctags[idx].Prototype)
 	idx++
 	require.Equal(t, "setup", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
@@ -469,10 +471,9 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 	idx++
 	require.Equal(t, "funcArr", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "()", ctags[idx].Signature)
+	require.Equal(t, "int funcArr();", ctags[idx].Prototype)
 	idx++
 	require.Equal(t, "funcCombo", ctags[idx].FunctionName)
 	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "(void (*(&in)[5])(int))", ctags[idx].Signature)
-
+	require.Equal(t, "void funcCombo(void (*(&in)[5])(int));", ctags[idx].Prototype)
 }

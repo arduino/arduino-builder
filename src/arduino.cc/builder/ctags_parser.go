@@ -87,7 +87,7 @@ func addPrototypes(tags []*types.CTag) {
 }
 
 func addPrototype(tag *types.CTag) {
-	if strings.Index(tag.Returntype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
+	if strings.Index(tag.Prototype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
 		code := tag.Code
 		if strings.Contains(code, "{") {
 			code = code[:strings.Index(code, "{")]
@@ -97,8 +97,6 @@ func addPrototype(tag *types.CTag) {
 		tag.Prototype = code + ";"
 		return
 	}
-
-	tag.Prototype = tag.Returntype + " " + tag.FunctionName + tag.Signature + ";"
 
 	tag.PrototypeModifiers = ""
 	if strings.Index(tag.Code, STATIC+" ") != -1 {
@@ -152,7 +150,7 @@ func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string
 }
 
 func signatureContainsDefaultArg(tag *types.CTag) bool {
-	return strings.Contains(tag.Signature, "=")
+	return strings.Contains(tag.Prototype, "=")
 }
 
 func prototypeAndCodeDontMatch(tag *types.CTag) bool {
@@ -207,6 +205,8 @@ func parseTag(row string) *types.CTag {
 
 	parts = parts[2:]
 
+	signature := ""
+	returntype := ""
 	for _, part := range parts {
 		if strings.Contains(part, ":") {
 			colon := strings.Index(part, ":")
@@ -222,9 +222,9 @@ func parseTag(row string) *types.CTag {
 			case "typeref":
 				tag.Typeref = value
 			case "signature":
-				tag.Signature = value
+				signature = value
 			case "returntype":
-				tag.Returntype = value
+				returntype = value
 			case "class":
 				tag.Class = value
 			case "struct":
@@ -234,6 +234,7 @@ func parseTag(row string) *types.CTag {
 			}
 		}
 	}
+	tag.Prototype = returntype + " " + tag.FunctionName + signature + ";"
 
 	if strings.Contains(row, "/^") && strings.Contains(row, "$/;") {
 		tag.Code = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]
