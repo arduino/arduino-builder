@@ -56,7 +56,7 @@ func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}) error {
 
 	if utils.DebugLevel(context) > 5 {
 		logger := context[constants.CTX_LOGGER].(i18n.Logger)
-		logger.Fprintln(os.Stderr, constants.MSG_SETTING_BUILD_PATH, buildPath)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_SETTING_BUILD_PATH, buildPath)
 	}
 
 	context[constants.CTX_BUILD_PATH] = buildPath

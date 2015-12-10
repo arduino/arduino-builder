@@ -154,7 +154,7 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 			return "", utils.WrapError(err)
 		}
 	} else if verbose {
-		logger.Println(constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
 	}
 
 	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil

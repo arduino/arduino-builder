@@ -75,7 +75,7 @@ func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
 
 	bootloaderPath := filepath.Join(buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH], constants.FOLDER_BOOTLOADERS, bootloader)
 	if _, err := os.Stat(bootloaderPath); err != nil {
-		logger.Fprintln(os.Stderr, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
 		return nil
 	}
 

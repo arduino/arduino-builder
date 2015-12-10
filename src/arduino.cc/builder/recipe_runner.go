@@ -47,7 +47,7 @@ type RecipeByPrefixSuffixRunner struct {
 func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}) error {
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	if utils.DebugLevel(context) >= 10 {
-		logger.Fprintln(os.Stderr, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
 	}
 
 	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
@@ -58,7 +58,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}) error {
 	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
 	for _, recipe := range recipes {
 		if utils.DebugLevel(context) >= 10 {
-			logger.Fprintln(os.Stderr, constants.MSG_RUNNING_RECIPE, recipe)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)
 		}
 		_, err := builder_utils.ExecRecipe(properties, recipe, false, verbose, verbose, logger)
 		if err != nil {

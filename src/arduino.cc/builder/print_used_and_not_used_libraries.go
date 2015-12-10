@@ -50,10 +50,10 @@ func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}) error
 
 	for header, libResResult := range libraryResolutionResults {
 		if !libResResult.IsLibraryFromPlatform {
-			logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-			logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
 			for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-				logger.Fprintln(os.Stderr, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
 			}
 		}
 	}

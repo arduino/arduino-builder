@@ -203,13 +203,13 @@ func printProgressIfProgressEnabledAndMachineLogger(progressEnabled bool, contex
 
 	log := utils.Logger(context)
 	if log.Name() == "machine" {
-		log.Println(constants.MSG_PROGRESS, strconv.FormatFloat(float64(progress), 'f', 2, 32))
+		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(float64(progress), 'f', 2, 32))
 	}
 }
 
 func PrintRingNameIfDebug(context map[string]interface{}, command types.Command) {
 	if utils.DebugLevel(context) >= 10 {
-		utils.Logger(context).Fprintln(os.Stderr, constants.MSG_RUNNING_COMMAND, strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
+		utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_COMMAND, strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 	}
 }
 

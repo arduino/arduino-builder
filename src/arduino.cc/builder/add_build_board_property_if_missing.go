@@ -48,7 +48,7 @@ func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}) err
 			for _, board := range platform.Boards {
 				if board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD] == constants.EMPTY_STRING {
 					board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD] = strings.ToUpper(platform.PlatformId + "_" + board.BoardId)
-					logger.Fprintln(os.Stderr, constants.MSG_MISSING_BUILD_BOARD, aPackage.PackageId, platform.PlatformId, board.BoardId, board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_MISSING_BUILD_BOARD, aPackage.PackageId, platform.PlatformId, board.BoardId, board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 				}
 			}
 		}

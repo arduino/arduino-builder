@@ -153,7 +153,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		for _, subFolder := range subFolders {
 			if utils.IsSCCSOrHiddenFile(subFolder) {
 				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
-					logger.Fprintln(os.Stderr, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), properties[constants.LIBRARY_NAME])
+					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), properties[constants.LIBRARY_NAME])
 				}
 			}
 		}
@@ -169,7 +169,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 
 	properties[constants.LIBRARY_CATEGORY] = strings.TrimSpace(properties[constants.LIBRARY_CATEGORY])
 	if !LIBRARY_CATEGORIES[properties[constants.LIBRARY_CATEGORY]] {
-		logger.Fprintln(os.Stderr, constants.MSG_WARNING_LIB_INVALID_CATEGORY, properties[constants.LIBRARY_CATEGORY], properties[constants.LIBRARY_NAME], constants.LIB_CATEGORY_UNCATEGORIZED)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_LIB_INVALID_CATEGORY, properties[constants.LIBRARY_CATEGORY], properties[constants.LIBRARY_NAME], constants.LIB_CATEGORY_UNCATEGORIZED)
 		properties[constants.LIBRARY_CATEGORY] = constants.LIB_CATEGORY_UNCATEGORIZED
 	}
 	library.Category = properties[constants.LIBRARY_CATEGORY]

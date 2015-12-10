@@ -43,16 +43,16 @@ import (
 var PLACEHOLDER = regexp.MustCompile("{(\\d)}")
 
 type Logger interface {
-	Fprintln(w io.Writer, format string, a ...interface{})
-	Println(format string, a ...interface{})
+	Fprintln(w io.Writer, level string, format string, a ...interface{})
+	Println(level string, format string, a ...interface{})
 	Name() string
 }
 
 type NoopLogger struct{}
 
-func (s NoopLogger) Fprintln(w io.Writer, format string, a ...interface{}) {}
+func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
 
-func (s NoopLogger) Println(format string, a ...interface{}) {}
+func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
 
 func (s NoopLogger) Name() string {
 	return "noop"
@@ -60,12 +60,12 @@ func (s NoopLogger) Name() string {
 
 type HumanLogger struct{}
 
-func (s HumanLogger) Fprintln(w io.Writer, format string, a ...interface{}) {
+func (s HumanLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	fmt.Fprintln(w, Format(format, a...))
 }
 
-func (s HumanLogger) Println(format string, a ...interface{}) {
-	s.Fprintln(os.Stdout, Format(format, a...))
+func (s HumanLogger) Println(level string, format string, a ...interface{}) {
+	s.Fprintln(os.Stdout, level, Format(format, a...))
 }
 
 func (s HumanLogger) Name() string {
@@ -74,7 +74,7 @@ func (s HumanLogger) Name() string {
 
 type MachineLogger struct{}
 
-func (s MachineLogger) printWithoutFormatting(w io.Writer, format string, a []interface{}) {
+func (s MachineLogger) printWithoutFormatting(w io.Writer, level string, format string, a []interface{}) {
 	a = append([]interface{}(nil), a...)
 	for idx, value := range a {
 		typeof := reflect.Indirect(reflect.ValueOf(value)).Kind()
@@ -82,16 +82,16 @@ func (s MachineLogger) printWithoutFormatting(w io.Writer, format string, a []in
 			a[idx] = url.QueryEscape(value.(string))
 		}
 	}
-	fmt.Fprintf(w, "===%s ||| %s", format, a)
+	fmt.Fprintf(w, "===%s ||| %s ||| %s", level, format, a)
 	fmt.Fprintln(w)
 }
 
-func (s MachineLogger) Fprintln(w io.Writer, format string, a ...interface{}) {
-	s.printWithoutFormatting(w, format, a)
+func (s MachineLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	s.printWithoutFormatting(w, level, format, a)
 }
 
-func (s MachineLogger) Println(format string, a ...interface{}) {
-	s.printWithoutFormatting(os.Stdout, format, a)
+func (s MachineLogger) Println(level string, format string, a ...interface{}) {
+	s.printWithoutFormatting(os.Stdout, level, format, a)
 }
 
 func (s MachineLogger) Name() string {

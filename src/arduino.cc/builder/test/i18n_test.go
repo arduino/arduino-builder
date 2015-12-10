@@ -30,6 +30,7 @@
 package test
 
 import (
+	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"fmt"
 	"github.com/stretchr/testify/require"
@@ -64,8 +65,8 @@ func TestI18NSyntax(t *testing.T) {
 func TestI18NInheritance(t *testing.T) {
 	var logger i18n.Logger
 	logger = i18n.HumanLogger{}
-	logger.Println("good {0} {1}", "morning", "vietnam!")
+	logger.Println(constants.LOG_LEVEL_INFO, "good {0} {1}", "morning", "vietnam!")
 
 	logger = i18n.MachineLogger{}
-	logger.Println("good {0} {1}", "morning", "vietnam!")
+	logger.Println(constants.LOG_LEVEL_INFO, "good {0} {1}", "morning", "vietnam!")
 }

@@ -118,7 +118,7 @@ func removeDefinedProtypes(tags []*types.CTag, context map[string]interface{}) {
 	for _, tag := range tags {
 		if definedPrototypes[tag.Prototype] {
 			if utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
+				utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
 			}
 			tag.SkipMe = true
 		}
@@ -144,7 +144,7 @@ func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string
 		if !tag.SkipMe {
 			skip := skipFunc(tag)
 			if skip && utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stderr, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
+				utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
 			}
 			tag.SkipMe = skip
 		}

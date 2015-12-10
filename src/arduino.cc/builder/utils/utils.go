@@ -296,7 +296,7 @@ func Errorf(context map[string]interface{}, format string, a ...interface{}) *er
 
 func ErrorfWithLogger(log i18n.Logger, format string, a ...interface{}) *errors.Error {
 	if log.Name() == "machine" {
-		log.Fprintln(os.Stderr, format, a...)
+		log.Fprintln(os.Stderr, constants.LOG_LEVEL_ERROR, format, a...)
 		return errors.Errorf(constants.EMPTY_STRING)
 	}
 	return errors.Errorf(i18n.Format(format, a...))
