@@ -31,15 +31,16 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 )
 
 type ComparePrototypesFromSourceAndPreprocSource struct{}
 
 func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]interface{}) error {
-	ctagsOfSource := context[constants.CTX_CTAGS_OF_SOURCE].([]*CTag)
-	ctagsOfPreprocSource := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*CTag)
+	ctagsOfSource := context[constants.CTX_CTAGS_OF_SOURCE].([]*types.CTag)
+	ctagsOfPreprocSource := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	actualCTags := []*CTag{}
+	actualCTags := []*types.CTag{}
 	for _, ctagOfPreprocSource := range ctagsOfPreprocSource {
 		if sliceContainsCTag(ctagsOfSource, ctagOfPreprocSource) {
 			actualCTags = append(actualCTags, ctagOfPreprocSource)
@@ -51,7 +52,7 @@ func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]int
 	return nil
 }
 
-func sliceContainsCTag(slice []*CTag, target *CTag) bool {
+func sliceContainsCTag(slice []*types.CTag, target *types.CTag) bool {
 	for _, value := range slice {
 		if value.FunctionName == target.FunctionName {
 			return true

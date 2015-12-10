@@ -38,7 +38,7 @@ import (
 type CTagsToPrototypes struct{}
 
 func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
-	tags := context[constants.CTX_COLLECTED_CTAGS].([]*CTag)
+	tags := context[constants.CTX_COLLECTED_CTAGS].([]*types.CTag)
 
 	lineWhereToInsertPrototypes := findLineWhereToInsertPrototypes(tags)
 	if lineWhereToInsertPrototypes != -1 {
@@ -51,7 +51,7 @@ func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func findLineWhereToInsertPrototypes(tags []*CTag) int {
+func findLineWhereToInsertPrototypes(tags []*types.CTag) int {
 	firstFunctionLine := firstFunctionAtLine(tags)
 	firstFunctionPointerAsArgument := firstFunctionPointerUsedAsArgument(tags)
 	if firstFunctionLine != -1 && firstFunctionPointerAsArgument != -1 {
@@ -67,7 +67,7 @@ func findLineWhereToInsertPrototypes(tags []*CTag) int {
 	}
 }
 
-func firstFunctionPointerUsedAsArgument(tags []*CTag) int {
+func firstFunctionPointerUsedAsArgument(tags []*types.CTag) int {
 	functionNames := collectFunctionNames(tags)
 	for _, tag := range tags {
 		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
@@ -77,7 +77,7 @@ func firstFunctionPointerUsedAsArgument(tags []*CTag) int {
 	return -1
 }
 
-func functionNameUsedAsFunctionPointerIn(tag *CTag, functionNames []string) bool {
+func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionNames []string) bool {
 	for _, functionName := range functionNames {
 		if strings.Index(tag.Code, "&"+functionName) != -1 {
 			return true
@@ -86,7 +86,7 @@ func functionNameUsedAsFunctionPointerIn(tag *CTag, functionNames []string) bool
 	return false
 }
 
-func collectFunctionNames(tags []*CTag) []string {
+func collectFunctionNames(tags []*types.CTag) []string {
 	names := []string{}
 	for _, tag := range tags {
 		if tag.Kind == KIND_FUNCTION {
@@ -96,16 +96,16 @@ func collectFunctionNames(tags []*CTag) []string {
 	return names
 }
 
-func firstFunctionAtLine(tags []*CTag) int {
+func firstFunctionAtLine(tags []*types.CTag) int {
 	for _, tag := range tags {
-		if !tagIsUnknown(tag) && tag.IsHandled() && tag.Kind == KIND_FUNCTION {
+		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION {
 			return tag.Line
 		}
 	}
 	return -1
 }
 
-func toPrototypes(tags []*CTag) []*types.Prototype {
+func toPrototypes(tags []*types.CTag) []*types.Prototype {
 	prototypes := []*types.Prototype{}
 	for _, tag := range tags {
 		if !tag.SkipMe {

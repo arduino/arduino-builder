@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"path/filepath"
@@ -49,7 +50,7 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 8, len(ctags))
 	idx := 0
@@ -97,7 +98,7 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
@@ -123,7 +124,7 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 4, len(ctags))
 	idx := 0
@@ -153,7 +154,7 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 2, len(ctags))
 	idx := 0
@@ -175,7 +176,7 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 5, len(ctags))
 	idx := 0
@@ -207,7 +208,7 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 8, len(ctags))
 	idx := 0
@@ -247,7 +248,7 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
@@ -272,7 +273,7 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 5, len(ctags))
 	idx := 0
@@ -306,7 +307,7 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 8, len(ctags))
 	idx := 0
@@ -348,7 +349,7 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
@@ -374,7 +375,7 @@ func TestCTagsParserNamespace(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
@@ -400,7 +401,7 @@ func TestCTagsParserStatic(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 3, len(ctags))
 	idx := 0
@@ -425,7 +426,7 @@ func TestCTagsParserFunctionPointer(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 4, len(ctags))
 	idx := 0
@@ -453,7 +454,7 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 	ctagsParser := builder.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*builder.CTag)
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
 	require.Equal(t, 5, len(ctags))
 	idx := 0

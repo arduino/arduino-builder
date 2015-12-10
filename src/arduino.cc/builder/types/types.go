@@ -175,3 +175,22 @@ type LibraryResolutionResult struct {
 	IsLibraryFromPlatform bool
 	NotUsedLibraries      []*Library
 }
+
+type CTag struct {
+	FunctionName string
+	Kind         string
+	Line         int
+	Signature    string
+	Returntype   string
+	Code         string
+	Class        string
+	Struct       string
+	Namespace    string
+	Filename     string
+	Typeref      string
+	SkipMe       bool
+
+	Prototype          string
+	Function           string
+	PrototypeModifiers string
+}

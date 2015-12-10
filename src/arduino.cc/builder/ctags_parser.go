@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
 	"reflect"
@@ -54,31 +55,12 @@ var KNOWN_TAG_KINDS = map[string]bool{
 
 type CTagsParser struct{}
 
-type CTag struct {
-	FunctionName string
-	Kind         string
-	Line         int
-	Signature    string
-	Returntype   string
-	Code         string
-	Class        string
-	Struct       string
-	Namespace    string
-	Filename     string
-	Typeref      string
-	SkipMe       bool
-
-	Prototype          string
-	Function           string
-	PrototypeModifiers string
-}
-
 func (s *CTagsParser) Run(context map[string]interface{}) error {
 	rows := strings.Split(context[constants.CTX_CTAGS_OUTPUT].(string), "\n")
 
 	rows = removeEmpty(rows)
 
-	var tags []*CTag
+	var tags []*types.CTag
 	for _, row := range rows {
 		tags = append(tags, parseTag(row))
 	}
@@ -96,15 +78,15 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func addPrototypes(tags []*CTag) {
+func addPrototypes(tags []*types.CTag) {
 	for _, tag := range tags {
 		if !tag.SkipMe {
-			tag.AddPrototype()
+			addPrototype(tag)
 		}
 	}
 }
 
-func (tag *CTag) AddPrototype() {
+func addPrototype(tag *types.CTag) {
 	if strings.Index(tag.Returntype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
 		code := tag.Code
 		if strings.Contains(code, "{") {
@@ -125,7 +107,7 @@ func (tag *CTag) AddPrototype() {
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
-func removeDefinedProtypes(tags []*CTag, context map[string]interface{}) {
+func removeDefinedProtypes(tags []*types.CTag, context map[string]interface{}) {
 	definedPrototypes := make(map[string]bool)
 	for _, tag := range tags {
 		if tag.Kind == KIND_PROTOTYPE {
@@ -143,7 +125,7 @@ func removeDefinedProtypes(tags []*CTag, context map[string]interface{}) {
 	}
 }
 
-func removeDuplicate(tags []*CTag) {
+func removeDuplicate(tags []*types.CTag) {
 	definedPrototypes := make(map[string]bool)
 
 	for _, tag := range tags {
@@ -155,9 +137,9 @@ func removeDuplicate(tags []*CTag) {
 	}
 }
 
-type skipFuncType func(tag *CTag) bool
+type skipFuncType func(tag *types.CTag) bool
 
-func skipTagsWhere(tags []*CTag, skipFunc skipFuncType, context map[string]interface{}) {
+func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string]interface{}) {
 	for _, tag := range tags {
 		if !tag.SkipMe {
 			skip := skipFunc(tag)
@@ -169,11 +151,11 @@ func skipTagsWhere(tags []*CTag, skipFunc skipFuncType, context map[string]inter
 	}
 }
 
-func signatureContainsDefaultArg(tag *CTag) bool {
+func signatureContainsDefaultArg(tag *types.CTag) bool {
 	return strings.Contains(tag.Signature, "=")
 }
 
-func prototypeAndCodeDontMatch(tag *CTag) bool {
+func prototypeAndCodeDontMatch(tag *types.CTag) bool {
 	if tag.SkipMe {
 		return true
 	}
@@ -195,11 +177,11 @@ func removeSpacesAndTabs(s string) string {
 	return s
 }
 
-func tagIsUnhandled(tag *CTag) bool {
-	return !tag.IsHandled()
+func tagIsUnhandled(tag *types.CTag) bool {
+	return !isHandled(tag)
 }
 
-func (tag *CTag) IsHandled() bool {
+func isHandled(tag *types.CTag) bool {
 	if tag.Class != "" {
 		return false
 	}
@@ -212,12 +194,12 @@ func (tag *CTag) IsHandled() bool {
 	return true
 }
 
-func tagIsUnknown(tag *CTag) bool {
+func tagIsUnknown(tag *types.CTag) bool {
 	return !KNOWN_TAG_KINDS[tag.Kind]
 }
 
-func parseTag(row string) *CTag {
-	tag := &CTag{}
+func parseTag(row string) *types.CTag {
+	tag := &types.CTag{}
 	parts := strings.Split(row, "\t")
 
 	tag.FunctionName = parts[0]

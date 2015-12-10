@@ -42,8 +42,8 @@ func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}) error 
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchFileNames := collectSketchFileNamesFrom(sketch)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*CTag)
-	ctagsOfSketch := []*CTag{}
+	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	ctagsOfSketch := []*types.CTag{}
 	for _, ctag := range ctags {
 		if utils.SliceContains(sketchFileNames, strings.Replace(ctag.Filename, "\\\\", "\\", -1)) {
 			ctagsOfSketch = append(ctagsOfSketch, ctag)
