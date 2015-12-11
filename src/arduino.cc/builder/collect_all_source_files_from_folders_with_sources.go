@@ -68,8 +68,10 @@ func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]int
 }
 
 func collectByWalk(filePaths *[]string, folder string) error {
-	checkExtensionFunc := func(ext string) bool {
-		return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
+	checkExtensionFunc := func(filePath string) bool {
+		name := filepath.Base(filePath)
+		ext := strings.ToLower(filepath.Ext(filePath))
+		return !strings.HasPrefix(name, ".") && ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext]
 	}
 	walkFunc := utils.CollectAllReadableFiles(filePaths, checkExtensionFunc)
 	err := gohasissues.Walk(folder, walkFunc)

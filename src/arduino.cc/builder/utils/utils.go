@@ -384,9 +384,9 @@ func FilterOutFoldersByNames(folders []os.FileInfo, names ...string) []os.FileIn
 	return filtered
 }
 
-type CheckFileExtensionFunc func(ext string) bool
+type CheckFilePathFunc func(filePath string) bool
 
-func CollectAllReadableFiles(collector *[]string, test CheckFileExtensionFunc) filepath.WalkFunc {
+func CollectAllReadableFiles(collector *[]string, test CheckFilePathFunc) filepath.WalkFunc {
 	walkFunc := func(currentPath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -395,8 +395,7 @@ func CollectAllReadableFiles(collector *[]string, test CheckFileExtensionFunc) f
 		if info.IsDir() {
 			return nil
 		}
-		ext := strings.ToLower(filepath.Ext(currentPath))
-		if !test(ext) {
+		if !test(currentPath) {
 			return nil
 		}
 		currentFile, err := os.Open(currentPath)

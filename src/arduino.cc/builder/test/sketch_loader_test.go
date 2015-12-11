@@ -165,3 +165,26 @@ func TestLoadSketchWithBackup(t *testing.T) {
 	require.Equal(t, 0, len(sketch.AdditionalFiles))
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))
 }
+
+func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
+	context := make(map[string]interface{})
+	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_macosx_garbage", "sketch.ino")
+
+	commands := []types.Command{
+		&builder.SetupHumanLoggerIfMissing{},
+		&builder.SketchLoader{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(context)
+		NoError(t, err)
+	}
+
+	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	require.NotNil(t, sketch)
+
+	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
+
+	require.Equal(t, 0, len(sketch.AdditionalFiles))
+	require.Equal(t, 0, len(sketch.OtherSketchFiles))
+}
