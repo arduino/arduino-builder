@@ -30,8 +30,8 @@
 package test
 
 import (
-	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -47,44 +47,44 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 8, len(ctags))
+	require.Equal(t, 8, len(tags))
 	idx := 0
-	require.Equal(t, "server", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "server", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "process", ctags[idx].FunctionName)
-	require.Equal(t, "prototype", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "process", tags[idx].FunctionName)
+	require.Equal(t, "prototype", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "process", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "process", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "digitalCommand", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "digitalCommand", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "analogCommand", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "analogCommand", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 	idx++
-	require.Equal(t, "modeCommand", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", ctags[idx].Filename)
+	require.Equal(t, "modeCommand", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", tags[idx].Filename)
 }
 
 func TestCTagsParserShouldListTemplates(t *testing.T) {
@@ -95,24 +95,24 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 3, len(ctags))
+	require.Equal(t, 3, len(tags))
 	idx := 0
-	require.Equal(t, "minimum", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "template <typename T> T minimum (T a, T b);", ctags[idx].Prototype)
+	require.Equal(t, "minimum", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "template <typename T> T minimum (T a, T b);", tags[idx].Prototype)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "void setup();", ctags[idx].Prototype)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "void setup();", tags[idx].Prototype)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "void loop();", ctags[idx].Prototype)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "void loop();", tags[idx].Prototype)
 }
 
 func TestCTagsParserShouldListTemplates2(t *testing.T) {
@@ -123,26 +123,26 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 4, len(ctags))
+	require.Equal(t, 4, len(tags))
 	idx := 0
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "SRAM_writeAnything", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", ctags[idx].Prototype)
+	require.Equal(t, "SRAM_writeAnything", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", tags[idx].Prototype)
 	idx++
-	require.Equal(t, "SRAM_readAnything", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", ctags[idx].Prototype)
+	require.Equal(t, "SRAM_readAnything", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", tags[idx].Prototype)
 }
 
 func TestCTagsParserShouldDealWithClasses(t *testing.T) {
@@ -153,18 +153,18 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 2, len(ctags))
+	require.Equal(t, 2, len(tags))
 	idx := 0
-	require.Equal(t, "SleepCycle", ctags[idx].FunctionName)
-	require.Equal(t, "prototype", ctags[idx].Kind)
+	require.Equal(t, "SleepCycle", tags[idx].FunctionName)
+	require.Equal(t, "prototype", tags[idx].Kind)
 	idx++
-	require.Equal(t, "SleepCycle", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "SleepCycle", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserShouldDealWithStructs(t *testing.T) {
@@ -175,28 +175,28 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 5, len(ctags))
+	require.Equal(t, 5, len(tags))
 	idx := 0
-	require.Equal(t, "A_NEW_TYPE", ctags[idx].FunctionName)
-	require.Equal(t, "struct", ctags[idx].Kind)
+	require.Equal(t, "A_NEW_TYPE", tags[idx].FunctionName)
+	require.Equal(t, "struct", tags[idx].Kind)
 	idx++
-	require.Equal(t, "foo", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
-	require.Equal(t, "struct:A_NEW_TYPE", ctags[idx].Typeref)
+	require.Equal(t, "foo", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
+	require.Equal(t, "struct:A_NEW_TYPE", tags[idx].Typeref)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "dostuff", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "dostuff", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserShouldDealWithMacros(t *testing.T) {
@@ -207,36 +207,36 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 8, len(ctags))
+	require.Equal(t, 8, len(tags))
 	idx := 0
-	require.Equal(t, "DEBUG", ctags[idx].FunctionName)
-	require.Equal(t, "macro", ctags[idx].Kind)
+	require.Equal(t, "DEBUG", tags[idx].FunctionName)
+	require.Equal(t, "macro", tags[idx].Kind)
 	idx++
-	require.Equal(t, "DISABLED", ctags[idx].FunctionName)
-	require.Equal(t, "macro", ctags[idx].Kind)
+	require.Equal(t, "DISABLED", tags[idx].FunctionName)
+	require.Equal(t, "macro", tags[idx].Kind)
 	idx++
-	require.Equal(t, "hello", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
+	require.Equal(t, "hello", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "debug", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "debug", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "disabledIsDefined", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "disabledIsDefined", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "useMyType", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "useMyType", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
@@ -247,21 +247,21 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 3, len(ctags))
+	require.Equal(t, 3, len(tags))
 	idx := 0
-	require.Equal(t, "getBytes", ctags[idx].FunctionName)
-	require.Equal(t, "prototype", ctags[idx].Kind)
+	require.Equal(t, "getBytes", tags[idx].FunctionName)
+	require.Equal(t, "prototype", tags[idx].Kind)
 	idx++
-	require.Equal(t, "getBytes", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "getBytes", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "getBytes", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "getBytes", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
@@ -272,30 +272,30 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 5, len(ctags))
+	require.Equal(t, 5, len(tags))
 	idx := 0
-	require.Equal(t, "set_values", ctags[idx].FunctionName)
-	require.Equal(t, "prototype", ctags[idx].Kind)
-	require.Equal(t, "Rectangle", ctags[idx].Class)
+	require.Equal(t, "set_values", tags[idx].FunctionName)
+	require.Equal(t, "prototype", tags[idx].Kind)
+	require.Equal(t, "Rectangle", tags[idx].Class)
 	idx++
-	require.Equal(t, "area", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "Rectangle", ctags[idx].Class)
+	require.Equal(t, "area", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "Rectangle", tags[idx].Class)
 	idx++
-	require.Equal(t, "set_values", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "Rectangle", ctags[idx].Class)
+	require.Equal(t, "set_values", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "Rectangle", tags[idx].Class)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserStructWithFunctions(t *testing.T) {
@@ -306,38 +306,38 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 8, len(ctags))
+	require.Equal(t, 8, len(tags))
 	idx := 0
-	require.Equal(t, "sensorData", ctags[idx].FunctionName)
-	require.Equal(t, "struct", ctags[idx].Kind)
+	require.Equal(t, "sensorData", tags[idx].FunctionName)
+	require.Equal(t, "struct", tags[idx].Kind)
 	idx++
-	require.Equal(t, "sensorData", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "sensorData", ctags[idx].Struct)
+	require.Equal(t, "sensorData", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "sensorData", tags[idx].Struct)
 	idx++
-	require.Equal(t, "sensorData", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "sensorData", ctags[idx].Struct)
+	require.Equal(t, "sensorData", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "sensorData", tags[idx].Struct)
 	idx++
-	require.Equal(t, "sensors", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
+	require.Equal(t, "sensors", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
 	idx++
-	require.Equal(t, "sensor1", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
+	require.Equal(t, "sensor1", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
 	idx++
-	require.Equal(t, "sensor2", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
+	require.Equal(t, "sensor2", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserDefaultArguments(t *testing.T) {
@@ -348,22 +348,22 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 3, len(ctags))
+	require.Equal(t, 3, len(tags))
 	idx := 0
-	require.Equal(t, "test", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "void test(int x = 1);", ctags[idx].Prototype)
+	require.Equal(t, "test", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "void test(int x = 1);", tags[idx].Prototype)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserNamespace(t *testing.T) {
@@ -374,22 +374,22 @@ func TestCTagsParserNamespace(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 3, len(ctags))
+	require.Equal(t, 3, len(tags))
 	idx := 0
-	require.Equal(t, "value", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "Test", ctags[idx].Namespace)
+	require.Equal(t, "value", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "Test", tags[idx].Namespace)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserStatic(t *testing.T) {
@@ -400,21 +400,21 @@ func TestCTagsParserStatic(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 3, len(ctags))
+	require.Equal(t, 3, len(tags))
 	idx := 0
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "doStuff", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "doStuff", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserFunctionPointer(t *testing.T) {
@@ -425,24 +425,24 @@ func TestCTagsParserFunctionPointer(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 4, len(ctags))
+	require.Equal(t, 4, len(tags))
 	idx := 0
-	require.Equal(t, "t1Callback", ctags[idx].FunctionName)
-	require.Equal(t, "variable", ctags[idx].Kind)
+	require.Equal(t, "t1Callback", tags[idx].FunctionName)
+	require.Equal(t, "variable", tags[idx].Kind)
 	idx++
-	require.Equal(t, "t1Callback", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "t1Callback", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 }
 
 func TestCTagsParserFunctionPointers(t *testing.T) {
@@ -453,27 +453,27 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
-	ctagsParser := builder.CTagsParser{}
+	ctagsParser := ctags.CTagsParser{}
 	ctagsParser.Run(context)
 
-	ctags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
-	require.Equal(t, 5, len(ctags))
+	require.Equal(t, 5, len(tags))
 	idx := 0
-	require.Equal(t, "setup", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "setup", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "loop", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "loop", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "func", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
+	require.Equal(t, "func", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
 	idx++
-	require.Equal(t, "funcArr", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "int funcArr();", ctags[idx].Prototype)
+	require.Equal(t, "funcArr", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "int funcArr();", tags[idx].Prototype)
 	idx++
-	require.Equal(t, "funcCombo", ctags[idx].FunctionName)
-	require.Equal(t, "function", ctags[idx].Kind)
-	require.Equal(t, "void funcCombo(void (*(&in)[5])(int));", ctags[idx].Prototype)
+	require.Equal(t, "funcCombo", tags[idx].FunctionName)
+	require.Equal(t, "function", tags[idx].Kind)
+	require.Equal(t, "void funcCombo(void (*(&in)[5])(int));", tags[idx].Prototype)
 }

@@ -27,7 +27,7 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package ctags
 
 import (
 	"arduino.cc/builder/constants"
