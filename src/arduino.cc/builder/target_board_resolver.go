@@ -31,7 +31,6 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -112,16 +111,16 @@ func addAdditionalPropertiesToTargetBoard(board *types.Board, options string) {
 		key := parts[0]
 		value := parts[1]
 		if key != constants.EMPTY_STRING && value != constants.EMPTY_STRING {
-			menu := props.SubTree(board.Properties, constants.BOARD_PROPERTIES_MENU)
+			menu := board.Properties.SubTree(constants.BOARD_PROPERTIES_MENU)
 			if len(menu) == 0 {
 				return
 			}
-			propertiesOfKey := props.SubTree(menu, key)
+			propertiesOfKey := menu.SubTree(key)
 			if len(propertiesOfKey) == 0 {
 				return
 			}
-			propertiesOfKeyValue := props.SubTree(propertiesOfKey, value)
-			utils.MergeMapsOfStrings(board.Properties, propertiesOfKeyValue)
+			propertiesOfKeyValue := propertiesOfKey.SubTree(value)
+			board.Properties.Merge(propertiesOfKeyValue)
 		}
 	}
 }

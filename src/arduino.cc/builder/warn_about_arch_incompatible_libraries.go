@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
@@ -46,7 +47,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(context map[string]interface{})
 	}
 
 	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
 	archs := []string{}

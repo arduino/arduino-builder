@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strings"
@@ -57,7 +58,7 @@ func (s *Linker) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
@@ -70,13 +71,13 @@ func (s *Linker) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties props.PropertiesMap, verbose bool, warningsLevel string, logger i18n.Logger) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	objectFiles = utils.Map(objectFiles, wrapWithDoubleQuotes)
 	objectFileList := strings.Join(objectFiles, constants.SPACE)
 
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
 	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
 	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath
@@ -91,7 +92,7 @@ func wrapWithDoubleQuotes(value string) string {
 	return "\"" + value + "\""
 }
 
-func addRelaxTrickIfATMEGA2560(buildProperties map[string]string) string {
+func addRelaxTrickIfATMEGA2560(buildProperties props.PropertiesMap) string {
 	if buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU] == "atmega2560" {
 		return ",--relax"
 	}

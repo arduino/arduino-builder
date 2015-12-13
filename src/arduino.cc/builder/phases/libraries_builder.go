@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
@@ -43,7 +44,7 @@ type LibrariesBuilder struct{}
 
 func (s *LibrariesBuilder) Run(context map[string]interface{}) error {
 	librariesBuildPath := context[constants.CTX_LIBRARIES_BUILD_PATH].(string)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
@@ -66,7 +67,7 @@ func (s *LibrariesBuilder) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func compileLibraries(libraries []*types.Library, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibraries(libraries []*types.Library, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles := []string{}
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
@@ -80,7 +81,7 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 
 }
 
-func compileLibrary(library *types.Library, buildPath string, buildProperties map[string]string, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibrary(library *types.Library, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	libraryBuildPath := filepath.Join(buildPath, library.Name)
 
 	err := utils.EnsureFolderExists(libraryBuildPath)

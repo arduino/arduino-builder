@@ -43,7 +43,7 @@ import (
 type MergeSketchWithBootloader struct{}
 
 func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
 	} else {
 		bootloader = buildProperties[constants.BUILD_PROPERTIES_BOOTLOADER_FILE]
 	}
-	bootloader = props.ExpandPropsInString(buildProperties, bootloader)
+	bootloader = buildProperties.ExpandPropsInString(bootloader)
 
 	bootloaderPath := filepath.Join(buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH], constants.FOLDER_BOOTLOADERS, bootloader)
 	if _, err := os.Stat(bootloaderPath); err != nil {

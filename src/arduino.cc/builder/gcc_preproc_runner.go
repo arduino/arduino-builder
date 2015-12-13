@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -86,7 +87,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFilePath string) (map[string]string, string, error) {
+func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFilePath string) (props.PropertiesMap, string, error) {
 	if targetFilePath != utils.NULLFile() {
 		preprocPath := context[constants.CTX_PREPROC_PATH].(string)
 		err := utils.EnsureFolderExists(preprocPath)
@@ -96,8 +97,10 @@ func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFil
 		targetFilePath = filepath.Join(preprocPath, targetFilePath)
 	}
 
-	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+	properties := make(props.PropertiesMap)
+	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
+		properties = p.(props.PropertiesMap).Clone()
+	}
 
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath

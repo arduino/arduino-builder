@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"strings"
 )
@@ -42,7 +43,10 @@ type IncludesFinderWithGCC struct {
 }
 
 func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
-	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
+	buildProperties := make(props.PropertiesMap)
+	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
+		buildProperties = p.(props.PropertiesMap).Clone()
+	}
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
@@ -53,7 +57,7 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 		includesParams = strings.Join(includes, " ")
 	}
 
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = s.SourceFile
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = includesParams
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)

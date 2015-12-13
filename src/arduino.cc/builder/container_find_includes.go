@@ -55,7 +55,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}) error {
 	foldersWithSources.Push(types.SourceFolder{Folder: context[constants.CTX_SKETCH_BUILD_PATH].(string), Recurse: true})
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		for _, library := range context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library) {
-			sourceFolders := utils.LibraryToSourceFolder(library)
+			sourceFolders := types.LibraryToSourceFolder(library)
 			for _, sourceFolder := range sourceFolders {
 				foldersWithSources.Push(sourceFolder)
 			}

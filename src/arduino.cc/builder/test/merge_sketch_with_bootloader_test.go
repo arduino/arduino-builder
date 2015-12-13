@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
@@ -154,7 +155,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	delete(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	delete(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 

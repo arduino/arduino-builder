@@ -50,7 +50,7 @@ func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}) error
 	vid := vidPidParts[0]
 	pid := vidPidParts[1]
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	VIDPIDIndex, err := findVIDPIDIndex(buildProperties, vid, pid)
 	if err != nil {
 		return utils.WrapError(err)
@@ -59,14 +59,14 @@ func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}) error
 		return nil
 	}
 
-	vidPidSpecificProperties := props.SubTree(props.SubTree(buildProperties, constants.BUILD_PROPERTIES_VID), strconv.Itoa(VIDPIDIndex))
-	utils.MergeMapsOfStrings(buildProperties, vidPidSpecificProperties)
+	vidPidSpecificProperties := buildProperties.SubTree(constants.BUILD_PROPERTIES_VID).SubTree(strconv.Itoa(VIDPIDIndex))
+	buildProperties.Merge(vidPidSpecificProperties)
 
 	return nil
 }
 
-func findVIDPIDIndex(buildProperties map[string]string, vid, pid string) (int, error) {
-	for key, value := range props.SubTree(buildProperties, constants.BUILD_PROPERTIES_VID) {
+func findVIDPIDIndex(buildProperties props.PropertiesMap, vid, pid string) (int, error) {
+	for key, value := range buildProperties.SubTree(constants.BUILD_PROPERTIES_VID) {
 		if !strings.Contains(key, ".") {
 			if vid == strings.ToLower(value) && pid == strings.ToLower(buildProperties[constants.BUILD_PROPERTIES_PID+"."+key]) {
 				return strconv.Atoi(key)

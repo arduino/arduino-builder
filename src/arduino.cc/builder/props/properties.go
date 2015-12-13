@@ -41,6 +41,8 @@ import (
 	"strings"
 )
 
+type PropertiesMap map[string]string
+
 var OSNAME string
 
 func init() {
@@ -56,7 +58,7 @@ func init() {
 	}
 }
 
-func Load(filepath string, logger i18n.Logger) (map[string]string, error) {
+func Load(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	bytes, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, utils.WrapError(err)
@@ -66,10 +68,10 @@ func Load(filepath string, logger i18n.Logger) (map[string]string, error) {
 	text = strings.Replace(text, "\r\n", "\n", -1)
 	text = strings.Replace(text, "\r", "\n", -1)
 
-	properties := make(map[string]string)
+	properties := make(PropertiesMap)
 
 	for _, line := range strings.Split(text, "\n") {
-		err := loadSingleLine(properties, line)
+		err := properties.loadSingleLine(line)
 		if err != nil {
 			return nil, utils.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES_FILE, line, filepath)
 		}
@@ -78,11 +80,11 @@ func Load(filepath string, logger i18n.Logger) (map[string]string, error) {
 	return properties, nil
 }
 
-func LoadFromSlice(lines []string, logger i18n.Logger) (map[string]string, error) {
-	properties := make(map[string]string)
+func LoadFromSlice(lines []string, logger i18n.Logger) (PropertiesMap, error) {
+	properties := make(PropertiesMap)
 
 	for _, line := range lines {
-		err := loadSingleLine(properties, line)
+		err := properties.loadSingleLine(line)
 		if err != nil {
 			return nil, utils.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES, line)
 		}
@@ -91,7 +93,7 @@ func LoadFromSlice(lines []string, logger i18n.Logger) (map[string]string, error
 	return properties, nil
 }
 
-func loadSingleLine(properties map[string]string, line string) error {
+func (properties PropertiesMap) loadSingleLine(line string) error {
 	line = strings.TrimSpace(line)
 
 	if len(line) > 0 && line[0] != '#' {
@@ -109,10 +111,10 @@ func loadSingleLine(properties map[string]string, line string) error {
 	return nil
 }
 
-func SafeLoad(filepath string, logger i18n.Logger) (map[string]string, error) {
+func SafeLoad(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		return make(map[string]string), nil
+		return make(PropertiesMap), nil
 	}
 
 	properties, err := Load(filepath, logger)
@@ -122,26 +124,26 @@ func SafeLoad(filepath string, logger i18n.Logger) (map[string]string, error) {
 	return properties, nil
 }
 
-func FirstLevelOf(aMap map[string]string) map[string]map[string]string {
-	newMap := make(map[string]map[string]string)
+func (aMap PropertiesMap) FirstLevelOf() map[string]PropertiesMap {
+	newMap := make(map[string]PropertiesMap)
 	for key, value := range aMap {
 		if strings.Index(key, ".") == -1 {
 			continue
 		}
 		keyParts := strings.SplitN(key, ".", 2)
 		if newMap[keyParts[0]] == nil {
-			newMap[keyParts[0]] = make(map[string]string)
+			newMap[keyParts[0]] = make(PropertiesMap)
 		}
 		newMap[keyParts[0]][keyParts[1]] = value
 	}
 	return newMap
 }
 
-func SubTree(aMap map[string]string, key string) map[string]string {
-	return FirstLevelOf(aMap)[key]
+func (aMap PropertiesMap) SubTree(key string) PropertiesMap {
+	return aMap.FirstLevelOf()[key]
 }
 
-func ExpandPropsInString(aMap map[string]string, str string) string {
+func (aMap PropertiesMap) ExpandPropsInString(str string) string {
 	replaced := true
 	for i := 0; i < 10 && replaced; i++ {
 		replaced = false
@@ -152,6 +154,30 @@ func ExpandPropsInString(aMap map[string]string, str string) string {
 		}
 	}
 	return str
+}
+
+func (target PropertiesMap) Merge(sources ...PropertiesMap) PropertiesMap {
+	for _, source := range sources {
+		for key, value := range source {
+			target[key] = value
+		}
+	}
+	return target
+}
+
+func (aMap PropertiesMap) Clone() PropertiesMap {
+	newMap := make(PropertiesMap)
+	newMap.Merge(aMap)
+	return newMap
+}
+
+func MergeMapsOfProperties(target map[string]PropertiesMap, sources ...map[string]PropertiesMap) map[string]PropertiesMap {
+	for _, source := range sources {
+		for key, value := range source {
+			target[key] = value
+		}
+	}
+	return target
 }
 
 func DeleteUnexpandedPropsFromString(str string) (string, error) {

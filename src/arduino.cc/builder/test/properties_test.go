@@ -48,7 +48,7 @@ func TestPropertiesBoardsTxt(t *testing.T) {
 	require.Equal(t, "32256", properties["ethernet.upload.maximum_size"])
 	require.Equal(t, "{build.usb_flags}", properties["robotMotor.build.extra_flags"])
 
-	ethernet := props.SubTree(properties, "ethernet")
+	ethernet := properties.SubTree("ethernet")
 	require.Equal(t, "Arduino Ethernet", ethernet[constants.LIBRARY_NAME])
 }
 
@@ -73,47 +73,47 @@ func TestPropertiesTestTxt(t *testing.T) {
 }
 
 func TestExpandPropsInString(t *testing.T) {
-	aMap := make(map[string]string)
+	aMap := make(props.PropertiesMap)
 	aMap["key1"] = "42"
 	aMap["key2"] = "{key1}"
 
 	str := "{key1} == {key2} == true"
 
-	str = props.ExpandPropsInString(aMap, str)
+	str = aMap.ExpandPropsInString(str)
 	require.Equal(t, "42 == 42 == true", str)
 }
 
 func TestExpandPropsInString2(t *testing.T) {
-	aMap := make(map[string]string)
+	aMap := make(props.PropertiesMap)
 	aMap["key2"] = "{key2}"
 	aMap["key1"] = "42"
 
 	str := "{key1} == {key2} == true"
 
-	str = props.ExpandPropsInString(aMap, str)
+	str = aMap.ExpandPropsInString(str)
 	require.Equal(t, "42 == {key2} == true", str)
 }
 
 func TestDeleteUnexpandedPropsFromString(t *testing.T) {
-	aMap := make(map[string]string)
+	aMap := make(props.PropertiesMap)
 	aMap["key1"] = "42"
 	aMap["key2"] = "{key1}"
 
 	str := "{key1} == {key2} == {key3} == true"
 
-	str = props.ExpandPropsInString(aMap, str)
+	str = aMap.ExpandPropsInString(str)
 	str, err := props.DeleteUnexpandedPropsFromString(str)
 	NoError(t, err)
 	require.Equal(t, "42 == 42 ==  == true", str)
 }
 
 func TestDeleteUnexpandedPropsFromString2(t *testing.T) {
-	aMap := make(map[string]string)
+	aMap := make(props.PropertiesMap)
 	aMap["key2"] = "42"
 
 	str := "{key1} == {key2} == {key3} == true"
 
-	str = props.ExpandPropsInString(aMap, str)
+	str = aMap.ExpandPropsInString(str)
 	str, err := props.DeleteUnexpandedPropsFromString(str)
 	NoError(t, err)
 	require.Equal(t, " == 42 ==  == true", str)
@@ -129,7 +129,7 @@ func TestPropertiesRedBeearLabBoardsTxt(t *testing.T) {
 	require.Equal(t, "arduino:arduino", properties["blend.build.core"])
 	require.Equal(t, "0x2404", properties["blendmicro16.pid.0"])
 
-	ethernet := props.SubTree(properties, "blend")
+	ethernet := properties.SubTree("blend")
 	require.Equal(t, "arduino:arduino", ethernet[constants.BUILD_PROPERTIES_BUILD_CORE])
 }
 
