@@ -182,3 +182,24 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
 }
+
+func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
+	context := make(map[string]interface{})
+
+	context[constants.CTX_INCLUDES] = []string{}
+
+	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
+		"compilation terminated.\n"
+
+	context["source"] = output
+
+	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	err := parser.Run(context)
+	NoError(t, err)
+
+	require.NotNil(t, context[constants.CTX_INCLUDES])
+	includes := context[constants.CTX_INCLUDES].([]string)
+	require.Equal(t, 1, len(includes))
+	sort.Strings(includes)
+	require.Equal(t, "SPI.h", includes[0])
+}

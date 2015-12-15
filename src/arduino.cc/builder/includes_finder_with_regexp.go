@@ -51,6 +51,13 @@ func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}) error {
 		includes = append(includes, strings.TrimSpace(match[1]))
 	}
 
+	if len(includes) == 0 {
+		include := findIncludesForOldCompilers(source)
+		if include != "" {
+			includes = append(includes, include)
+		}
+	}
+
 	context[constants.CTX_INCLUDES_JUST_FOUND] = includes
 
 	if !utils.MapHas(context, constants.CTX_INCLUDES) {
@@ -61,4 +68,15 @@ func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}) error {
 	context[constants.CTX_INCLUDES] = utils.AddStringsToStringsSet(context[constants.CTX_INCLUDES].([]string), includes)
 
 	return nil
+}
+
+func findIncludesForOldCompilers(source string) string {
+	firstLine := strings.Split(source, "\n")[0]
+	splittedLine := strings.Split(firstLine, ":")
+	for i, _ := range splittedLine {
+		if strings.Contains(splittedLine[i], "fatal error") {
+			return strings.TrimSpace(splittedLine[i+1])
+		}
+	}
+	return ""
 }
