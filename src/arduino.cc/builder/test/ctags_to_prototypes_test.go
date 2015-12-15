@@ -336,10 +336,11 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 
 	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
-	require.Equal(t, 2, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0].Prototype)
-	require.Equal(t, "/tmp/test179252494/preproc/ctags_target.cpp", prototypes[0].File)
-	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, 3, len(prototypes))
+	require.Equal(t, "void test(int x = 1);", prototypes[0].Prototype)
+	require.Equal(t, "void setup();", prototypes[1].Prototype)
+	require.Equal(t, "/tmp/test179252494/preproc/ctags_target.cpp", prototypes[1].File)
+	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
 	require.Equal(t, 2, prototypeLine)

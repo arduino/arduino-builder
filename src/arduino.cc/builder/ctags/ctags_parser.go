@@ -67,7 +67,6 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 
 	skipTagsWhere(tags, tagIsUnknown, context)
 	skipTagsWhere(tags, tagIsUnhandled, context)
-	skipTagsWhere(tags, signatureContainsDefaultArg, context)
 	addPrototypes(tags)
 	removeDefinedProtypes(tags, context)
 	removeDuplicate(tags)
@@ -147,10 +146,6 @@ func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string
 			tag.SkipMe = skip
 		}
 	}
-}
-
-func signatureContainsDefaultArg(tag *types.CTag) bool {
-	return strings.Contains(tag.Prototype, "=")
 }
 
 func prototypeAndCodeDontMatch(tag *types.CTag) bool {

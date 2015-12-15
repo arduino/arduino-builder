@@ -78,6 +78,9 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 func joinPrototypes(prototypes []*types.Prototype) string {
 	prototypesSlice := []string{}
 	for _, proto := range prototypes {
+		if signatureContainsaDefaultArg(proto) {
+			continue
+		}
 		prototypesSlice = append(prototypesSlice, "#line "+strconv.Itoa(proto.Line)+" \""+proto.File+"\"")
 		prototypeParts := []string{}
 		if proto.Modifiers != "" {
@@ -87,6 +90,10 @@ func joinPrototypes(prototypes []*types.Prototype) string {
 		prototypesSlice = append(prototypesSlice, strings.Join(prototypeParts, " "))
 	}
 	return strings.Join(prototypesSlice, "\n")
+}
+
+func signatureContainsaDefaultArg(proto *types.Prototype) bool {
+	return strings.Contains(proto.Prototype, "=")
 }
 
 func firstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) bool {
