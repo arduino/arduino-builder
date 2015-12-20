@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -40,6 +41,7 @@ import (
 type PrototypesAdder struct{}
 
 func (s *PrototypesAdder) Run(context map[string]interface{}) error {
+	debugOutput := context[constants.CTX_DEBUG_PREPROCESSOR] != nil
 	source := context[constants.CTX_SOURCE].(string)
 	sourceRows := strings.Split(source, "\n")
 
@@ -58,6 +60,21 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	context[constants.CTX_PROTOTYPE_SECTION] = prototypeSection
 	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
+	if debugOutput {
+		fmt.Println("#PREPROCESSED SOURCE")
+		prototypesRows := strings.Split(prototypeSection, "\n")
+		prototypesRows = prototypesRows[:len(prototypesRows)-1]
+		for i := 0; i < len(sourceRows)+len(prototypesRows); i++ {
+			if i < insertionLine {
+				fmt.Printf("   |%s\n", sourceRows[i])
+			} else if i < insertionLine+len(prototypesRows) {
+				fmt.Printf("PRO|%s\n", prototypesRows[i-insertionLine])
+			} else {
+				fmt.Printf("   |%s\n", sourceRows[i-len(prototypesRows)])
+			}
+		}
+		fmt.Println("#END OF PREPROCESSED SOURCE")
+	}
 	context[constants.CTX_SOURCE] = source
 
 	return nil
