@@ -14,7 +14,7 @@ void setup();
 #line 13 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
 #line 17 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
-void dostuff(A_NEW_TYPE * bar);
+void dostuff (A_NEW_TYPE * bar);
 #line 9
 void setup() {
 

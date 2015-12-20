@@ -370,7 +370,12 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	}
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch8", "SketchWithStruct.preprocessed.txt"), context)
-	require.Equal(t, preprocessed, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
+	obtained := strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1)
+	// ctags based preprocessing removes the space after "dostuff", but this is still OK
+	// TODO: remove this exception when moving to a more powerful parser
+	preprocessed = strings.Replace(preprocessed, "void dostuff (A_NEW_TYPE * bar);", "void dostuff(A_NEW_TYPE * bar);", 1)
+	obtained = strings.Replace(obtained, "void dostuff (A_NEW_TYPE * bar);", "void dostuff(A_NEW_TYPE * bar);", 1)
+	require.Equal(t, preprocessed, obtained)
 }
 
 func TestPrototypesAdderSketchWithConfig(t *testing.T) {
@@ -587,7 +592,18 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "#line 1 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 2 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 4 \""+absoluteSketchLocation+"\"\nshort unsigned int testInt();\n#line 8 \""+absoluteSketchLocation+"\"\nstatic int8_t testInline();\n#line 12 \""+absoluteSketchLocation+"\"\nuint8_t testAttribute();\n#line 1\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+
+	expected := "#line 1 \"" + absoluteSketchLocation + "\"\nvoid setup();\n#line 2 \"" + absoluteSketchLocation + "\"\nvoid loop();\n#line 4 \"" + absoluteSketchLocation + "\"\nshort unsigned int testInt();\n#line 8 \"" + absoluteSketchLocation + "\"\nstatic int8_t testInline();\n#line 12 \"" + absoluteSketchLocation + "\"\n__attribute__((always_inline)) uint8_t testAttribute();\n#line 1\n"
+	obtained := context[constants.CTX_PROTOTYPE_SECTION].(string)
+	// ctags based preprocessing removes "inline" but this is still OK
+	// TODO: remove this exception when moving to a more powerful parser
+	expected = strings.Replace(expected, "static inline int8_t testInline();", "static int8_t testInline();", -1)
+	obtained = strings.Replace(obtained, "static inline int8_t testInline();", "static int8_t testInline();", -1)
+	// ctags based preprocessing removes "__attribute__ ....." but this is still OK
+	// TODO: remove this exception when moving to a more powerful parser
+	expected = strings.Replace(expected, "__attribute__((always_inline)) uint8_t testAttribute();", "uint8_t testAttribute();", -1)
+	obtained = strings.Replace(obtained, "__attribute__((always_inline)) uint8_t testAttribute();", "uint8_t testAttribute();", -1)
+	require.Equal(t, expected, obtained)
 }
 
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
@@ -718,7 +734,13 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1\n", context[constants.CTX_INCLUDE_SECTION].(string))
-	require.Equal(t, "#line 6 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 10 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 6\n", context[constants.CTX_PROTOTYPE_SECTION].(string))
+	expected := "#line 6 \"" + absoluteSketchLocation + "\"\nvoid setup();\n#line 10 \"" + absoluteSketchLocation + "\"\nvoid loop();\n#line 12 \"" + absoluteSketchLocation + "\"\ntypename Foo<char>::Bar func();\n#line 6\n"
+	obtained := context[constants.CTX_PROTOTYPE_SECTION].(string)
+	// ctags based preprocessing ignores line with typename
+	// TODO: remove this exception when moving to a more powerful parser
+	expected = strings.Replace(expected, "#line 12 \""+absoluteSketchLocation+"\"\ntypename Foo<char>::Bar func();\n", "", -1)
+	obtained = strings.Replace(obtained, "#line 12 \""+absoluteSketchLocation+"\"\ntypename Foo<char>::Bar func();\n", "", -1)
+	require.Equal(t, expected, obtained)
 }
 
 func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
