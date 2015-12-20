@@ -108,6 +108,9 @@ func firstFunctionAtLine(tags []*types.CTag) int {
 func toPrototypes(tags []*types.CTag) []*types.Prototype {
 	prototypes := []*types.Prototype{}
 	for _, tag := range tags {
+		if strings.TrimSpace(tag.Prototype) == "" {
+			continue
+		}
 		if !tag.SkipMe {
 			prototype := &types.Prototype{
 				FunctionName: tag.FunctionName,
