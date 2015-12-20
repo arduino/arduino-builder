@@ -2,4 +2,4 @@
 #include <IRremoteInt.h>
 
 void setup() {}
-void main() {}
+void loop() {}

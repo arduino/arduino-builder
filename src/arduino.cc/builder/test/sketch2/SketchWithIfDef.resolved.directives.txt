@@ -4,7 +4,7 @@
 #define DEBUG 1
 #define DISABLED 0
 
-typedef MyType int;
+typedef int MyType;
 
 
 
@@ -51,4 +51,5 @@ void disabledIsDefined() {
 int useMyType(MyType type) {
 
 }
+
 

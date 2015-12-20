@@ -9,7 +9,7 @@ void setup()
 }
 void loop()
 {
-	long total1 = cs_13_8.read(30);
+	long total1 = cs_13_8.capacitiveSensor(30);
 	Serial.println(total1);
 	delay(100);
 }

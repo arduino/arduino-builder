@@ -1,7 +1,7 @@
 #define DEBUG 1
 #define DISABLED 0
 
-typedef MyType int;
+typedef int MyType;
 
 #if DISABLED
 #include <debug.h>
