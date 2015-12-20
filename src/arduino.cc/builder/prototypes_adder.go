@@ -48,11 +48,12 @@ func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	}
 
 	firstFunctionLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	if firstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
+	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
 		return nil
 	}
 
-	firstFunctionChar := len(strings.Join(sourceRows[:firstFunctionLine+context[constants.CTX_LINE_OFFSET].(int)-1], "\n")) + 1
+	insertionLine := firstFunctionLine + context[constants.CTX_LINE_OFFSET].(int) - 1
+	firstFunctionChar := len(strings.Join(sourceRows[:insertionLine], "\n")) + 1
 	prototypeSection := composePrototypeSection(firstFunctionLine, context[constants.CTX_PROTOTYPES].([]*types.Prototype))
 	context[constants.CTX_PROTOTYPE_SECTION] = prototypeSection
 	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
@@ -96,6 +97,6 @@ func signatureContainsaDefaultArg(proto *types.Prototype) bool {
 	return strings.Contains(proto.Prototype, "=")
 }
 
-func firstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) bool {
+func isFirstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) bool {
 	return firstFunctionLine > len(sourceRows)-1
 }
