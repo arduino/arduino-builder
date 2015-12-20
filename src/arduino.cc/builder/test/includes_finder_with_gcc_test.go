@@ -209,7 +209,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 }
 
-func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet(t *testing.T) {
+func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndIncludesMissingLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
@@ -247,7 +247,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	includes := context[constants.CTX_INCLUDES].([]string)
 	require.Equal(t, 2, len(includes))
 	sort.Strings(includes)
-	require.Equal(t, "Ethernet.h", includes[0])
+	require.Equal(t, "Inexistent.h", includes[0])
 	require.Equal(t, "SPI.h", includes[1])
 
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)

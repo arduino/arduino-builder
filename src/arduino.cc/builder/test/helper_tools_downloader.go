@@ -134,6 +134,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 		Library{Name: "Adafruit PN532", Version: "1.0.0"},
 		Library{Name: "Bridge", Version: "1.1.0"},
 		Library{Name: "CapacitiveSensor", Version: "0.5.0", VersionInLibProperties: "0.5"},
+		Library{Name: "Ethernet", Version: "1.1.1"},
 		Library{Name: "Robot IR Remote", Version: "1.0.2"},
 	}
 

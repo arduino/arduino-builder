@@ -69,7 +69,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
 	libraries := context[constants.CTX_LIBRARIES].([]*types.Library)
-	require.Equal(t, 18, len(libraries))
+	require.Equal(t, 19, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 
@@ -106,6 +106,8 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, "CapacitiveSensor", libraries[idx].Name)
 	idx++
 	require.Equal(t, "EEPROM", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Ethernet", libraries[idx].Name)
 	idx++
 	require.Equal(t, "FakeAudio", libraries[idx].Name)
 	idx++
@@ -175,7 +177,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
 	libraries := context[constants.CTX_LIBRARIES].([]*types.Library)
-	require.Equal(t, 16, len(libraries))
+	require.Equal(t, 17, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 
@@ -191,6 +193,8 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.Equal(t, "Bridge", libraries[idx].Name)
 	idx++
 	require.Equal(t, "CapacitiveSensor", libraries[idx].Name)
+	idx++
+	require.Equal(t, "Ethernet", libraries[idx].Name)
 	idx++
 	require.Equal(t, "FakeAudio", libraries[idx].Name)
 	idx++
