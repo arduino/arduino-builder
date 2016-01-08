@@ -31,8 +31,8 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
@@ -40,11 +40,13 @@ type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
 func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(context map[string]interface{}) error {
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 
-	buildProperties = utils.MergeMapsOfStrings(make(map[string]string), packages.Properties, targetPackage.Properties, buildProperties)
+	newBuildProperties := packages.Properties.Clone()
+	newBuildProperties.Merge(targetPackage.Properties)
+	newBuildProperties.Merge(buildProperties)
 
-	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
+	context[constants.CTX_BUILD_PROPERTIES] = newBuildProperties
 
 	return nil
 }

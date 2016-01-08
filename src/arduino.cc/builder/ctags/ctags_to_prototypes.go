@@ -27,7 +27,7 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package ctags
 
 import (
 	"arduino.cc/builder/constants"
@@ -108,6 +108,9 @@ func firstFunctionAtLine(tags []*types.CTag) int {
 func toPrototypes(tags []*types.CTag) []*types.Prototype {
 	prototypes := []*types.Prototype{}
 	for _, tag := range tags {
+		if strings.TrimSpace(tag.Prototype) == "" {
+			continue
+		}
 		if !tag.SkipMe {
 			prototype := &types.Prototype{
 				FunctionName: tag.FunctionName,

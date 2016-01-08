@@ -31,6 +31,8 @@ package types
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
+	"path/filepath"
 	"strconv"
 )
 
@@ -60,13 +62,13 @@ type Sketch struct {
 }
 
 type Packages struct {
-	Properties map[string]string
+	Properties props.PropertiesMap
 	Packages   map[string]*Package
 }
 
 type Package struct {
 	PackageId  string
-	Properties map[string]string
+	Properties props.PropertiesMap
 	Platforms  map[string]*Platform
 }
 
@@ -75,13 +77,13 @@ type Platform struct {
 	Folder       string
 	DefaultBoard *Board
 	Boards       map[string]*Board
-	Properties   map[string]string
-	Programmers  map[string]map[string]string
+	Properties   props.PropertiesMap
+	Programmers  map[string]props.PropertiesMap
 }
 
 type Board struct {
 	BoardId    string
-	Properties map[string]string
+	Properties props.PropertiesMap
 }
 
 type Tool struct {
@@ -180,8 +182,6 @@ type CTag struct {
 	FunctionName string
 	Kind         string
 	Line         int
-	Signature    string
-	Returntype   string
 	Code         string
 	Class        string
 	Struct       string
@@ -193,4 +193,15 @@ type CTag struct {
 	Prototype          string
 	Function           string
 	PrototypeModifiers string
+}
+
+func LibraryToSourceFolder(library *Library) []SourceFolder {
+	sourceFolders := []SourceFolder{}
+	recurse := library.Layout == LIBRARY_RECURSIVE
+	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
+	if library.Layout == LIBRARY_FLAT {
+		utility := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
+		sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
+	}
+	return sourceFolders
 }

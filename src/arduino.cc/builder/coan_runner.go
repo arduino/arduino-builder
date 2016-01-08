@@ -60,8 +60,9 @@ func (s *CoanRunner) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties, props.SubTree(props.SubTree(buildProperties, constants.BUILD_PROPERTIES_TOOLS_KEY), constants.COAN))
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	properties := buildProperties.Clone()
+	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.COAN))
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = coanTargetFileName
 
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
@@ -70,7 +71,7 @@ func (s *CoanRunner) Run(context map[string]interface{}) error {
 	}
 
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	commandLine := props.ExpandPropsInString(properties, pattern)
+	commandLine := properties.ExpandPropsInString(pattern)
 	command, err := utils.PrepareCommandFilteredArgs(commandLine, filterAllowedArg, logger)
 
 	if verbose {

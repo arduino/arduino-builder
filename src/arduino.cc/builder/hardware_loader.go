@@ -67,7 +67,7 @@ func (s *HardwareLoader) Run(context map[string]interface{}) error {
 		if err != nil {
 			return utils.WrapError(err)
 		}
-		packages.Properties = utils.MergeMapsOfStrings(packages.Properties, hardwarePlatformTxt)
+		packages.Properties.Merge(hardwarePlatformTxt)
 
 		subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 		if err != nil {
@@ -115,7 +115,7 @@ func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger
 	if err != nil {
 		return utils.WrapError(err)
 	}
-	targetPackage.Properties = utils.MergeMapsOfStrings(targetPackage.Properties, packagePlatformTxt)
+	targetPackage.Properties.Merge(packagePlatformTxt)
 
 	subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 	if err != nil {
@@ -161,7 +161,7 @@ func getOrCreatePlatform(platforms map[string]*types.Platform, platformId string
 	targetPlatform.PlatformId = platformId
 	targetPlatform.Boards = make(map[string]*types.Board)
 	targetPlatform.Properties = make(map[string]string)
-	targetPlatform.Programmers = make(map[string]map[string]string)
+	targetPlatform.Programmers = make(map[string]props.PropertiesMap)
 
 	return &targetPlatform
 }
@@ -195,13 +195,15 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 		return utils.WrapError(err)
 	}
 
-	targetPlatform.Properties = utils.MergeMapsOfStrings(make(map[string]string), targetPlatform.Properties, platformTxt, localPlatformProperties)
+	targetPlatform.Properties = targetPlatform.Properties.Clone()
+	targetPlatform.Properties.Merge(platformTxt)
+	targetPlatform.Properties.Merge(localPlatformProperties)
 
 	programmersProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PROGRAMMERS_TXT), logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
-	targetPlatform.Programmers = utils.MergeMapsOfMapsOfStrings(make(map[string]map[string]string), targetPlatform.Programmers, props.FirstLevelOf(programmersProperties))
+	targetPlatform.Programmers = props.MergeMapsOfProperties(make(map[string]props.PropertiesMap), targetPlatform.Programmers, programmersProperties.FirstLevelOf())
 
 	return nil
 }
@@ -227,15 +229,15 @@ func loadBoards(boards map[string]*types.Board, packageId string, platformId str
 		return utils.WrapError(err)
 	}
 
-	properties = utils.MergeMapsOfStrings(properties, localProperties)
+	properties = properties.Merge(localProperties)
 
-	propertiesByBoardId := props.FirstLevelOf(properties)
+	propertiesByBoardId := properties.FirstLevelOf()
 	delete(propertiesByBoardId, constants.BOARD_PROPERTIES_MENU)
 
 	for boardId, properties := range propertiesByBoardId {
 		properties[constants.ID] = boardId
 		board := getOrCreateBoard(boards, boardId)
-		board.Properties = utils.MergeMapsOfStrings(board.Properties, properties)
+		board.Properties.Merge(properties)
 		boards[boardId] = board
 	}
 
@@ -249,7 +251,7 @@ func getOrCreateBoard(boards map[string]*types.Board, boardId string) *types.Boa
 
 	board := types.Board{}
 	board.BoardId = boardId
-	board.Properties = make(map[string]string)
+	board.Properties = make(props.PropertiesMap)
 
 	return &board
 }

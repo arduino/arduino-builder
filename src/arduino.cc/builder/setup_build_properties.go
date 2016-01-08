@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -48,10 +49,10 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
 
-	buildProperties := make(map[string]string)
-	utils.MergeMapsOfStrings(buildProperties, actualPlatform.Properties)
-	utils.MergeMapsOfStrings(buildProperties, targetPlatform.Properties)
-	utils.MergeMapsOfStrings(buildProperties, targetBoard.Properties)
+	buildProperties := make(props.PropertiesMap)
+	buildProperties.Merge(actualPlatform.Properties)
+	buildProperties.Merge(targetPlatform.Properties)
+	buildProperties.Merge(targetBoard.Properties)
 
 	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH] = context[constants.CTX_BUILD_PATH].(string)

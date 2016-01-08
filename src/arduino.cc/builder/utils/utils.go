@@ -33,7 +33,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/types"
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/go-errors/errors"
@@ -70,25 +69,7 @@ func KeysOfMapOfStringBool(input map[string]bool) []string {
 	return keys
 }
 
-func MergeMapsOfStrings(target map[string]string, sources ...map[string]string) map[string]string {
-	for _, source := range sources {
-		for key, value := range source {
-			target[key] = value
-		}
-	}
-	return target
-}
-
 func MergeMapsOfStringBool(target map[string]bool, sources ...map[string]bool) map[string]bool {
-	for _, source := range sources {
-		for key, value := range source {
-			target[key] = value
-		}
-	}
-	return target
-}
-
-func MergeMapsOfMapsOfStrings(target map[string]map[string]string, sources ...map[string]map[string]string) map[string]map[string]string {
 	for _, source := range sources {
 		for key, value := range source {
 			target[key] = value
@@ -327,14 +308,6 @@ func SliceToMapStringBool(keys []string, value bool) map[string]bool {
 	return aMap
 }
 
-func GetMapStringStringOrDefault(aMap map[string]interface{}, key string) map[string]string {
-	if MapHas(aMap, key) {
-		return aMap[key].(map[string]string)
-	}
-
-	return make(map[string]string)
-}
-
 func AbsolutizePaths(files []string) ([]string, error) {
 	for idx, file := range files {
 		absFile, err := filepath.Abs(file)
@@ -417,17 +390,6 @@ func AppendIfNotPresent(target []string, elements ...string) []string {
 		}
 	}
 	return target
-}
-
-func LibraryToSourceFolder(library *types.Library) []types.SourceFolder {
-	sourceFolders := []types.SourceFolder{}
-	recurse := library.Layout == types.LIBRARY_RECURSIVE
-	sourceFolders = append(sourceFolders, types.SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
-	if library.Layout == types.LIBRARY_FLAT {
-		utility := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
-		sourceFolders = append(sourceFolders, types.SourceFolder{Folder: utility, Recurse: false})
-	}
-	return sourceFolders
 }
 
 func AddStringsToStringsSet(accumulator []string, stringsToAdd []string) []string {

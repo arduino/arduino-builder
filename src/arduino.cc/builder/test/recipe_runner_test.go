@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -43,7 +44,7 @@ import (
 // So this test is pretty useless
 func TestRecipeRunner(t *testing.T) {
 	context := make(map[string]interface{})
-	buildProperties := make(map[string]string)
+	buildProperties := make(props.PropertiesMap)
 	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
 
 	buildProperties["recipe.hooks.prebuild.1.pattern"] = "echo"

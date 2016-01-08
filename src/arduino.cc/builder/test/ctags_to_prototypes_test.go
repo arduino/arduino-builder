@@ -30,8 +30,8 @@
 package test
 
 import (
-	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -48,9 +48,9 @@ func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -81,9 +81,9 @@ func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -112,9 +112,9 @@ func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -144,9 +144,9 @@ func TestCTagsToPrototypesShouldDealWithClasses(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -171,9 +171,9 @@ func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -202,9 +202,9 @@ func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -235,9 +235,9 @@ func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -264,9 +264,9 @@ func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -294,9 +294,9 @@ func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -324,9 +324,9 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -336,10 +336,11 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 
 	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
 
-	require.Equal(t, 2, len(prototypes))
-	require.Equal(t, "void setup();", prototypes[0].Prototype)
-	require.Equal(t, "/tmp/test179252494/preproc/ctags_target.cpp", prototypes[0].File)
-	require.Equal(t, "void loop();", prototypes[1].Prototype)
+	require.Equal(t, 3, len(prototypes))
+	require.Equal(t, "void test(int x = 1);", prototypes[0].Prototype)
+	require.Equal(t, "void setup();", prototypes[1].Prototype)
+	require.Equal(t, "/tmp/test179252494/preproc/ctags_target.cpp", prototypes[1].File)
+	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
 	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
 	require.Equal(t, 2, prototypeLine)
@@ -354,9 +355,9 @@ func TestCTagsToPrototypesNamespace(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -384,9 +385,9 @@ func TestCTagsToPrototypesStatic(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -416,9 +417,9 @@ func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
@@ -447,9 +448,9 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	commands := []types.Command{
-		&builder.CTagsParser{},
+		&ctags.CTagsParser{},
 		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
-		&builder.CTagsToPrototypes{},
+		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {

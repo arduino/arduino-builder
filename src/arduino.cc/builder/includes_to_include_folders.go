@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -67,7 +68,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	for _, newlyImportedLibrary := range newlyImportedLibraries {
 		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
 			importedLibraries = append(importedLibraries, newlyImportedLibrary)
-			sourceFolders := utils.LibraryToSourceFolder(newlyImportedLibrary)
+			sourceFolders := types.LibraryToSourceFolder(newlyImportedLibrary)
 			for _, sourceFolder := range sourceFolders {
 				foldersWithSources.Push(sourceFolder)
 			}
@@ -76,7 +77,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 
 	context[constants.CTX_IMPORTED_LIBRARIES] = importedLibraries
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	includeFolders := resolveIncludeFolders(newlyImportedLibraries, buildProperties, verbose)
 	context[constants.CTX_INCLUDE_FOLDERS] = includeFolders
@@ -84,7 +85,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties map[string]string, verbose bool) []string {
+func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties props.PropertiesMap, verbose bool) []string {
 	var includeFolders []string
 	includeFolders = append(includeFolders, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
 	if buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {

@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 	"os"
 	"sort"
@@ -50,12 +51,15 @@ func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}) error {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
 	}
 
-	buildProperties := utils.GetMapStringStringOrDefault(context, constants.CTX_BUILD_PROPERTIES)
+	buildProperties := make(props.PropertiesMap)
+	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
+		buildProperties = p.(props.PropertiesMap).Clone()
+	}
 	verbose := context[constants.CTX_VERBOSE].(bool)
 
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
 
-	properties := utils.MergeMapsOfStrings(make(map[string]string), buildProperties)
+	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
 		if utils.DebugLevel(context) >= 10 {
 			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)

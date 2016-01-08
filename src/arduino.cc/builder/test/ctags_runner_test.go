@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -70,7 +71,7 @@ func TestCTagsRunner(t *testing.T) {
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
-		&builder.CTagsRunner{},
+		&ctags.CTagsRunner{},
 	}
 
 	for _, command := range commands {
@@ -120,7 +121,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
-		&builder.CTagsRunner{},
+		&ctags.CTagsRunner{},
 	}
 
 	for _, command := range commands {
@@ -168,7 +169,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
-		&builder.CTagsRunner{},
+		&ctags.CTagsRunner{},
 	}
 
 	for _, command := range commands {
@@ -215,7 +216,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
-		&builder.CTagsRunner{},
+		&ctags.CTagsRunner{},
 	}
 
 	for _, command := range commands {

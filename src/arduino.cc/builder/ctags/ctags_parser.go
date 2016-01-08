@@ -27,7 +27,7 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package ctags
 
 import (
 	"arduino.cc/builder/constants"
@@ -67,7 +67,6 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 
 	skipTagsWhere(tags, tagIsUnknown, context)
 	skipTagsWhere(tags, tagIsUnhandled, context)
-	skipTagsWhere(tags, signatureContainsDefaultArg, context)
 	addPrototypes(tags)
 	removeDefinedProtypes(tags, context)
 	removeDuplicate(tags)
@@ -87,7 +86,7 @@ func addPrototypes(tags []*types.CTag) {
 }
 
 func addPrototype(tag *types.CTag) {
-	if strings.Index(tag.Returntype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
+	if strings.Index(tag.Prototype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
 		code := tag.Code
 		if strings.Contains(code, "{") {
 			code = code[:strings.Index(code, "{")]
@@ -97,8 +96,6 @@ func addPrototype(tag *types.CTag) {
 		tag.Prototype = code + ";"
 		return
 	}
-
-	tag.Prototype = tag.Returntype + " " + tag.FunctionName + tag.Signature + ";"
 
 	tag.PrototypeModifiers = ""
 	if strings.Index(tag.Code, STATIC+" ") != -1 {
@@ -149,10 +146,6 @@ func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string
 			tag.SkipMe = skip
 		}
 	}
-}
-
-func signatureContainsDefaultArg(tag *types.CTag) bool {
-	return strings.Contains(tag.Signature, "=")
 }
 
 func prototypeAndCodeDontMatch(tag *types.CTag) bool {
@@ -207,6 +200,8 @@ func parseTag(row string) *types.CTag {
 
 	parts = parts[2:]
 
+	signature := ""
+	returntype := ""
 	for _, part := range parts {
 		if strings.Contains(part, ":") {
 			colon := strings.Index(part, ":")
@@ -222,9 +217,9 @@ func parseTag(row string) *types.CTag {
 			case "typeref":
 				tag.Typeref = value
 			case "signature":
-				tag.Signature = value
+				signature = value
 			case "returntype":
-				tag.Returntype = value
+				returntype = value
 			case "class":
 				tag.Class = value
 			case "struct":
@@ -234,6 +229,7 @@ func parseTag(row string) *types.CTag {
 			}
 		}
 	}
+	tag.Prototype = returntype + " " + tag.FunctionName + signature + ";"
 
 	if strings.Contains(row, "/^") && strings.Contains(row, "$/;") {
 		tag.Code = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]

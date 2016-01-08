@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/utils"
 )
 
@@ -40,7 +41,7 @@ type CoreBuilder struct{}
 
 func (s *CoreBuilder) Run(context map[string]interface{}) error {
 	coreBuildPath := context[constants.CTX_CORE_BUILD_PATH].(string)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(map[string]string)
+	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
@@ -61,7 +62,7 @@ func (s *CoreBuilder) Run(context map[string]interface{}) error {
 	return nil
 }
 
-func compileCore(buildPath string, buildProperties map[string]string, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
+func compileCore(buildPath string, buildProperties props.PropertiesMap, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
 
