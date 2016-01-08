@@ -31,7 +31,7 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-debug-level`: Optional, defaults to "5". Used for debugging. Set it to 10 when submitting an issue.
 
-* `-ide-version`: Optional, defaults to "10600". The version of the Arduino IDE which is using this tool.
+* `-core-api-version`: Optional, defaults to "10600". The version of the Arduino IDE which is using this tool.
 
 * `-logger`: Optional, can be "human" or "machine". Defaults to "human". If "machine", messages emitted will be in a format which the Arduino IDE understands and that it uses for I18N.
 
@@ -48,13 +48,13 @@ Final mandatory parameter is the sketch to compile (of course).
 Every time you run this tool, it will create a `build.options.json` file in build path. It's used to understand if build options (such as hardware folders, fqbn and so on) were changed when compiling the same sketch.
 If they changed, the whole build path is wiped out. If they didn't change, previous compiled files will be reused if the corresponding source files didn't change as well.
 You can save this file locally and use it instead of specifying `-hardware`, `-tools`, `-libraries`, `-fqbn`, `-pref` and `-ide-version`.
-    
+
 ### Using it for continuously verify your libraries or cores
 
 See [Doing continuous integration with arduino builder](https://github.com/arduino/arduino-builder/wiki/Doing-continuous-integration-with-arduino-builder/).
-               
+
 ### Building from source
-               
+
 You need [Go 1.4.3](https://golang.org/dl/#go1.4.3).
 
 Repo root contains script `setup_go_env_vars`. Use it as is or as a template for setting up Go environment variables.

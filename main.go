@@ -31,20 +31,21 @@
 package main
 
 import (
-	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/gohasissues"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/utils"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 	"syscall"
+
+	"arduino.cc/builder"
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/utils"
+	"github.com/go-errors/errors"
 )
 
 const VERSION = "1.3.9"
@@ -59,7 +60,7 @@ const FLAG_BUILT_IN_LIBRARIES = "built-in-libraries"
 const FLAG_LIBRARIES = "libraries"
 const FLAG_PREFS = "prefs"
 const FLAG_FQBN = "fqbn"
-const FLAG_IDE_VERSION = "ide-version"
+const FLAG_IDE_VERSION = "core-api-version"
 const FLAG_BUILD_PATH = "build-path"
 const FLAG_VERBOSE = "verbose"
 const FLAG_QUIET = "quiet"
