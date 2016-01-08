@@ -60,7 +60,8 @@ const FLAG_BUILT_IN_LIBRARIES = "built-in-libraries"
 const FLAG_LIBRARIES = "libraries"
 const FLAG_PREFS = "prefs"
 const FLAG_FQBN = "fqbn"
-const FLAG_IDE_VERSION = "core-api-version"
+const FLAG_IDE_VERSION = "ide-version"
+const FLAG_CORE_API_VERSION = "core-api-version"
 const FLAG_BUILD_PATH = "build-path"
 const FLAG_VERBOSE = "verbose"
 const FLAG_QUIET = "quiet"
@@ -108,6 +109,7 @@ var librariesBuiltInFoldersFlag slice
 var librariesFoldersFlag slice
 var customBuildPropertiesFlag slice
 var fqbnFlag *string
+var coreAPIVersionFlag *string
 var ideVersionFlag *string
 var buildPathFlag *string
 var verboseFlag *bool
@@ -129,7 +131,8 @@ func init() {
 	flag.Var(&librariesFoldersFlag, FLAG_LIBRARIES, "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
 	flag.Var(&customBuildPropertiesFlag, FLAG_PREFS, "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
 	fqbnFlag = flag.String(FLAG_FQBN, "", "fully qualified board name")
-	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "fake IDE version")
+	coreAPIVersionFlag = flag.String(FLAG_CORE_API_VERSION, "10600", "version of core APIs (used to populate ARDUINO #define)")
+	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "[deprecated] use '"+FLAG_CORE_API_VERSION+"' instead")
 	buildPathFlag = flag.String(FLAG_BUILD_PATH, "", "build path")
 	verboseFlag = flag.Bool(FLAG_VERBOSE, false, "if 'true' prints lots of stuff")
 	quietFlag = flag.Bool(FLAG_QUIET, false, "if 'true' doesn't print any warnings or progress or whatever")
@@ -274,13 +277,18 @@ func main() {
 
 	context[constants.CTX_VERBOSE] = *verboseFlag
 
-	ideVersion := ""
+	coreAPIVersion := ""
 	if utils.MapStringStringHas(buildOptions, constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION) {
-		ideVersion = buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION]
+		coreAPIVersion = buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION]
 	} else {
-		ideVersion = *ideVersionFlag
+		// if deprecated 'ideVersionFlag' has been used...
+		if *coreAPIVersionFlag == "10600" && *ideVersionFlag != "10600" {
+			coreAPIVersion = *ideVersionFlag
+		} else {
+			coreAPIVersion = *coreAPIVersionFlag
+		}
 	}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ideVersion
+	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = coreAPIVersion
 
 	if *warningsLevelFlag != "" {
 		context[constants.CTX_WARNINGS_LEVEL] = *warningsLevelFlag
