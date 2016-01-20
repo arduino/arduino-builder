@@ -42,6 +42,7 @@ import (
 
 func TestLoadHardware(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"}
 
 	commands := []types.Command{
@@ -50,7 +51,7 @@ func TestLoadHardware(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -86,6 +87,7 @@ func TestLoadHardware(t *testing.T) {
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
 
 	commands := []types.Command{
@@ -97,7 +99,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -156,6 +158,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff"}
 
 	commands := []types.Command{
@@ -164,7 +167,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -204,6 +207,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 
 func TestLoadLotsOfHardware(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
 
@@ -213,7 +217,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

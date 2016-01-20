@@ -151,10 +151,6 @@ type KeyValuePair struct {
 	Value string
 }
 
-type Command interface {
-	Run(context map[string]interface{}) error
-}
-
 type Prototype struct {
 	FunctionName string
 	File         string
@@ -204,4 +200,8 @@ func LibraryToSourceFolder(library *Library) []SourceFolder {
 		sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
 	}
 	return sourceFolders
+}
+
+type Command interface {
+	Run(context map[string]interface{}, ctx *Context) error
 }

@@ -41,6 +41,7 @@ import (
 
 func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
@@ -54,7 +55,7 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -68,6 +69,7 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 
 func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
@@ -81,7 +83,7 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -103,6 +105,7 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 
 func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
@@ -118,7 +121,7 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

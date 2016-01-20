@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strconv"
 	"strings"
@@ -39,7 +40,7 @@ import (
 
 type LoadVIDPIDSpecificProperties struct{}
 
-func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}) error {
+func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}, ctx *types.Context) error {
 	if !utils.MapHas(context, constants.CTX_VIDPID) {
 		return nil
 	}

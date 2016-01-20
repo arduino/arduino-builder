@@ -40,7 +40,7 @@ import (
 
 type FailIfImportedLibraryIsWrong struct{}
 
-func (s *FailIfImportedLibraryIsWrong) Run(context map[string]interface{}) error {
+func (s *FailIfImportedLibraryIsWrong) Run(context map[string]interface{}, ctx *types.Context) error {
 	if !utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		return nil
 	}

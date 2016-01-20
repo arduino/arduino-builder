@@ -41,7 +41,7 @@ import (
 
 type WarnAboutArchIncompatibleLibraries struct{}
 
-func (s *WarnAboutArchIncompatibleLibraries) Run(context map[string]interface{}) error {
+func (s *WarnAboutArchIncompatibleLibraries) Run(context map[string]interface{}, ctx *types.Context) error {
 	if utils.DebugLevel(context) <= 0 {
 		return nil
 	}

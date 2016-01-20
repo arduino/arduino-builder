@@ -39,7 +39,7 @@ import (
 
 type PrintUsedLibrariesIfVerbose struct{}
 
-func (s *PrintUsedLibrariesIfVerbose) Run(context map[string]interface{}) error {
+func (s *PrintUsedLibrariesIfVerbose) Run(context map[string]interface{}, ctx *types.Context) error {
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 

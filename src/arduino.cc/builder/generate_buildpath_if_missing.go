@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
@@ -40,7 +41,7 @@ import (
 
 type GenerateBuildPathIfMissing struct{}
 
-func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}) error {
+func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
 	if utils.MapHas(context, constants.CTX_BUILD_PATH) && context[constants.CTX_BUILD_PATH].(string) != constants.EMPTY_STRING {
 		return nil
 	}

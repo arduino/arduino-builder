@@ -50,11 +50,12 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
 	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(context)
+	err = cmd.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(temp, "SPI"))
@@ -68,11 +69,12 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_LIBRARIES_BUILD_PATH] = filepath.Join(os.TempDir(), "test")
 	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err := cmd.Run(context)
+	err := cmd.Run(context, ctx)
 	NoError(t, err)
 }
 
@@ -86,11 +88,12 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
 	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(context)
+	err = cmd.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(temp, "SPI"))

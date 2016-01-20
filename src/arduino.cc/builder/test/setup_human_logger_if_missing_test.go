@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"reflect"
 	"testing"
@@ -40,9 +41,10 @@ import (
 
 func TestSetupHumanLogger(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	command := &builder.SetupHumanLoggerIfMissing{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)

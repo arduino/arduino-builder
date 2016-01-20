@@ -45,6 +45,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -78,7 +79,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -90,6 +91,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -119,7 +121,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -131,6 +133,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -160,7 +163,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -172,6 +175,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -201,7 +205,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -213,6 +217,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -242,7 +247,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -254,6 +259,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -283,7 +289,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -295,6 +301,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -324,7 +331,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -336,6 +343,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -365,7 +373,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -382,6 +390,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -414,7 +423,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -429,6 +438,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -461,7 +471,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -473,6 +483,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -505,7 +516,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -517,6 +528,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -549,7 +561,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -561,6 +573,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -593,7 +606,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -616,6 +629,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -648,7 +662,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -660,6 +674,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -692,7 +707,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -704,6 +719,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -735,7 +751,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -753,6 +769,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -785,7 +802,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -800,6 +817,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -832,7 +850,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -847,6 +865,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -879,7 +898,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -891,6 +910,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -922,7 +942,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 	// only requires no error as result

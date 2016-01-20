@@ -43,6 +43,7 @@ import (
 
 func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -58,7 +59,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -75,6 +76,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 
 func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -89,7 +91,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -106,6 +108,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 
 func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -121,7 +124,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

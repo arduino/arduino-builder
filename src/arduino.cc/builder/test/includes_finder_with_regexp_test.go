@@ -44,6 +44,7 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -68,7 +69,7 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -82,6 +83,7 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 
 func TestIncludesFinderWithRegExp(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
 		"#include <SPI.h>\n" +
@@ -90,7 +92,7 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 	context["source"] = output
 
 	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
@@ -101,13 +103,14 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 
 func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := ""
 
 	context["source"] = output
 
 	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
@@ -117,6 +120,7 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 
 func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_INCLUDES] = []string{"test.h"}
 
@@ -128,7 +132,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	context["source"] = output
 
 	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
@@ -141,6 +145,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_INCLUDES] = []string{}
 
@@ -151,7 +156,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	context["source"] = output
 
 	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
@@ -163,6 +168,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 
 func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_INCLUDES] = []string{}
 
@@ -173,7 +179,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	context["source"] = output
 
 	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])
@@ -185,6 +191,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 
 func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_INCLUDES] = []string{}
 
@@ -194,7 +201,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	context["source"] = output
 
 	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])

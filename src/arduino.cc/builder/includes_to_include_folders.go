@@ -40,7 +40,7 @@ import (
 
 type IncludesToIncludeFolders struct{}
 
-func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
+func (s *IncludesToIncludeFolders) Run(context map[string]interface{}, ctx *types.Context) error {
 	includes := []string{}
 	if utils.MapHas(context, constants.CTX_INCLUDES) {
 		includes = context[constants.CTX_INCLUDES].([]string)

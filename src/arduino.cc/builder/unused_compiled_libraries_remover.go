@@ -40,7 +40,7 @@ import (
 
 type UnusedCompiledLibrariesRemover struct{}
 
-func (s *UnusedCompiledLibrariesRemover) Run(context map[string]interface{}) error {
+func (s *UnusedCompiledLibrariesRemover) Run(context map[string]interface{}, ctx *types.Context) error {
 	librariesBuildPath := context[constants.CTX_LIBRARIES_BUILD_PATH].(string)
 	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 

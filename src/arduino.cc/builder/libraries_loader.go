@@ -42,7 +42,7 @@ import (
 
 type LibrariesLoader struct{}
 
-func (s *LibrariesLoader) Run(context map[string]interface{}) error {
+func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context) error {
 	sortedLibrariesFolders := []string{}
 
 	builtInLibrariesFolders := []string{}

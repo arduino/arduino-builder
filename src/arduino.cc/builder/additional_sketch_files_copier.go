@@ -40,7 +40,7 @@ import (
 
 type AdditionalSketchFilesCopier struct{}
 
-func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}) error {
+func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 

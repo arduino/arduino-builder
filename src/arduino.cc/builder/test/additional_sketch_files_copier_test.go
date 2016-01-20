@@ -56,6 +56,7 @@ func (s ByFileInfoName) Less(i, j int) bool {
 
 func TestCopyOtherFiles(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -70,7 +71,7 @@ func TestCopyOtherFiles(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -94,6 +95,7 @@ func TestCopyOtherFiles(t *testing.T) {
 
 func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -108,7 +110,7 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -122,7 +124,7 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

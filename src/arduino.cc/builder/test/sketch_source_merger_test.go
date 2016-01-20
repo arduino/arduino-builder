@@ -42,6 +42,7 @@ import (
 
 func TestMergeSketch(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 
 	commands := []types.Command{
@@ -51,7 +52,7 @@ func TestMergeSketch(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

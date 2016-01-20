@@ -42,7 +42,7 @@ import (
 
 type MergeSketchWithBootloader struct{}
 
-func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
+func (s *MergeSketchWithBootloader) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil

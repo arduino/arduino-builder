@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
@@ -41,7 +42,7 @@ import (
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
 
-func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface{}) error {
+func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface{}, ctx *types.Context) error {
 	if !utils.MapHas(context, constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON) {
 		return nil
 	}

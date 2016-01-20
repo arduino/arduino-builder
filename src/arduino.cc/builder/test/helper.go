@@ -101,7 +101,7 @@ type CopyContextKeys struct {
 	To   string
 }
 
-func (s *CopyContextKeys) Run(context map[string]interface{}) error {
+func (s *CopyContextKeys) Run(context map[string]interface{}, ctx *types.Context) error {
 	context[s.To] = context[s.From]
 	return nil
 }

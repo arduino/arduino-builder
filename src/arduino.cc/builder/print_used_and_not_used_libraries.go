@@ -40,7 +40,7 @@ import (
 
 type PrintUsedAndNotUsedLibraries struct{}
 
-func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}) error {
+func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}, ctx *types.Context) error {
 	if utils.DebugLevel(context) <= 0 {
 		return nil
 	}

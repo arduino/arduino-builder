@@ -44,7 +44,7 @@ type GCCPreprocRunner struct {
 	TargetFileName string
 }
 
-func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
+func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
@@ -74,7 +74,7 @@ type GCCPreprocRunnerForDiscoveringIncludes struct {
 	TargetFilePath string
 }
 
-func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}) error {
+func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}, ctx *types.Context) error {
 	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFilePath)
 	if err != nil {
 		return utils.WrapError(err)

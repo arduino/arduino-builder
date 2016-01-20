@@ -39,7 +39,7 @@ import (
 
 type AddBuildBoardPropertyIfMissing struct{}
 
-func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}) error {
+func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 

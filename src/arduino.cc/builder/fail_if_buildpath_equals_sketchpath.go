@@ -31,13 +31,14 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
 type FailIfBuildPathEqualsSketchPath struct{}
 
-func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}) error {
+func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}, ctx *types.Context) error {
 	if !utils.MapHas(context, constants.CTX_BUILD_PATH) || !utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
 		return nil
 	}

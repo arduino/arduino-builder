@@ -40,7 +40,7 @@ import (
 
 type PrototypesAdder struct{}
 
-func (s *PrototypesAdder) Run(context map[string]interface{}) error {
+func (s *PrototypesAdder) Run(context map[string]interface{}, ctx *types.Context) error {
 	debugOutput := context[constants.CTX_DEBUG_PREPROCESSOR] != nil
 	source := context[constants.CTX_SOURCE].(string)
 

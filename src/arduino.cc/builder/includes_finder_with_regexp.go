@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"regexp"
 	"strings"
@@ -42,7 +43,7 @@ type IncludesFinderWithRegExp struct {
 	ContextField string
 }
 
-func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}) error {
+func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}, ctx *types.Context) error {
 	source := context[s.ContextField].(string)
 
 	matches := INCLUDE_REGEXP.FindAllStringSubmatch(source, -1)

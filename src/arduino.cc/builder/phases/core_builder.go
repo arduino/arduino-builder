@@ -34,12 +34,13 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
 type CoreBuilder struct{}
 
-func (s *CoreBuilder) Run(context map[string]interface{}) error {
+func (s *CoreBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
 	coreBuildPath := context[constants.CTX_CORE_BUILD_PATH].(string)
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := context[constants.CTX_VERBOSE].(bool)

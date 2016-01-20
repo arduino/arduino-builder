@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strings"
@@ -41,7 +42,7 @@ import (
 
 type Linker struct{}
 
-func (s *Linker) Run(context map[string]interface{}) error {
+func (s *Linker) Run(context map[string]interface{}, ctx *types.Context) error {
 	objectFilesSketch := context[constants.CTX_OBJECT_FILES_SKETCH].([]string)
 	objectFilesLibraries := context[constants.CTX_OBJECT_FILES_LIBRARIES].([]string)
 	objectFilesCore := context[constants.CTX_OBJECT_FILES_CORE].([]string)

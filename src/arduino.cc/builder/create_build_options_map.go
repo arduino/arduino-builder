@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"encoding/json"
 	"reflect"
@@ -39,7 +40,7 @@ import (
 
 type CreateBuildOptionsMap struct{}
 
-func (s *CreateBuildOptionsMap) Run(context map[string]interface{}) error {
+func (s *CreateBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildOptions := make(map[string]string)
 
 	buildOptionsMapKeys := []string{

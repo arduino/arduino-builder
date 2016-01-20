@@ -43,6 +43,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
@@ -58,7 +59,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -153,6 +154,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x_dbg"
@@ -168,7 +170,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -237,6 +239,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
 	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
@@ -252,7 +255,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -267,6 +270,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"}
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
@@ -282,7 +286,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

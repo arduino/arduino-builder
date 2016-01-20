@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
 	"sort"
@@ -45,7 +46,7 @@ type RecipeByPrefixSuffixRunner struct {
 	Suffix string
 }
 
-func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}) error {
+func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	if utils.DebugLevel(context) >= 10 {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)

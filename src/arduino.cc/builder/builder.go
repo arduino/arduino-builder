@@ -66,7 +66,7 @@ const DEFAULT_BUILD_CORE = "arduino"
 
 type Builder struct{}
 
-func (s *Builder) Run(context map[string]interface{}) error {
+func (s *Builder) Run(context map[string]interface{}, ctx *types.Context) error {
 	commands := []types.Command{
 		&SetupHumanLoggerIfMissing{},
 
@@ -115,14 +115,14 @@ func (s *Builder) Run(context map[string]interface{}) error {
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 	}
 
-	mainErr := runCommands(context, commands, true)
+	mainErr := runCommands(context, ctx, commands, true)
 
 	commands = []types.Command{
 		&PrintUsedAndNotUsedLibraries{},
 
 		&PrintUsedLibrariesIfVerbose{},
 	}
-	otherErr := runCommands(context, commands, false)
+	otherErr := runCommands(context, ctx, commands, false)
 
 	if mainErr != nil {
 		return mainErr
@@ -133,7 +133,7 @@ func (s *Builder) Run(context map[string]interface{}) error {
 
 type Preprocess struct{}
 
-func (s *Preprocess) Run(context map[string]interface{}) error {
+func (s *Preprocess) Run(context map[string]interface{}, ctx *types.Context) error {
 	commands := []types.Command{
 		&SetupHumanLoggerIfMissing{},
 
@@ -157,12 +157,12 @@ func (s *Preprocess) Run(context map[string]interface{}) error {
 		&PrintPreprocessedSource{},
 	}
 
-	return runCommands(context, commands, true)
+	return runCommands(context, ctx, commands, true)
 }
 
 type ParseHardwareAndDumpBuildProperties struct{}
 
-func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}) error {
+func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
 	commands := []types.Command{
 		&SetupHumanLoggerIfMissing{},
 
@@ -173,10 +173,10 @@ func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}
 		&DumpBuildProperties{},
 	}
 
-	return runCommands(context, commands, true)
+	return runCommands(context, ctx, commands, true)
 }
 
-func runCommands(context map[string]interface{}, commands []types.Command, progressEnabled bool) error {
+func runCommands(context map[string]interface{}, ctx *types.Context, commands []types.Command, progressEnabled bool) error {
 	commandsLength := len(commands)
 	progressForEachCommand := float32(100) / float32(commandsLength)
 
@@ -184,7 +184,7 @@ func runCommands(context map[string]interface{}, commands []types.Command, progr
 	for _, command := range commands {
 		PrintRingNameIfDebug(context, command)
 		printProgressIfProgressEnabledAndMachineLogger(progressEnabled, context, progress)
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		if err != nil {
 			return utils.WrapError(err)
 		}
@@ -213,17 +213,17 @@ func PrintRingNameIfDebug(context map[string]interface{}, command types.Command)
 	}
 }
 
-func RunBuilder(context map[string]interface{}) error {
+func RunBuilder(context map[string]interface{}, ctx *types.Context) error {
 	command := Builder{}
-	return command.Run(context)
+	return command.Run(context, ctx)
 }
 
-func RunParseHardwareAndDumpBuildProperties(context map[string]interface{}) error {
+func RunParseHardwareAndDumpBuildProperties(context map[string]interface{}, ctx *types.Context) error {
 	command := ParseHardwareAndDumpBuildProperties{}
-	return command.Run(context)
+	return command.Run(context, ctx)
 }
 
-func RunPreprocess(context map[string]interface{}) error {
+func RunPreprocess(context map[string]interface{}, ctx *types.Context) error {
 	command := Preprocess{}
-	return command.Run(context)
+	return command.Run(context, ctx)
 }

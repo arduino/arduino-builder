@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
@@ -40,7 +41,7 @@ type CTagsTargetFileSaver struct {
 	TargetFileName string
 }
 
-func (s *CTagsTargetFileSaver) Run(context map[string]interface{}) error {
+func (s *CTagsTargetFileSaver) Run(context map[string]interface{}, ctx *types.Context) error {
 	source := context[s.SourceField].(string)
 
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)

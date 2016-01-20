@@ -41,11 +41,12 @@ import (
 
 func TestGenerateBuildPathIfMissing(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_SKETCH_LOCATION] = "test"
 
 	command := builder.GenerateBuildPathIfMissing{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), context[constants.CTX_BUILD_PATH])
@@ -55,12 +56,13 @@ func TestGenerateBuildPathIfMissing(t *testing.T) {
 
 func TestGenerateBuildPathIfEmpty(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_SKETCH_LOCATION] = "test"
 	context[constants.CTX_BUILD_PATH] = constants.EMPTY_STRING
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
-	err := createBuildPathIfMissing.Run(context)
+	err := createBuildPathIfMissing.Run(context, ctx)
 	NoError(t, err)
 
 	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), context[constants.CTX_BUILD_PATH])
@@ -70,11 +72,12 @@ func TestGenerateBuildPathIfEmpty(t *testing.T) {
 
 func TestDontGenerateBuildPathIfPresent(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_BUILD_PATH] = "test"
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
-	err := createBuildPathIfMissing.Run(context)
+	err := createBuildPathIfMissing.Run(context, ctx)
 	NoError(t, err)
 
 	require.Equal(t, "test", context[constants.CTX_BUILD_PATH])
@@ -82,6 +85,7 @@ func TestDontGenerateBuildPathIfPresent(t *testing.T) {
 
 func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_SKETCH_LOCATION] = "test"
 
@@ -91,7 +95,7 @@ func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

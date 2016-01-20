@@ -38,7 +38,7 @@ import (
 
 type CollectCTagsFromSketchFiles struct{}
 
-func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}) error {
+func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchFileNames := collectSketchFileNamesFrom(sketch)
 

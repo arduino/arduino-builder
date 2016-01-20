@@ -57,7 +57,7 @@ var KNOWN_TAG_KINDS = map[string]bool{
 
 type CTagsParser struct{}
 
-func (s *CTagsParser) Run(context map[string]interface{}) error {
+func (s *CTagsParser) Run(context map[string]interface{}, ctx *types.Context) error {
 	rows := strings.Split(context[constants.CTX_CTAGS_OUTPUT].(string), "\n")
 
 	rows = removeEmpty(rows)

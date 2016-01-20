@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"fmt"
 	"path/filepath"
@@ -43,7 +44,7 @@ var ALLOWED_ARG = regexp.MustCompile("^source$|\\-E$|\\-m$|\\-P$|\\-kb$|\\-D.*")
 
 type CoanRunner struct{}
 
-func (s *CoanRunner) Run(context map[string]interface{}) error {
+func (s *CoanRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	source := context[constants.CTX_SOURCE].(string)
 	source += "\n"
 	verbose := context[constants.CTX_VERBOSE].(bool)

@@ -40,9 +40,10 @@ import (
 
 func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	command := builder.AddAdditionalEntriesToContext{}
-	NoError(t, command.Run(context))
+	NoError(t, command.Run(context, ctx))
 
 	require.Nil(t, context[constants.CTX_PREPROC_PATH])
 	require.Nil(t, context[constants.CTX_SKETCH_BUILD_PATH])
@@ -61,11 +62,12 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_BUILD_PATH] = "folder"
 
 	command := builder.AddAdditionalEntriesToContext{}
-	NoError(t, command.Run(context))
+	NoError(t, command.Run(context, ctx))
 
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), context[constants.CTX_PREPROC_PATH])
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), context[constants.CTX_SKETCH_BUILD_PATH])

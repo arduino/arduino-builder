@@ -44,7 +44,7 @@ import (
 
 type PlatformKeysRewriteLoader struct{}
 
-func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}) error {
+func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}, ctx *types.Context) error {
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	folders := context[constants.CTX_HARDWARE_FOLDERS].([]string)
 

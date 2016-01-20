@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -39,6 +40,7 @@ import (
 
 func TestCreateBuildOptionsMap(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{"hardware", "hardware2"}
@@ -51,7 +53,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	context[constants.CTX_DEBUG_LEVEL] = 5
 
 	create := builder.CreateBuildOptionsMap{}
-	err := create.Run(context)
+	err := create.Run(context, ctx)
 	NoError(t, err)
 
 	buildOptions := context[constants.CTX_BUILD_OPTIONS].(map[string]string)

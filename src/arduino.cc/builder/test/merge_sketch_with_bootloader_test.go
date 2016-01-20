@@ -47,6 +47,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -74,7 +75,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -90,6 +91,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -117,7 +119,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -133,6 +135,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -151,7 +154,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -160,7 +163,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	delete(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
 	command := &builder.MergeSketchWithBootloader{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, "sketch.ino.with_bootloader.hex"))
@@ -172,6 +175,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -199,7 +203,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 

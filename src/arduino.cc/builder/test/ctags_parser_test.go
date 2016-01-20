@@ -41,6 +41,7 @@ import (
 
 func TestCTagsParserShouldListPrototypes(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListPrototypes.txt"))
 	NoError(t, err)
@@ -48,7 +49,7 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -89,6 +90,7 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 
 func TestCTagsParserShouldListTemplates(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListTemplates.txt"))
 	NoError(t, err)
@@ -96,7 +98,7 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -117,6 +119,7 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 
 func TestCTagsParserShouldListTemplates2(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListTemplates2.txt"))
 	NoError(t, err)
@@ -124,7 +127,7 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -147,6 +150,7 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 
 func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithClasses.txt"))
 	NoError(t, err)
@@ -154,7 +158,7 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -169,6 +173,7 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 
 func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithStructs.txt"))
 	NoError(t, err)
@@ -176,7 +181,7 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -201,6 +206,7 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 
 func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithMacros.txt"))
 	NoError(t, err)
@@ -208,7 +214,7 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -241,6 +247,7 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 
 func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealFunctionWithDifferentSignatures.txt"))
 	NoError(t, err)
@@ -248,7 +255,7 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -266,6 +273,7 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 
 func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserClassMembersAreFilteredOut.txt"))
 	NoError(t, err)
@@ -273,7 +281,7 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -300,6 +308,7 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 
 func TestCTagsParserStructWithFunctions(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStructWithFunctions.txt"))
 	NoError(t, err)
@@ -307,7 +316,7 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -342,6 +351,7 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 
 func TestCTagsParserDefaultArguments(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserDefaultArguments.txt"))
 	NoError(t, err)
@@ -349,7 +359,7 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -368,6 +378,7 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 
 func TestCTagsParserNamespace(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserNamespace.txt"))
 	NoError(t, err)
@@ -375,7 +386,7 @@ func TestCTagsParserNamespace(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -394,6 +405,7 @@ func TestCTagsParserNamespace(t *testing.T) {
 
 func TestCTagsParserStatic(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStatic.txt"))
 	NoError(t, err)
@@ -401,7 +413,7 @@ func TestCTagsParserStatic(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -419,6 +431,7 @@ func TestCTagsParserStatic(t *testing.T) {
 
 func TestCTagsParserFunctionPointer(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointer.txt"))
 	NoError(t, err)
@@ -426,7 +439,7 @@ func TestCTagsParserFunctionPointer(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 
@@ -447,6 +460,7 @@ func TestCTagsParserFunctionPointer(t *testing.T) {
 
 func TestCTagsParserFunctionPointers(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointers.txt"))
 	NoError(t, err)
@@ -454,7 +468,7 @@ func TestCTagsParserFunctionPointers(t *testing.T) {
 	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
 
 	ctagsParser := ctags.CTagsParser{}
-	ctagsParser.Run(context)
+	ctagsParser.Run(context, ctx)
 
 	tags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
 

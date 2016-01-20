@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
@@ -43,6 +44,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -58,7 +60,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 	context[constants.CTX_DEBUG_LEVEL] = 10
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -77,6 +79,7 @@ func TestBuilderBridge(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -91,7 +94,7 @@ func TestBuilderBridge(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -112,6 +115,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -125,7 +129,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -146,6 +150,7 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -159,11 +164,11 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	command = builder.Builder{}
-	err = command.Run(context)
+	err = command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -184,6 +189,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -198,7 +204,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	context[constants.CTX_WARNINGS_LEVEL] = "all"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "syscalls_sam3.c.o"))
@@ -228,6 +234,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -241,7 +248,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -262,6 +269,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -275,7 +283,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	require.Error(t, err)
 }
 
@@ -283,6 +291,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -296,7 +305,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 }
 
@@ -304,6 +313,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -317,7 +327,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 }
 
@@ -325,6 +335,7 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -338,7 +349,7 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 }
 
@@ -346,6 +357,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -361,7 +373,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"))

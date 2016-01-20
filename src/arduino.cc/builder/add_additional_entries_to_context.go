@@ -38,7 +38,7 @@ import (
 
 type AddAdditionalEntriesToContext struct{}
 
-func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}) error {
+func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx *types.Context) error {
 	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
 		buildPath := context[constants.CTX_BUILD_PATH].(string)
 		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))

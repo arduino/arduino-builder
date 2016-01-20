@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"io/ioutil"
 	"os"
@@ -39,7 +40,7 @@ import (
 
 type LoadPreviousBuildOptionsMap struct{}
 
-func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}) error {
+func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 
 	buildOptionsFile := filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE)

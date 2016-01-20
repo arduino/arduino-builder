@@ -32,26 +32,29 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestFailIfBuildPathEqualsSketchPath(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
 	context[constants.CTX_SKETCH_LOCATION] = "buildPath/sketch.ino"
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
-	require.Error(t, command.Run(context))
+	require.Error(t, command.Run(context, ctx))
 }
 
 func TestFailIfBuildPathEqualsSketchPathSketchPathDiffers(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
 	context[constants.CTX_SKETCH_LOCATION] = "sketchPath/sketch.ino"
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
-	NoError(t, command.Run(context))
+	NoError(t, command.Run(context, ctx))
 }

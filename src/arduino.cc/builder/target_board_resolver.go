@@ -38,7 +38,7 @@ import (
 
 type TargetBoardResolver struct{}
 
-func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
+func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Context) error {
 	fqbn := context[constants.CTX_FQBN].(string)
 
 	fqbnParts := strings.Split(fqbn, ":")

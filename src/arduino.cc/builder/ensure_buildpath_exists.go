@@ -31,12 +31,13 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
 type EnsureBuildPathExists struct{}
 
-func (s *EnsureBuildPathExists) Run(context map[string]interface{}) error {
+func (s *EnsureBuildPathExists) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 
 	err := utils.EnsureFolderExists(buildPath)

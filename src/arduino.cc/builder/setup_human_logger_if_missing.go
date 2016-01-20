@@ -32,12 +32,13 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
 type SetupHumanLoggerIfMissing struct{}
 
-func (s *SetupHumanLoggerIfMissing) Run(context map[string]interface{}) error {
+func (s *SetupHumanLoggerIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
 	if !utils.MapHas(context, constants.CTX_LOGGER) {
 		context[constants.CTX_LOGGER] = i18n.HumanLogger{}
 	}

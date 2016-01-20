@@ -44,6 +44,7 @@ import (
 // So this test is pretty useless
 func TestRecipeRunner(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	buildProperties := make(props.PropertiesMap)
 	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
 
@@ -56,7 +57,7 @@ func TestRecipeRunner(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 }

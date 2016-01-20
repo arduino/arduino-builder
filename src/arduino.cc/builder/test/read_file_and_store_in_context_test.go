@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -47,10 +48,11 @@ func TestReadFileAndStoreInContext(t *testing.T) {
 	utils.WriteFile(file.Name(), "test test\nciao")
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_FILE_PATH_TO_READ] = file.Name()
 
 	command := &builder.ReadFileAndStoreInContext{TargetField: constants.CTX_GCC_MINUS_E_SOURCE}
-	err = command.Run(context)
+	err = command.Run(context, ctx)
 	NoError(t, err)
 
 	require.Equal(t, "test test\nciao", context[constants.CTX_GCC_MINUS_E_SOURCE].(string))

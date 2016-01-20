@@ -45,6 +45,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -67,7 +68,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -78,6 +79,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -102,7 +104,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -120,6 +122,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -143,7 +146,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -171,6 +174,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -195,7 +199,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -213,6 +217,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
@@ -235,12 +240,12 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
 	command := &builder.ContainerFindIncludes{}
-	err := command.Run(context)
+	err := command.Run(context, ctx)
 	require.Error(t, err)
 
 	require.NotNil(t, context[constants.CTX_INCLUDES])

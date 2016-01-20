@@ -40,6 +40,7 @@ import (
 
 func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:mymega"
 
@@ -51,7 +52,7 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
@@ -67,6 +68,7 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 
 func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
 	context[constants.CTX_FQBN] = "my_avr_platform:avr:mymega:cpu=atmega2560"
 
@@ -78,7 +80,7 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
 
