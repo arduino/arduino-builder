@@ -173,6 +173,10 @@ func TestTryBuild032(t *testing.T) {
 	tryBuild(t, "sketch10", "sketch.ino")
 }
 
+func TestTryBuild033(t *testing.T) {
+	tryBuild(t, "sketch_that_includes_arduino_h", "sketch_that_includes_arduino_h.ino")
+}
+
 func makeDefaultContext(t *testing.T) map[string]interface{} {
 	DownloadCoresAndToolsAndLibraries(t)
 

@@ -33,6 +33,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
+	"regexp"
 	"strings"
 )
 
@@ -42,8 +43,13 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}) error {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 
 	lineOffset := 0
-	includeSection := composeIncludeArduinoSection()
-	lineOffset += 2
+	includeSection := ""
+	if !sketchIncludesArduinoH(&sketch.MainFile) {
+		includeSection += "#include <Arduino.h>\n"
+		lineOffset++
+	}
+	includeSection += "#line 1\n"
+	lineOffset++
 	context[constants.CTX_INCLUDE_SECTION] = includeSection
 
 	source := includeSection
@@ -59,17 +65,18 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}) error {
 	return nil
 }
 
+func sketchIncludesArduinoH(sketch *types.SketchFile) bool {
+	if matched, err := regexp.MatchString("(?m)^\\s*#\\s*include\\s*[<\"]Arduino\\.h[>\"]", sketch.Source); err != nil {
+		panic(err)
+	} else {
+		return matched
+	}
+}
+
 func addSourceWrappedWithLineDirective(sketch *types.SketchFile) string {
 	source := "#line 1 \"" + strings.Replace(sketch.Name, "\\", "\\\\", -1) + "\"\n"
 	source += sketch.Source
 	source += "\n"
 
 	return source
-}
-
-func composeIncludeArduinoSection() string {
-	str := "#include <Arduino.h>\n"
-	str += "#line 1\n"
-
-	return str
 }
