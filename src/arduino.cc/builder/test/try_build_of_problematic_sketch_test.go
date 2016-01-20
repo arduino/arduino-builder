@@ -177,6 +177,10 @@ func TestTryBuild033(t *testing.T) {
 	tryBuild(t, "sketch_that_includes_arduino_h", "sketch_that_includes_arduino_h.ino")
 }
 
+func TestTryBuild034(t *testing.T) {
+	tryBuild(t, "sketch_with_static_asserts", "sketch_with_static_asserts.ino")
+}
+
 func makeDefaultContext(t *testing.T) map[string]interface{} {
 	DownloadCoresAndToolsAndLibraries(t)
 
