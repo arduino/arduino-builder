@@ -30,10 +30,10 @@
 package props
 
 import (
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/go-errors/errors"
 	"arduino.cc/arduino-builder/builder/constants"
 	"arduino.cc/arduino-builder/builder/i18n"
 	"arduino.cc/arduino-builder/builder/utils"
-	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
 	"regexp"

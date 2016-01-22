@@ -30,12 +30,12 @@
 package test
 
 import (
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/stretchr/testify/require"
 	"arduino.cc/arduino-builder/builder"
 	"arduino.cc/arduino-builder/builder/constants"
 	"arduino.cc/arduino-builder/builder/gohasissues"
 	"arduino.cc/arduino-builder/builder/types"
 	"arduino.cc/arduino-builder/builder/utils"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"

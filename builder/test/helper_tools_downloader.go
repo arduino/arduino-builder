@@ -30,6 +30,8 @@
 package test
 
 import (
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/go-errors/errors"
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/golang.org/x/codereview/patch"
 	"arduino.cc/arduino-builder/builder/constants"
 	"arduino.cc/arduino-builder/builder/gohasissues"
 	"arduino.cc/arduino-builder/builder/i18n"
@@ -37,8 +39,6 @@ import (
 	"arduino.cc/arduino-builder/builder/utils"
 	"encoding/json"
 	"fmt"
-	"github.com/go-errors/errors"
-	"golang.org/x/codereview/patch"
 	"io"
 	"io/ioutil"
 	"net/http"

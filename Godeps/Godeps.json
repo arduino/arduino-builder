@@ -1,0 +1,41 @@
+{
+	"ImportPath": "arduino.cc/arduino-builder",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/davecgh/go-spew/spew",
+			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
+		},
+		{
+			"ImportPath": "github.com/go-errors/errors",
+			"Rev": "a41850380601eeb43f4350f7d17c6bbd8944aaf8"
+		},
+		{
+			"ImportPath": "github.com/pmezard/go-difflib/difflib",
+			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.1.3",
+			"Rev": "f390dcf405f7b83c997eac1b06768bb9f44dec18"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.1.3",
+			"Rev": "f390dcf405f7b83c997eac1b06768bb9f44dec18"
+		},
+		{
+			"ImportPath": "golang.org/x/codereview/git85",
+			"Comment": "null-15",
+			"Rev": "'3a1b049cbe8dbfe303b5012c640f147268f28e04'"
+		},
+		{
+			"ImportPath": "golang.org/x/codereview/patch",
+			"Comment": "null-15",
+			"Rev": "'3a1b049cbe8dbfe303b5012c640f147268f28e04'"
+		}
+	]
+}

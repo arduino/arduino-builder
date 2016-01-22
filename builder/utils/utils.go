@@ -30,12 +30,12 @@
 package utils
 
 import (
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/go-errors/errors"
 	"arduino.cc/arduino-builder/builder/constants"
 	"arduino.cc/arduino-builder/builder/gohasissues"
 	"arduino.cc/arduino-builder/builder/i18n"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
 	"os/exec"

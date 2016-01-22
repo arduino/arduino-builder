@@ -31,12 +31,12 @@
 package test
 
 import (
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/go-errors/errors"
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"arduino.cc/arduino-builder/builder/constants"
 	"arduino.cc/arduino-builder/builder/types"
 	"bytes"
 	"fmt"
-	"github.com/go-errors/errors"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"path/filepath"
 	"strings"

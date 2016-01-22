@@ -30,10 +30,10 @@
 package test
 
 import (
+	"arduino.cc/arduino-builder/Godeps/_workspace/src/github.com/stretchr/testify/require"
 	"arduino.cc/arduino-builder/builder/constants"
 	"arduino.cc/arduino-builder/builder/i18n"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
 )
 
