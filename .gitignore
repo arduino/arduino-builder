@@ -1,6 +1,4 @@
 bin
-src/github.com
-src/golang.org
 arduino-builder
 
 # Created by .ignore support plugin (hsz.mobi)

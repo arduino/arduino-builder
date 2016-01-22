@@ -40,11 +40,11 @@ import (
 	"strings"
 	"syscall"
 
-	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/gohasissues"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/utils"
+	"arduino.cc/arduino-builder/builder"
+	"arduino.cc/arduino-builder/builder/constants"
+	"arduino.cc/arduino-builder/builder/gohasissues"
+	"arduino.cc/arduino-builder/builder/i18n"
+	"arduino.cc/arduino-builder/builder/utils"
 	"github.com/go-errors/errors"
 )
 

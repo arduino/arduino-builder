@@ -77,12 +77,12 @@ go build
 In order to run the tests, type:
 
 ```
-go test -v ./src/arduino.cc/builder/test/...
+go test -v ./src/arduino.cc/arduino-builder/builder/test/...
 ```
 
 In jenkins, use
 ```
-go test -v ./src/arduino.cc/builder/test/... | bin/go-junit-report > report.xml
+go test -v ./src/arduino.cc/arduino-builder/builder/test/... | bin/go-junit-report > report.xml
 ```
 
 ### License and Copyright
