@@ -57,18 +57,32 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 You need [Go 1.4.3](https://golang.org/dl/#go1.4.3).
 
-Repo root contains the script `setup_go_env_vars`. Use it as is or as a template for setting up Go environment variables.
+[Mercurial](https://www.mercurial-scm.org/) is also currently needed as a dependency of `golang.org/x/codereview/patch`.
 
-To install `codereview/patch` you have to install [Mercurial](https://www.mercurial-scm.org/) first.
-
-Once done, run the following commands:
+Arduino-builder uses [godep](https://github.com/tools/godep) to manage dependencies. So it expects a [standard Go workspace](https://golang.org/doc/code.html#Workspaces). For example:
 
 ```
-go get github.com/go-errors/errors
-go get github.com/stretchr/testify
-go get github.com/jstemmer/go-junit-report
-go get golang.org/x/codereview/patch
-go get golang.org/x/tools/cmd/vet
+~/gocode/								# This should be your $GOPATH
+	bin/
+	pkg/
+	src/
+		arduino.cc/arduino-builder		# This is the current repository
+```
+
+For convenience you can add these exports to use the suggested tree structure:
+
+```
+export PATH=$PATH:/usr/local/go/bin:~/gocode/bin
+export GOPATH=~/gocode
+```
+
+if you use a different `gocode` folder make sure to customize the exports.
+
+Then from the arduino-builder folder run:
+
+```
+go get github.com/tools/godep
+godep restore
 go build
 ```
 
@@ -77,18 +91,25 @@ go build
 In order to run the tests, type:
 
 ```
-go test -v ./src/arduino.cc/arduino-builder/builder/test/...
+go test -v ./builder/test/...
 ```
 
-In jenkins, use
+To run the tests in Jenkins, you have to install `go-junit-report`:
+
 ```
-go test -v ./src/arduino.cc/arduino-builder/builder/test/... | bin/go-junit-report > report.xml
+go get github.com/jstemmer/go-junit-report
+```
+
+and then you can use:
+
+```
+go test -v ./builder/test/... | bin/go-junit-report > report.xml
 ```
 
 ### License and Copyright
 
 `arduino-builder` is licensed under General Public License version 2, as published by the Free Software Foundation. See [LICENSE.txt](LICENSE.txt).
 
-Copyright (C) 2015 Arduino LLC and contributors
+Copyright (C) 2016 Arduino LLC and contributors
 
 See https://www.arduino.cc/ and https://github.com/arduino/arduino-builder/graphs/contributors
