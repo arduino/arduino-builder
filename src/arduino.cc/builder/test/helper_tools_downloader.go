@@ -110,6 +110,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 			OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/coan-5.2-x86_64-pc-linux-gnu.tar.bz2"},
 			OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/coan-5.2-i686-mingw32.zip"},
 			OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/coan-5.2-x86_64-apple-darwin.zip"},
+			OsUrl{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/coan-5.2-arm-linux-gnueabihf.tar.bz2"},
 		}},
 		Tool{Name: "ctags", Version: "5.8-arduino7",
 			OsUrls: []OsUrl{
@@ -117,6 +118,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino7-x86_64-pc-linux-gnu.tar.bz2"},
 				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino7-i686-mingw32.zip"},
 				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino7-x86_64-apple-darwin.zip"},
+				OsUrl{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino7-armv6-linux-gnueabihf.tar.bz2"},
 			}},
 	}
 
@@ -193,7 +195,7 @@ func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores
 	err = downloadBoardsManagerTools(boardsManagerTools, index)
 	NoError(t, err)
 
-	rfduinoIndex, err := downloadIndex("http://www.rfduino.com/package_rfduino_index.json")
+	rfduinoIndex, err := downloadIndex("http://downloads.arduino.cc/packages/test_package_rfduino_index.json")
 	NoError(t, err)
 
 	err = downloadBoardsManagerTools(boardsManagerRFduinoTools, rfduinoIndex)
@@ -700,6 +702,8 @@ func translateGOOSGOARCHToPackageIndexValue() []string {
 		return []string{"i686-mingw32"}
 	case "darwin-amd64":
 		return []string{"i386-apple-darwin11", "x86_64-apple-darwin"}
+	case "linux-arm":
+		return []string{"arm-linux-gnueabihf"}
 	default:
 		panic("Unknown OS: " + value)
 	}
