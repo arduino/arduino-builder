@@ -9,7 +9,7 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 ### Usage
 
-* `-compile` or `-dump-prefs` or `-preprocess`: Optional. If omitted, defaults to `-compile`. `-dump-prefs` will just print all build preferences used, `-compile` will use those preferences to run the actual compiler, `-preprocess` will only print preprocessed code to stdout.
+* `-compile` or `-dump-prefs` or `-preprocess` or `-listen:3000`: Optional. If omitted, defaults to `-compile`. `-dump-prefs` will just print all build preferences used, `-compile` will use those preferences to run the actual compiler, `-preprocess` will only print preprocessed code to stdout, `-listen:3000` opens a web server on the specified port. See the section web api below.
 
 * `-hardware`: Mandatory. Folder containing Arduino platforms. An example is the `hardware` folder shipped with the Arduino IDE, or the `packages` folder created by Arduino Boards Manager. Can be specified multiple times. If conflicting hardware definitions are specified, the last one wins.
 
@@ -41,7 +41,7 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-vid-pid`: when specified, VID/PID specific build properties are used, if boards supports them.
 
-Final mandatory parameter is the sketch to compile (of course).
+Final mandatory parameter is the sketch to compile.
 
 ### What is and how to use build.options.json file
 
@@ -70,6 +70,60 @@ go get github.com/jstemmer/go-junit-report
 go get golang.org/x/codereview/patch
 go get golang.org/x/tools/cmd/vet
 go build
+```
+
+### Web Api
+
+You can choose to compile the builder with the -api option:
+
+```bash
+go build -tags 'api'
+```
+
+Then if you launch it with the option `listen=3000` the builder will open a web server listening for requests to the /compile endpoint.
+
+Here's how to request the compilation of the simplest sketch possible:
+
+```
+POST /compile HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+
+{
+    "fqbn": "arduino:avr:uno",
+    "sketch": {
+        "main_file": {
+            "name": "sketch.ino",
+            "source": "void setup() {\n  // initialize digital pin 13 as an output.\n  pinMode(13, OUTPUT);\n}\n// the loop function runs over and over again forever\nvoid loop() {\n  digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)\n  delay(1000);              // wait for a second\n  digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW\n  delay(1000);              // wait for a second\n}"
+        }
+    }
+}
+```
+
+And here's the response (the actual response will be much bigger, but the structure is the same):
+
+```
+{
+    "binaries": {
+        "elf": "f0VMRgEBAQAAAAAAAAAAAAIAUwABAAAAAAAAADQAAACILAAAhQAAAA...",
+        "hex": "OjEwMDAwMDAwMEM5NDVDMDAwQzk0NkUwMDBDOTQ2RTAwMEM5NDZFMD..."
+    },
+    "out": [
+        {
+            "Level": "warn",
+            "Message": "Board Intel:i586:izmir_fd doesn't define a 'build.board' preference. Auto-set to: I586_IZMIR_FD"
+        },
+        {
+            "Level": "info",
+            "Message": "\"/opt/tools/avr-gcc/4.8.1-arduino5/bin/avr-g++\" -c -g -Os -w -std=gnu++11 -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics  -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10608 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR   \"-I/opt/cores/arduino/avr/cores/arduino\" \"-I/opt/cores/arduino/avr/variants/standard\" \"/tmp/build/sketch/sketch.ino.cpp\" -o \"/dev/null\""
+        },
+        {
+            "Level": "info",
+            "Message": "\"/opt/tools/avr-gcc/4.8.1-arduino5/bin/avr-g++\" -c -g -Os -w -std=gnu++11 -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics  -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10608 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR   \"-I/opt/cores/arduino/avr/cores/arduino\" \"-I/opt/cores/arduino/avr/variants/standard\" \"/tmp/build/sketch/sketch.ino.cpp\" -o \"/dev/null\""
+        },
+        ...
+    ]
+}
 ```
 
 ### TDD

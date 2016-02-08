@@ -76,6 +76,7 @@ const FLAG_LOGGER_HUMAN = "human"
 const FLAG_LOGGER_MACHINE = "machine"
 const FLAG_VERSION = "version"
 const FLAG_VID_PID = "vid-pid"
+const FLAG_LISTEN = "listen"
 
 type slice []string
 
@@ -119,6 +120,7 @@ var warningsLevelFlag *string
 var loggerFlag *string
 var versionFlag *bool
 var vidPidFlag *string
+var listenFlag *string
 
 func init() {
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
@@ -141,6 +143,7 @@ func init() {
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
 	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
+	listenFlag = flag.String(FLAG_LISTEN, "", "specify to listen for web request at a certain host")
 }
 
 func main() {
@@ -310,6 +313,8 @@ func main() {
 		err = builder.RunParseHardwareAndDumpBuildProperties(context)
 	} else if *preprocessFlag {
 		err = builder.RunPreprocess(context)
+	} else if *listenFlag != "" {
+		listen(context)
 	} else {
 		if flag.NArg() == 0 {
 			fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")

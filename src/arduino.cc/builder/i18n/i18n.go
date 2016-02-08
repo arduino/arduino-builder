@@ -98,6 +98,37 @@ func (s MachineLogger) Name() string {
 	return "machine"
 }
 
+type message struct {
+	Level   string
+	Message string
+}
+
+// I tried keeping this inside the WebLogger but it didn't work
+var out = make([]message, 0)
+
+type WebLogger struct {
+}
+
+func (s WebLogger) Init() {
+	out = make([]message, 0)
+}
+
+func (s WebLogger) Out() []message {
+	return out
+}
+
+func (s WebLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	out = append(out, message{Level: level, Message: Format(format, a...)})
+}
+
+func (s WebLogger) Println(level string, format string, a ...interface{}) {
+	out = append(out, message{Level: level, Message: Format(format, a...)})
+}
+
+func (s WebLogger) Name() string {
+	return "web"
+}
+
 func FromJavaToGoSyntax(s string) string {
 	submatches := PLACEHOLDER.FindAllStringSubmatch(s, -1)
 	for _, submatch := range submatches {
