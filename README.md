@@ -102,13 +102,13 @@ go build
 In order to run the tests, type:
 
 ```
-go test -v ./builder/test/...
+go test -timeout 60m -v ./builder/test/...
 ```
 
 In jenkins, use
 
 ```
-go test -v ./builder/test/... | bin/go-junit-report > report.xml
+go test -timeout 60m -v ./builder/test/... | bin/go-junit-report > report.xml
 ```
 
 ### License and Copyright
