@@ -57,7 +57,32 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 You need [Go 1.4.3](https://golang.org/dl/#go1.4.3).
 
-Repo root contains the script `setup_go_env_vars`. Use it as is or as a template for setting up Go environment variables.
+If you want a clean Gopath you can start by creating a directory wherever you want
+
+```bash
+$ mkdir abuilder
+$ cd abuilder
+```
+
+And set the GOPATH to that directory
+
+```bash
+$ export GOPATH=`pwd`
+```
+
+Then you can clone this repository in the folder
+
+```bash
+$ go get github.com/arduino/arduino-builder
+```
+
+If you instead need to clone a private fork you can use this method:
+
+```bash
+$ mkdir -p src/github.com/arduino
+$ cd src/github.com/arduino
+$ git clone git@github.com:myusername/arduino-builder.git
+```
 
 To install `codereview/patch` you have to install [Mercurial](https://www.mercurial-scm.org/) first.
 
@@ -77,12 +102,13 @@ go build
 In order to run the tests, type:
 
 ```
-go test -timeout 60m -v ./src/arduino.cc/builder/test/...
+go test -timeout 60m -v ./builder/test/...
 ```
 
 In jenkins, use
+
 ```
-go test -timeout 60m -v ./src/arduino.cc/builder/test/... | bin/go-junit-report > report.xml
+go test -timeout 60m -v ./builder/test/... | bin/go-junit-report > report.xml
 ```
 
 ### License and Copyright
