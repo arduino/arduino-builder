@@ -77,12 +77,12 @@ go build
 In order to run the tests, type:
 
 ```
-go test -v ./src/arduino.cc/builder/test/...
+go test -timeout 60m -v ./src/arduino.cc/builder/test/...
 ```
 
 In jenkins, use
 ```
-go test -v ./src/arduino.cc/builder/test/... | bin/go-junit-report > report.xml
+go test -timeout 60m -v ./src/arduino.cc/builder/test/... | bin/go-junit-report > report.xml
 ```
 
 ### License and Copyright
