@@ -43,6 +43,10 @@ type PrototypesAdder struct{}
 func (s *PrototypesAdder) Run(context map[string]interface{}) error {
 	debugOutput := context[constants.CTX_DEBUG_PREPROCESSOR] != nil
 	source := context[constants.CTX_SOURCE].(string)
+
+	source = strings.Replace(source, "\r\n", "\n", -1)
+	source = strings.Replace(source, "\r", "\n", -1)
+
 	sourceRows := strings.Split(source, "\n")
 
 	if !utils.MapHas(context, constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES) {
