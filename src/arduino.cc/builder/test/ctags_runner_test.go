@@ -271,7 +271,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	}
 
 	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
-	expectedOutput := "printGyro\t" + sketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
+	expectedOutput := "printGyro\t" + sketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
 }
