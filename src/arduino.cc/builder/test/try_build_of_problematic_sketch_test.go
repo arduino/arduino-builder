@@ -185,6 +185,10 @@ func TestTryBuild035(t *testing.T) {
 	tryBuild(t, "sketch_with_enum_class", "sketch_with_enum_class.ino")
 }
 
+func TestTryBuild036(t *testing.T) { 
+	tryBuild(t, "sketch_with_multiline_prototypes", "sketch_with_multiline_prototypes.ino")
+}
+
 func makeDefaultContext(t *testing.T) map[string]interface{} {
 	DownloadCoresAndToolsAndLibraries(t)
 
