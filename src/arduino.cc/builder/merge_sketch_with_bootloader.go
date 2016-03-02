@@ -86,6 +86,48 @@ func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
 	return err
 }
 
+func hexLineOnlyContainsFF(line string) bool {
+	//:206FE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB1
+	if len(line) <= 11 {
+		return false
+	}
+	byteArray := []byte(line)
+	for _, char := range byteArray[9:(len(byteArray) - 2)] {
+		if char != 'F' {
+			return false
+		}
+	}
+	return true
+}
+
+func extractActualBootloader(bootloader []string) []string {
+
+	var realBootloader []string
+
+	// skip until we find a line full of FFFFFF (except address and checksum)
+	for i, row := range bootloader {
+		if hexLineOnlyContainsFF(row) {
+			realBootloader = bootloader[i:len(bootloader)]
+			break
+		}
+	}
+
+	// drop all "empty" lines
+	for i, row := range realBootloader {
+		if !hexLineOnlyContainsFF(row) {
+			realBootloader = realBootloader[i:len(realBootloader)]
+			break
+		}
+	}
+
+	if len(realBootloader) == 0 {
+		// we didn't find any line full of FFFF, thus it's a standalone bootloader
+		realBootloader = bootloader
+	}
+
+	return realBootloader
+}
+
 func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	sketch, err := utils.ReadFileToRows(builtSketchPath)
 	if err != nil {
@@ -98,7 +140,9 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 		return utils.WrapError(err)
 	}
 
-	for _, row := range bootloader {
+	realBootloader := extractActualBootloader(bootloader)
+
+	for _, row := range realBootloader {
 		sketch = append(sketch, row)
 	}
 
