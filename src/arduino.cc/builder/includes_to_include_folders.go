@@ -140,7 +140,7 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 	var library *types.Library
 
 	for _, platform := range platforms {
-		if platform != nil && library == nil {
+		if platform != nil {
 			library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libraries, platform))
 		}
 	}
@@ -218,21 +218,34 @@ func findLibraryIn(libraries []*types.Library, library *types.Library) *types.Li
 	return nil
 }
 
-func libraryCompatibleWithPlatform(library *types.Library, platform *types.Platform) bool {
+func libraryCompatibleWithPlatform(library *types.Library, platform *types.Platform) (bool, bool) {
 	if len(library.Archs) == 0 {
-		return true
+		return true, true
 	}
+	if utils.SliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
+		return true, true
+	}
+	return utils.SliceContains(library.Archs, platform.PlatformId), false
+}
+
+func libraryCompatibleWithAllPlatforms(library *types.Library) bool {
 	if utils.SliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
 		return true
 	}
-	return utils.SliceContains(library.Archs, platform.PlatformId)
+	return false
 }
 
 func librariesCompatibleWithPlatform(libraries []*types.Library, platform *types.Platform) []*types.Library {
 	var compatibleLibraries []*types.Library
 	for _, library := range libraries {
-		if libraryCompatibleWithPlatform(library, platform) {
-			compatibleLibraries = append(compatibleLibraries, library)
+		compatible, generic := libraryCompatibleWithPlatform(library, platform)
+		if compatible {
+			if !generic && len(compatibleLibraries) != 0 && libraryCompatibleWithAllPlatforms(compatibleLibraries[0]) {
+				//priority inversion
+				compatibleLibraries = append([]*types.Library{library}, compatibleLibraries...)
+			} else {
+				compatibleLibraries = append(compatibleLibraries, library)
+			}
 		}
 	}
 
