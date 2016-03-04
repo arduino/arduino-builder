@@ -48,7 +48,7 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}) error {
 		includeSection += "#include <Arduino.h>\n"
 		lineOffset++
 	}
-	includeSection += "#line 1\n"
+	includeSection += "#line 1 \"" + strings.Replace((&sketch.MainFile).Name, "\\", "\\\\", -1) + "\"\n"
 	lineOffset++
 	context[constants.CTX_INCLUDE_SECTION] = includeSection
 
