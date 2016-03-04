@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #include <SoftwareSerial.h> // required to send and receive AT commands from the GPRS Shield
 #include <Wire.h> // required for I2C communication with the RTC
@@ -81,7 +81,7 @@ void printTime();
 void setup();
 #line 334 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
-#line 39
+#line 39 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setPowerStateTo( int newState )
 {
   if( newState != 1 && newState != 0 ) { // tests for an invalid state. In this case no change is made to powerstate
