@@ -8,9 +8,9 @@ tools.ctags.pattern="{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf -
 tools.avrdude.path={runtime.tools.avrdude.path}
 
 preproc.includes.flags=-w -x c++ -M -MG -MP
-preproc.includes.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}
-recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.includes.compatibility_flags} {includes} "{source_file}"
+#preproc.includes.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}
+#recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {preproc.includes.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.includes.compatibility_flags} {includes} "{source_file}"
 
 preproc.macros.flags=-w -x c++ -E -CC
-preproc.macros.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}
-recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
+#preproc.macros.compatibility_flags={build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}
+#recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
