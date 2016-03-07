@@ -141,7 +141,7 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 
 	for _, platform := range platforms {
 		if platform != nil {
-			library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libraries, platform))
+			library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libraries, platform, true))
 		}
 	}
 
@@ -150,6 +150,12 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 	}
 
 	if library == nil {
+		// reorder libraries to promote fully compatible ones
+		for _, platform := range platforms {
+			if platform != nil {
+				libraries = append(librariesCompatibleWithPlatform(libraries, platform, false), libraries...)
+			}
+		}
 		library = libraries[0]
 	}
 
@@ -235,12 +241,12 @@ func libraryCompatibleWithAllPlatforms(library *types.Library) bool {
 	return false
 }
 
-func librariesCompatibleWithPlatform(libraries []*types.Library, platform *types.Platform) []*types.Library {
+func librariesCompatibleWithPlatform(libraries []*types.Library, platform *types.Platform, reorder bool) []*types.Library {
 	var compatibleLibraries []*types.Library
 	for _, library := range libraries {
 		compatible, generic := libraryCompatibleWithPlatform(library, platform)
 		if compatible {
-			if !generic && len(compatibleLibraries) != 0 && libraryCompatibleWithAllPlatforms(compatibleLibraries[0]) {
+			if !generic && len(compatibleLibraries) != 0 && libraryCompatibleWithAllPlatforms(compatibleLibraries[0]) && reorder == true {
 				//priority inversion
 				compatibleLibraries = append([]*types.Library{library}, compatibleLibraries...)
 			} else {
