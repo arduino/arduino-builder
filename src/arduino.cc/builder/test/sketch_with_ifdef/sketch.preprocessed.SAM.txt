@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #if __SAM3X8E__
 #line 2 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
@@ -12,7 +12,7 @@ void f2();
 void setup();
 #line 14 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
-#line 2
+#line 2 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void ifBranch() {
 }
 #else

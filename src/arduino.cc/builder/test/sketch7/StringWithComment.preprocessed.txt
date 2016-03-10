@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup();
 #line 10 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup() {
   // put your setup code here, to run once:
   // "comment with a double quote

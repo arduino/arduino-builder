@@ -92,6 +92,7 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 	str := joinPrototypes(prototypes)
 	str += "\n#line "
 	str += strconv.Itoa(line)
+	str += " \"" + prototypes[0].File + "\""
 	str += "\n"
 
 	return str

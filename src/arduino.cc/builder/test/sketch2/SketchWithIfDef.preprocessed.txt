@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #define DEBUG 1
 #define DISABLED 0
@@ -26,7 +26,7 @@ void debug();
 void disabledIsDefined();
 #line 48 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 int useMyType(MyType type);
-#line 16
+#line 16 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup() {
   // put your setup code here, to run once:
 
