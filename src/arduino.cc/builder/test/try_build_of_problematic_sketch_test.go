@@ -191,18 +191,6 @@ func TestTryBuild036(t *testing.T) {
 	tryBuildWithContext(t, context, "sketch11", "sketch_fastleds.ino")
 }
 
-func TestTryBuild037(t *testing.T) {
-	context := makeDefaultContext(t)
-	context[constants.CTX_FQBN] = "arduino:samd:arduino_zero_native"
-	tryBuildWithContext(t, context, "sketch12", "sketch12.ino")
-}
-
-func TestTryBuild038(t *testing.T) {
-	context := makeDefaultContext(t)
-	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x"
-	tryBuildWithContext(t, context, "sketch12", "sketch12.ino")
-}
-
 func makeDefaultContext(t *testing.T) map[string]interface{} {
 	DownloadCoresAndToolsAndLibraries(t)
 
