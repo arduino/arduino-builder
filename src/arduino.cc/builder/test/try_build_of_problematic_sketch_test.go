@@ -191,6 +191,10 @@ func TestTryBuild036(t *testing.T) {
 	tryBuildWithContext(t, context, "sketch11", "sketch_fastleds.ino")
 }
 
+func TestTryBuild037(t *testing.T) {
+	tryBuild(t, "sketch_with_externC", "sketch_with_externC.ino")
+}
+
 func makeDefaultContext(t *testing.T) map[string]interface{} {
 	DownloadCoresAndToolsAndLibraries(t)
 
