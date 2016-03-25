@@ -147,7 +147,6 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties["tools.ctags.pattern"])
 	require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties["tools.avrdude.path"])
 	require.Equal(t, "-w -x c++ -E -CC", packages.Properties["preproc.macros.flags"])
-	require.Equal(t, "{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}", packages.Properties["preproc.macros.compatibility_flags"])
 
 	if runtime.GOOS != "windows" {
 		require.NotNil(t, packages.Packages["my_symlinked_avr_platform"])
