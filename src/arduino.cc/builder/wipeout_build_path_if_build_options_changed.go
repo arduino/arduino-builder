@@ -36,6 +36,7 @@ import (
 	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
@@ -44,11 +45,19 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface
 	if !utils.MapHas(context, constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON) {
 		return nil
 	}
-
 	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
 	previousBuildOptionsJson := context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON].(string)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 
+	if buildOptionsJson == previousBuildOptionsJson {
+		return nil
+	}
+
+	re := regexp.MustCompile("(?m)^.*" + constants.CTX_SKETCH_LOCATION + ".*$[\r\n]+")
+	buildOptionsJson = re.ReplaceAllString(buildOptionsJson, "")
+	previousBuildOptionsJson = re.ReplaceAllString(previousBuildOptionsJson, "")
+
+	// if the only difference is the sketch path skip deleting everything
 	if buildOptionsJson == previousBuildOptionsJson {
 		return nil
 	}
