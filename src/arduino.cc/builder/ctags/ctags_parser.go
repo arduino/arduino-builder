@@ -47,6 +47,7 @@ const KIND_FUNCTION = "function"
 
 const TEMPLATE = "template"
 const STATIC = "static"
+const EXTERN = "extern \"C\""
 
 var KNOWN_TAG_KINDS = map[string]bool{
 	"prototype": true,
@@ -100,6 +101,9 @@ func addPrototype(tag *types.CTag) {
 	tag.PrototypeModifiers = ""
 	if strings.Index(tag.Code, STATIC+" ") != -1 {
 		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + STATIC
+	}
+	if strings.Index(tag.Code, EXTERN+" ") != -1 {
+		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + EXTERN
 	}
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
