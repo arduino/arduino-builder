@@ -40,9 +40,10 @@ import (
 
 func TestTargetBoardResolverUno(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:avr:uno",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -66,9 +67,10 @@ func TestTargetBoardResolverUno(t *testing.T) {
 
 func TestTargetBoardResolverDue(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:sam:arduino_due_x",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -92,9 +94,10 @@ func TestTargetBoardResolverDue(t *testing.T) {
 
 func TestTargetBoardResolverMega1280(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:mega:cpu=atmega1280"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:avr:mega:cpu=atmega1280",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -119,9 +122,10 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 
 func TestTargetBoardResolverMega2560(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:mega:cpu=atmega2560"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:avr:mega:cpu=atmega2560",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -146,9 +150,10 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 
 func TestTargetBoardResolverCustomYun(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "my_avr_platform:avr:custom_yun",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -173,9 +178,10 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 
 func TestTargetBoardResolverCustomCore(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "watterott:avr:attiny841:core=spencekonde,info=info"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "watterott:avr:attiny841:core=spencekonde,info=info",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

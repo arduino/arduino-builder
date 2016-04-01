@@ -44,18 +44,19 @@ func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_VERBOSE] = true
 	context[constants.CTX_DEBUG_LEVEL] = 10
 
@@ -79,18 +80,19 @@ func TestBuilderBridge(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
+		FQBN:                    "arduino:avr:leonardo",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_VERBOSE] = true
 
 	command := builder.Builder{}
@@ -115,18 +117,18 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_with_config", "sketch_with_config.ino"),
+		FQBN:                    "arduino:avr:leonardo",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_config", "sketch_with_config.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -150,18 +152,18 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
+		FQBN:                    "arduino:avr:leonardo",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -189,18 +191,19 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
+		FQBN:                    "arduino:sam:arduino_due_x_dbg",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x_dbg"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_WARNINGS_LEVEL] = "all"
 
 	command := builder.Builder{}
@@ -234,18 +237,18 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
+		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
+		FQBN:                    "RedBearLab:avr:blend",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
-	context[constants.CTX_FQBN] = "RedBearLab:avr:blend"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -269,18 +272,18 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
+		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_no_functions", "main.ino"),
+		FQBN:                    "RedBearLab:avr:blend",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
-	context[constants.CTX_FQBN] = "RedBearLab:avr:blend"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_no_functions", "main.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -291,18 +294,18 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
+		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_with_backup_files", "sketch.ino"),
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_backup_files", "sketch.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -313,18 +316,18 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_with_old_lib", "sketch.ino"),
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_old_lib", "sketch.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -335,18 +338,18 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"),
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)
@@ -357,20 +360,20 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
+		FQBN:                    "arduino:avr:leonardo",
+		ArduinoAPIVersion:       "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
 	NoError(t, os.MkdirAll(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"), os.FileMode(0755)))
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)

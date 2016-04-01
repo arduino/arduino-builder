@@ -42,8 +42,9 @@ import (
 
 func TestMergeSketch(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

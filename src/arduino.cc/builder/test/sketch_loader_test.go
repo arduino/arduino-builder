@@ -40,8 +40,9 @@ import (
 
 func TestLoadSketchWithFolder(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = "sketch1"
+	ctx := &types.Context{
+		SketchLocation: "sketch1",
+	}
 
 	loggerCommand := builder.SetupHumanLoggerIfMissing{}
 	err := loggerCommand.Run(context, ctx)
@@ -58,8 +59,9 @@ func TestLoadSketchWithFolder(t *testing.T) {
 
 func TestLoadSketchNonExistentPath(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = "asdasd78128123981723981273asdasd"
+	ctx := &types.Context{
+		SketchLocation: "asdasd78128123981723981273asdasd",
+	}
 
 	loggerCommand := builder.SetupHumanLoggerIfMissing{}
 	err := loggerCommand.Run(context, ctx)
@@ -76,8 +78,9 @@ func TestLoadSketchNonExistentPath(t *testing.T) {
 
 func TestLoadSketch(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -106,8 +109,9 @@ func TestLoadSketch(t *testing.T) {
 
 func TestFailToLoadSketchFromFolder(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = "./sketch1"
+	ctx := &types.Context{
+		SketchLocation: "./sketch1",
+	}
 
 	loggerCommand := builder.SetupHumanLoggerIfMissing{}
 	err := loggerCommand.Run(context, ctx)
@@ -123,8 +127,9 @@ func TestFailToLoadSketchFromFolder(t *testing.T) {
 
 func TestLoadSketchFromFolder(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = "sketch_with_subfolders"
+	ctx := &types.Context{
+		SketchLocation: "sketch_with_subfolders",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -150,8 +155,9 @@ func TestLoadSketchFromFolder(t *testing.T) {
 
 func TestLoadSketchWithBackup(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_backup_files", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch_with_backup_files", "sketch.ino"),
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -174,8 +180,9 @@ func TestLoadSketchWithBackup(t *testing.T) {
 
 func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_macosx_garbage", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch_with_macosx_garbage", "sketch.ino"),
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

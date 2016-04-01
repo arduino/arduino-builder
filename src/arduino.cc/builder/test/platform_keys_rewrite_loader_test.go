@@ -40,8 +40,9 @@ import (
 
 func TestLoadPlatformKeysRewrite(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"},
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

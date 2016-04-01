@@ -40,9 +40,10 @@ import (
 
 func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:mymega"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "my_avr_platform:avr:mymega",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -68,9 +69,10 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 
 func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:mymega:cpu=atmega2560"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "my_avr_platform:avr:mymega:cpu=atmega2560",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

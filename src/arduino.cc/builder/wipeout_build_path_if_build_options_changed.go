@@ -54,7 +54,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface
 		return nil
 	}
 
-	re := regexp.MustCompile("(?m)^.*" + constants.CTX_SKETCH_LOCATION + ".*$[\r\n]+")
+	re := regexp.MustCompile("(?m)^.*" + ctx.SketchLocation + ".*$[\r\n]+")
 	buildOptionsJson = re.ReplaceAllString(buildOptionsJson, "")
 	previousBuildOptionsJson = re.ReplaceAllString(previousBuildOptionsJson, "")
 

@@ -43,12 +43,12 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		FQBN: "arduino:avr:leonardo",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -63,7 +63,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := context[constants.CTX_LIBRARIES_FOLDERS].([]string)
+	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 3, len(librariesFolders))
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
@@ -154,12 +154,12 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x_dbg"
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		FQBN: "arduino:sam:arduino_due_x_dbg",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -174,7 +174,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := context[constants.CTX_LIBRARIES_FOLDERS].([]string)
+	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 3, len(librariesFolders))
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "sam", "libraries")), librariesFolders[1])
@@ -239,12 +239,12 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")},
+		FQBN: "arduino:avr:leonardo",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -259,7 +259,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := context[constants.CTX_LIBRARIES_FOLDERS].([]string)
+	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 3, len(librariesFolders))
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
@@ -270,12 +270,12 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")},
+		FQBN: "my_avr_platform:avr:custom_yun",
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -290,7 +290,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := context[constants.CTX_LIBRARIES_FOLDERS].([]string)
+	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 4, len(librariesFolders))
 	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])

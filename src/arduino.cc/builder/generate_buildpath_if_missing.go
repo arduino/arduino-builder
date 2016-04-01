@@ -46,8 +46,7 @@ func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}, ctx *ty
 		return nil
 	}
 
-	sketchLocation := context[constants.CTX_SKETCH_LOCATION].(string)
-	md5sum := utils.MD5Sum([]byte(sketchLocation))
+	md5sum := utils.MD5Sum([]byte(ctx.SketchLocation))
 
 	buildPath := filepath.Join(os.TempDir(), "arduino-sketch-"+strings.ToUpper(md5sum))
 	_, err := os.Stat(buildPath)

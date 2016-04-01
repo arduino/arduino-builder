@@ -44,16 +44,17 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:      []string{"downloaded_tools"},
+		SketchLocation:    filepath.Join("sketch2", "SketchWithIfDef.ino"),
+		FQBN:              "arduino:avr:leonardo",
+		ArduinoAPIVersion: "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch2", "SketchWithIfDef.ino")
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{

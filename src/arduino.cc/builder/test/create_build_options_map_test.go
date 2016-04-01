@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
@@ -40,32 +41,37 @@ import (
 
 func TestCreateBuildOptionsMap(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:       []string{"hardware", "hardware2"},
+		ToolsFolders:          []string{"tools"},
+		OtherLibrariesFolders: []string{"libraries"},
+		SketchLocation:        "sketchLocation",
+		FQBN:                  "fqbn",
+		ArduinoAPIVersion:     "ideVersion",
+	}
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"hardware", "hardware2"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"tools"}
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_FQBN] = "fqbn"
-	context[constants.CTX_SKETCH_LOCATION] = "sketchLocation"
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "ideVersion"
 	context[constants.CTX_DEBUG_LEVEL] = 5
 
 	create := builder.CreateBuildOptionsMap{}
 	err := create.Run(context, ctx)
 	NoError(t, err)
 
-	buildOptions := context[constants.CTX_BUILD_OPTIONS].(map[string]string)
-	require.Equal(t, 6, len(utils.KeysOfMapOfString(buildOptions)))
-	require.Equal(t, "hardware,hardware2", buildOptions[constants.CTX_HARDWARE_FOLDERS])
-	require.Equal(t, "tools", buildOptions[constants.CTX_TOOLS_FOLDERS])
-	require.Equal(t, "libraries", buildOptions[constants.CTX_OTHER_LIBRARIES_FOLDERS])
-	require.Equal(t, "fqbn", buildOptions[constants.CTX_FQBN])
-	require.Equal(t, "sketchLocation", buildOptions[constants.CTX_SKETCH_LOCATION])
-	require.Equal(t, "ideVersion", buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
+	buildOptions := context[constants.CTX_BUILD_OPTIONS].(props.PropertiesMap)
+	require.Equal(t, 8, len(utils.KeysOfMapOfString(buildOptions)))
+	require.Equal(t, "hardware,hardware2", buildOptions["hardwareFolders"])
+	require.Equal(t, "tools", buildOptions["toolsFolders"])
+	require.Equal(t, "", buildOptions["builtInLibrariesFolders"])
+	require.Equal(t, "", buildOptions["customBuildProperties"])
+	require.Equal(t, "libraries", buildOptions["otherLibrariesFolders"])
+	require.Equal(t, "fqbn", buildOptions["fqbn"])
+	require.Equal(t, "sketchLocation", buildOptions["sketchLocation"])
+	require.Equal(t, "ideVersion", buildOptions["runtime.ide.version"])
 
 	require.Equal(t, "{\n"+
+		"  \"builtInLibrariesFolders\": \"\",\n"+
+		"  \"customBuildProperties\": \"\",\n"+
 		"  \"fqbn\": \"fqbn\",\n"+
 		"  \"hardwareFolders\": \"hardware,hardware2\",\n"+
 		"  \"otherLibrariesFolders\": \"libraries\",\n"+

@@ -67,8 +67,8 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Co
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(targetPlatform.Folder, "..")
-	buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION].(string)
-	buildProperties[constants.IDE_VERSION] = context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION].(string)
+	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ctx.ArduinoAPIVersion
+	buildProperties[constants.IDE_VERSION] = ctx.ArduinoAPIVersion
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS] = utils.PrettyOSName()
 
 	variant := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT]
@@ -96,8 +96,8 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Co
 		buildProperties[constants.BUILD_PROPERTIES_SOFTWARE] = DEFAULT_SOFTWARE
 	}
 
-	if utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
-		sourcePath, err := filepath.Abs(context[constants.CTX_SKETCH_LOCATION].(string))
+	if ctx.SketchLocation != "" {
+		sourcePath, err := filepath.Abs(ctx.SketchLocation)
 		if err != nil {
 			return err
 		}

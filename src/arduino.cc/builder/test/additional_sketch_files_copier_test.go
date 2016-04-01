@@ -56,12 +56,12 @@ func (s ByFileInfoName) Less(i, j int) bool {
 
 func TestCopyOtherFiles(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -95,12 +95,12 @@ func TestCopyOtherFiles(t *testing.T) {
 
 func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -121,7 +121,9 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 
 	context = make(map[string]interface{})
 	context[constants.CTX_BUILD_PATH] = buildPath
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+	ctx = &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	for _, command := range commands {
 		err := command.Run(context, ctx)

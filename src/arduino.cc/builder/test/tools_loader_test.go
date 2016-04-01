@@ -57,8 +57,9 @@ func TestLoadTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "tools_builtin"}
+	ctx := &types.Context{
+		ToolsFolders: []string{"downloaded_tools", "tools_builtin"},
+	}
 
 	loader := builder.ToolsLoader{}
 	err := loader.Run(context, ctx)
@@ -95,8 +96,9 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_board_manager_stuff"}
+	ctx := &types.Context{
+		ToolsFolders: []string{"downloaded_board_manager_stuff"},
+	}
 
 	loader := builder.ToolsLoader{}
 	err := loader.Run(context, ctx)
@@ -121,8 +123,9 @@ func TestLoadLotsOfTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "tools_builtin", "downloaded_board_manager_stuff"}
+	ctx := &types.Context{
+		ToolsFolders: []string{"downloaded_tools", "tools_builtin", "downloaded_board_manager_stuff"},
+	}
 
 	loader := builder.ToolsLoader{}
 	err := loader.Run(context, ctx)

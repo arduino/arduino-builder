@@ -41,9 +41,9 @@ import (
 
 func TestGenerateBuildPathIfMissing(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_SKETCH_LOCATION] = "test"
+	ctx := &types.Context{
+		SketchLocation: "test",
+	}
 
 	command := builder.GenerateBuildPathIfMissing{}
 	err := command.Run(context, ctx)
@@ -56,9 +56,10 @@ func TestGenerateBuildPathIfMissing(t *testing.T) {
 
 func TestGenerateBuildPathIfEmpty(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		SketchLocation: "test",
+	}
 
-	context[constants.CTX_SKETCH_LOCATION] = "test"
 	context[constants.CTX_BUILD_PATH] = constants.EMPTY_STRING
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
@@ -85,9 +86,9 @@ func TestDontGenerateBuildPathIfPresent(t *testing.T) {
 
 func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_SKETCH_LOCATION] = "test"
+	ctx := &types.Context{
+		SketchLocation: "test",
+	}
 
 	commands := []types.Command{
 		&builder.GenerateBuildPathIfMissing{},

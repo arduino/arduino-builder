@@ -45,11 +45,11 @@ import (
 type SketchLoader struct{}
 
 func (s *SketchLoader) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
+	if ctx.SketchLocation == "" {
 		return nil
 	}
 
-	sketchLocation := context[constants.CTX_SKETCH_LOCATION].(string)
+	sketchLocation := ctx.SketchLocation
 
 	sketchLocation, err := filepath.Abs(sketchLocation)
 	if err != nil {
@@ -62,7 +62,8 @@ func (s *SketchLoader) Run(context map[string]interface{}, ctx *types.Context) e
 	if mainSketchStat.IsDir() {
 		sketchLocation = filepath.Join(sketchLocation, mainSketchStat.Name()+".ino")
 	}
-	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+
+	ctx.SketchLocation = sketchLocation
 
 	allSketchFilePaths, err := collectAllSketchFiles(filepath.Dir(sketchLocation))
 	if err != nil {
@@ -79,7 +80,7 @@ func (s *SketchLoader) Run(context map[string]interface{}, ctx *types.Context) e
 		return utils.WrapError(err)
 	}
 
-	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	ctx.SketchLocation = sketchLocation
 	context[constants.CTX_SKETCH] = sketch
 
 	return nil

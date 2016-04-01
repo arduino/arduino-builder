@@ -119,7 +119,7 @@ func TestTryBuild019(t *testing.T) {
 
 func TestTryBuild020(t *testing.T) {
 	context, ctx := makeDefaultContext(t)
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"dependent_libraries", "libraries"}
+	ctx.OtherLibrariesFolders = []string{"dependent_libraries", "libraries"}
 	tryPreprocessWithContext(t, context, ctx, "sketch_with_dependend_libraries", "sketch.ino")
 }
 
@@ -129,7 +129,7 @@ func TestTryBuild021(t *testing.T) {
 
 func TestTryBuild022(t *testing.T) {
 	context, ctx := makeDefaultContext(t)
-	context[constants.CTX_FQBN] = "arduino:samd:arduino_zero_native"
+	ctx.FQBN = "arduino:samd:arduino_zero_native"
 	tryBuildWithContext(t, context, ctx, "sketch_usbhost", "sketch_usbhost.ino")
 }
 
@@ -188,7 +188,7 @@ func TestTryBuild035(t *testing.T) {
 
 func TestTryBuild036(t *testing.T) {
 	context, ctx := makeDefaultContext(t)
-	context[constants.CTX_FQBN] = "arduino:samd:arduino_zero_native"
+	ctx.FQBN = "arduino:samd:arduino_zero_native"
 	tryBuildWithContext(t, context, ctx, "sketch11", "sketch_fastleds.ino")
 }
 
@@ -204,16 +204,17 @@ func makeDefaultContext(t *testing.T) (map[string]interface{}, *types.Context) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
+		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		FQBN:              "arduino:avr:leonardo",
+		ArduinoAPIVersion: "10607",
+	}
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10607"
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
 	context[constants.CTX_VERBOSE] = true
 	context[constants.CTX_DEBUG_PREPROCESSOR] = true
 
@@ -227,7 +228,7 @@ func tryBuild(t *testing.T, sketchPath ...string) {
 
 func tryBuildWithContext(t *testing.T, context map[string]interface{}, ctx *types.Context, sketchPath ...string) {
 	sketchLocation := filepath.Join(sketchPath...)
-	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	ctx.SketchLocation = sketchLocation
 
 	err := builder.RunBuilder(context, ctx)
 	NoError(t, err, "Build error for "+sketchLocation)
@@ -240,7 +241,7 @@ func tryPreprocess(t *testing.T, sketchPath ...string) {
 
 func tryPreprocessWithContext(t *testing.T, context map[string]interface{}, ctx *types.Context, sketchPath ...string) {
 	sketchLocation := filepath.Join(sketchPath...)
-	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	ctx.SketchLocation = sketchLocation
 
 	err := builder.RunPreprocess(context, ctx)
 	NoError(t, err, "Build error for "+sketchLocation)

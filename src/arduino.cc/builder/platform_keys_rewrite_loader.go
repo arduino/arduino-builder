@@ -46,7 +46,7 @@ type PlatformKeysRewriteLoader struct{}
 
 func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}, ctx *types.Context) error {
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	folders := context[constants.CTX_HARDWARE_FOLDERS].([]string)
+	folders := ctx.HardwareFolders
 
 	platformKeysRewriteTxtPath, err := findPlatformKeysRewriteTxt(folders)
 	if err != nil {

@@ -39,7 +39,7 @@ import (
 type FailIfBuildPathEqualsSketchPath struct{}
 
 func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_BUILD_PATH) || !utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
+	if !utils.MapHas(context, constants.CTX_BUILD_PATH) || ctx.SketchLocation == "" {
 		return nil
 	}
 
@@ -48,7 +48,7 @@ func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}, ct
 		return utils.WrapError(err)
 	}
 
-	sketchPath, err := filepath.Abs(context[constants.CTX_SKETCH_LOCATION].(string))
+	sketchPath, err := filepath.Abs(ctx.SketchLocation)
 	if err != nil {
 		return utils.WrapError(err)
 	}

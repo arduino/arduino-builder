@@ -42,8 +42,9 @@ import (
 
 func TestLoadHardware(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"},
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -87,8 +88,9 @@ func TestLoadHardware(t *testing.T) {
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"},
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -158,8 +160,9 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_board_manager_stuff"},
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -207,9 +210,9 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 
 func TestLoadLotsOfHardware(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"},
+	}
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},

@@ -44,16 +44,16 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
+		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		FQBN:              "arduino:avr:micro",
+		ArduinoAPIVersion: "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "arduino:avr:micro"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 
 	commands := []types.Command{
 		&builder.SetupHumanLoggerIfMissing{},
@@ -76,16 +76,17 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
+		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		FQBN:              "arduino:avr:micro",
+		ArduinoAPIVersion: "10600",
+	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "arduino:avr:micro"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
 	context[constants.CTX_VIDPID] = "0x2341_0x0237"
 
 	commands := []types.Command{

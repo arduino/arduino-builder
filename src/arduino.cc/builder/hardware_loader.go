@@ -48,7 +48,7 @@ func (s *HardwareLoader) Run(context map[string]interface{}, ctx *types.Context)
 	packages.Packages = make(map[string]*types.Package)
 	packages.Properties = make(map[string]string)
 
-	folders := context[constants.CTX_HARDWARE_FOLDERS].([]string)
+	folders := ctx.HardwareFolders
 	folders, err := utils.AbsolutizePaths(folders)
 	if err != nil {
 		return utils.WrapError(err)

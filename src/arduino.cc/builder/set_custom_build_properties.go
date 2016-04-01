@@ -40,13 +40,9 @@ import (
 type SetCustomBuildProperties struct{}
 
 func (s *SetCustomBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_CUSTOM_BUILD_PROPERTIES) {
-		return nil
-	}
-
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	customBuildProperties, err := props.LoadFromSlice(context[constants.CTX_CUSTOM_BUILD_PROPERTIES].([]string), logger)
+	customBuildProperties, err := props.LoadFromSlice(ctx.CustomBuildProperties, logger)
 	if err != nil {
 		return utils.WrapError(err)
 	}
