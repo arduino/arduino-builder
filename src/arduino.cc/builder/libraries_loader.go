@@ -86,7 +86,7 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 		}
 	}
 
-	context[constants.CTX_LIBRARIES] = libraries
+	ctx.Libraries = libraries
 
 	headerToLibraries := make(map[string][]*types.Library)
 	for _, library := range libraries {
@@ -100,7 +100,7 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 		}
 	}
 
-	context[constants.CTX_HEADER_TO_LIBRARIES] = headerToLibraries
+	ctx.HeaderToLibraries = headerToLibraries
 
 	return nil
 }

@@ -59,23 +59,6 @@ func KeysOfMapOfString(input map[string]string) []string {
 	return keys
 }
 
-func KeysOfMapOfStringBool(input map[string]bool) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
-
-func MergeMapsOfStringBool(target map[string]bool, sources ...map[string]bool) map[string]bool {
-	for _, source := range sources {
-		for key, value := range source {
-			target[key] = value
-		}
-	}
-	return target
-}
-
 func PrettyOSName() string {
 	switch osName := runtime.GOOS; osName {
 	case "darwin":
@@ -354,15 +337,6 @@ func AppendIfNotPresent(target []string, elements ...string) []string {
 		}
 	}
 	return target
-}
-
-func AddStringsToStringsSet(accumulator []string, stringsToAdd []string) []string {
-	previousStringsSet := SliceToMapStringBool(accumulator, true)
-	stringsSetToAdd := SliceToMapStringBool(stringsToAdd, true)
-
-	newStringsSet := MergeMapsOfStringBool(previousStringsSet, stringsSetToAdd)
-
-	return KeysOfMapOfStringBool(newStringsSet)
 }
 
 func EnsureFolderExists(folder string) error {

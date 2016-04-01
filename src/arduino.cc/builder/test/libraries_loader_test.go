@@ -68,7 +68,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
-	libraries := context[constants.CTX_LIBRARIES].([]*types.Library)
+	libraries := ctx.Libraries
 	require.Equal(t, 20, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
@@ -131,7 +131,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	require.Equal(t, "Wire", libraries[idx].Name)
 
-	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
+	headerToLibraries := ctx.HeaderToLibraries
 	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
 	require.Equal(t, "Audio", headerToLibraries["Audio.h"][0].Name)
 	require.Equal(t, "FakeAudio", headerToLibraries["Audio.h"][1].Name)
@@ -178,7 +178,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "sam", "libraries")), librariesFolders[1])
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
-	libraries := context[constants.CTX_LIBRARIES].([]*types.Library)
+	libraries := ctx.Libraries
 	require.Equal(t, 18, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
@@ -218,7 +218,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	idx++
 	require.Equal(t, "Wire", libraries[idx].Name)
 
-	headerToLibraries := context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
+	headerToLibraries := ctx.HeaderToLibraries
 
 	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
 	libraries = headerToLibraries["Audio.h"]

@@ -58,7 +58,6 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
 		&builder.ContainerMergeCopySketchFiles{},
@@ -70,8 +69,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 		err := command.Run(context, ctx)
 		NoError(t, err)
 	}
-
-	require.Nil(t, context[constants.CTX_INCLUDES])
+	require.Nil(t, ctx.Includes)
 }
 
 func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
@@ -106,8 +104,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	require.True(t, utils.SliceContains(includes, "Bridge.h"))
 
@@ -147,8 +144,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 4, len(includes))
 
 	sort.Strings(includes)
@@ -199,8 +195,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	require.Equal(t, "SPI.h", includes[0])
 
@@ -243,8 +238,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	err := command.Run(context, ctx)
 	require.Error(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 2, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Inexistent.h", includes[0])

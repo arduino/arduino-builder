@@ -51,7 +51,6 @@ func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}, ctx *type
 	for _, match := range matches {
 		includes = append(includes, strings.TrimSpace(match[1]))
 	}
-
 	if len(includes) == 0 {
 		include := findIncludesForOldCompilers(source)
 		if include != "" {
@@ -60,14 +59,7 @@ func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}, ctx *type
 	}
 
 	context[constants.CTX_INCLUDES_JUST_FOUND] = includes
-
-	if !utils.MapHas(context, constants.CTX_INCLUDES) {
-		context[constants.CTX_INCLUDES] = includes
-		return nil
-	}
-
-	context[constants.CTX_INCLUDES] = utils.AddStringsToStringsSet(context[constants.CTX_INCLUDES].([]string), includes)
-
+	ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, includes...)
 	return nil
 }
 

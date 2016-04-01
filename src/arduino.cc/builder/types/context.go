@@ -16,6 +16,11 @@ type Context struct {
 	ArduinoAPIVersion       string
 	FQBN                    string
 
+	// Libraries handling
+	Includes          []string
+	Libraries         []*Library
+	HeaderToLibraries map[string][]*Library
+
 	// Verbosity settings
 	Verbose           bool
 	DebugPreprocessor bool

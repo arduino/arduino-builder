@@ -31,13 +31,14 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
 )
 
 type GCCMinusMOutputParser struct{}
 
-func (s *GCCMinusMOutputParser) Run(context map[string]interface{}) error {
+func (s *GCCMinusMOutputParser) Run(context map[string]interface{}, ctx *types.Context) error {
 	output := context[constants.CTX_GCC_MINUS_M_OUTPUT].(string)
 
 	rows := strings.Split(output, "\n")
@@ -55,12 +56,7 @@ func (s *GCCMinusMOutputParser) Run(context map[string]interface{}) error {
 		}
 	}
 
-	if !utils.MapHas(context, constants.CTX_INCLUDES) {
-		context[constants.CTX_INCLUDES] = includes
-		return nil
-	}
-
-	context[constants.CTX_INCLUDES] = utils.AddStringsToStringsSet(context[constants.CTX_INCLUDES].([]string), includes)
+	ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, includes...)
 
 	return nil
 }

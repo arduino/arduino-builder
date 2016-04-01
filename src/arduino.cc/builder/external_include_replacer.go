@@ -30,7 +30,7 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"path/filepath"
 	"strings"
 )
@@ -42,9 +42,9 @@ type ExternalIncludeReplacer struct {
 	To        string
 }
 
-func (s *ExternalIncludeReplacer) Run(context map[string]interface{}) error {
+func (s *ExternalIncludeReplacer) Run(context map[string]interface{}, ctx *types.Context) error {
 	source := context[s.SourceKey].(string)
-	nonAbsoluteIncludes := findNonAbsoluteIncludes(context[constants.CTX_INCLUDES].([]string))
+	nonAbsoluteIncludes := findNonAbsoluteIncludes(ctx.Includes)
 
 	for _, include := range nonAbsoluteIncludes {
 		source = strings.Replace(source, s.From+"<"+include+">", s.To+"<"+include+">", -1)

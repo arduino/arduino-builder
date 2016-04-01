@@ -32,12 +32,14 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestGCCMinusMOutputParser(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := "sketch_with_config.o: sketch_with_config.ino config.h de\\ bug.h Bridge.h\n" +
 		"\n" +
@@ -50,11 +52,10 @@ func TestGCCMinusMOutputParser(t *testing.T) {
 	context[constants.CTX_GCC_MINUS_M_OUTPUT] = output
 
 	parser := builder.GCCMinusMOutputParser{}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 3, len(includes))
 	require.Equal(t, "config.h", includes[0])
 	require.Equal(t, "de bug.h", includes[1])
@@ -63,22 +64,23 @@ func TestGCCMinusMOutputParser(t *testing.T) {
 
 func TestGCCMinusMOutputParserEmptyOutput(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := "sketch.ino.o: /tmp/test699709208/sketch/sketch.ino.cpp"
 
 	context[constants.CTX_GCC_MINUS_M_OUTPUT] = output
 
 	parser := builder.GCCMinusMOutputParser{}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 0, len(includes))
 }
 
 func TestGCCMinusMOutputParserFirstLineOnMultipleLines(t *testing.T) {
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := "sketch_with_config.ino.o: \\\n" +
 		" /tmp/test097286304/sketch/sketch_with_config.ino.cpp \\\n" +
@@ -94,11 +96,10 @@ func TestGCCMinusMOutputParserFirstLineOnMultipleLines(t *testing.T) {
 	context[constants.CTX_GCC_MINUS_M_OUTPUT] = output
 
 	parser := builder.GCCMinusMOutputParser{}
-	err := parser.Run(context)
+	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 3, len(includes))
 	require.Equal(t, "/tmp/test097286304/sketch/config.h", includes[0])
 	require.Equal(t, "/tmp/test097286304/sketch/includes/de bug.h", includes[1])

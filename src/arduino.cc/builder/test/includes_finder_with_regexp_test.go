@@ -57,7 +57,6 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
 		&builder.ContainerMergeCopySketchFiles{},
@@ -72,8 +71,7 @@ func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 3, len(includes))
 	require.Equal(t, "Arduino.h", includes[0])
 	require.Equal(t, "empty_1.h", includes[1])
@@ -94,8 +92,7 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	require.Equal(t, "SPI.h", includes[0])
 }
@@ -112,16 +109,15 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 0, len(includes))
 }
 
 func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	context := make(map[string]interface{})
-	ctx := &types.Context{}
-
-	context[constants.CTX_INCLUDES] = []string{"test.h"}
+	ctx := &types.Context{
+		Includes: []string{"test.h"},
+	}
 
 	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
 		"#include <SPI.h>\n" +
@@ -134,8 +130,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 2, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
@@ -145,8 +140,6 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-
-	context[constants.CTX_INCLUDES] = []string{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
 		" #               include <Wire.h>\n" +
@@ -158,8 +151,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
@@ -168,8 +160,6 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-
-	context[constants.CTX_INCLUDES] = []string{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
 		" #\t\t\tinclude <Wire.h>\n" +
@@ -181,8 +171,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
@@ -191,8 +180,6 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-
-	context[constants.CTX_INCLUDES] = []string{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
 		"compilation terminated.\n"
@@ -203,8 +190,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
