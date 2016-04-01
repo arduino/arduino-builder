@@ -30,8 +30,8 @@
 package builder
 
 import (
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
@@ -55,10 +55,10 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]i
 	}
 
 	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
+		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(context, ctx)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 

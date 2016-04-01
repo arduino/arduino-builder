@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -48,19 +49,21 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Con
 
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
 
+	logger := ctx.GetLogger()
+
 	targetPackage := packages.Packages[targetPackageName]
 	if targetPackage == nil {
-		return utils.Errorf(context, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
 	}
 
 	targetPlatform := targetPackage.Platforms[targetPlatformName]
 	if targetPlatform == nil {
-		return utils.Errorf(context, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
 	}
 
 	targetBoard := targetPlatform.Boards[targetBoardName]
 	if targetBoard == nil {
-		return utils.Errorf(context, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
 	}
 
 	context[constants.CTX_TARGET_PACKAGE] = targetPackage
@@ -81,7 +84,7 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Con
 	if len(coreParts) > 1 {
 		core = coreParts[1]
 		if packages.Packages[coreParts[0]] == nil {
-			return utils.Errorf(context, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
+			return i18n.ErrorfWithLogger(logger, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
 
 		}
 		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatform.PlatformId]

@@ -59,7 +59,6 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -96,7 +95,6 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -139,7 +137,6 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -193,7 +190,6 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -237,7 +233,6 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 

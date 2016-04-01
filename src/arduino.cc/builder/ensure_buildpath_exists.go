@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
@@ -42,7 +43,7 @@ func (s *EnsureBuildPathExists) Run(context map[string]interface{}, ctx *types.C
 
 	err := utils.EnsureFolderExists(buildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	return nil

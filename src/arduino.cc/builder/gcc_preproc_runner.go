@@ -49,7 +49,7 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Contex
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
@@ -58,10 +58,10 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Contex
 	}
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_FILE_PATH_TO_READ] = targetFilePath
@@ -77,11 +77,11 @@ type GCCPreprocRunnerForDiscoveringIncludes struct {
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}, ctx *types.Context) error {
 	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFilePath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
@@ -90,7 +90,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 
 	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(stderr)
@@ -103,7 +103,7 @@ func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFil
 		preprocPath := context[constants.CTX_PREPROC_PATH].(string)
 		err := utils.EnsureFolderExists(preprocPath)
 		if err != nil {
-			return nil, "", utils.WrapError(err)
+			return nil, "", i18n.WrapError(err)
 		}
 		targetFilePath = filepath.Join(preprocPath, targetFilePath)
 	}

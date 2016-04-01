@@ -50,7 +50,6 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 
@@ -78,7 +77,6 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 
@@ -116,7 +114,6 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
 	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 

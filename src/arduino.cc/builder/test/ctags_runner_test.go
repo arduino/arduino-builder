@@ -63,7 +63,6 @@ func TestCTagsRunner(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -116,7 +115,6 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -167,7 +165,6 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -217,7 +214,6 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -266,7 +262,6 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 

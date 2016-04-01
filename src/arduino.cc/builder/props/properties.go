@@ -32,7 +32,6 @@ package props
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/utils"
 	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
@@ -61,7 +60,7 @@ func init() {
 func Load(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	bytes, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, err
 	}
 
 	text := string(bytes)
@@ -73,7 +72,7 @@ func Load(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	for _, line := range strings.Split(text, "\n") {
 		err := properties.loadSingleLine(line)
 		if err != nil {
-			return nil, utils.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES_FILE, line, filepath)
+			return nil, i18n.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES_FILE, line, filepath)
 		}
 	}
 
@@ -86,7 +85,7 @@ func LoadFromSlice(lines []string, logger i18n.Logger) (PropertiesMap, error) {
 	for _, line := range lines {
 		err := properties.loadSingleLine(line)
 		if err != nil {
-			return nil, utils.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES, line)
+			return nil, i18n.ErrorfWithLogger(logger, constants.MSG_WRONG_PROPERTIES, line)
 		}
 	}
 
@@ -119,7 +118,7 @@ func SafeLoad(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 
 	properties, err := Load(filepath, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	return properties, nil
 }
@@ -183,7 +182,7 @@ func MergeMapsOfProperties(target map[string]PropertiesMap, sources ...map[strin
 func DeleteUnexpandedPropsFromString(str string) (string, error) {
 	rxp, err := regexp.Compile("\\{.+?\\}")
 	if err != nil {
-		return constants.EMPTY_STRING, utils.WrapError(err)
+		return constants.EMPTY_STRING, i18n.WrapError(err)
 	}
 
 	return rxp.ReplaceAllString(str, constants.EMPTY_STRING), nil

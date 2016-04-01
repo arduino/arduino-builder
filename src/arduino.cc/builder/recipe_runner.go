@@ -35,7 +35,6 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"sort"
 	"strings"
@@ -47,8 +46,8 @@ type RecipeByPrefixSuffixRunner struct {
 }
 
 func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}, ctx *types.Context) error {
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	if utils.DebugLevel(context) >= 10 {
+	logger := ctx.GetLogger()
+	if ctx.DebugLevel >= 10 {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
 	}
 
@@ -62,12 +61,12 @@ func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}, ctx *ty
 
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		if utils.DebugLevel(context) >= 10 {
+		if ctx.DebugLevel >= 10 {
 			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)
 		}
 		_, err := builder_utils.ExecRecipe(properties, recipe, false, verbose, verbose, logger)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 

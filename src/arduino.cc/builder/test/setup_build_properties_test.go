@@ -57,7 +57,6 @@ func TestSetupBuildProperties(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.ToolsLoader{},
@@ -122,7 +121,6 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.ToolsLoader{},
@@ -163,7 +161,6 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.ToolsLoader{},
@@ -203,7 +200,6 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}
 

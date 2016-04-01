@@ -64,7 +64,6 @@ func TestCopyOtherFiles(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.SketchLoader{},
 		&builder.AdditionalSketchFilesCopier{},
@@ -103,7 +102,6 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.SketchLoader{},
 		&builder.AdditionalSketchFilesCopier{},

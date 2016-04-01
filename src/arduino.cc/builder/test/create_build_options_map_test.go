@@ -52,7 +52,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 5
+	ctx.DebugLevel = 5
 
 	create := builder.CreateBuildOptionsMap{}
 	err := create.Run(context, ctx)

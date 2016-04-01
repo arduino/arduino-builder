@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -43,19 +44,19 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 		buildPath := context[constants.CTX_BUILD_PATH].(string)
 		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		sketchBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_SKETCH))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		librariesBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_LIBRARIES))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		coreBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_CORE))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 
 		context[constants.CTX_PREPROC_PATH] = preprocPath
@@ -70,10 +71,6 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 
 	if !utils.MapHas(context, constants.CTX_VERBOSE) {
 		context[constants.CTX_VERBOSE] = false
-	}
-
-	if !utils.MapHas(context, constants.CTX_DEBUG_LEVEL) {
-		context[constants.CTX_DEBUG_LEVEL] = DEFAULT_DEBUG_LEVEL
 	}
 
 	sourceFiles := &types.UniqueStringQueue{}

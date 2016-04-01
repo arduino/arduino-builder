@@ -43,7 +43,7 @@ type CTagsRunner struct{}
 func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	ctagsTargetFilePath := context[constants.CTX_CTAGS_TEMP_FILE_PATH].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
@@ -51,13 +51,13 @@ func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) er
 
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
 	if pattern == constants.EMPTY_STRING {
-		return utils.Errorf(context, constants.MSG_PATTERN_MISSING, constants.CTAGS)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, constants.CTAGS)
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
 	command, err := utils.PrepareCommand(commandLine, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
@@ -67,7 +67,7 @@ func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) er
 
 	sourceBytes, err := command.Output()
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_CTAGS_OUTPUT] = string(sourceBytes)

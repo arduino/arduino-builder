@@ -56,7 +56,6 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}
 
@@ -90,7 +89,6 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 	context[constants.CTX_VIDPID] = "0x2341_0x0237"
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}
 

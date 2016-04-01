@@ -56,17 +56,17 @@ func (s *Linker) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 	coreDotARelPath, err := filepath.Rel(buildPath, coreArchiveFilePath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	err = link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	return nil

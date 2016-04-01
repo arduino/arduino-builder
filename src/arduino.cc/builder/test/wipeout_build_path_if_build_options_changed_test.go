@@ -54,7 +54,6 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	utils.TouchFile(filepath.Join(buildPath, "should_be_deleted.txt"))
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
 	}
 
@@ -86,7 +85,6 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
 	}
 
@@ -119,7 +117,6 @@ func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
 	}
 

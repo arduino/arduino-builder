@@ -60,7 +60,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -103,7 +102,6 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -144,7 +142,6 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -190,7 +187,6 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -235,7 +231,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -280,7 +275,6 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -325,7 +319,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 

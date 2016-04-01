@@ -31,9 +31,9 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/phases"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"reflect"
 	"strconv"
@@ -68,8 +68,6 @@ type Builder struct{}
 
 func (s *Builder) Run(context map[string]interface{}, ctx *types.Context) error {
 	commands := []types.Command{
-		&SetupHumanLoggerIfMissing{},
-
 		&GenerateBuildPathIfMissing{},
 		&EnsureBuildPathExists{},
 
@@ -135,8 +133,6 @@ type Preprocess struct{}
 
 func (s *Preprocess) Run(context map[string]interface{}, ctx *types.Context) error {
 	commands := []types.Command{
-		&SetupHumanLoggerIfMissing{},
-
 		&GenerateBuildPathIfMissing{},
 		&EnsureBuildPathExists{},
 
@@ -164,8 +160,6 @@ type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
 	commands := []types.Command{
-		&SetupHumanLoggerIfMissing{},
-
 		&GenerateBuildPathIfMissing{},
 
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -182,34 +176,34 @@ func runCommands(context map[string]interface{}, ctx *types.Context, commands []
 
 	progress := float32(0)
 	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		printProgressIfProgressEnabledAndMachineLogger(progressEnabled, context, progress)
+		PrintRingNameIfDebug(ctx, command)
+		printProgressIfProgressEnabledAndMachineLogger(progressEnabled, ctx, progress)
 		err := command.Run(context, ctx)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		progress += progressForEachCommand
 	}
 
-	printProgressIfProgressEnabledAndMachineLogger(progressEnabled, context, 100)
+	printProgressIfProgressEnabledAndMachineLogger(progressEnabled, ctx, 100)
 
 	return nil
 }
 
-func printProgressIfProgressEnabledAndMachineLogger(progressEnabled bool, context map[string]interface{}, progress float32) {
+func printProgressIfProgressEnabledAndMachineLogger(progressEnabled bool, ctx *types.Context, progress float32) {
 	if !progressEnabled {
 		return
 	}
 
-	log := utils.Logger(context)
+	log := ctx.GetLogger()
 	if log.Name() == "machine" {
 		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(float64(progress), 'f', 2, 32))
 	}
 }
 
-func PrintRingNameIfDebug(context map[string]interface{}, command types.Command) {
-	if utils.DebugLevel(context) >= 10 {
-		utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_COMMAND, strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
+func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
+	if ctx.DebugLevel >= 10 {
+		ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_COMMAND, strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 	}
 }
 

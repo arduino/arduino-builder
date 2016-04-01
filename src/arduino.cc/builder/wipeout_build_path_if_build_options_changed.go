@@ -48,7 +48,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface
 	}
 	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
 	previousBuildOptionsJson := context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	if buildOptionsJson == previousBuildOptionsJson {
 		return nil
@@ -68,7 +68,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 	files, err := gohasissues.ReadDir(buildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	for _, file := range files {
 		os.RemoveAll(filepath.Join(buildPath, file.Name()))

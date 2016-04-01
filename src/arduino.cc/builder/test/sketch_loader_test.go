@@ -44,12 +44,8 @@ func TestLoadSketchWithFolder(t *testing.T) {
 		SketchLocation: "sketch1",
 	}
 
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context, ctx)
-	NoError(t, err)
-
 	loader := builder.SketchLoader{}
-	err = loader.Run(context, ctx)
+	err := loader.Run(context, ctx)
 
 	require.Error(t, err)
 
@@ -63,12 +59,8 @@ func TestLoadSketchNonExistentPath(t *testing.T) {
 		SketchLocation: "asdasd78128123981723981273asdasd",
 	}
 
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context, ctx)
-	NoError(t, err)
-
 	loader := builder.SketchLoader{}
-	err = loader.Run(context, ctx)
+	err := loader.Run(context, ctx)
 
 	require.Error(t, err)
 
@@ -83,7 +75,6 @@ func TestLoadSketch(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
@@ -113,12 +104,8 @@ func TestFailToLoadSketchFromFolder(t *testing.T) {
 		SketchLocation: "./sketch1",
 	}
 
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context, ctx)
-	NoError(t, err)
-
 	loader := builder.SketchLoader{}
-	err = loader.Run(context, ctx)
+	err := loader.Run(context, ctx)
 	require.Error(t, err)
 
 	sketch := context[constants.CTX_SKETCH]
@@ -132,7 +119,6 @@ func TestLoadSketchFromFolder(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
@@ -160,7 +146,6 @@ func TestLoadSketchWithBackup(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
@@ -185,7 +170,6 @@ func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 

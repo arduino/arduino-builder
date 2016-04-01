@@ -31,7 +31,6 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"time"
@@ -41,7 +40,7 @@ type PrintUsedLibrariesIfVerbose struct{}
 
 func (s *PrintUsedLibrariesIfVerbose) Run(context map[string]interface{}, ctx *types.Context) error {
 	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	if !verbose || !utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		return nil

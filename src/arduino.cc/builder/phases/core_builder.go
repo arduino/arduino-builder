@@ -45,16 +45,16 @@ func (s *CoreBuilder) Run(context map[string]interface{}, ctx *types.Context) er
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(coreBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	archiveFile, objectFiles, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_ARCHIVE_FILE_PATH_CORE] = archiveFile
@@ -80,18 +80,18 @@ func compileCore(buildPath string, buildProperties props.PropertiesMap, verbose 
 	if variantFolder != constants.EMPTY_STRING {
 		variantObjectFiles, err = builder_utils.CompileFiles(variantObjectFiles, variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return "", nil, utils.WrapError(err)
+			return "", nil, i18n.WrapError(err)
 		}
 	}
 
 	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return "", nil, utils.WrapError(err)
+		return "", nil, i18n.WrapError(err)
 	}
 
 	archiveFile, err := builder_utils.ArchiveCompiledFiles(buildPath, "core.a", coreObjectFiles, buildProperties, verbose, logger)
 	if err != nil {
-		return "", nil, utils.WrapError(err)
+		return "", nil, i18n.WrapError(err)
 	}
 
 	return archiveFile, variantObjectFiles, nil

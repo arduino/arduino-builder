@@ -31,7 +31,6 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"os"
 	"strings"
@@ -41,7 +40,7 @@ type AddBuildBoardPropertyIfMissing struct{}
 
 func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {

@@ -60,7 +60,6 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.RewriteHardwareKeys{},
 	}
@@ -98,7 +97,6 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.RewriteHardwareKeys{},
 	}

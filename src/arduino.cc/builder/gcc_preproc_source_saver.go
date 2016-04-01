@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
@@ -41,11 +42,11 @@ func (s *GCCPreprocSourceSaver) Run(context map[string]interface{}) error {
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
 	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	source := context[constants.CTX_SOURCE].(string)
 
 	err = utils.WriteFile(filepath.Join(preprocPath, constants.FILE_GCC_PREPROC_TARGET), source)
-	return utils.WrapError(err)
+	return i18n.WrapError(err)
 }

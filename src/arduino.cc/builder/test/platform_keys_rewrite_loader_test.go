@@ -45,7 +45,6 @@ func TestLoadPlatformKeysRewrite(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.PlatformKeysRewriteLoader{},
 	}
 

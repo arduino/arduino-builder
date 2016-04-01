@@ -58,7 +58,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
+	ctx.DebugLevel = 10
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)

@@ -47,17 +47,17 @@ func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) 
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	var objectFiles []string
 	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, true, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_OBJECT_FILES_SKETCH] = objectFiles

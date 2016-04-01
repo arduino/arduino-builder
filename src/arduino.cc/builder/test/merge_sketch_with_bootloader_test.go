@@ -69,7 +69,6 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	NoError(t, err)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.MergeSketchWithBootloader{},
 	}
@@ -113,7 +112,6 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	NoError(t, err)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.MergeSketchWithBootloader{},
 	}
@@ -149,7 +147,6 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}
 
@@ -197,7 +194,6 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	NoError(t, err)
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.MergeSketchWithBootloader{},
 	}

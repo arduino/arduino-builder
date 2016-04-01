@@ -47,7 +47,6 @@ func TestLoadHardware(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 	}
 
@@ -93,7 +92,6 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.PlatformKeysRewriteLoader{},
@@ -165,7 +163,6 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 	}
 
@@ -215,7 +212,6 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 	}
 

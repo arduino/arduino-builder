@@ -47,7 +47,6 @@ func TestMergeSketch(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 		&builder.SketchSourceMerger{},
 	}

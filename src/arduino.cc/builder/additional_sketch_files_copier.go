@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"bytes"
@@ -46,7 +47,7 @@ func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}, ctx *t
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	sketchBasePath := filepath.Dir(sketch.MainFile.Name)
@@ -54,24 +55,24 @@ func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}, ctx *t
 	for _, file := range sketch.AdditionalFiles {
 		relativePath, err := filepath.Rel(sketchBasePath, file.Name)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 
 		targetFilePath := filepath.Join(sketchBuildPath, relativePath)
 		err = utils.EnsureFolderExists(filepath.Dir(targetFilePath))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 
 		bytes, err := ioutil.ReadFile(file.Name)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 
 		if targetFileChanged(bytes, targetFilePath) {
 			err := utils.WriteFileBytes(targetFilePath, bytes)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 		}
 	}

@@ -31,9 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"time"
 )
@@ -41,11 +39,11 @@ import (
 type PrintUsedAndNotUsedLibraries struct{}
 
 func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}, ctx *types.Context) error {
-	if utils.DebugLevel(context) <= 0 {
+	if ctx.DebugLevel < 0 {
 		return nil
 	}
 
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
 
 	for header, libResResult := range libraryResolutionResults {

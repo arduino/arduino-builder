@@ -51,11 +51,11 @@ func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}, ctx *ty
 	buildPath := filepath.Join(os.TempDir(), "arduino-sketch-"+strings.ToUpper(md5sum))
 	_, err := os.Stat(buildPath)
 	if err != nil && !os.IsNotExist(err) {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	if utils.DebugLevel(context) > 5 {
-		logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	if ctx.DebugLevel > 5 {
+		logger := ctx.GetLogger()
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_SETTING_BUILD_PATH, buildPath)
 	}
 

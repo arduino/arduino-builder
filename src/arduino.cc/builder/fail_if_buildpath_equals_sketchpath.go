@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -45,17 +46,17 @@ func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}, ct
 
 	buildPath, err := filepath.Abs(context[constants.CTX_BUILD_PATH].(string))
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	sketchPath, err := filepath.Abs(ctx.SketchLocation)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	sketchPath = filepath.Dir(sketchPath)
 
 	if buildPath == sketchPath {
-		return utils.Errorf(context, constants.MSG_SKETCH_CANT_BE_IN_BUILDPATH)
+		return i18n.ErrorfWithLogger(ctx.GetLogger(), constants.MSG_SKETCH_CANT_BE_IN_BUILDPATH)
 	}
 
 	return nil

@@ -59,7 +59,6 @@ func TestCoanRunner(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.SketchSourceMerger{},
 		&builder.CoanRunner{},

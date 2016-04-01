@@ -51,7 +51,6 @@ func TestRecipeRunner(t *testing.T) {
 	buildProperties["recipe.hooks.prebuild.1.pattern"] = "echo"
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 	}

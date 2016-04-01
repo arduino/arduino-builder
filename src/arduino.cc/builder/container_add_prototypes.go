@@ -32,8 +32,8 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/ctags"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type ContainerAddPrototypes struct{}
@@ -52,10 +52,10 @@ func (s *ContainerAddPrototypes) Run(context map[string]interface{}, ctx *types.
 	}
 
 	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
+		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(context, ctx)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 

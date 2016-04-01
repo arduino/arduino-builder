@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
 )
@@ -42,13 +43,13 @@ type IncludesFinderWithGCC struct {
 	SourceFile string
 }
 
-func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
+func (s *IncludesFinderWithGCC) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildProperties := make(props.PropertiesMap)
 	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
 		buildProperties = p.(props.PropertiesMap).Clone()
 	}
 	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	includesParams := constants.EMPTY_STRING
 	if utils.MapHas(context, constants.CTX_INCLUDE_FOLDERS) {
@@ -69,7 +70,7 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 
 	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_INCLUDES, true, verbose, false, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_GCC_MINUS_M_OUTPUT] = string(output)

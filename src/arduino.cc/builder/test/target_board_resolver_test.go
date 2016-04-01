@@ -46,7 +46,6 @@ func TestTargetBoardResolverUno(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -73,7 +72,6 @@ func TestTargetBoardResolverDue(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -100,7 +98,6 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -128,7 +125,6 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -156,7 +152,6 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
@@ -184,7 +179,6 @@ func TestTargetBoardResolverCustomCore(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}

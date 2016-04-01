@@ -32,7 +32,6 @@ package ctags
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"bufio"
 	"os"
 	"reflect"
@@ -67,12 +66,12 @@ func (s *CTagsParser) Run(context map[string]interface{}, ctx *types.Context) er
 		tags = append(tags, parseTag(row))
 	}
 
-	skipTagsWhere(tags, tagIsUnknown, context)
-	skipTagsWhere(tags, tagIsUnhandled, context)
+	skipTagsWhere(tags, tagIsUnknown, ctx)
+	skipTagsWhere(tags, tagIsUnhandled, ctx)
 	addPrototypes(tags)
-	removeDefinedProtypes(tags, context)
+	removeDefinedProtypes(tags, ctx)
 	removeDuplicate(tags)
-	skipTagsWhere(tags, prototypeAndCodeDontMatch, context)
+	skipTagsWhere(tags, prototypeAndCodeDontMatch, ctx)
 
 	context[constants.CTX_CTAGS_OF_PREPROC_SOURCE] = tags
 
@@ -109,7 +108,7 @@ func addPrototype(tag *types.CTag) {
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
-func removeDefinedProtypes(tags []*types.CTag, context map[string]interface{}) {
+func removeDefinedProtypes(tags []*types.CTag, ctx *types.Context) {
 	definedPrototypes := make(map[string]bool)
 	for _, tag := range tags {
 		if tag.Kind == KIND_PROTOTYPE {
@@ -119,8 +118,8 @@ func removeDefinedProtypes(tags []*types.CTag, context map[string]interface{}) {
 
 	for _, tag := range tags {
 		if definedPrototypes[tag.Prototype] {
-			if utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
+			if ctx.DebugLevel >= 10 {
+				ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
 			}
 			tag.SkipMe = true
 		}
@@ -141,12 +140,12 @@ func removeDuplicate(tags []*types.CTag) {
 
 type skipFuncType func(tag *types.CTag) bool
 
-func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string]interface{}) {
+func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, ctx *types.Context) {
 	for _, tag := range tags {
 		if !tag.SkipMe {
 			skip := skipFunc(tag)
-			if skip && utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
+			if skip && ctx.DebugLevel >= 10 {
+				ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
 			}
 			tag.SkipMe = skip
 		}

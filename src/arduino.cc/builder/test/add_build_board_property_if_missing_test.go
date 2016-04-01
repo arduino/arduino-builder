@@ -46,7 +46,6 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 		&builder.AddBuildBoardPropertyIfMissing{},
@@ -75,7 +74,6 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 		&builder.AddBuildBoardPropertyIfMissing{},

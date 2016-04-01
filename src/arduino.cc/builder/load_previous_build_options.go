@@ -31,8 +31,8 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -50,12 +50,12 @@ func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}, ctx *t
 		if os.IsNotExist(err) {
 			return nil
 		}
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	bytes, err := ioutil.ReadFile(buildOptionsFile)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = string(bytes)

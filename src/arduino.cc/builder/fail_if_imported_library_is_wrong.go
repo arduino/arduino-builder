@@ -45,22 +45,22 @@ func (s *FailIfImportedLibraryIsWrong) Run(context map[string]interface{}, ctx *
 		return nil
 	}
 
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 
 	for _, library := range importedLibraries {
 		if !library.IsLegacy {
 			if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_ARCH)); err == nil && stat.IsDir() {
-				return utils.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
+				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
 			}
 			for _, propName := range LIBRARY_MANDATORY_PROPERTIES {
 				if _, ok := library.Properties[propName]; !ok {
-					return utils.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.Folder)
+					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.Folder)
 				}
 			}
 			if library.Layout == types.LIBRARY_RECURSIVE {
 				if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)); err == nil && stat.IsDir() {
-					return utils.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
+					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
 				}
 			}
 		}

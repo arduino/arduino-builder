@@ -34,17 +34,16 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type SetCustomBuildProperties struct{}
 
 func (s *SetCustomBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	customBuildProperties, err := props.LoadFromSlice(ctx.CustomBuildProperties, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	for key, value := range customBuildProperties {

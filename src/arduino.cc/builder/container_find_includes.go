@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -41,14 +42,14 @@ type ContainerFindIncludes struct{}
 func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.Context) error {
 	err := runCommand(context, ctx, &IncludesToIncludeFolders{})
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	err = findIncludesUntilDone(context, ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
@@ -64,7 +65,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 
 	err = runCommand(context, ctx, &CollectAllSourceFilesFromFoldersWithSources{})
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	sourceFilePaths := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
@@ -72,27 +73,27 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 	for !sourceFilePaths.Empty() {
 		err = findIncludesUntilDone(context, ctx, sourceFilePaths.Pop().(string))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		err := runCommand(context, ctx, &CollectAllSourceFilesFromFoldersWithSources{})
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 
 	err = runCommand(context, ctx, &FailIfImportedLibraryIsWrong{})
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	return nil
 }
 
 func runCommand(context map[string]interface{}, ctx *types.Context, command types.Command) error {
-	PrintRingNameIfDebug(context, command)
+	PrintRingNameIfDebug(ctx, command)
 	err := command.Run(context, ctx)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	return nil
 }
@@ -110,14 +111,14 @@ func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, s
 		for _, command := range commands {
 			err := runCommand(context, ctx, command)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 		}
 		if len(context[constants.CTX_INCLUDES_JUST_FOUND].([]string)) == 0 {
 			done = true
 		} else if len(context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)) == len(importedLibraries) {
 			err := runCommand(context, ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 		context[constants.CTX_INCLUDES_JUST_FOUND] = []string{}

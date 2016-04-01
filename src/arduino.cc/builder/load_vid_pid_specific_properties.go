@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -54,7 +55,7 @@ func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}, ctx *
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	VIDPIDIndex, err := findVIDPIDIndex(buildProperties, vid, pid)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	if VIDPIDIndex < 0 {
 		return nil

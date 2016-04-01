@@ -46,14 +46,14 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 	builtInLibrariesFolders := ctx.BuiltInLibrariesFolders
 	builtInLibrariesFolders, err := utils.AbsolutizePaths(builtInLibrariesFolders)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	sortedLibrariesFolders := []string{}
 	sortedLibrariesFolders = utils.AppendIfNotPresent(sortedLibrariesFolders, builtInLibrariesFolders...)
 
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	debugLevel := utils.DebugLevel(context)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	debugLevel := ctx.DebugLevel
+	logger := ctx.GetLogger()
 
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
 	if actualPlatform != platform {
@@ -65,7 +65,7 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 	librariesFolders := ctx.OtherLibrariesFolders
 	librariesFolders, err = utils.AbsolutizePaths(librariesFolders)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	sortedLibrariesFolders = utils.AppendIfNotPresent(sortedLibrariesFolders, librariesFolders...)
 
@@ -75,12 +75,12 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 	for _, libraryFolder := range sortedLibrariesFolders {
 		subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		for _, subFolder := range subFolders {
 			library, err := makeLibrary(filepath.Join(libraryFolder, subFolder.Name()), debugLevel, logger)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 			libraries = append(libraries, library)
 		}
@@ -92,7 +92,7 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 	for _, library := range libraries {
 		headers, err := utils.ReadDirFiltered(library.SrcFolder, utils.FilterFilesWithExtension(".h"))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		for _, header := range headers {
 			headerFileName := header.Name()
@@ -115,7 +115,7 @@ func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*typ
 func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*types.Library, error) {
 	properties, err := props.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES), logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	if properties[constants.LIBRARY_MAINTAINER] == constants.EMPTY_STRING && properties[constants.LIBRARY_EMAIL] != constants.EMPTY_STRING {
@@ -139,10 +139,10 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 
 	subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
-	if debugLevel > 0 {
+	if debugLevel >= 0 {
 		for _, subFolder := range subFolders {
 			if utils.IsSCCSOrHiddenFile(subFolder) {
 				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {

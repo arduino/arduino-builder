@@ -51,7 +51,6 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
@@ -162,7 +161,6 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
@@ -247,7 +245,6 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
@@ -278,7 +275,6 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},

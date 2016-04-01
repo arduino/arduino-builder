@@ -45,12 +45,12 @@ import (
 type PlatformKeysRewriteLoader struct{}
 
 func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}, ctx *types.Context) error {
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 	folders := ctx.HardwareFolders
 
 	platformKeysRewriteTxtPath, err := findPlatformKeysRewriteTxt(folders)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	if platformKeysRewriteTxtPath == constants.EMPTY_STRING {
 		return nil
@@ -68,7 +68,7 @@ func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}, ctx *typ
 		if keyParts[0] == constants.PLATFORM_REWRITE_OLD {
 			index, err := strconv.Atoi(keyParts[1])
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 			rewriteKey := strings.Join(keyParts[2:], ".")
 			oldValue := txt[key]
@@ -92,7 +92,7 @@ func findPlatformKeysRewriteTxt(folders []string) (string, error) {
 			return txtPath, nil
 		}
 		if !os.IsNotExist(err) {
-			return constants.EMPTY_STRING, utils.WrapError(err)
+			return constants.EMPTY_STRING, i18n.WrapError(err)
 		}
 	}
 

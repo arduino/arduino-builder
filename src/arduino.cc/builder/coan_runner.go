@@ -52,13 +52,13 @@ func (s *CoanRunner) Run(context map[string]interface{}, ctx *types.Context) err
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
 	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	coanTargetFileName := filepath.Join(preprocPath, constants.FILE_COAN_TARGET)
 	err = utils.WriteFile(coanTargetFileName, source)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
@@ -66,12 +66,13 @@ func (s *CoanRunner) Run(context map[string]interface{}, ctx *types.Context) err
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.COAN))
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = coanTargetFileName
 
+	logger := ctx.GetLogger()
+
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
 	if pattern == constants.EMPTY_STRING {
-		return utils.Errorf(context, constants.MSG_PATTERN_MISSING, constants.COAN)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, constants.COAN)
 	}
 
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	commandLine := properties.ExpandPropsInString(pattern)
 	command, err := utils.PrepareCommandFilteredArgs(commandLine, filterAllowedArg, logger)
 

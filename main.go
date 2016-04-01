@@ -308,7 +308,7 @@ func main() {
 	}
 
 	if *debugLevelFlag > -1 {
-		context[constants.CTX_DEBUG_LEVEL] = *debugLevelFlag
+		ctx.DebugLevel = *debugLevelFlag
 	}
 
 	if *quietFlag {
@@ -335,11 +335,11 @@ func main() {
 
 	exitCode := 0
 	if err != nil {
-		err = utils.WrapError(err)
+		err = i18n.WrapError(err)
 
 		fmt.Fprintln(os.Stderr, err)
 
-		if utils.DebugLevel(context) >= 10 {
+		if ctx.DebugLevel >= 10 {
 			fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
 		}
 
@@ -398,7 +398,7 @@ func printError(err error, printStackTrace bool) {
 }
 
 func printCompleteError(err error) {
-	err = utils.WrapError(err)
+	err = i18n.WrapError(err)
 	fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
 }
 

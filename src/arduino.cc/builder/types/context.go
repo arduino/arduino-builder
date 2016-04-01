@@ -1,6 +1,7 @@
 package types
 
 import "strings"
+import "arduino.cc/builder/i18n"
 import "arduino.cc/builder/props"
 
 // Context structure
@@ -17,6 +18,10 @@ type Context struct {
 
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
+
+	// Logging
+	logger     i18n.Logger
+	DebugLevel int
 
 	// For now it is used in conjunction with the old map[string]string, but
 	// it will be slowly populated with all the fields currently used in the
@@ -46,4 +51,15 @@ func (ctx *Context) InjectBuildOptions(opts props.PropertiesMap) {
 	ctx.FQBN = opts["fqbn"]
 	ctx.ArduinoAPIVersion = opts["runtime.ide.version"]
 	ctx.CustomBuildProperties = strings.Split(opts["customBuildProperties"], ",")
+}
+
+func (ctx *Context) GetLogger() i18n.Logger {
+	if ctx.logger == nil {
+		return &i18n.HumanLogger{}
+	}
+	return ctx.logger
+}
+
+func (ctx *Context) SetLogger(l i18n.Logger) {
+	ctx.logger = l
 }

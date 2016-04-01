@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
@@ -45,9 +46,9 @@ func (s *SketchSaver) Run(context map[string]interface{}, ctx *types.Context) er
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	err = utils.WriteFile(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), source)
-	return utils.WrapError(err)
+	return i18n.WrapError(err)
 }

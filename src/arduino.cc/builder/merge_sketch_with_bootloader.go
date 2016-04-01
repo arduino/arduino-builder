@@ -51,7 +51,7 @@ func (s *MergeSketchWithBootloader) Run(context map[string]interface{}, ctx *typ
 	buildPath := context[constants.CTX_BUILD_PATH].(string)
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	sketchFileName := filepath.Base(sketch.MainFile.Name)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	sketchInBuildPath := filepath.Join(buildPath, sketchFileName+".hex")
 	sketchInSubfolder := filepath.Join(buildPath, constants.FOLDER_SKETCH, sketchFileName+".hex")
@@ -131,13 +131,13 @@ func extractActualBootloader(bootloader []string) []string {
 func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	sketch, err := utils.ReadFileToRows(builtSketchPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	sketch = sketch[:len(sketch)-2]
 
 	bootloader, err := utils.ReadFileToRows(bootloaderPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	realBootloader := extractActualBootloader(bootloader)

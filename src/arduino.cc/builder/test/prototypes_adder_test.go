@@ -62,10 +62,9 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_LEVEL] = 10
+	ctx.DebugLevel = 10
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -108,7 +107,6 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -151,7 +149,6 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -194,7 +191,6 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -237,7 +233,6 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -280,7 +275,6 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -323,7 +317,6 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -366,7 +359,6 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -417,7 +409,6 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -466,7 +457,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -512,7 +502,6 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -558,7 +547,6 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -604,7 +592,6 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -661,7 +648,6 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -707,7 +693,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -752,7 +737,6 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -804,7 +788,6 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -853,7 +836,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -902,7 +884,6 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -945,7 +926,6 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 
