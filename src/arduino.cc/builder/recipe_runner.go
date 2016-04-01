@@ -55,7 +55,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}, ctx *ty
 	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
 		buildProperties = p.(props.PropertiesMap).Clone()
 	}
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
 

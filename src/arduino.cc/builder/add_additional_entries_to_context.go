@@ -69,10 +69,6 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 		context[constants.CTX_WARNINGS_LEVEL] = DEFAULT_WARNINGS_LEVEL
 	}
 
-	if !utils.MapHas(context, constants.CTX_VERBOSE) {
-		context[constants.CTX_VERBOSE] = false
-	}
-
 	sourceFiles := &types.UniqueStringQueue{}
 	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
 	foldersWithSources := &types.UniqueSourceFolderQueue{}

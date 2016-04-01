@@ -56,12 +56,12 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_VERBOSE] = true
 	ctx.DebugLevel = 10
 
 	commands := []types.Command{
@@ -99,12 +99,11 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch2", "SketchWithIfDef.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -141,12 +140,11 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch3", "Baladuino.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -183,12 +181,11 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch4", "CharWithEscapedDoubleQuote.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -225,12 +222,11 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch5", "IncludeBetweenMultilineComment.ino"),
 		FQBN:                    "arduino:sam:arduino_due_x_dbg",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -267,12 +263,11 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch6", "/LineContinuations.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -309,12 +304,11 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch7", "StringWithComment.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -351,12 +345,11 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch8", "SketchWithStruct.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -401,12 +394,11 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -449,12 +441,11 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch_no_functions_two_files", "main.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -491,6 +482,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch_no_functions", "main.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
@@ -498,8 +490,6 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 
 	sketchLocation := filepath.Join("sketch_no_functions", "main.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -539,12 +529,11 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -584,12 +573,11 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -640,12 +628,11 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -685,12 +672,11 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -729,12 +715,11 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		SketchLocation:    sketchLocation,
 		FQBN:              "arduino:avr:leonardo",
 		ArduinoAPIVersion: "10600",
+		Verbose:           true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -780,12 +765,11 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:yun",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -828,12 +812,11 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:sam:arduino_due_x_dbg",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -876,12 +859,11 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:uno",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -918,12 +900,11 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		SketchLocation:          filepath.Join("eol_processing", "sketch.ino"),
 		FQBN:                    "arduino:avr:uno",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 

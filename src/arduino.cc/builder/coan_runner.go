@@ -47,7 +47,7 @@ type CoanRunner struct{}
 func (s *CoanRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	source := context[constants.CTX_SOURCE].(string)
 	source += "\n"
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 
 	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
 	err := utils.EnsureFolderExists(preprocPath)

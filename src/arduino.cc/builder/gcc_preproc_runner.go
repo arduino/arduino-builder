@@ -57,7 +57,7 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Contex
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
@@ -80,7 +80,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 		return i18n.WrapError(err)
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {

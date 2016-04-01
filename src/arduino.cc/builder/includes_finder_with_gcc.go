@@ -48,7 +48,7 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}, ctx *types.C
 	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
 		buildProperties = p.(props.PropertiesMap).Clone()
 	}
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
 	includesParams := constants.EMPTY_STRING

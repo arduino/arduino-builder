@@ -51,13 +51,12 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		FQBN:                    "fqbn",
 		ArduinoAPIVersion:       "ideVersion",
 		CustomBuildProperties:   []string{"custom=prop"},
+		Verbose:                 true,
+		DebugLevel:              5,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
-	ctx.DebugLevel = 5
 
 	commands := []types.Command{
 		&builder.CreateBuildOptionsMap{},

@@ -55,12 +55,11 @@ func TestCTagsRunner(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -107,12 +106,11 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -157,12 +155,11 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -206,12 +203,11 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -254,12 +250,11 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 

@@ -51,12 +51,11 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 		SketchLocation:    filepath.Join("sketch2", "SketchWithIfDef.ino"),
 		FQBN:              "arduino:avr:leonardo",
 		ArduinoAPIVersion: "10600",
+		Verbose:           true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -87,12 +86,11 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch_with_config", "sketch_with_config.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -129,12 +127,11 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 		SketchLocation:        filepath.Join("sketch_with_dependend_libraries", "sketch.ino"),
 		FQBN:                  "arduino:avr:leonardo",
 		ArduinoAPIVersion:     "10600",
+		Verbose:               true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -182,12 +179,11 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 		SketchLocation:          filepath.Join("sketch_that_checks_if_SPI_has_transactions", "sketch.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -225,12 +221,11 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 		SketchLocation:          filepath.Join("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 

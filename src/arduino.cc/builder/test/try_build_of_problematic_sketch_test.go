@@ -32,7 +32,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"os"
 	"path/filepath"
@@ -211,12 +210,11 @@ func makeDefaultContext(t *testing.T) (map[string]interface{}, *types.Context) {
 		OtherLibrariesFolders:   []string{"libraries"},
 		FQBN:              "arduino:avr:leonardo",
 		ArduinoAPIVersion: "10607",
+		Verbose:           true,
+		DebugPreprocessor: true,
 	}
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_PREPROCESSOR] = true
 
 	return context, ctx
 }

@@ -52,12 +52,12 @@ func TestBuilderEmptySketch(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
 		FQBN:                    "arduino:avr:uno",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_VERBOSE] = true
 	ctx.DebugLevel = 10
 
 	command := builder.Builder{}
@@ -88,12 +88,11 @@ func TestBuilderBridge(t *testing.T) {
 		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)

@@ -60,7 +60,7 @@ func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) er
 		return i18n.WrapError(err)
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	if verbose {
 		fmt.Println(commandLine)
 	}

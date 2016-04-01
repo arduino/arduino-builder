@@ -48,10 +48,10 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		SketchLocation:        "sketchLocation",
 		FQBN:                  "fqbn",
 		ArduinoAPIVersion:     "ideVersion",
+		Verbose:               true,
 	}
 
 	context[constants.CTX_BUILD_PATH] = "buildPath"
-	context[constants.CTX_VERBOSE] = true
 	ctx.DebugLevel = 5
 
 	create := builder.CreateBuildOptionsMap{}

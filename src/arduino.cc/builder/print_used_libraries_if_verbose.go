@@ -39,7 +39,7 @@ import (
 type PrintUsedLibrariesIfVerbose struct{}
 
 func (s *PrintUsedLibrariesIfVerbose) Run(context map[string]interface{}, ctx *types.Context) error {
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
 	if !verbose || !utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {

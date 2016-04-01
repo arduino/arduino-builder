@@ -45,7 +45,7 @@ func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := ctx.GetLogger()
 

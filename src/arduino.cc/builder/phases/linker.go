@@ -60,7 +60,7 @@ func (s *Linker) Run(context map[string]interface{}, ctx *types.Context) error {
 	}
 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := ctx.GetLogger()
 

@@ -52,12 +52,11 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -94,12 +93,11 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch2", "SketchWithIfDef.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -134,12 +132,11 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch9", "sketch.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -179,12 +176,11 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch10", "sketch.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -223,12 +219,11 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 		SketchLocation:          filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
 		FQBN:                    "my_avr_platform:avr:custom_yun",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -267,12 +262,11 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 		SketchLocation:          filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
 		FQBN:                    "my_avr_platform:avr:custom_yun",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 
@@ -311,12 +305,11 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 		SketchLocation:          filepath.Join("sketch_usbhost", "sketch_usbhost.ino"),
 		FQBN:                    "arduino:samd:arduino_zero_native",
 		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 

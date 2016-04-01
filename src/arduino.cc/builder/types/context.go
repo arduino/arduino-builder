@@ -16,6 +16,10 @@ type Context struct {
 	ArduinoAPIVersion       string
 	FQBN                    string
 
+	// Verbosity settings
+	Verbose           bool
+	DebugPreprocessor bool
+
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
 

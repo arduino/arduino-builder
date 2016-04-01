@@ -48,7 +48,7 @@ func (s *LibrariesBuilder) Run(context map[string]interface{}, ctx *types.Contex
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
 	logger := ctx.GetLogger()
 

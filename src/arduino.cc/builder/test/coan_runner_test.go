@@ -51,12 +51,11 @@ func TestCoanRunner(t *testing.T) {
 		SketchLocation:    filepath.Join("sketch2", "SketchWithIfDef.ino"),
 		FQBN:              "arduino:avr:leonardo",
 		ArduinoAPIVersion: "10600",
+		Verbose:           true,
 	}
 
 	buildPath := SetupBuildPath(t, context)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_VERBOSE] = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

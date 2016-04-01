@@ -41,7 +41,7 @@ import (
 type PrototypesAdder struct{}
 
 func (s *PrototypesAdder) Run(context map[string]interface{}, ctx *types.Context) error {
-	debugOutput := context[constants.CTX_DEBUG_PREPROCESSOR] != nil
+	debugOutput := ctx.DebugPreprocessor
 	source := context[constants.CTX_SOURCE].(string)
 
 	source = strings.Replace(source, "\r\n", "\n", -1)
