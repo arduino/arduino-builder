@@ -57,7 +57,7 @@ func (s *CTagsTargetFileSaver) Run(context map[string]interface{}, ctx *types.Co
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_CTAGS_TEMP_FILE_PATH] = ctagsTargetFilePath
+	ctx.CTagsTargetFile = ctagsTargetFilePath
 
 	return nil
 }

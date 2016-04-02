@@ -21,6 +21,16 @@ type Context struct {
 	Libraries         []*Library
 	HeaderToLibraries map[string][]*Library
 
+	// C++ Parsing
+	CTagsOutput                 string
+	CTagsTargetFile             string
+	CTagsOfSource               []*CTag
+	CTagsOfPreprocessedSource   []*CTag
+	CTagsCollected              []*CTag
+	PrototypesSection           string
+	PrototypesLineWhereToInsert int
+	Prototypes                  []*Prototype
+
 	// Verbosity settings
 	Verbose           bool
 	DebugPreprocessor bool

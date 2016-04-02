@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -49,19 +48,15 @@ func (s *PrototypesAdder) Run(context map[string]interface{}, ctx *types.Context
 
 	sourceRows := strings.Split(source, "\n")
 
-	if !utils.MapHas(context, constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES) {
-		return nil
-	}
-
-	firstFunctionLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
+	firstFunctionLine := ctx.PrototypesLineWhereToInsert
 	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
 		return nil
 	}
 
 	insertionLine := firstFunctionLine + context[constants.CTX_LINE_OFFSET].(int) - 1
 	firstFunctionChar := len(strings.Join(sourceRows[:insertionLine], "\n")) + 1
-	prototypeSection := composePrototypeSection(firstFunctionLine, context[constants.CTX_PROTOTYPES].([]*types.Prototype))
-	context[constants.CTX_PROTOTYPE_SECTION] = prototypeSection
+	prototypeSection := composePrototypeSection(firstFunctionLine, ctx.Prototypes)
+	ctx.PrototypesSection = prototypeSection
 	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
 	if debugOutput {

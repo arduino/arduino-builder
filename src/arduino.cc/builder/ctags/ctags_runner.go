@@ -42,7 +42,7 @@ type CTagsRunner struct{}
 
 func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	ctagsTargetFilePath := context[constants.CTX_CTAGS_TEMP_FILE_PATH].(string)
+	ctagsTargetFilePath := ctx.CTagsTargetFile
 	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
@@ -70,7 +70,7 @@ func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) er
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(sourceBytes)
+	ctx.CTagsOutput = string(sourceBytes)
 
 	return nil
 }

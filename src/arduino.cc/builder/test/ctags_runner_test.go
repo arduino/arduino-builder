@@ -89,7 +89,7 @@ func TestCTagsRunner(t *testing.T) {
 		"analogCommand	" + sketchLocation + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:109	signature:(BridgeClient client)	returntype:void\n" +
 		"modeCommand	" + sketchLocation + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:149	signature:(BridgeClient client)	returntype:void\n"
 
-	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
@@ -138,7 +138,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		"setup\t" + sketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
 		"loop\t" + sketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
 
-	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
@@ -186,7 +186,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
 		"func\t" + sketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
 
-	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
@@ -233,7 +233,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		"setup\t" + sketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
 		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
 
-	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
@@ -281,5 +281,5 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		"aVar\t" + sketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
 		"func\t" + sketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
 
-	require.Equal(t, expectedOutput, strings.Replace(context[constants.CTX_CTAGS_OUTPUT].(string), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
