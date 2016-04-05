@@ -62,6 +62,11 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = includesParams
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
+	if properties[constants.RECIPE_PREPROC_INCLUDES] == "" {
+		//generate RECIPE_PREPROC_INCLUDES from RECIPE_CPP_PATTERN
+		properties[constants.RECIPE_PREPROC_INCLUDES] = GeneratePreprocIncludePatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
+	}
+
 	output, err := builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_INCLUDES, true, verbose, false, logger)
 	if err != nil {
 		return utils.WrapError(err)
@@ -70,4 +75,13 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}) error {
 	context[constants.CTX_GCC_MINUS_M_OUTPUT] = string(output)
 
 	return nil
+}
+
+func GeneratePreprocIncludePatternFromCompile(compilePattern string) string {
+	// add {preproc.includes.flags}
+	// remove -o "{object_file}"
+	returnString := compilePattern
+	returnString = strings.Replace(returnString, "{compiler.cpp.flags}", "{compiler.cpp.flags} {preproc.includes.flags}", 1)
+	returnString = strings.Replace(returnString, "-o {object_file}", "", 1)
+	return returnString
 }

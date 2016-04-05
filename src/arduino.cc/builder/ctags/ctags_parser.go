@@ -38,6 +38,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"bufio"
 )
 
 const KIND_PROTOTYPE = "prototype"
@@ -47,6 +48,7 @@ const KIND_FUNCTION = "function"
 
 const TEMPLATE = "template"
 const STATIC = "static"
+const EXTERN = "extern \"C\""
 
 var KNOWN_TAG_KINDS = map[string]bool{
 	"prototype": true,
@@ -101,6 +103,9 @@ func addPrototype(tag *types.CTag) {
 	if strings.Index(tag.Code, STATIC+" ") != -1 {
 		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + STATIC
 	}
+	if strings.Index(tag.Code, EXTERN+" ") != -1 {
+		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + EXTERN
+	}
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
@@ -154,6 +159,35 @@ func prototypeAndCodeDontMatch(tag *types.CTag) bool {
 	}
 
 	code := removeSpacesAndTabs(tag.Code)
+
+	// original code is multi-line, which tags doesn't have - could we find this code in the
+	// original source file, for purposes of checking here?
+	if strings.Index(code, ")") == -1 {
+		file, err := os.Open(tag.Filename)
+		if err == nil {
+			defer file.Close()
+
+			scanner := bufio.NewScanner(file)
+			line := 1
+
+			// skip lines until we get to the start of this tag
+			for scanner.Scan() && line < tag.Line {
+				line++;
+			}
+
+			// read up to 10 lines in search of a closing paren
+			newcode := scanner.Text()
+			for scanner.Scan() && line < (tag.Line + 10) && strings.Index(newcode, ")") == -1 {
+				newcode += scanner.Text()
+			}
+
+			// don't bother replacing the code text if we haven't found a closing paren
+			if strings.Index(newcode, ")") != -1 {
+				code = removeSpacesAndTabs(newcode)
+			}
+		}
+	}
+
 	prototype := removeSpacesAndTabs(tag.Prototype)
 	prototype = removeTralingSemicolon(prototype)
 

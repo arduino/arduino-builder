@@ -52,6 +52,11 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 		return utils.WrapError(err)
 	}
 
+	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
+		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
+		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
+	}
+
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
 	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
@@ -77,6 +82,12 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 
 	verbose := context[constants.CTX_VERBOSE].(bool)
 	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+
+	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
+		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
+		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
+	}
+
 	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
 		return utils.WrapError(err)
@@ -111,4 +122,13 @@ func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFil
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
 	return properties, targetFilePath, nil
+}
+
+func GeneratePreprocPatternFromCompile(compilePattern string) string {
+	// add {preproc.macros.flags}
+	// replace "{object_file}" with "{preprocessed_file_path}"
+	returnString := compilePattern
+	returnString = strings.Replace(returnString, "{compiler.cpp.flags}", "{compiler.cpp.flags} {preproc.macros.flags}", 1)
+	returnString = strings.Replace(returnString, "{object_file}", "{preprocessed_file_path}", 1)
+	return returnString
 }

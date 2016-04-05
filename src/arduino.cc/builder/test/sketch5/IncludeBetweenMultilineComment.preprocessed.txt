@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #include <CapacitiveSensor.h>
 /*
@@ -10,7 +10,7 @@ CapacitiveSensor cs_13_8 = CapacitiveSensor(13,8);
 void setup();
 #line 10 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
-#line 6
+#line 6 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup()
 {
 	Serial.begin(9600);

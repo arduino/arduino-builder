@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1
+#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 #line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 /*
  * The code is released under the GNU General Public License.
@@ -92,7 +92,7 @@ WII Wii(&Btd); // The Wii library can communicate with Wiimotes and the Nunchuck
 void setup();
 #line 204 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void loop();
-#line 88
+#line 88 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
 void setup() {
   /* Initialize UART */
   Serial.begin(115200);
