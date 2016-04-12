@@ -178,7 +178,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	require.Equal(t, 0, len(packages.Packages["RFduino"].Platforms))
 
 	samdPlatform := packages.Packages["arduino"].Platforms["samd"]
-	require.Equal(t, 2, len(samdPlatform.Boards))
+	require.Equal(t, 3, len(samdPlatform.Boards))
 
 	require.Equal(t, "arduino_zero_edbg", samdPlatform.Boards["arduino_zero_edbg"].BoardId)
 	require.Equal(t, "arduino_zero_edbg", samdPlatform.Boards["arduino_zero_edbg"].Properties[constants.ID])
@@ -232,7 +232,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms))
 	require.Equal(t, 20, len(packages.Packages["arduino"].Platforms["avr"].Boards))
 	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["sam"].Boards))
-	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["samd"].Boards))
+	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms["samd"].Boards))
 
 	require.Equal(t, 1, len(packages.Packages["my_avr_platform"].Platforms))
 	require.Equal(t, 2, len(packages.Packages["my_avr_platform"].Platforms["avr"].Boards))

@@ -84,12 +84,12 @@ type Core struct {
 
 func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	cores := []Core{
-		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.9"},
-		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.5"},
+		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.10"},
+		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.7"},
 	}
 
 	boardsManagerCores := []Core{
-		Core{Maintainer: "arduino", Arch: "samd", Version: "1.6.2"},
+		Core{Maintainer: "arduino", Arch: "samd", Version: "1.6.5"},
 	}
 
 	boardsManagerRedBearCores := []Core{
@@ -134,7 +134,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	libraries := []Library{
 		Library{Name: "Audio", Version: "1.0.4"},
 		Library{Name: "Adafruit PN532", Version: "1.0.0"},
-		Library{Name: "Bridge", Version: "1.1.0"},
+		Library{Name: "Bridge", Version: "1.6.1"},
 		Library{Name: "CapacitiveSensor", Version: "0.5.0", VersionInLibProperties: "0.5"},
 		Library{Name: "Ethernet", Version: "1.1.1"},
 		Library{Name: "Robot IR Remote", Version: "1.0.2"},
