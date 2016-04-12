@@ -77,13 +77,13 @@ const FLAG_LOGGER_MACHINE = "machine"
 const FLAG_VERSION = "version"
 const FLAG_VID_PID = "vid-pid"
 
-type slice []string
+type foldersFlag []string
 
-func (h *slice) String() string {
+func (h *foldersFlag) String() string {
 	return fmt.Sprint(*h)
 }
 
-func (h *slice) Set(csv string) error {
+func (h *foldersFlag) Set(csv string) error {
 	var values []string
 	if strings.Contains(csv, string(os.PathListSeparator)) {
 		values = strings.Split(csv, string(os.PathListSeparator))
@@ -99,15 +99,28 @@ func (h *slice) Set(csv string) error {
 	return nil
 }
 
+type propertiesFlag []string
+
+func (h *propertiesFlag) String() string {
+	return fmt.Sprint(*h)
+}
+
+func (h *propertiesFlag) Set(value string) error {
+	value = strings.TrimSpace(value)
+	*h = append(*h, value)
+
+	return nil
+}
+
 var compileFlag *bool
 var preprocessFlag *bool
 var dumpPrefsFlag *bool
 var buildOptionsFileFlag *string
-var hardwareFoldersFlag slice
-var toolsFoldersFlag slice
-var librariesBuiltInFoldersFlag slice
-var librariesFoldersFlag slice
-var customBuildPropertiesFlag slice
+var hardwareFoldersFlag foldersFlag
+var toolsFoldersFlag foldersFlag
+var librariesBuiltInFoldersFlag foldersFlag
+var librariesFoldersFlag foldersFlag
+var customBuildPropertiesFlag propertiesFlag
 var fqbnFlag *string
 var coreAPIVersionFlag *string
 var ideVersionFlag *string
@@ -336,7 +349,7 @@ func main() {
 	defer os.Exit(exitCode)
 }
 
-func setContextSliceKeyOrLoadItFromOptions(context map[string]interface{}, cliFlag slice, buildOptions map[string]string, contextKey string, paramName string, mandatory bool) (error, bool) {
+func setContextSliceKeyOrLoadItFromOptions(context map[string]interface{}, cliFlag []string, buildOptions map[string]string, contextKey string, paramName string, mandatory bool) (error, bool) {
 	values, err := toSliceOfUnquoted(cliFlag)
 	if err != nil {
 		return err, true
@@ -364,7 +377,7 @@ func toExitCode(err error) int {
 	return 1
 }
 
-func toSliceOfUnquoted(value slice) ([]string, error) {
+func toSliceOfUnquoted(value []string) ([]string, error) {
 	var values []string
 	for _, v := range value {
 		v, err := gohasissues.Unquote(v)
