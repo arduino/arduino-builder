@@ -33,12 +33,12 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"bufio"
 	"os"
 	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
-	"bufio"
 )
 
 const KIND_PROTOTYPE = "prototype"
@@ -172,12 +172,12 @@ func prototypeAndCodeDontMatch(tag *types.CTag) bool {
 
 			// skip lines until we get to the start of this tag
 			for scanner.Scan() && line < tag.Line {
-				line++;
+				line++
 			}
 
 			// read up to 10 lines in search of a closing paren
 			newcode := scanner.Text()
-			for scanner.Scan() && line < (tag.Line + 10) && strings.Index(newcode, ")") == -1 {
+			for scanner.Scan() && line < (tag.Line+10) && strings.Index(newcode, ")") == -1 {
 				newcode += scanner.Text()
 			}
 
