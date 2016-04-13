@@ -167,7 +167,6 @@ func main() {
 		fmt.Println("See https://www.arduino.cc/ and https://github.com/arduino/arduino-builder/graphs/contributors")
 		fmt.Println("This is free software; see the source for copying conditions.  There is NO")
 		fmt.Println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
-		defer os.Exit(0)
 		return
 	}
 
@@ -249,8 +248,7 @@ func main() {
 		_, err := os.Stat(buildPath)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			defer os.Exit(1)
-			return
+			os.Exit(1)
 		}
 
 		err = utils.EnsureFolderExists(buildPath)
@@ -314,13 +312,11 @@ func main() {
 		if flag.NArg() == 0 {
 			fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")
 			flag.Usage()
-			defer os.Exit(1)
-			return
+			os.Exit(1)
 		}
 		err = builder.RunBuilder(context, ctx)
 	}
 
-	exitCode := 0
 	if err != nil {
 		err = i18n.WrapError(err)
 
@@ -330,10 +326,8 @@ func main() {
 			fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
 		}
 
-		exitCode = toExitCode(err)
+		os.Exit(toExitCode(err))
 	}
-
-	defer os.Exit(exitCode)
 }
 
 func setContextSliceKeyOrLoadItFromOptions(context map[string]interface{}, cliFlag []string, buildOptions map[string]string, contextKey string, paramName string, mandatory bool) (error, bool) {
