@@ -50,7 +50,7 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	require.Empty(t, ctx.LibrariesBuildPath)
 	require.Empty(t, ctx.CoreBuildPath)
 
-	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
+	require.NotNil(t, ctx.WarningsLevel)
 
 	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
 	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue).Empty())
@@ -71,7 +71,7 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_LIBRARIES)), ctx.LibrariesBuildPath)
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
 
-	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
+	require.NotNil(t, ctx.WarningsLevel)
 
 	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
 	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue).Empty())

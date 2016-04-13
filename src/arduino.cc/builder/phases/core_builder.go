@@ -44,7 +44,7 @@ func (s *CoreBuilder) Run(context map[string]interface{}, ctx *types.Context) er
 	coreBuildPath := ctx.CoreBuildPath
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := ctx.Verbose
-	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
+	warningsLevel := ctx.WarningsLevel
 	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(coreBuildPath)

@@ -289,7 +289,7 @@ func main() {
 	}
 
 	if *warningsLevelFlag != "" {
-		context[constants.CTX_WARNINGS_LEVEL] = *warningsLevelFlag
+		ctx.WarningsLevel = *warningsLevelFlag
 	}
 
 	if *debugLevelFlag > -1 {

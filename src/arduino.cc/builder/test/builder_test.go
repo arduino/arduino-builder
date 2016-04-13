@@ -203,7 +203,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_WARNINGS_LEVEL] = "all"
+	ctx.WarningsLevel = "all"
 
 	command := builder.Builder{}
 	err := command.Run(context, ctx)

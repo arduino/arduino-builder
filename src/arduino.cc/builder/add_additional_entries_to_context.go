@@ -33,7 +33,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
@@ -65,8 +64,8 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 		ctx.CoreBuildPath = coreBuildPath
 	}
 
-	if !utils.MapHas(context, constants.CTX_WARNINGS_LEVEL) {
-		context[constants.CTX_WARNINGS_LEVEL] = DEFAULT_WARNINGS_LEVEL
+	if ctx.WarningsLevel == "" {
+		ctx.WarningsLevel = DEFAULT_WARNINGS_LEVEL
 	}
 
 	sourceFiles := &types.UniqueStringQueue{}

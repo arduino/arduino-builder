@@ -22,6 +22,8 @@ type Context struct {
 	LibrariesBuildPath string
 	PreprocPath        string
 
+	WarningsLevel string
+
 	// Libraries handling
 	Includes          []string
 	Libraries         []*Library

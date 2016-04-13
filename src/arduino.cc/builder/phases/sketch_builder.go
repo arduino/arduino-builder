@@ -46,7 +46,7 @@ func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) 
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	verbose := ctx.Verbose
-	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
+	warningsLevel := ctx.WarningsLevel
 	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
