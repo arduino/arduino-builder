@@ -53,7 +53,7 @@ func (s *Linker) Run(context map[string]interface{}, ctx *types.Context) error {
 	objectFiles = append(objectFiles, objectFilesCore...)
 
 	coreArchiveFilePath := context[constants.CTX_ARCHIVE_FILE_PATH_CORE].(string)
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
+	buildPath := ctx.BuildPath
 	coreDotARelPath, err := filepath.Rel(buildPath, coreArchiveFilePath)
 	if err != nil {
 		return i18n.WrapError(err)

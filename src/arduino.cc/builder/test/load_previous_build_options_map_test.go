@@ -44,7 +44,7 @@ func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	err := utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), "test")
@@ -61,7 +61,7 @@ func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.LoadPreviousBuildOptionsMap{}

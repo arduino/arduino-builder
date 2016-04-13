@@ -213,7 +213,7 @@ func makeDefaultContext(t *testing.T) (map[string]interface{}, *types.Context) {
 		Verbose:           true,
 		DebugPreprocessor: true,
 	}
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	return context, ctx

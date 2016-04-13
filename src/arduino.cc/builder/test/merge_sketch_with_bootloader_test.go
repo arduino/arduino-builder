@@ -57,7 +57,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	err := utils.EnsureFolderExists(filepath.Join(buildPath, "sketch"))
@@ -100,7 +100,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	err := utils.EnsureFolderExists(filepath.Join(buildPath, "sketch"))
@@ -143,7 +143,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -182,7 +182,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	err := utils.EnsureFolderExists(filepath.Join(buildPath, "sketch"))

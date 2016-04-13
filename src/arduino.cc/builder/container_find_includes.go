@@ -45,7 +45,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 		return i18n.WrapError(err)
 	}
 
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
+	sketchBuildPath := ctx.SketchBuildPath
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
 	err = findIncludesUntilDone(context, ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 	}
 
 	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
-	foldersWithSources.Push(types.SourceFolder{Folder: context[constants.CTX_SKETCH_BUILD_PATH].(string), Recurse: true})
+	foldersWithSources.Push(types.SourceFolder{Folder: ctx.SketchBuildPath, Recurse: true})
 	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
 		for _, library := range context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library) {
 			sourceFolders := types.LibraryToSourceFolder(library)

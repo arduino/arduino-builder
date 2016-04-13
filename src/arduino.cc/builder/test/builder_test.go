@@ -55,7 +55,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	ctx.DebugLevel = 10
@@ -91,7 +91,7 @@ func TestBuilderBridge(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -126,7 +126,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -161,7 +161,7 @@ func TestBuilderBridgeTwice(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -200,7 +200,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_WARNINGS_LEVEL] = "all"
@@ -246,7 +246,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -281,7 +281,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -303,7 +303,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -325,7 +325,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -347,7 +347,7 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
@@ -369,7 +369,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 		ArduinoAPIVersion:       "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	NoError(t, os.MkdirAll(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"), os.FileMode(0755)))

@@ -39,7 +39,7 @@ import (
 type StoreBuildOptionsMap struct{}
 
 func (s *StoreBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
+	buildPath := ctx.BuildPath
 	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
 
 	utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), buildOptionsJson)

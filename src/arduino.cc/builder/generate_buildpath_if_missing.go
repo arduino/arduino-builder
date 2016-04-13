@@ -42,7 +42,7 @@ import (
 type GenerateBuildPathIfMissing struct{}
 
 func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) && context[constants.CTX_BUILD_PATH].(string) != constants.EMPTY_STRING {
+	if ctx.BuildPath != "" {
 		return nil
 	}
 
@@ -59,7 +59,7 @@ func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}, ctx *ty
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_SETTING_BUILD_PATH, buildPath)
 	}
 
-	context[constants.CTX_BUILD_PATH] = buildPath
+	ctx.BuildPath = buildPath
 
 	return nil
 }

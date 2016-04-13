@@ -45,10 +45,10 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	command := builder.AddAdditionalEntriesToContext{}
 	NoError(t, command.Run(context, ctx))
 
-	require.Nil(t, context[constants.CTX_PREPROC_PATH])
-	require.Nil(t, context[constants.CTX_SKETCH_BUILD_PATH])
-	require.Nil(t, context[constants.CTX_LIBRARIES_BUILD_PATH])
-	require.Nil(t, context[constants.CTX_CORE_BUILD_PATH])
+	require.Empty(t, ctx.PreprocPath)
+	require.Empty(t, ctx.SketchBuildPath)
+	require.Empty(t, ctx.LibrariesBuildPath)
+	require.Empty(t, ctx.CoreBuildPath)
 
 	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
 
@@ -61,16 +61,15 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-
-	context[constants.CTX_BUILD_PATH] = "folder"
+	ctx.BuildPath = "folder"
 
 	command := builder.AddAdditionalEntriesToContext{}
 	NoError(t, command.Run(context, ctx))
 
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), context[constants.CTX_PREPROC_PATH])
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), context[constants.CTX_SKETCH_BUILD_PATH])
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_LIBRARIES)), context[constants.CTX_LIBRARIES_BUILD_PATH])
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), context[constants.CTX_CORE_BUILD_PATH])
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), ctx.PreprocPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_LIBRARIES)), ctx.LibrariesBuildPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
 
 	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
 

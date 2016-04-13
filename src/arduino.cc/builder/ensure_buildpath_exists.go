@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -39,9 +38,7 @@ import (
 type EnsureBuildPathExists struct{}
 
 func (s *EnsureBuildPathExists) Run(context map[string]interface{}, ctx *types.Context) error {
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
-
-	err := utils.EnsureFolderExists(buildPath)
+	err := utils.EnsureFolderExists(ctx.BuildPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}

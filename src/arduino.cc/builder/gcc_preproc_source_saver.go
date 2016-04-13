@@ -32,14 +32,15 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
 type GCCPreprocSourceSaver struct{}
 
-func (s *GCCPreprocSourceSaver) Run(context map[string]interface{}) error {
-	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+func (s *GCCPreprocSourceSaver) Run(context map[string]interface{}, ctx *types.Context) error {
+	preprocPath := ctx.PreprocPath
 	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
 		return i18n.WrapError(err)

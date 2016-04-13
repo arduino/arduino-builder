@@ -45,9 +45,9 @@ type GCCPreprocRunner struct {
 }
 
 func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Context) error {
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
+	sketchBuildPath := ctx.SketchBuildPath
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -75,7 +75,7 @@ type GCCPreprocRunnerForDiscoveringIncludes struct {
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}, ctx *types.Context) error {
-	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFilePath)
+	properties, _, err := prepareGCCPreprocRecipeProperties(context, ctx, s.SourceFilePath, s.TargetFilePath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -98,9 +98,9 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFilePath string) (props.PropertiesMap, string, error) {
+func prepareGCCPreprocRecipeProperties(context map[string]interface{}, ctx *types.Context, sourceFilePath string, targetFilePath string) (props.PropertiesMap, string, error) {
 	if targetFilePath != utils.NULLFile() {
-		preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+		preprocPath := ctx.PreprocPath
 		err := utils.EnsureFolderExists(preprocPath)
 		if err != nil {
 			return nil, "", i18n.WrapError(err)

@@ -41,7 +41,7 @@ type SketchSaver struct{}
 
 func (s *SketchSaver) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
+	sketchBuildPath := ctx.SketchBuildPath
 	source := context[constants.CTX_SOURCE].(string)
 
 	err := utils.EnsureFolderExists(sketchBuildPath)

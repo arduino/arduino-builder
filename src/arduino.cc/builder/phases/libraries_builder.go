@@ -43,7 +43,7 @@ import (
 type LibrariesBuilder struct{}
 
 func (s *LibrariesBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
-	librariesBuildPath := context[constants.CTX_LIBRARIES_BUILD_PATH].(string)
+	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)

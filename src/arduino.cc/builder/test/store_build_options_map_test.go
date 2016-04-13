@@ -55,7 +55,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		DebugLevel:              5,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{

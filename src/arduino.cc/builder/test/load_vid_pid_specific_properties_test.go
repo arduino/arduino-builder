@@ -52,7 +52,7 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 		ArduinoAPIVersion: "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -83,7 +83,7 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 		ArduinoAPIVersion: "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_VIDPID] = "0x2341_0x0237"

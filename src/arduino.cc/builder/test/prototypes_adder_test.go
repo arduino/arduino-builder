@@ -59,7 +59,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	ctx.DebugLevel = 10
@@ -102,7 +102,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -143,7 +143,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -184,7 +184,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -225,7 +225,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -266,7 +266,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -307,7 +307,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -348,7 +348,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -397,7 +397,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -444,7 +444,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -485,7 +485,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	sketchLocation := filepath.Join("sketch_no_functions", "main.ino")
@@ -532,7 +532,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -576,7 +576,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -631,7 +631,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -675,7 +675,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -718,7 +718,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		Verbose:           true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -768,7 +768,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -815,7 +815,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -862,7 +862,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -903,7 +903,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{

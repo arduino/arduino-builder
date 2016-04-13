@@ -16,6 +16,12 @@ type Context struct {
 	ArduinoAPIVersion       string
 	FQBN                    string
 
+	BuildPath          string
+	SketchBuildPath    string
+	CoreBuildPath      string
+	LibrariesBuildPath string
+	PreprocPath        string
+
 	// Libraries handling
 	Includes          []string
 	Libraries         []*Library

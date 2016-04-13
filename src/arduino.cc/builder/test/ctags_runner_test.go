@@ -58,7 +58,7 @@ func TestCTagsRunner(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -109,7 +109,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -158,7 +158,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -206,7 +206,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -253,7 +253,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{

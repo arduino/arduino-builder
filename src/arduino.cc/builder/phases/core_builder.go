@@ -41,7 +41,7 @@ import (
 type CoreBuilder struct{}
 
 func (s *CoreBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
-	coreBuildPath := context[constants.CTX_CORE_BUILD_PATH].(string)
+	coreBuildPath := ctx.CoreBuildPath
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := ctx.Verbose
 	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)

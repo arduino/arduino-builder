@@ -45,7 +45,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "old"
@@ -77,7 +77,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
@@ -108,7 +108,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "options"

@@ -54,7 +54,7 @@ func TestCoanRunner(t *testing.T) {
 		Verbose:           true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{

@@ -54,8 +54,8 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Co
 	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(targetBoard.Properties)
 
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH] = context[constants.CTX_BUILD_PATH].(string)
+	if ctx.BuildPath != "" {
+		buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH] = ctx.BuildPath
 	}
 	if utils.MapHas(context, constants.CTX_SKETCH) {
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_NAME] = filepath.Base(context[constants.CTX_SKETCH].(*types.Sketch).MainFile.Name)

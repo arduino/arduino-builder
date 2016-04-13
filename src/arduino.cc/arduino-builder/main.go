@@ -239,11 +239,11 @@ func main() {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_FQBN + "' is mandatory"))
 	}
 
+	// FLAG_BUILD_PATH
 	buildPath, err := gohasissues.Unquote(*buildPathFlag)
 	if err != nil {
 		printCompleteError(err)
 	}
-
 	if buildPath != "" {
 		_, err := os.Stat(buildPath)
 		if err != nil {
@@ -256,7 +256,7 @@ func main() {
 			printCompleteError(err)
 		}
 	}
-	context[constants.CTX_BUILD_PATH] = buildPath
+	ctx.BuildPath = buildPath
 
 	if *vidPidFlag != "" {
 		context[constants.CTX_VIDPID] = *vidPidFlag

@@ -33,18 +33,17 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
 type FailIfBuildPathEqualsSketchPath struct{}
 
 func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_BUILD_PATH) || ctx.SketchLocation == "" {
+	if ctx.BuildPath == "" || ctx.SketchLocation == "" {
 		return nil
 	}
 
-	buildPath, err := filepath.Abs(context[constants.CTX_BUILD_PATH].(string))
+	buildPath, err := filepath.Abs(ctx.BuildPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}

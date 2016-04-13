@@ -65,7 +65,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface
 
 	logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
 
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
+	buildPath := ctx.BuildPath
 	files, err := gohasissues.ReadDir(buildPath)
 	if err != nil {
 		return i18n.WrapError(err)

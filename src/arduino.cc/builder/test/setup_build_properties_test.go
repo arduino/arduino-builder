@@ -53,7 +53,7 @@ func TestSetupBuildProperties(t *testing.T) {
 		ArduinoAPIVersion: "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -117,7 +117,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -157,7 +157,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 		ArduinoAPIVersion: "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -196,7 +196,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 		ArduinoAPIVersion: "10600",
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{

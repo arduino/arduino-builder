@@ -49,7 +49,7 @@ func (s *CoanRunner) Run(context map[string]interface{}, ctx *types.Context) err
 	source += "\n"
 	verbose := ctx.Verbose
 
-	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+	preprocPath := ctx.PreprocPath
 	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
 		return i18n.WrapError(err)

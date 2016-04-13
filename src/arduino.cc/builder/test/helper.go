@@ -77,10 +77,10 @@ func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 	}
 }
 
-func SetupBuildPath(t *testing.T, context map[string]interface{}) string {
+func SetupBuildPath(t *testing.T, ctx *types.Context) string {
 	buildPath, err := ioutil.TempDir(constants.EMPTY_STRING, "test")
 	NoError(t, err)
-	context[constants.CTX_BUILD_PATH] = buildPath
+	ctx.BuildPath = buildPath
 	return buildPath
 }
 

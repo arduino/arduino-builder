@@ -41,9 +41,7 @@ import (
 type LoadPreviousBuildOptionsMap struct{}
 
 func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
-
-	buildOptionsFile := filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE)
+	buildOptionsFile := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
 
 	_, err := os.Stat(buildOptionsFile)
 	if err != nil {

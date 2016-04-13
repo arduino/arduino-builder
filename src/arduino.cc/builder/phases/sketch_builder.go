@@ -41,7 +41,7 @@ import (
 type SketchBuilder struct{}
 
 func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
+	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)

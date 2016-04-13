@@ -51,7 +51,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
+	ctx.LibrariesBuildPath = temp
 	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
@@ -70,7 +70,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-	context[constants.CTX_LIBRARIES_BUILD_PATH] = filepath.Join(os.TempDir(), "test")
+	ctx.LibrariesBuildPath = filepath.Join(os.TempDir(), "test")
 	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
@@ -89,7 +89,7 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
+	ctx.LibrariesBuildPath = temp
 	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}

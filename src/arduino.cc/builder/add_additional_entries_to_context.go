@@ -40,8 +40,8 @@ import (
 type AddAdditionalEntriesToContext struct{}
 
 func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx *types.Context) error {
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
-		buildPath := context[constants.CTX_BUILD_PATH].(string)
+	if ctx.BuildPath != "" {
+		buildPath := ctx.BuildPath
 		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))
 		if err != nil {
 			return i18n.WrapError(err)
@@ -59,10 +59,10 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 			return i18n.WrapError(err)
 		}
 
-		context[constants.CTX_PREPROC_PATH] = preprocPath
-		context[constants.CTX_SKETCH_BUILD_PATH] = sketchBuildPath
-		context[constants.CTX_LIBRARIES_BUILD_PATH] = librariesBuildPath
-		context[constants.CTX_CORE_BUILD_PATH] = coreBuildPath
+		ctx.PreprocPath = preprocPath
+		ctx.SketchBuildPath = sketchBuildPath
+		ctx.LibrariesBuildPath = librariesBuildPath
+		ctx.CoreBuildPath = coreBuildPath
 	}
 
 	if !utils.MapHas(context, constants.CTX_WARNINGS_LEVEL) {

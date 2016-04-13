@@ -55,7 +55,7 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -96,7 +96,7 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -135,7 +135,7 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -179,7 +179,7 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -222,7 +222,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -265,7 +265,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -308,7 +308,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 		Verbose:                 true,
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{

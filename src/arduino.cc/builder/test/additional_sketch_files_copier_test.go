@@ -60,7 +60,7 @@ func TestCopyOtherFiles(t *testing.T) {
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -98,7 +98,7 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	commands := []types.Command{
@@ -118,9 +118,9 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	context = make(map[string]interface{})
-	context[constants.CTX_BUILD_PATH] = buildPath
 	ctx = &types.Context{
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+		BuildPath:      buildPath,
 	}
 
 	for _, command := range commands {
