@@ -69,7 +69,7 @@ go get github.com/stretchr/testify
 go get github.com/jstemmer/go-junit-report
 go get golang.org/x/codereview/patch
 go get golang.org/x/tools/cmd/vet
-go build
+go build arduino.cc/arduino-builder
 ```
 
 ### TDD

@@ -44,6 +44,8 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/go-errors/errors"
 )
@@ -170,85 +172,77 @@ func main() {
 	}
 
 	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
-	buildOptions := make(map[string]string)
 	if *buildOptionsFileFlag != "" {
+		buildOptions := make(props.PropertiesMap)
 		if _, err := os.Stat(*buildOptionsFileFlag); err == nil {
 			data, err := ioutil.ReadFile(*buildOptionsFileFlag)
 			if err != nil {
 				printCompleteError(err)
-				defer os.Exit(1)
-				return
 			}
 			err = json.Unmarshal(data, &buildOptions)
 			if err != nil {
 				printCompleteError(err)
-				defer os.Exit(1)
-				return
 			}
 		}
+		ctx.InjectBuildOptions(buildOptions)
 	}
 
-	var err error
-	printStackTrace := false
-	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, hardwareFoldersFlag, buildOptions, constants.CTX_HARDWARE_FOLDERS, FLAG_HARDWARE, true)
-	if err != nil {
-		printError(err, printStackTrace)
-		defer os.Exit(1)
-		return
-	}
-
-	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, toolsFoldersFlag, buildOptions, constants.CTX_TOOLS_FOLDERS, FLAG_TOOLS, true)
-	if err != nil {
-		printError(err, printStackTrace)
-		defer os.Exit(1)
-		return
-	}
-
-	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, librariesFoldersFlag, buildOptions, constants.CTX_OTHER_LIBRARIES_FOLDERS, FLAG_LIBRARIES, false)
-	if err != nil {
-		printError(err, printStackTrace)
-		defer os.Exit(1)
-		return
-	}
-
-	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, librariesBuiltInFoldersFlag, buildOptions, constants.CTX_BUILT_IN_LIBRARIES_FOLDERS, FLAG_BUILT_IN_LIBRARIES, false)
-	if err != nil {
-		printError(err, printStackTrace)
-		defer os.Exit(1)
-		return
-	}
-
-	err, printStackTrace = setContextSliceKeyOrLoadItFromOptions(context, customBuildPropertiesFlag, buildOptions, constants.CTX_CUSTOM_BUILD_PROPERTIES, FLAG_PREFS, false)
-	if err != nil {
-		printError(err, printStackTrace)
-		defer os.Exit(1)
-		return
-	}
-
-	fqbn, err := gohasissues.Unquote(*fqbnFlag)
-	if err != nil {
+	// FLAG_HARDWARE
+	if hardwareFolders, err := toSliceOfUnquoted(hardwareFoldersFlag); err != nil {
 		printCompleteError(err)
-		defer os.Exit(1)
-		return
+	} else if len(hardwareFolders) > 0 {
+		ctx.HardwareFolders = hardwareFolders
+	}
+	if len(ctx.HardwareFolders) == 0 {
+		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_HARDWARE + "' is mandatory"))
 	}
 
-	if fqbn == "" {
-		fqbn = buildOptions[constants.CTX_FQBN]
+	// FLAG_TOOLS
+	if toolsFolders, err := toSliceOfUnquoted(toolsFoldersFlag); err != nil {
+		printCompleteError(err)
+	} else if len(toolsFolders) > 0 {
+		ctx.ToolsFolders = toolsFolders
+	}
+	if len(ctx.ToolsFolders) == 0 {
+		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_TOOLS + "' is mandatory"))
 	}
 
-	if fqbn == "" {
+	// FLAG_LIBRARIES
+	if librariesFolders, err := toSliceOfUnquoted(librariesFoldersFlag); err != nil {
+		printCompleteError(err)
+	} else if len(librariesFolders) > 0 {
+		ctx.OtherLibrariesFolders = librariesFolders
+	}
+
+	// FLAG_BUILT_IN_LIBRARIES
+	if librariesBuiltInFolders, err := toSliceOfUnquoted(librariesBuiltInFoldersFlag); err != nil {
+		printCompleteError(err)
+	} else if len(librariesBuiltInFolders) > 0 {
+		ctx.BuiltInLibrariesFolders = librariesBuiltInFolders
+	}
+
+	// FLAG_PREFS
+	if customBuildProperties, err := toSliceOfUnquoted(customBuildPropertiesFlag); err != nil {
+		printCompleteError(err)
+	} else if len(customBuildProperties) > 0 {
+		ctx.CustomBuildProperties = customBuildProperties
+	}
+
+	// FLAG_FQBN
+	if fqbn, err := gohasissues.Unquote(*fqbnFlag); err != nil {
+		printCompleteError(err)
+	} else if fqbn != "" {
+		ctx.FQBN = fqbn
+	}
+	if ctx.FQBN == "" {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_FQBN + "' is mandatory"))
-		defer os.Exit(1)
-		return
 	}
-	context[constants.CTX_FQBN] = fqbn
 
 	buildPath, err := gohasissues.Unquote(*buildPathFlag)
 	if err != nil {
 		printCompleteError(err)
-		defer os.Exit(1)
-		return
 	}
 
 	if buildPath != "" {
@@ -262,8 +256,6 @@ func main() {
 		err = utils.EnsureFolderExists(buildPath)
 		if err != nil {
 			printCompleteError(err)
-			defer os.Exit(1)
-			return
 		}
 	}
 	context[constants.CTX_BUILD_PATH] = buildPath
@@ -277,10 +269,8 @@ func main() {
 		sketchLocation, err := gohasissues.Unquote(sketchLocation)
 		if err != nil {
 			printCompleteError(err)
-			defer os.Exit(1)
-			return
 		}
-		context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+		ctx.SketchLocation = sketchLocation
 	}
 
 	if *verboseFlag && *quietFlag {
@@ -288,20 +278,17 @@ func main() {
 		*quietFlag = false
 	}
 
-	context[constants.CTX_VERBOSE] = *verboseFlag
+	ctx.Verbose = *verboseFlag
 
-	coreAPIVersion := ""
-	if utils.MapStringStringHas(buildOptions, constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION) {
-		coreAPIVersion = buildOptions[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION]
-	} else {
-		// if deprecated 'ideVersionFlag' has been used...
+	// FLAG_IDE_VERSION
+	if ctx.ArduinoAPIVersion == "" {
+		// if deprecated "--ideVersionFlag" has been used...
 		if *coreAPIVersionFlag == "10600" && *ideVersionFlag != "10600" {
-			coreAPIVersion = *ideVersionFlag
+			ctx.ArduinoAPIVersion = *ideVersionFlag
 		} else {
-			coreAPIVersion = *coreAPIVersionFlag
+			ctx.ArduinoAPIVersion = *coreAPIVersionFlag
 		}
 	}
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = coreAPIVersion
 
 	if *warningsLevelFlag != "" {
 		context[constants.CTX_WARNINGS_LEVEL] = *warningsLevelFlag
@@ -312,17 +299,17 @@ func main() {
 	}
 
 	if *quietFlag {
-		context[constants.CTX_LOGGER] = i18n.NoopLogger{}
+		ctx.SetLogger(i18n.NoopLogger{})
 	} else if *loggerFlag == FLAG_LOGGER_MACHINE {
-		context[constants.CTX_LOGGER] = i18n.MachineLogger{}
+		ctx.SetLogger(i18n.MachineLogger{})
 	} else {
-		context[constants.CTX_LOGGER] = i18n.HumanLogger{}
+		ctx.SetLogger(i18n.HumanLogger{})
 	}
 
 	if *dumpPrefsFlag {
-		err = builder.RunParseHardwareAndDumpBuildProperties(context)
+		err = builder.RunParseHardwareAndDumpBuildProperties(context, ctx)
 	} else if *preprocessFlag {
-		err = builder.RunPreprocess(context)
+		err = builder.RunPreprocess(context, ctx)
 	} else {
 		if flag.NArg() == 0 {
 			fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")
@@ -330,7 +317,7 @@ func main() {
 			defer os.Exit(1)
 			return
 		}
-		err = builder.RunBuilder(context)
+		err = builder.RunBuilder(context, ctx)
 	}
 
 	exitCode := 0
@@ -400,9 +387,11 @@ func printError(err error, printStackTrace bool) {
 func printCompleteError(err error) {
 	err = i18n.WrapError(err)
 	fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
+	os.Exit(1)
 }
 
 func printErrorMessageAndFlagUsage(err error) {
 	fmt.Fprintln(os.Stderr, err)
 	flag.Usage()
+	os.Exit(1)
 }
