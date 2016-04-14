@@ -45,8 +45,8 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}, ctx *type
 	includes := ctx.Includes
 	headerToLibraries := ctx.HeaderToLibraries
 
-	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
+	platform := ctx.TargetPlatform
+	actualPlatform := ctx.ActualPlatform
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 

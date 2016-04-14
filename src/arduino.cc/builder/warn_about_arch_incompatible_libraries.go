@@ -44,7 +44,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(context map[string]interface{},
 		return nil
 	}
 
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	logger := ctx.GetLogger()
 

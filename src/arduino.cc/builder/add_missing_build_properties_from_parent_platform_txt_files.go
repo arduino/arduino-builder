@@ -39,7 +39,7 @@ type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
 
 func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(context map[string]interface{}, ctx *types.Context) error {
 	packages := context[constants.CTX_HARDWARE].(*types.Packages)
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 
 	newBuildProperties := packages.Properties.Clone()

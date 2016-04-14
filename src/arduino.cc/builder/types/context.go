@@ -20,6 +20,11 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
+	TargetBoard    *Board
+	TargetPackage  *Package
+	TargetPlatform *Platform
+	ActualPlatform *Platform
+
 	BuildPath          string
 	SketchBuildPath    string
 	CoreBuildPath      string

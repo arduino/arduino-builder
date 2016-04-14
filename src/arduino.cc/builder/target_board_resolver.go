@@ -66,9 +66,9 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Con
 		return i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
 	}
 
-	context[constants.CTX_TARGET_PACKAGE] = targetPackage
-	context[constants.CTX_TARGET_PLATFORM] = targetPlatform
-	context[constants.CTX_TARGET_BOARD] = targetBoard
+	ctx.TargetPackage = targetPackage
+	ctx.TargetPlatform = targetPlatform
+	ctx.TargetBoard = targetBoard
 
 	if len(fqbnParts) > 3 {
 		addAdditionalPropertiesToTargetBoard(targetBoard, fqbnParts[3])
@@ -98,7 +98,7 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Con
 	}
 
 	context[constants.CTX_BUILD_CORE] = core
-	context[constants.CTX_ACTUAL_PLATFORM] = actualPlatform
+	ctx.ActualPlatform = actualPlatform
 
 	return nil
 }

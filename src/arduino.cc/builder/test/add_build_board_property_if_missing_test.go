@@ -56,11 +56,11 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardId)
 	require.Equal(t, constants.EMPTY_STRING, targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MYMEGA", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
@@ -84,11 +84,11 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardId)
 	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])

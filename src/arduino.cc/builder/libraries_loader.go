@@ -51,11 +51,11 @@ func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context
 	sortedLibrariesFolders := []string{}
 	sortedLibrariesFolders = utils.AppendIfNotPresent(sortedLibrariesFolders, builtInLibrariesFolders...)
 
-	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	platform := ctx.TargetPlatform
 	debugLevel := ctx.DebugLevel
 	logger := ctx.GetLogger()
 
-	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
+	actualPlatform := ctx.ActualPlatform
 	if actualPlatform != platform {
 		sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(actualPlatform.Folder, constants.FOLDER_LIBRARIES))
 	}

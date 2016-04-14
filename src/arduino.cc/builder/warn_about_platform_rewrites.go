@@ -44,8 +44,8 @@ func (s *WarnAboutPlatformRewrites) Run(context map[string]interface{}, ctx *typ
 
 	logger := ctx.GetLogger()
 	hardwareRewriteResults := context[constants.CTX_HARDWARE_REWRITE_RESULTS].(map[*types.Platform][]types.PlatforKeyRewrite)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
+	actualPlatform := ctx.ActualPlatform
 
 	platforms := []*types.Platform{targetPlatform}
 	if actualPlatform != targetPlatform {
