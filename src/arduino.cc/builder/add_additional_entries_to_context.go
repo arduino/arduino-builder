@@ -68,12 +68,10 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 		ctx.WarningsLevel = DEFAULT_WARNINGS_LEVEL
 	}
 
-	sourceFiles := &types.UniqueStringQueue{}
-	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
-	foldersWithSources := &types.UniqueSourceFolderQueue{}
-	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
+	ctx.CollectedSourceFiles = &types.UniqueStringQueue{}
+	ctx.FoldersWithSourceFiles = &types.UniqueSourceFolderQueue{}
 
-	context[constants.CTX_LIBRARY_RESOLUTION_RESULTS] = make(map[string]types.LibraryResolutionResult)
+	ctx.LibrariesResolutionResults = make(map[string]types.LibraryResolutionResult)
 	context[constants.CTX_HARDWARE_REWRITE_RESULTS] = make(map[*types.Platform][]types.PlatforKeyRewrite)
 
 	return nil

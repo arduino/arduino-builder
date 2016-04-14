@@ -47,7 +47,7 @@ func (s *LibrariesBuilder) Run(context map[string]interface{}, ctx *types.Contex
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	libraries := ctx.ImportedLibraries
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel
 	logger := ctx.GetLogger()

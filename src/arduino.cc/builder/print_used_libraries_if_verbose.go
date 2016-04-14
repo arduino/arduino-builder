@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"time"
 )
 
@@ -42,13 +41,11 @@ func (s *PrintUsedLibrariesIfVerbose) Run(context map[string]interface{}, ctx *t
 	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
-	if !verbose || !utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
+	if !verbose || len(ctx.ImportedLibraries) == 0 {
 		return nil
 	}
 
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
-
-	for _, library := range importedLibraries {
+	for _, library := range ctx.ImportedLibraries {
 		legacy := constants.EMPTY_STRING
 		if library.IsLegacy {
 			legacy = constants.MSG_LIB_LEGACY

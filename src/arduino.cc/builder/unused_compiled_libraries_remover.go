@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -43,14 +42,13 @@ type UnusedCompiledLibrariesRemover struct{}
 
 func (s *UnusedCompiledLibrariesRemover) Run(context map[string]interface{}, ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
-	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 
 	_, err := os.Stat(librariesBuildPath)
 	if err != nil && os.IsNotExist(err) {
 		return nil
 	}
 
-	libraryNames := toLibraryNames(libraries)
+	libraryNames := toLibraryNames(ctx.ImportedLibraries)
 
 	files, err := ioutil.ReadDir(librariesBuildPath)
 	if err != nil {

@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
@@ -108,7 +107,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	require.Equal(t, 1, len(includes))
 	require.True(t, utils.SliceContains(includes, "Bridge.h"))
 
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
 }
@@ -153,7 +152,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	require.Equal(t, "library3.h", includes[2])
 	require.Equal(t, "library4.h", includes[3])
 
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 4, len(importedLibraries))
 
 	sort.Sort(ByLibraryName(importedLibraries))
@@ -199,7 +198,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 	require.Equal(t, 1, len(includes))
 	require.Equal(t, "SPI.h", includes[0])
 
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 }
@@ -244,7 +243,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	require.Equal(t, "Inexistent.h", includes[0])
 	require.Equal(t, "SPI.h", includes[1])
 
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 }

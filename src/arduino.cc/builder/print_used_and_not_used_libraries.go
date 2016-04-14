@@ -44,7 +44,7 @@ func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}, ctx *
 	}
 
 	logger := ctx.GetLogger()
-	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
+	libraryResolutionResults := ctx.LibrariesResolutionResults
 
 	for header, libResResult := range libraryResolutionResults {
 		if !libResResult.IsLibraryFromPlatform {

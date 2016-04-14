@@ -47,18 +47,15 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}, ctx *type
 
 	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
 	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
-	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
+	libraryResolutionResults := ctx.LibrariesResolutionResults
+	importedLibraries := ctx.ImportedLibraries
 
-	importedLibraries := []*types.Library{}
-	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
-		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
-	}
 	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
+	foldersWithSources := ctx.FoldersWithSourceFiles
 
 	for _, newlyImportedLibrary := range newlyImportedLibraries {
 		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
@@ -70,7 +67,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}, ctx *type
 		}
 	}
 
-	context[constants.CTX_IMPORTED_LIBRARIES] = importedLibraries
+	ctx.ImportedLibraries = importedLibraries
 
 	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
 	verbose := ctx.Verbose

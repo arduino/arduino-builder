@@ -52,10 +52,10 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 
 	require.NotNil(t, ctx.WarningsLevel)
 
-	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
-	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue).Empty())
+	require.True(t, ctx.CollectedSourceFiles.Empty())
+	require.True(t, ctx.FoldersWithSourceFiles.Empty())
 
-	require.Equal(t, 0, len(context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)))
+	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
 }
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
@@ -73,8 +73,8 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 
 	require.NotNil(t, ctx.WarningsLevel)
 
-	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
-	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue).Empty())
+	require.True(t, ctx.CollectedSourceFiles.Empty())
+	require.True(t, ctx.FoldersWithSourceFiles.Empty())
 
-	require.Equal(t, 0, len(context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)))
+	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
 }

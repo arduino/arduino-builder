@@ -52,10 +52,10 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 		return i18n.WrapError(err)
 	}
 
-	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
+	foldersWithSources := ctx.FoldersWithSourceFiles
 	foldersWithSources.Push(types.SourceFolder{Folder: ctx.SketchBuildPath, Recurse: true})
-	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
-		for _, library := range context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library) {
+	if len(ctx.ImportedLibraries) > 0 {
+		for _, library := range ctx.ImportedLibraries {
 			sourceFolders := types.LibraryToSourceFolder(library)
 			for _, sourceFolder := range sourceFolders {
 				foldersWithSources.Push(sourceFolder)
@@ -68,7 +68,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 		return i18n.WrapError(err)
 	}
 
-	sourceFilePaths := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
+	sourceFilePaths := ctx.CollectedSourceFiles
 
 	for !sourceFilePaths.Empty() {
 		err = findIncludesUntilDone(context, ctx, sourceFilePaths.Pop().(string))
@@ -100,7 +100,7 @@ func runCommand(context map[string]interface{}, ctx *types.Context, command type
 
 func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, sourceFilePath string) error {
 	targetFilePath := utils.NULLFile()
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+	importedLibraries := ctx.ImportedLibraries
 	done := false
 	for !done {
 		commands := []types.Command{
@@ -116,11 +116,11 @@ func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, s
 		}
 		if len(context[constants.CTX_INCLUDES_JUST_FOUND].([]string)) == 0 {
 			done = true
-		} else if len(context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)) == len(importedLibraries) {
+		} else if len(ctx.ImportedLibraries) == len(importedLibraries) {
 			err := runCommand(context, ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return i18n.WrapError(err)
 		}
-		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+		importedLibraries = ctx.ImportedLibraries
 		context[constants.CTX_INCLUDES_JUST_FOUND] = []string{}
 	}
 	return nil

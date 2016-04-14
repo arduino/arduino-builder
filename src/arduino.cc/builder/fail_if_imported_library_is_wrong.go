@@ -33,7 +33,6 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
 )
@@ -41,14 +40,13 @@ import (
 type FailIfImportedLibraryIsWrong struct{}
 
 func (s *FailIfImportedLibraryIsWrong) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
+	if len(ctx.ImportedLibraries) == 0 {
 		return nil
 	}
 
 	logger := ctx.GetLogger()
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
 
-	for _, library := range importedLibraries {
+	for _, library := range ctx.ImportedLibraries {
 		if !library.IsLegacy {
 			if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_ARCH)); err == nil && stat.IsDir() {
 				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)

@@ -26,12 +26,17 @@ type Context struct {
 	LibrariesBuildPath string
 	PreprocPath        string
 
+	CollectedSourceFiles   *UniqueStringQueue
+	FoldersWithSourceFiles *UniqueSourceFolderQueue
+
 	WarningsLevel string
 
 	// Libraries handling
-	Includes          []string
-	Libraries         []*Library
-	HeaderToLibraries map[string][]*Library
+	Includes                   []string
+	Libraries                  []*Library
+	HeaderToLibraries          map[string][]*Library
+	ImportedLibraries          []*Library
+	LibrariesResolutionResults map[string]LibraryResolutionResult
 
 	// C++ Parsing
 	CTagsOutput                 string

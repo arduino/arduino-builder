@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -52,7 +51,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
-	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
+	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(context, ctx)
@@ -71,7 +70,7 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = filepath.Join(os.TempDir(), "test")
-	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
+	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err := cmd.Run(context, ctx)
@@ -90,7 +89,7 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
-	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{}
+	ctx.ImportedLibraries = []*types.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(context, ctx)
