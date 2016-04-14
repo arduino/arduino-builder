@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -43,11 +42,11 @@ import (
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
 
 func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON) {
+	if ctx.BuildOptionsJsonPrevious == "" {
 		return nil
 	}
-	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
-	previousBuildOptionsJson := context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON].(string)
+	buildOptionsJson := ctx.BuildOptionsJson
+	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 	logger := ctx.GetLogger()
 
 	if buildOptionsJson == previousBuildOptionsJson {

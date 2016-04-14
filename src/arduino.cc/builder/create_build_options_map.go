@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"encoding/json"
@@ -40,14 +39,12 @@ type CreateBuildOptionsMap struct{}
 
 func (s *CreateBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
 	buildOptions := ctx.ExtractBuildOptions()
-	context[constants.CTX_BUILD_OPTIONS] = buildOptions
-
 	bytes, err := json.MarshalIndent(buildOptions, "", "  ")
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_BUILD_OPTIONS_JSON] = string(bytes)
+	ctx.BuildOptionsJson = string(bytes)
 
 	return nil
 }

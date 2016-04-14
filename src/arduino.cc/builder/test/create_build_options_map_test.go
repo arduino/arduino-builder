@@ -31,10 +31,7 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -57,17 +54,6 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	err := create.Run(context, ctx)
 	NoError(t, err)
 
-	buildOptions := context[constants.CTX_BUILD_OPTIONS].(props.PropertiesMap)
-	require.Equal(t, 8, len(utils.KeysOfMapOfString(buildOptions)))
-	require.Equal(t, "hardware,hardware2", buildOptions["hardwareFolders"])
-	require.Equal(t, "tools", buildOptions["toolsFolders"])
-	require.Equal(t, "", buildOptions["builtInLibrariesFolders"])
-	require.Equal(t, "", buildOptions["customBuildProperties"])
-	require.Equal(t, "libraries", buildOptions["otherLibrariesFolders"])
-	require.Equal(t, "fqbn", buildOptions["fqbn"])
-	require.Equal(t, "sketchLocation", buildOptions["sketchLocation"])
-	require.Equal(t, "ideVersion", buildOptions["runtime.ide.version"])
-
 	require.Equal(t, "{\n"+
 		"  \"builtInLibrariesFolders\": \"\",\n"+
 		"  \"customBuildProperties\": \"\",\n"+
@@ -77,5 +63,5 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		"  \"runtime.ide.version\": \"ideVersion\",\n"+
 		"  \"sketchLocation\": \"sketchLocation\",\n"+
 		"  \"toolsFolders\": \"tools\"\n"+
-		"}", context[constants.CTX_BUILD_OPTIONS_JSON].(string))
+		"}", ctx.BuildOptionsJson)
 }

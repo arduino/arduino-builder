@@ -16,6 +16,10 @@ type Context struct {
 	ArduinoAPIVersion       string
 	FQBN                    string
 
+	// Build options are serialized here
+	BuildOptionsJson         string
+	BuildOptionsJsonPrevious string
+
 	BuildPath          string
 	SketchBuildPath    string
 	CoreBuildPath      string

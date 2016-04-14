@@ -56,7 +56,7 @@ func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}, ctx *t
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = string(bytes)
+	ctx.BuildOptionsJsonPrevious = string(bytes)
 
 	return nil
 }

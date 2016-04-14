@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -48,8 +47,8 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "old"
-	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
+	ctx.BuildOptionsJsonPrevious = "old"
+	ctx.BuildOptionsJson = "new"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_be_deleted.txt"))
 
@@ -80,7 +79,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
+	ctx.BuildOptionsJson = "new"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
@@ -111,8 +110,8 @@ func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "options"
-	context[constants.CTX_BUILD_OPTIONS_JSON] = "options"
+	ctx.BuildOptionsJsonPrevious = "options"
+	ctx.BuildOptionsJson = "options"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 

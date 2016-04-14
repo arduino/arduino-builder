@@ -54,7 +54,7 @@ func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	err = command.Run(context, ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test", context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON])
+	require.Equal(t, "test", ctx.BuildOptionsJsonPrevious)
 }
 
 func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
@@ -68,5 +68,5 @@ func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
 	err := command.Run(context, ctx)
 	NoError(t, err)
 
-	require.False(t, utils.MapHas(context, constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON))
+	require.Empty(t, ctx.BuildOptionsJsonPrevious)
 }
