@@ -55,7 +55,7 @@ func TestLoadHardware(t *testing.T) {
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	require.Equal(t, 2, len(packages.Packages))
 	require.NotNil(t, packages.Packages["arduino"])
 	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms))
@@ -103,7 +103,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
@@ -171,7 +171,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	require.Equal(t, 3, len(packages.Packages))
 	require.NotNil(t, packages.Packages["arduino"])
 	require.Equal(t, 1, len(packages.Packages["arduino"].Platforms))
@@ -220,7 +220,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them

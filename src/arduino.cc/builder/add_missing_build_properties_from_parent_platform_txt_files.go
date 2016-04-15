@@ -30,14 +30,13 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 )
 
 type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
 
 func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(context map[string]interface{}, ctx *types.Context) error {
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	targetPackage := ctx.TargetPackage
 	buildProperties := ctx.BuildProperties
 

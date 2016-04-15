@@ -92,7 +92,7 @@ func (s *HardwareLoader) Run(context map[string]interface{}, ctx *types.Context)
 		}
 	}
 
-	context[constants.CTX_HARDWARE] = packages
+	ctx.Hardware = packages
 
 	return nil
 }

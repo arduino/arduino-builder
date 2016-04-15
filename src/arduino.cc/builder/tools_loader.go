@@ -72,7 +72,7 @@ func (s *ToolsLoader) Run(context map[string]interface{}, ctx *types.Context) er
 		}
 	}
 
-	context[constants.CTX_TOOLS] = tools
+	ctx.Tools = tools
 
 	return nil
 }

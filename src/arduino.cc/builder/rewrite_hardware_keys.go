@@ -42,7 +42,7 @@ func (s *RewriteHardwareKeys) Run(context map[string]interface{}, ctx *types.Con
 		return nil
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	platformKeysRewrite := context[constants.CTX_PLATFORM_KEYS_REWRITE].(types.PlatforKeysRewrite)
 	hardwareRewriteResults := context[constants.CTX_HARDWARE_REWRITE_RESULTS].(map[*types.Platform][]types.PlatforKeyRewrite)
 

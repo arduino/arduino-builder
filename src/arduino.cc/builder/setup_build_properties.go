@@ -43,7 +43,7 @@ import (
 type SetupBuildProperties struct{}
 
 func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	targetPlatform := ctx.TargetPlatform
 	actualPlatform := ctx.ActualPlatform
@@ -86,7 +86,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Co
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] = filepath.Join(variantPlatform.Folder, constants.FOLDER_VARIANTS, variant)
 	}
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	for _, tool := range tools {
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Version+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder

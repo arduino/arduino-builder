@@ -20,10 +20,13 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
+	Hardware       *Packages
+	Tools          []*Tool
 	TargetBoard    *Board
 	TargetPackage  *Package
 	TargetPlatform *Platform
 	ActualPlatform *Platform
+	USBVidPid      string
 
 	BuildProperties    props.PropertiesMap
 	BuildPath          string

@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -85,7 +84,7 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_VIDPID] = "0x2341_0x0237"
+	ctx.USBVidPid = "0x2341_0x0237"
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

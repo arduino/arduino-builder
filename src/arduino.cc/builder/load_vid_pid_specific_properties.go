@@ -34,7 +34,6 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"strconv"
 	"strings"
 )
@@ -42,11 +41,11 @@ import (
 type LoadVIDPIDSpecificProperties struct{}
 
 func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_VIDPID) {
+	if ctx.USBVidPid == "" {
 		return nil
 	}
 
-	vidPid := context[constants.CTX_VIDPID].(string)
+	vidPid := ctx.USBVidPid
 	vidPid = strings.ToLower(vidPid)
 	vidPidParts := strings.Split(vidPid, "_")
 	vid := vidPidParts[0]

@@ -39,7 +39,7 @@ import (
 type AddBuildBoardPropertyIfMissing struct{}
 
 func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	logger := ctx.GetLogger()
 
 	for _, aPackage := range packages.Packages {

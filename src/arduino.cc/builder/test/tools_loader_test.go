@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"sort"
@@ -65,7 +64,7 @@ func TestLoadTools(t *testing.T) {
 	err := loader.Run(context, ctx)
 	NoError(t, err)
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	require.Equal(t, 7, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -104,7 +103,7 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	err := loader.Run(context, ctx)
 	NoError(t, err)
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	require.Equal(t, 3, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -131,7 +130,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 	err := loader.Run(context, ctx)
 	NoError(t, err)
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	require.Equal(t, 9, len(tools))
 
 	require.Equal(t, "arm-none-eabi-gcc", tools[0].Name)

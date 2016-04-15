@@ -41,7 +41,6 @@ import (
 	"syscall"
 
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
@@ -258,8 +257,9 @@ func main() {
 	}
 	ctx.BuildPath = buildPath
 
+	// FLAG_VID_PID
 	if *vidPidFlag != "" {
-		context[constants.CTX_VIDPID] = *vidPidFlag
+		ctx.USBVidPid = *vidPidFlag
 	}
 
 	if flag.NArg() > 0 {

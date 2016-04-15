@@ -47,7 +47,7 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Con
 	targetPlatformName := fqbnParts[1]
 	targetBoardName := fqbnParts[2]
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	logger := ctx.GetLogger()
 
