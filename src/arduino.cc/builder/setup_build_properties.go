@@ -62,7 +62,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Co
 	}
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.PlatformId)
 
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = context[constants.CTX_BUILD_CORE].(string)
+	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = ctx.BuildCore
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder

@@ -57,8 +57,8 @@ func (s *CoreBuilder) Run(context map[string]interface{}, ctx *types.Context) er
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_ARCHIVE_FILE_PATH_CORE] = archiveFile
-	context[constants.CTX_OBJECT_FILES_CORE] = objectFiles
+	ctx.CoreArchiveFilePath = archiveFile
+	ctx.CoreObjectsFiles = objectFiles
 
 	return nil
 }

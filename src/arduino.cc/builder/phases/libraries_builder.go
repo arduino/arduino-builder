@@ -62,7 +62,7 @@ func (s *LibrariesBuilder) Run(context map[string]interface{}, ctx *types.Contex
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_OBJECT_FILES_LIBRARIES] = objectFiles
+	ctx.LibrariesObjectFiles = objectFiles
 
 	return nil
 }

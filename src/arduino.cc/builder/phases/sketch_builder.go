@@ -31,7 +31,6 @@ package phases
 
 import (
 	"arduino.cc/builder/builder_utils"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -59,7 +58,7 @@ func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) 
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_OBJECT_FILES_SKETCH] = objectFiles
+	ctx.SketchObjectFiles = objectFiles
 
 	return nil
 }

@@ -97,7 +97,7 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}, ctx *types.Con
 		actualPlatform = targetPlatform
 	}
 
-	context[constants.CTX_BUILD_CORE] = core
+	ctx.BuildCore = core
 	ctx.ActualPlatform = actualPlatform
 
 	return nil

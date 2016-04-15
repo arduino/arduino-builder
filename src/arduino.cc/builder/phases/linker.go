@@ -43,16 +43,16 @@ import (
 type Linker struct{}
 
 func (s *Linker) Run(context map[string]interface{}, ctx *types.Context) error {
-	objectFilesSketch := context[constants.CTX_OBJECT_FILES_SKETCH].([]string)
-	objectFilesLibraries := context[constants.CTX_OBJECT_FILES_LIBRARIES].([]string)
-	objectFilesCore := context[constants.CTX_OBJECT_FILES_CORE].([]string)
+	objectFilesSketch := ctx.SketchObjectFiles
+	objectFilesLibraries := ctx.LibrariesObjectFiles
+	objectFilesCore := ctx.CoreObjectsFiles
 
 	var objectFiles []string
 	objectFiles = append(objectFiles, objectFilesSketch...)
 	objectFiles = append(objectFiles, objectFilesLibraries...)
 	objectFiles = append(objectFiles, objectFilesCore...)
 
-	coreArchiveFilePath := context[constants.CTX_ARCHIVE_FILE_PATH_CORE].(string)
+	coreArchiveFilePath := ctx.CoreArchiveFilePath
 	buildPath := ctx.BuildPath
 	coreDotARelPath, err := filepath.Rel(buildPath, coreArchiveFilePath)
 	if err != nil {

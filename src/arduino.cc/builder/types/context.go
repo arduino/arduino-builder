@@ -28,12 +28,17 @@ type Context struct {
 	ActualPlatform *Platform
 	USBVidPid      string
 
-	BuildProperties    props.PropertiesMap
-	BuildPath          string
-	SketchBuildPath    string
-	CoreBuildPath      string
-	LibrariesBuildPath string
-	PreprocPath        string
+	BuildProperties      props.PropertiesMap
+	BuildCore            string
+	BuildPath            string
+	SketchBuildPath      string
+	CoreBuildPath        string
+	CoreArchiveFilePath  string
+	CoreObjectsFiles     []string
+	LibrariesBuildPath   string
+	LibrariesObjectFiles []string
+	PreprocPath          string
+	SketchObjectFiles    []string
 
 	CollectedSourceFiles   *UniqueStringQueue
 	FoldersWithSourceFiles *UniqueSourceFolderQueue
