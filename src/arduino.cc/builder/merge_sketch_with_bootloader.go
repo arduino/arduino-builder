@@ -48,7 +48,7 @@ func (s *MergeSketchWithBootloader) Run(context map[string]interface{}, ctx *typ
 	}
 
 	buildPath := ctx.BuildPath
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	sketchFileName := filepath.Base(sketch.MainFile.Name)
 	logger := ctx.GetLogger()
 

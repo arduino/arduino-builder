@@ -44,7 +44,7 @@ import (
 	"text/template"
 )
 
-func LoadAndInterpolate(t *testing.T, filename string, context map[string]interface{}) string {
+func LoadAndInterpolate(t *testing.T, filename string, context map[string]interface{}, ctx *types.Context) string {
 	funcsMap := template.FuncMap{
 		"EscapeBackSlashes": func(s string) string {
 			return strings.Replace(s, "\\", "\\\\", -1)
@@ -55,6 +55,7 @@ func LoadAndInterpolate(t *testing.T, filename string, context map[string]interf
 	NoError(t, err)
 
 	var buf bytes.Buffer
+	context["sketch"] = ctx.Sketch
 	err = tpl.Execute(&buf, context)
 	NoError(t, err)
 

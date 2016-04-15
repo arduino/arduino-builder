@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -42,7 +41,7 @@ import (
 type AdditionalSketchFilesCopier struct{}
 
 func (s *AdditionalSketchFilesCopier) Run(context map[string]interface{}, ctx *types.Context) error {
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
 
 	err := utils.EnsureFolderExists(sketchBuildPath)

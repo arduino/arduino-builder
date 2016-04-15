@@ -46,7 +46,7 @@ type GCCPreprocRunner struct {
 
 func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
 	if err != nil {
 		return i18n.WrapError(err)

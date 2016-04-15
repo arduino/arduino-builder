@@ -82,7 +82,7 @@ func (s *SketchLoader) Run(context map[string]interface{}, ctx *types.Context) e
 	}
 
 	ctx.SketchLocation = sketchLocation
-	context[constants.CTX_SKETCH] = sketch
+	ctx.Sketch = sketch
 
 	return nil
 }

@@ -68,7 +68,7 @@ func TestCoanRunner(t *testing.T) {
 		NoError(t, err)
 	}
 
-	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.resolved.directives.txt"), context)
+	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.resolved.directives.txt"), context, ctx)
 	require.Equal(t, expectedSource, strings.Replace(context[constants.CTX_SOURCE].(string), "\r\n", "\n", -1))
 
 }

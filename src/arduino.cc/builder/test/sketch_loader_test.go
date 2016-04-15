@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
@@ -48,9 +47,7 @@ func TestLoadSketchWithFolder(t *testing.T) {
 	err := loader.Run(context, ctx)
 
 	require.Error(t, err)
-
-	sketch := context[constants.CTX_SKETCH]
-	require.Nil(t, sketch)
+	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketchNonExistentPath(t *testing.T) {
@@ -63,9 +60,7 @@ func TestLoadSketchNonExistentPath(t *testing.T) {
 	err := loader.Run(context, ctx)
 
 	require.Error(t, err)
-
-	sketch := context[constants.CTX_SKETCH]
-	require.Nil(t, sketch)
+	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketch(t *testing.T) {
@@ -83,7 +78,7 @@ func TestLoadSketch(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
@@ -107,9 +102,7 @@ func TestFailToLoadSketchFromFolder(t *testing.T) {
 	loader := builder.SketchLoader{}
 	err := loader.Run(context, ctx)
 	require.Error(t, err)
-
-	sketch := context[constants.CTX_SKETCH]
-	require.Nil(t, sketch)
+	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketchFromFolder(t *testing.T) {
@@ -127,7 +120,7 @@ func TestLoadSketchFromFolder(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch_with_subfolders.ino")
@@ -154,7 +147,7 @@ func TestLoadSketchWithBackup(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
@@ -178,7 +171,7 @@ func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch.ino")

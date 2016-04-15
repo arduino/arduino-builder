@@ -40,7 +40,7 @@ import (
 type SketchSaver struct{}
 
 func (s *SketchSaver) Run(context map[string]interface{}, ctx *types.Context) error {
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
 	source := context[constants.CTX_SOURCE].(string)
 

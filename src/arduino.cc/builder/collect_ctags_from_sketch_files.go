@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -39,8 +38,7 @@ import (
 type CollectCTagsFromSketchFiles struct{}
 
 func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}, ctx *types.Context) error {
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	sketchFileNames := collectSketchFileNamesFrom(sketch)
+	sketchFileNames := collectSketchFileNamesFrom(ctx.Sketch)
 
 	allCtags := ctx.CTagsOfPreprocessedSource
 	ctagsOfSketch := []*types.CTag{}

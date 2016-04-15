@@ -58,6 +58,6 @@ func TestMergeSketch(t *testing.T) {
 
 	source := context[constants.CTX_SOURCE].(string)
 
-	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), context)
+	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), context, ctx)
 	require.Equal(t, expected_source, strings.Replace(source, "\r\n", "\n", -1))
 }

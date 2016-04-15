@@ -46,7 +46,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 	}
 
 	sketchBuildPath := ctx.SketchBuildPath
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	err = findIncludesUntilDone(context, ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 	if err != nil {
 		return i18n.WrapError(err)
