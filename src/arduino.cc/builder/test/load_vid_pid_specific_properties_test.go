@@ -32,7 +32,6 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -64,7 +63,7 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 
 	require.Equal(t, "0x0037", buildProperties["pid.0"])
 	require.Equal(t, "\"Genuino Micro\"", buildProperties["vid.4.build.usb_product"])
@@ -97,7 +96,7 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 
 	require.Equal(t, "0x0037", buildProperties["pid.0"])
 	require.Equal(t, "\"Genuino Micro\"", buildProperties["vid.4.build.usb_product"])

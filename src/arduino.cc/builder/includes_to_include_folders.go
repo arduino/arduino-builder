@@ -69,7 +69,7 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}, ctx *type
 
 	ctx.ImportedLibraries = importedLibraries
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose
 	includeFolders := resolveIncludeFolders(newlyImportedLibraries, buildProperties, verbose)
 	context[constants.CTX_INCLUDE_FOLDERS] = includeFolders

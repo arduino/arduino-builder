@@ -33,7 +33,6 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
@@ -42,7 +41,7 @@ type SketchBuilder struct{}
 
 func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	verbose := ctx.Verbose

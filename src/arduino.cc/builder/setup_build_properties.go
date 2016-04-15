@@ -111,7 +111,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Co
 	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = strconv.Itoa(utils.TimezoneOffset())
 	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = strconv.Itoa(utils.DaylightSavingsOffset(now))
 
-	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
+	ctx.BuildProperties = buildProperties
 
 	return nil
 }

@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
@@ -43,7 +42,7 @@ import (
 type MergeSketchWithBootloader struct{}
 
 func (s *MergeSketchWithBootloader) Run(context map[string]interface{}, ctx *types.Context) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil
 	}

@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
@@ -40,7 +39,7 @@ type SetCustomBuildProperties struct{}
 
 func (s *SetCustomBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
 	logger := ctx.GetLogger()
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 	customBuildProperties, err := props.LoadFromSlice(ctx.CustomBuildProperties, logger)
 	if err != nil {
 		return i18n.WrapError(err)

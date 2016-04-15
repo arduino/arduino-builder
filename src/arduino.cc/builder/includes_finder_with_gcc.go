@@ -33,7 +33,6 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -44,10 +43,7 @@ type IncludesFinderWithGCC struct {
 }
 
 func (s *IncludesFinderWithGCC) Run(context map[string]interface{}, ctx *types.Context) error {
-	buildProperties := make(props.PropertiesMap)
-	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
-		buildProperties = p.(props.PropertiesMap).Clone()
-	}
+	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 

@@ -52,7 +52,7 @@ func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}, ctx *
 	vid := vidPidParts[0]
 	pid := vidPidParts[1]
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 	VIDPIDIndex, err := findVIDPIDIndex(buildProperties, vid, pid)
 	if err != nil {
 		return i18n.WrapError(err)

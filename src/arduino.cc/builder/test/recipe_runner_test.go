@@ -46,7 +46,7 @@ func TestRecipeRunner(t *testing.T) {
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	buildProperties := make(props.PropertiesMap)
-	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
+	ctx.BuildProperties = buildProperties
 
 	buildProperties["recipe.hooks.prebuild.1.pattern"] = "echo"
 

@@ -25,6 +25,7 @@ type Context struct {
 	TargetPlatform *Platform
 	ActualPlatform *Platform
 
+	BuildProperties    props.PropertiesMap
 	BuildPath          string
 	SketchBuildPath    string
 	CoreBuildPath      string

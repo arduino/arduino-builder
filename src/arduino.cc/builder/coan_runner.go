@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"fmt"
@@ -61,7 +60,7 @@ func (s *CoanRunner) Run(context map[string]interface{}, ctx *types.Context) err
 		return i18n.WrapError(err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 	properties := buildProperties.Clone()
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.COAN))
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = coanTargetFileName

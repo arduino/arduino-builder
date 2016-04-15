@@ -33,7 +33,6 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"os"
 	"sort"
@@ -51,10 +50,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}, ctx *ty
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
 	}
 
-	buildProperties := make(props.PropertiesMap)
-	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
-		buildProperties = p.(props.PropertiesMap).Clone()
-	}
+	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose
 
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
