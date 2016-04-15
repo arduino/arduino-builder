@@ -51,6 +51,7 @@ type Context struct {
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
 	IncludeFolders             []string
+	OutputGccMinusM            string
 
 	// C++ Parsing
 	CTagsOutput                 string

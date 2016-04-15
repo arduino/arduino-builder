@@ -65,7 +65,7 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}, ctx *types.C
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_GCC_MINUS_M_OUTPUT] = string(output)
+	ctx.OutputGccMinusM = string(output)
 
 	return nil
 }

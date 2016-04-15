@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -49,7 +48,7 @@ func TestGCCMinusMOutputParser(t *testing.T) {
 		"\n" +
 		"Bridge.h:\n"
 
-	context[constants.CTX_GCC_MINUS_M_OUTPUT] = output
+	ctx.OutputGccMinusM = output
 
 	parser := builder.GCCMinusMOutputParser{}
 	err := parser.Run(context, ctx)
@@ -68,7 +67,7 @@ func TestGCCMinusMOutputParserEmptyOutput(t *testing.T) {
 
 	output := "sketch.ino.o: /tmp/test699709208/sketch/sketch.ino.cpp"
 
-	context[constants.CTX_GCC_MINUS_M_OUTPUT] = output
+	ctx.OutputGccMinusM = output
 
 	parser := builder.GCCMinusMOutputParser{}
 	err := parser.Run(context, ctx)
@@ -93,7 +92,7 @@ func TestGCCMinusMOutputParserFirstLineOnMultipleLines(t *testing.T) {
 		"\n" +
 		"Bridge.h:\n"
 
-	context[constants.CTX_GCC_MINUS_M_OUTPUT] = output
+	ctx.OutputGccMinusM = output
 
 	parser := builder.GCCMinusMOutputParser{}
 	err := parser.Run(context, ctx)

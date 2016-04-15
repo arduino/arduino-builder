@@ -39,7 +39,7 @@ import (
 type GCCMinusMOutputParser struct{}
 
 func (s *GCCMinusMOutputParser) Run(context map[string]interface{}, ctx *types.Context) error {
-	output := context[constants.CTX_GCC_MINUS_M_OUTPUT].(string)
+	output := ctx.OutputGccMinusM
 
 	rows := strings.Split(output, "\n")
 	includes := make([]string, 0)
