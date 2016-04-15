@@ -45,7 +45,7 @@ type LibrariesBuilder struct{}
 func (s *LibrariesBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	libraries := ctx.ImportedLibraries
 	verbose := ctx.Verbose

@@ -42,7 +42,7 @@ type SketchBuilder struct{}
 func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel

@@ -47,12 +47,8 @@ func (s *IncludesFinderWithGCC) Run(context map[string]interface{}, ctx *types.C
 	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
-	includesParams := constants.EMPTY_STRING
-	if utils.MapHas(context, constants.CTX_INCLUDE_FOLDERS) {
-		includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
-		includes = utils.Map(includes, utils.WrapWithHyphenI)
-		includesParams = strings.Join(includes, " ")
-	}
+	includes := utils.Map(ctx.IncludeFolders, utils.WrapWithHyphenI)
+	includesParams := strings.Join(includes, " ")
 
 	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = s.SourceFile

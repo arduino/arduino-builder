@@ -112,7 +112,7 @@ func prepareGCCPreprocRecipeProperties(context map[string]interface{}, ctx *type
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
 
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)

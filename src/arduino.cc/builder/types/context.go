@@ -43,6 +43,7 @@ type Context struct {
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
+	IncludeFolders             []string
 
 	// C++ Parsing
 	CTagsOutput                 string
