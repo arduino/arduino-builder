@@ -34,49 +34,9 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
-	"os"
-	"path/filepath"
 	"sort"
 	"testing"
 )
-
-func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	context := make(map[string]interface{})
-	ctx := &types.Context{
-		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:      []string{"downloaded_tools"},
-		SketchLocation:    filepath.Join("sketch2", "SketchWithIfDef.ino"),
-		FQBN:              "arduino:avr:leonardo",
-		ArduinoAPIVersion: "10600",
-		Verbose:           true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
-
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
-		&builder.ContainerMergeCopySketchFiles{},
-
-		&builder.CoanRunner{},
-
-		&builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE},
-	}
-
-	for _, command := range commands {
-		err := command.Run(context, ctx)
-		NoError(t, err)
-	}
-
-	includes := ctx.Includes
-	require.Equal(t, 3, len(includes))
-	require.Equal(t, "Arduino.h", includes[0])
-	require.Equal(t, "empty_1.h", includes[1])
-	require.Equal(t, "empty_2.h", includes[2])
-}
 
 func TestIncludesFinderWithRegExp(t *testing.T) {
 	context := make(map[string]interface{})
@@ -86,9 +46,9 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
-	context["source"] = output
+	context[constants.CTX_SOURCE] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -103,9 +63,9 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 
 	output := ""
 
-	context["source"] = output
+	context[constants.CTX_SOURCE] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -124,9 +84,9 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 		"^\n" +
 		"compilation terminated."
 
-	context["source"] = output
+	context[constants.CTX_SOURCE] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -145,9 +105,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 		" #               include <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	context["source"] = output
+	context[constants.CTX_SOURCE] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -165,9 +125,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 		" #\t\t\tinclude <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	context["source"] = output
+	context[constants.CTX_SOURCE] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -184,9 +144,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
 		"compilation terminated.\n"
 
-	context["source"] = output
+	context[constants.CTX_SOURCE] = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
+	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 

@@ -217,10 +217,6 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
 
-	coanProps := buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.COAN)
-	require.Equal(t, "{path}/coan", coanProps["cmd.path"])
-	require.Equal(t, "\"{cmd.path}\" source -m -E -P -kb {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} \"{source_file}\"", coanProps[constants.BUILD_PROPERTIES_PATTERN])
-
 	require.Equal(t, Abs(t, "user_hardware/my_avr_platform/avr"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
 	require.Equal(t, Abs(t, "user_hardware/my_avr_platform"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
 	require.Equal(t, "10600", buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
