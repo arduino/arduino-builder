@@ -37,12 +37,12 @@ import (
 )
 
 type CTagsTargetFileSaver struct {
-	SourceField    string
+	Source         *string
 	TargetFileName string
 }
 
 func (s *CTagsTargetFileSaver) Run(context map[string]interface{}, ctx *types.Context) error {
-	source := context[s.SourceField].(string)
+	source := *s.Source
 
 	preprocPath := ctx.PreprocPath
 	err := utils.EnsureFolderExists(preprocPath)

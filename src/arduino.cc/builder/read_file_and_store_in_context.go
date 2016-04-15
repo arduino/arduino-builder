@@ -37,7 +37,7 @@ import (
 )
 
 type ReadFileAndStoreInContext struct {
-	TargetField string
+	Target *string
 }
 
 func (s *ReadFileAndStoreInContext) Run(context map[string]interface{}, ctx *types.Context) error {
@@ -46,7 +46,7 @@ func (s *ReadFileAndStoreInContext) Run(context map[string]interface{}, ctx *typ
 		return i18n.WrapError(err)
 	}
 
-	context[s.TargetField] = string(bytes)
+	*s.Target = string(bytes)
 
 	return nil
 }

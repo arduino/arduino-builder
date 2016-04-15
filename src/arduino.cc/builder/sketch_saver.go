@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -42,13 +41,12 @@ type SketchSaver struct{}
 func (s *SketchSaver) Run(context map[string]interface{}, ctx *types.Context) error {
 	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
-	source := context[constants.CTX_SOURCE].(string)
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	err = utils.WriteFile(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), source)
+	err = utils.WriteFile(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), ctx.Source)
 	return i18n.WrapError(err)
 }

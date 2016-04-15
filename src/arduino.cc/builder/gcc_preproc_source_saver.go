@@ -46,8 +46,6 @@ func (s *GCCPreprocSourceSaver) Run(context map[string]interface{}, ctx *types.C
 		return i18n.WrapError(err)
 	}
 
-	source := context[constants.CTX_SOURCE].(string)
-
-	err = utils.WriteFile(filepath.Join(preprocPath, constants.FILE_GCC_PREPROC_TARGET), source)
+	err = utils.WriteFile(filepath.Join(preprocPath, constants.FILE_GCC_PREPROC_TARGET), ctx.Source)
 	return i18n.WrapError(err)
 }

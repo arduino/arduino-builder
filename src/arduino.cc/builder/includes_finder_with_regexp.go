@@ -40,11 +40,11 @@ import (
 var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
 
 type IncludesFinderWithRegExp struct {
-	ContextField string
+	Source *string
 }
 
 func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}, ctx *types.Context) error {
-	source := context[s.ContextField].(string)
+	source := *s.Source
 
 	matches := INCLUDE_REGEXP.FindAllStringSubmatch(source, -1)
 	includes := []string{}

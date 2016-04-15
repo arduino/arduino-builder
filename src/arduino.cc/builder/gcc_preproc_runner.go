@@ -93,7 +93,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(stderr)
+	ctx.SourceGccMinusE = string(stderr)
 
 	return nil
 }

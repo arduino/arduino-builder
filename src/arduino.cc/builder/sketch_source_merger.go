@@ -60,7 +60,7 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}, ctx *types.Cont
 	}
 
 	context[constants.CTX_LINE_OFFSET] = lineOffset
-	context[constants.CTX_SOURCE] = source
+	ctx.Source = source
 
 	return nil
 }

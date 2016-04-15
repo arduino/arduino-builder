@@ -35,7 +35,9 @@ type Context struct {
 	CollectedSourceFiles   *UniqueStringQueue
 	FoldersWithSourceFiles *UniqueSourceFolderQueue
 
-	Sketch *Sketch
+	Sketch          *Sketch
+	Source          string
+	SourceGccMinusE string
 
 	WarningsLevel string
 

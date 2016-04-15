@@ -36,14 +36,14 @@ import (
 )
 
 type ExternalIncludeReplacer struct {
-	SourceKey string
-	TargetKey string
-	From      string
-	To        string
+	Source *string
+	Target *string
+	From   string
+	To     string
 }
 
 func (s *ExternalIncludeReplacer) Run(context map[string]interface{}, ctx *types.Context) error {
-	source := context[s.SourceKey].(string)
+	source := *s.Source
 	nonAbsoluteIncludes := findNonAbsoluteIncludes(ctx.Includes)
 
 	for _, include := range nonAbsoluteIncludes {
@@ -51,7 +51,7 @@ func (s *ExternalIncludeReplacer) Run(context map[string]interface{}, ctx *types
 		source = strings.Replace(source, s.From+"\""+include+"\"", s.To+"\""+include+"\"", -1)
 	}
 
-	context[s.TargetKey] = source
+	*s.Target = source
 
 	return nil
 }

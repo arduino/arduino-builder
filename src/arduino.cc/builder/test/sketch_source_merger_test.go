@@ -32,7 +32,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
@@ -56,7 +55,7 @@ func TestMergeSketch(t *testing.T) {
 		NoError(t, err)
 	}
 
-	source := context[constants.CTX_SOURCE].(string)
+	source := ctx.Source
 
 	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), context, ctx)
 	require.Equal(t, expected_source, strings.Replace(source, "\r\n", "\n", -1))

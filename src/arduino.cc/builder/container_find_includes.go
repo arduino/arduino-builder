@@ -105,7 +105,7 @@ func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, s
 	for !done {
 		commands := []types.Command{
 			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFilePath: targetFilePath},
-			&IncludesFinderWithRegExp{ContextField: constants.CTX_GCC_MINUS_E_SOURCE},
+			&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
 			&IncludesToIncludeFolders{},
 		}
 		for _, command := range commands {

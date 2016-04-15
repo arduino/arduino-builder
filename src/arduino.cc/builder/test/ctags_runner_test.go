@@ -71,7 +71,7 @@ func TestCTagsRunner(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
 	}
 
@@ -122,7 +122,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
 	}
 
@@ -171,7 +171,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
 	}
 
@@ -219,7 +219,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
 	}
 
@@ -266,7 +266,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{SourceField: constants.CTX_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
 	}
 

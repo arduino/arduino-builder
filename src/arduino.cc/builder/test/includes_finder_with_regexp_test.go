@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"sort"
@@ -46,9 +45,9 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
-	context[constants.CTX_SOURCE] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -63,9 +62,9 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 
 	output := ""
 
-	context[constants.CTX_SOURCE] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -84,9 +83,9 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 		"^\n" +
 		"compilation terminated."
 
-	context[constants.CTX_SOURCE] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -105,9 +104,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 		" #               include <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	context[constants.CTX_SOURCE] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -125,9 +124,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 		" #\t\t\tinclude <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	context[constants.CTX_SOURCE] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 
@@ -144,9 +143,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
 		"compilation terminated.\n"
 
-	context[constants.CTX_SOURCE] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE}
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
 	err := parser.Run(context, ctx)
 	NoError(t, err)
 

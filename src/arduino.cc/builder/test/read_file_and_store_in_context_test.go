@@ -51,9 +51,9 @@ func TestReadFileAndStoreInContext(t *testing.T) {
 	ctx := &types.Context{}
 	context[constants.CTX_FILE_PATH_TO_READ] = file.Name()
 
-	command := &builder.ReadFileAndStoreInContext{TargetField: constants.CTX_GCC_MINUS_E_SOURCE}
+	command := &builder.ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE}
 	err = command.Run(context, ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test test\nciao", context[constants.CTX_GCC_MINUS_E_SOURCE].(string))
+	require.Equal(t, "test test\nciao", ctx.SourceGccMinusE)
 }
