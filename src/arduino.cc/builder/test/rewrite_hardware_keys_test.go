@@ -38,7 +38,6 @@ import (
 )
 
 func TestRewriteHardwareKeys(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	packages := &types.Packages{}
@@ -65,7 +64,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -73,7 +72,6 @@ func TestRewriteHardwareKeys(t *testing.T) {
 }
 
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	packages := &types.Packages{}
@@ -102,7 +100,7 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

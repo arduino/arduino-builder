@@ -55,7 +55,6 @@ func (s ByFileInfoName) Less(i, j int) bool {
 }
 
 func TestCopyOtherFiles(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 	}
@@ -70,7 +69,7 @@ func TestCopyOtherFiles(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -93,7 +92,6 @@ func TestCopyOtherFiles(t *testing.T) {
 }
 
 func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 	}
@@ -108,7 +106,7 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -117,14 +115,13 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	context = make(map[string]interface{})
 	ctx = &types.Context{
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 		BuildPath:      buildPath,
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

@@ -39,15 +39,15 @@ import (
 
 type ContainerFindIncludes struct{}
 
-func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.Context) error {
-	err := runCommand(context, ctx, &IncludesToIncludeFolders{})
+func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
+	err := runCommand(ctx, &IncludesToIncludeFolders{})
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
 	sketchBuildPath := ctx.SketchBuildPath
 	sketch := ctx.Sketch
-	err = findIncludesUntilDone(context, ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
+	err = findIncludesUntilDone(ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -63,7 +63,7 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 		}
 	}
 
-	err = runCommand(context, ctx, &CollectAllSourceFilesFromFoldersWithSources{})
+	err = runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -71,17 +71,17 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 	sourceFilePaths := ctx.CollectedSourceFiles
 
 	for !sourceFilePaths.Empty() {
-		err = findIncludesUntilDone(context, ctx, sourceFilePaths.Pop().(string))
+		err = findIncludesUntilDone(ctx, sourceFilePaths.Pop().(string))
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		err := runCommand(context, ctx, &CollectAllSourceFilesFromFoldersWithSources{})
+		err := runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 	}
 
-	err = runCommand(context, ctx, &FailIfImportedLibraryIsWrong{})
+	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -89,16 +89,16 @@ func (s *ContainerFindIncludes) Run(context map[string]interface{}, ctx *types.C
 	return nil
 }
 
-func runCommand(context map[string]interface{}, ctx *types.Context, command types.Command) error {
+func runCommand(ctx *types.Context, command types.Command) error {
 	PrintRingNameIfDebug(ctx, command)
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 	return nil
 }
 
-func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, sourceFilePath string) error {
+func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 	targetFilePath := utils.NULLFile()
 	importedLibraries := ctx.ImportedLibraries
 	done := false
@@ -109,7 +109,7 @@ func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, s
 			&IncludesToIncludeFolders{},
 		}
 		for _, command := range commands {
-			err := runCommand(context, ctx, command)
+			err := runCommand(ctx, command)
 			if err != nil {
 				return i18n.WrapError(err)
 			}
@@ -117,7 +117,7 @@ func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, s
 		if len(ctx.IncludesJustFound) == 0 {
 			done = true
 		} else if len(ctx.ImportedLibraries) == len(importedLibraries) {
-			err := runCommand(context, ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
+			err := runCommand(ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return i18n.WrapError(err)
 		}
 		importedLibraries = ctx.ImportedLibraries

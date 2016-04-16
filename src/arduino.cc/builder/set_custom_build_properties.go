@@ -37,7 +37,7 @@ import (
 
 type SetCustomBuildProperties struct{}
 
-func (s *SetCustomBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *SetCustomBuildProperties) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 	buildProperties := ctx.BuildProperties
 	customBuildProperties, err := props.LoadFromSlice(ctx.CustomBuildProperties, logger)

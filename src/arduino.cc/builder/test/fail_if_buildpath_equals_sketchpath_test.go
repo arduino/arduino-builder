@@ -37,23 +37,21 @@ import (
 )
 
 func TestFailIfBuildPathEqualsSketchPath(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: "buildPath/sketch.ino",
 		BuildPath:      "buildPath",
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
-	require.Error(t, command.Run(context, ctx))
+	require.Error(t, command.Run(ctx))
 }
 
 func TestFailIfBuildPathEqualsSketchPathSketchPathDiffers(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: "sketchPath/sketch.ino",
 		BuildPath:      "buildPath",
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
-	NoError(t, command.Run(context, ctx))
+	NoError(t, command.Run(ctx))
 }

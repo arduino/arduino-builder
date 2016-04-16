@@ -38,7 +38,7 @@ import (
 
 type StoreBuildOptionsMap struct{}
 
-func (s *StoreBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *StoreBuildOptionsMap) Run(ctx *types.Context) error {
 	utils.WriteFile(filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE), ctx.BuildOptionsJson)
 	return nil
 }

@@ -42,7 +42,7 @@ import (
 
 type LibrariesLoader struct{}
 
-func (s *LibrariesLoader) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	builtInLibrariesFolders := ctx.BuiltInLibrariesFolders
 	builtInLibrariesFolders, err := utils.AbsolutizePaths(builtInLibrariesFolders)
 	if err != nil {

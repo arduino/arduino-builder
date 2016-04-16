@@ -29,11 +29,13 @@
 
 package builder
 
+// XXX: Obsolete?
+
 import "arduino.cc/builder/types"
 
 type ComparePrototypesFromSourceAndPreprocSource struct{}
 
-func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ComparePrototypesFromSourceAndPreprocSource) Run(ctx *types.Context) error {
 	ctagsOfSource := ctx.CTagsOfSource
 	ctagsOfPreprocSource := ctx.CTagsOfPreprocessedSource
 

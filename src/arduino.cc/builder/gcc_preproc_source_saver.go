@@ -29,6 +29,8 @@
 
 package builder
 
+// XXX: OBSOLETE?
+
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
@@ -39,7 +41,7 @@ import (
 
 type GCCPreprocSourceSaver struct{}
 
-func (s *GCCPreprocSourceSaver) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *GCCPreprocSourceSaver) Run(ctx *types.Context) error {
 	preprocPath := ctx.PreprocPath
 	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {

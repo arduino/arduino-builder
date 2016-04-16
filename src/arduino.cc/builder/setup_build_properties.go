@@ -42,7 +42,7 @@ import (
 
 type SetupBuildProperties struct{}
 
-func (s *SetupBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	packages := ctx.Hardware
 
 	targetPlatform := ctx.TargetPlatform

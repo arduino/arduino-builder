@@ -38,7 +38,7 @@ import (
 
 type AddBuildBoardPropertyIfMissing struct{}
 
-func (s *AddBuildBoardPropertyIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 	packages := ctx.Hardware
 	logger := ctx.GetLogger()
 

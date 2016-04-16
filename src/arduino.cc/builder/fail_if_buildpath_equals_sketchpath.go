@@ -38,7 +38,7 @@ import (
 
 type FailIfBuildPathEqualsSketchPath struct{}
 
-func (s *FailIfBuildPathEqualsSketchPath) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *FailIfBuildPathEqualsSketchPath) Run(ctx *types.Context) error {
 	if ctx.BuildPath == "" || ctx.SketchLocation == "" {
 		return nil
 	}

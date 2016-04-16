@@ -41,7 +41,6 @@ import (
 )
 
 func TestStoreBuildOptionsMap(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{"hardware"},
 		ToolsFolders:            []string{"tools"},
@@ -64,7 +63,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

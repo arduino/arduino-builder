@@ -36,7 +36,7 @@ import (
 
 type PrintPreprocessedSource struct{}
 
-func (s *PrintPreprocessedSource) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *PrintPreprocessedSource) Run(ctx *types.Context) error {
 	fmt.Println(ctx.SourceGccMinusE)
 	return nil
 }

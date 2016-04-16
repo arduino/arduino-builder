@@ -41,7 +41,7 @@ import (
 
 type IncludesToIncludeFolders struct{}
 
-func (s *IncludesToIncludeFolders) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 	includes := ctx.Includes
 	headerToLibraries := ctx.HeaderToLibraries
 

@@ -36,7 +36,7 @@ import (
 
 type RewriteHardwareKeys struct{}
 
-func (s *RewriteHardwareKeys) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *RewriteHardwareKeys) Run(ctx *types.Context) error {
 	if ctx.PlatformKeyRewrites.Empty() {
 		return nil
 	}

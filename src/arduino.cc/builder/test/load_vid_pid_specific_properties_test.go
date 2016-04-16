@@ -41,7 +41,6 @@ import (
 func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
@@ -58,7 +57,7 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -72,7 +71,6 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
@@ -91,7 +89,7 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

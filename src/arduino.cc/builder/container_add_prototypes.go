@@ -38,7 +38,7 @@ import (
 
 type ContainerAddPrototypes struct{}
 
-func (s *ContainerAddPrototypes) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
@@ -53,7 +53,7 @@ func (s *ContainerAddPrototypes) Run(context map[string]interface{}, ctx *types.
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)
 		}

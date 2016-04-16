@@ -66,7 +66,7 @@ const DEFAULT_BUILD_CORE = "arduino"
 
 type Builder struct{}
 
-func (s *Builder) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *Builder) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&GenerateBuildPathIfMissing{},
 		&EnsureBuildPathExists{},
@@ -113,14 +113,14 @@ func (s *Builder) Run(context map[string]interface{}, ctx *types.Context) error 
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 	}
 
-	mainErr := runCommands(context, ctx, commands, true)
+	mainErr := runCommands(ctx, commands, true)
 
 	commands = []types.Command{
 		&PrintUsedAndNotUsedLibraries{},
 
 		&PrintUsedLibrariesIfVerbose{},
 	}
-	otherErr := runCommands(context, ctx, commands, false)
+	otherErr := runCommands(ctx, commands, false)
 
 	if mainErr != nil {
 		return mainErr
@@ -131,7 +131,7 @@ func (s *Builder) Run(context map[string]interface{}, ctx *types.Context) error 
 
 type Preprocess struct{}
 
-func (s *Preprocess) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *Preprocess) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&GenerateBuildPathIfMissing{},
 		&EnsureBuildPathExists{},
@@ -153,12 +153,12 @@ func (s *Preprocess) Run(context map[string]interface{}, ctx *types.Context) err
 		&PrintPreprocessedSource{},
 	}
 
-	return runCommands(context, ctx, commands, true)
+	return runCommands(ctx, commands, true)
 }
 
 type ParseHardwareAndDumpBuildProperties struct{}
 
-func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&GenerateBuildPathIfMissing{},
 
@@ -167,10 +167,10 @@ func (s *ParseHardwareAndDumpBuildProperties) Run(context map[string]interface{}
 		&DumpBuildProperties{},
 	}
 
-	return runCommands(context, ctx, commands, true)
+	return runCommands(ctx, commands, true)
 }
 
-func runCommands(context map[string]interface{}, ctx *types.Context, commands []types.Command, progressEnabled bool) error {
+func runCommands(ctx *types.Context, commands []types.Command, progressEnabled bool) error {
 	commandsLength := len(commands)
 	progressForEachCommand := float32(100) / float32(commandsLength)
 
@@ -178,7 +178,7 @@ func runCommands(context map[string]interface{}, ctx *types.Context, commands []
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
 		printProgressIfProgressEnabledAndMachineLogger(progressEnabled, ctx, progress)
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
@@ -207,17 +207,17 @@ func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
 	}
 }
 
-func RunBuilder(context map[string]interface{}, ctx *types.Context) error {
+func RunBuilder(ctx *types.Context) error {
 	command := Builder{}
-	return command.Run(context, ctx)
+	return command.Run(ctx)
 }
 
-func RunParseHardwareAndDumpBuildProperties(context map[string]interface{}, ctx *types.Context) error {
+func RunParseHardwareAndDumpBuildProperties(ctx *types.Context) error {
 	command := ParseHardwareAndDumpBuildProperties{}
-	return command.Run(context, ctx)
+	return command.Run(ctx)
 }
 
-func RunPreprocess(context map[string]interface{}, ctx *types.Context) error {
+func RunPreprocess(ctx *types.Context) error {
 	command := Preprocess{}
-	return command.Run(context, ctx)
+	return command.Run(ctx)
 }

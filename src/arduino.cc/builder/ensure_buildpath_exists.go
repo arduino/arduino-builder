@@ -37,7 +37,7 @@ import (
 
 type EnsureBuildPathExists struct{}
 
-func (s *EnsureBuildPathExists) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *EnsureBuildPathExists) Run(ctx *types.Context) error {
 	err := utils.EnsureFolderExists(ctx.BuildPath)
 	if err != nil {
 		return i18n.WrapError(err)

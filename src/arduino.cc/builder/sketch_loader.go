@@ -44,7 +44,7 @@ import (
 
 type SketchLoader struct{}
 
-func (s *SketchLoader) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *SketchLoader) Run(ctx *types.Context) error {
 	if ctx.SketchLocation == "" {
 		return nil
 	}

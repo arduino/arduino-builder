@@ -39,7 +39,7 @@ import (
 
 type CTagsRunner struct{}
 
-func (s *CTagsRunner) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *CTagsRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	ctagsTargetFilePath := ctx.CTagsTargetFile
 	logger := ctx.GetLogger()

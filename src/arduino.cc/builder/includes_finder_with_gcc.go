@@ -29,6 +29,8 @@
 
 package builder
 
+// XXX: Obsolete?
+
 import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
@@ -42,7 +44,7 @@ type IncludesFinderWithGCC struct {
 	SourceFile string
 }
 
-func (s *IncludesFinderWithGCC) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *IncludesFinderWithGCC) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose
 	logger := ctx.GetLogger()

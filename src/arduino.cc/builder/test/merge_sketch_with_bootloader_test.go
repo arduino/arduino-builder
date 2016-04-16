@@ -45,7 +45,6 @@ import (
 func TestMergeSketchWithBootloader(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -73,7 +72,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -88,7 +87,6 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -116,7 +114,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -131,7 +129,6 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -150,7 +147,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -159,7 +156,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	delete(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
 	command := &builder.MergeSketchWithBootloader{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, "sketch.ino.with_bootloader.hex"))
@@ -170,7 +167,6 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -198,7 +194,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

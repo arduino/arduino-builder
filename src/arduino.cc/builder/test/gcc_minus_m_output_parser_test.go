@@ -37,7 +37,6 @@ import (
 )
 
 func TestGCCMinusMOutputParser(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "sketch_with_config.o: sketch_with_config.ino config.h de\\ bug.h Bridge.h\n" +
@@ -51,7 +50,7 @@ func TestGCCMinusMOutputParser(t *testing.T) {
 	ctx.OutputGccMinusM = output
 
 	parser := builder.GCCMinusMOutputParser{}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -62,7 +61,6 @@ func TestGCCMinusMOutputParser(t *testing.T) {
 }
 
 func TestGCCMinusMOutputParserEmptyOutput(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "sketch.ino.o: /tmp/test699709208/sketch/sketch.ino.cpp"
@@ -70,7 +68,7 @@ func TestGCCMinusMOutputParserEmptyOutput(t *testing.T) {
 	ctx.OutputGccMinusM = output
 
 	parser := builder.GCCMinusMOutputParser{}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -78,7 +76,6 @@ func TestGCCMinusMOutputParserEmptyOutput(t *testing.T) {
 }
 
 func TestGCCMinusMOutputParserFirstLineOnMultipleLines(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "sketch_with_config.ino.o: \\\n" +
@@ -95,7 +92,7 @@ func TestGCCMinusMOutputParserFirstLineOnMultipleLines(t *testing.T) {
 	ctx.OutputGccMinusM = output
 
 	parser := builder.GCCMinusMOutputParser{}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes

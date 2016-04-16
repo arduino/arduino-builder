@@ -42,7 +42,7 @@ import (
 
 type ToolsLoader struct{}
 
-func (s *ToolsLoader) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ToolsLoader) Run(ctx *types.Context) error {
 	folders := ctx.ToolsFolders
 
 	tools := []*types.Tool{}

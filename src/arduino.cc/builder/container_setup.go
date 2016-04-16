@@ -36,7 +36,7 @@ import (
 
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
 
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&AddAdditionalEntriesToContext{},
 		&FailIfBuildPathEqualsSketchPath{},
@@ -56,7 +56,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(context map[string]i
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)
 		}

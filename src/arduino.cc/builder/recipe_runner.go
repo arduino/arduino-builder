@@ -44,7 +44,7 @@ type RecipeByPrefixSuffixRunner struct {
 	Suffix string
 }
 
-func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 	if ctx.DebugLevel >= 10 {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)

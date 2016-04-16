@@ -55,13 +55,12 @@ func (s ByToolIDAndVersion) Less(i, j int) bool {
 func TestLoadTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		ToolsFolders: []string{"downloaded_tools", "tools_builtin"},
 	}
 
 	loader := builder.ToolsLoader{}
-	err := loader.Run(context, ctx)
+	err := loader.Run(ctx)
 	NoError(t, err)
 
 	tools := ctx.Tools
@@ -94,13 +93,12 @@ func TestLoadTools(t *testing.T) {
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		ToolsFolders: []string{"downloaded_board_manager_stuff"},
 	}
 
 	loader := builder.ToolsLoader{}
-	err := loader.Run(context, ctx)
+	err := loader.Run(ctx)
 	NoError(t, err)
 
 	tools := ctx.Tools
@@ -121,13 +119,12 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 func TestLoadLotsOfTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		ToolsFolders: []string{"downloaded_tools", "tools_builtin", "downloaded_board_manager_stuff"},
 	}
 
 	loader := builder.ToolsLoader{}
-	err := loader.Run(context, ctx)
+	err := loader.Run(ctx)
 	NoError(t, err)
 
 	tools := ctx.Tools

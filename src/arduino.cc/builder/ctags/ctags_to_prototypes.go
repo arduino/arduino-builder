@@ -36,7 +36,7 @@ import (
 
 type CTagsToPrototypes struct{}
 
-func (s *CTagsToPrototypes) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *CTagsToPrototypes) Run(ctx *types.Context) error {
 	tags := ctx.CTagsCollected
 
 	lineWhereToInsertPrototypes := findLineWhereToInsertPrototypes(tags)

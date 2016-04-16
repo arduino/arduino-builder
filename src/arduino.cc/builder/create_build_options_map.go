@@ -37,7 +37,7 @@ import (
 
 type CreateBuildOptionsMap struct{}
 
-func (s *CreateBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *CreateBuildOptionsMap) Run(ctx *types.Context) error {
 	buildOptions := ctx.ExtractBuildOptions()
 	bytes, err := json.MarshalIndent(buildOptions, "", "  ")
 	if err != nil {

@@ -43,7 +43,6 @@ import (
 func TestIncludesFinderWithGCC(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:      []string{"downloaded_tools"},
@@ -65,7 +64,7 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 	require.Nil(t, ctx.Includes)
@@ -74,7 +73,6 @@ func TestIncludesFinderWithGCC(t *testing.T) {
 func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -99,7 +97,7 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -115,7 +113,6 @@ func TestIncludesFinderWithGCCSketchWithConfig(t *testing.T) {
 func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:       []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:          []string{"downloaded_tools"},
@@ -139,7 +136,7 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -165,7 +162,6 @@ func TestIncludesFinderWithGCCSketchWithDependendLibraries(t *testing.T) {
 func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -190,7 +186,7 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -206,7 +202,6 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactions(t *testin
 func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndIncludesMissingLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -229,12 +224,12 @@ func TestIncludesFinderWithGCCSketchWithThatChecksIfSPIHasTransactionsAndInclude
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
 	command := &builder.ContainerFindIncludes{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	require.Error(t, err)
 
 	includes := ctx.Includes

@@ -39,7 +39,6 @@ import (
 )
 
 func TestTargetBoardResolverUno(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		FQBN:            "arduino:avr:uno",
@@ -51,7 +50,7 @@ func TestTargetBoardResolverUno(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -65,7 +64,6 @@ func TestTargetBoardResolverUno(t *testing.T) {
 }
 
 func TestTargetBoardResolverDue(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		FQBN:            "arduino:sam:arduino_due_x",
@@ -77,7 +75,7 @@ func TestTargetBoardResolverDue(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -91,7 +89,6 @@ func TestTargetBoardResolverDue(t *testing.T) {
 }
 
 func TestTargetBoardResolverMega1280(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		FQBN:            "arduino:avr:mega:cpu=atmega1280",
@@ -103,7 +100,7 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -118,7 +115,6 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 }
 
 func TestTargetBoardResolverMega2560(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		FQBN:            "arduino:avr:mega:cpu=atmega2560",
@@ -130,7 +126,7 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -145,7 +141,6 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 }
 
 func TestTargetBoardResolverCustomYun(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		FQBN:            "my_avr_platform:avr:custom_yun",
@@ -157,7 +152,7 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -172,7 +167,6 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 }
 
 func TestTargetBoardResolverCustomCore(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		FQBN:            "watterott:avr:attiny841:core=spencekonde,info=info",
@@ -184,7 +178,7 @@ func TestTargetBoardResolverCustomCore(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

@@ -39,7 +39,7 @@ import (
 
 type FailIfImportedLibraryIsWrong struct{}
 
-func (s *FailIfImportedLibraryIsWrong) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 	if len(ctx.ImportedLibraries) == 0 {
 		return nil
 	}

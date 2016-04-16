@@ -42,7 +42,7 @@ import (
 
 type LibrariesBuilder struct{}
 
-func (s *LibrariesBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
 	includes := ctx.IncludeFolders

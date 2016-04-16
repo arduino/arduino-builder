@@ -43,7 +43,6 @@ import (
 // and that allows to test if the recipe is actually run
 // So this test is pretty useless
 func TestRecipeRunner(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	buildProperties := make(props.PropertiesMap)
 	ctx.BuildProperties = buildProperties
@@ -56,7 +55,7 @@ func TestRecipeRunner(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 }

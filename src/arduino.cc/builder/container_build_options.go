@@ -36,7 +36,7 @@ import (
 
 type ContainerBuildOptions struct{}
 
-func (s *ContainerBuildOptions) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&CreateBuildOptionsMap{},
 		&LoadPreviousBuildOptionsMap{},
@@ -46,7 +46,7 @@ func (s *ContainerBuildOptions) Run(context map[string]interface{}, ctx *types.C
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)
 		}

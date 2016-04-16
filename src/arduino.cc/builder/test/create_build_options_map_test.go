@@ -37,7 +37,6 @@ import (
 )
 
 func TestCreateBuildOptionsMap(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:       []string{"hardware", "hardware2"},
 		ToolsFolders:          []string{"tools"},
@@ -51,7 +50,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	}
 
 	create := builder.CreateBuildOptionsMap{}
-	err := create.Run(context, ctx)
+	err := create.Run(ctx)
 	NoError(t, err)
 
 	require.Equal(t, "{\n"+

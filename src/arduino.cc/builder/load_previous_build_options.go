@@ -40,7 +40,7 @@ import (
 
 type LoadPreviousBuildOptionsMap struct{}
 
-func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
 	buildOptionsFile := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
 
 	_, err := os.Stat(buildOptionsFile)

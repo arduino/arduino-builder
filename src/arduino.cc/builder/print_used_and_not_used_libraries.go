@@ -38,7 +38,7 @@ import (
 
 type PrintUsedAndNotUsedLibraries struct{}
 
-func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 	if ctx.DebugLevel < 0 {
 		return nil
 	}

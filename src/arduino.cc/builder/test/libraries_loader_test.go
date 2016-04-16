@@ -42,7 +42,6 @@ import (
 func TestLoadLibrariesAVR(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
@@ -58,7 +57,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -152,7 +151,6 @@ func TestLoadLibrariesAVR(t *testing.T) {
 func TestLoadLibrariesSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
@@ -168,7 +166,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -236,7 +234,6 @@ func TestLoadLibrariesSAM(t *testing.T) {
 func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
@@ -252,7 +249,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -266,7 +263,6 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
@@ -282,7 +278,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

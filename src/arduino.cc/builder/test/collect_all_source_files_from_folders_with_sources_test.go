@@ -39,7 +39,6 @@ import (
 )
 
 func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
@@ -53,7 +52,7 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -66,7 +65,6 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 }
 
 func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
@@ -80,7 +78,7 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -101,7 +99,6 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 }
 
 func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
@@ -117,7 +114,7 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

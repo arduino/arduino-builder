@@ -41,7 +41,6 @@ import (
 )
 
 func TestLoadPreviousBuildOptionsMap(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -51,21 +50,20 @@ func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	NoError(t, err)
 
 	command := builder.LoadPreviousBuildOptionsMap{}
-	err = command.Run(context, ctx)
+	err = command.Run(ctx)
 	NoError(t, err)
 
 	require.Equal(t, "test", ctx.BuildOptionsJsonPrevious)
 }
 
 func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.LoadPreviousBuildOptionsMap{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	require.Empty(t, ctx.BuildOptionsJsonPrevious)

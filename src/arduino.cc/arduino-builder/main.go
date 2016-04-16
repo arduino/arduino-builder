@@ -169,7 +169,6 @@ func main() {
 		return
 	}
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	if *buildOptionsFileFlag != "" {
@@ -305,16 +304,16 @@ func main() {
 	}
 
 	if *dumpPrefsFlag {
-		err = builder.RunParseHardwareAndDumpBuildProperties(context, ctx)
+		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
 	} else if *preprocessFlag {
-		err = builder.RunPreprocess(context, ctx)
+		err = builder.RunPreprocess(ctx)
 	} else {
 		if flag.NArg() == 0 {
 			fmt.Fprintln(os.Stderr, "Last parameter must be the sketch to compile")
 			flag.Usage()
 			os.Exit(1)
 		}
-		err = builder.RunBuilder(context, ctx)
+		err = builder.RunBuilder(ctx)
 	}
 
 	if err != nil {
@@ -328,25 +327,6 @@ func main() {
 
 		os.Exit(toExitCode(err))
 	}
-}
-
-func setContextSliceKeyOrLoadItFromOptions(context map[string]interface{}, cliFlag []string, buildOptions map[string]string, contextKey string, paramName string, mandatory bool) (error, bool) {
-	values, err := toSliceOfUnquoted(cliFlag)
-	if err != nil {
-		return err, true
-	}
-
-	if len(values) == 0 && len(buildOptions[contextKey]) > 0 {
-		values = strings.Split(buildOptions[contextKey], ",")
-	}
-
-	if mandatory && len(values) == 0 {
-		return errors.New("Parameter '" + paramName + "' is mandatory"), false
-	}
-
-	context[contextKey] = values
-
-	return nil, false
 }
 
 func toExitCode(err error) int {

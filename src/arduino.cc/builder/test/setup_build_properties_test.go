@@ -43,7 +43,6 @@ import (
 func TestSetupBuildProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
@@ -65,7 +64,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -105,7 +104,6 @@ func TestSetupBuildProperties(t *testing.T) {
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
@@ -130,7 +128,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -147,7 +145,6 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
@@ -169,7 +166,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -186,7 +183,6 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
@@ -203,7 +199,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

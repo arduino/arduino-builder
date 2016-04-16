@@ -41,7 +41,7 @@ import (
 
 type GenerateBuildPathIfMissing struct{}
 
-func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *GenerateBuildPathIfMissing) Run(ctx *types.Context) error {
 	if ctx.BuildPath != "" {
 		return nil
 	}

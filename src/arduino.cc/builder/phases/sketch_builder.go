@@ -38,7 +38,7 @@ import (
 
 type SketchBuilder struct{}
 
-func (s *SketchBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *SketchBuilder) Run(ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := ctx.BuildProperties
 	includes := ctx.IncludeFolders

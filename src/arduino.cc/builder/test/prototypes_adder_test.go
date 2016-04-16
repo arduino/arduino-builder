@@ -46,7 +46,6 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	sketchLocation := filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -78,7 +77,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -89,7 +88,6 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -119,18 +117,17 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderBaladuino(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -160,18 +157,17 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch3", "Baladuino.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch3", "Baladuino.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -201,18 +197,17 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch4", "CharWithEscapedDoubleQuote.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch4", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -242,18 +237,17 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch5", "IncludeBetweenMultilineComment.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch5", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderLineContinuations(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -283,18 +277,17 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch6", "LineContinuations.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch6", "LineContinuations.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderStringWithComment(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -324,18 +317,17 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch7", "StringWithComment.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch7", "StringWithComment.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -365,11 +357,11 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch8", "SketchWithStruct.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch8", "SketchWithStruct.preprocessed.txt"), ctx)
 	obtained := strings.Replace(ctx.Source, "\r\n", "\n", -1)
 	// ctags based preprocessing removes the space after "dostuff", but this is still OK
 	// TODO: remove this exception when moving to a more powerful parser
@@ -384,7 +376,6 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_config", "sketch_with_config.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -414,14 +405,14 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 13 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 17 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 13 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), context, ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -431,7 +422,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_no_functions_two_files", "main.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -461,7 +451,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -472,7 +462,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -505,7 +494,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -519,7 +508,6 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_default_args", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -549,7 +537,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -563,7 +551,6 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_inline_function", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -593,7 +580,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -618,7 +605,6 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_function_signature_inside_ifdef", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -648,7 +634,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -662,7 +648,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_usbcon", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -692,7 +677,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -706,7 +691,6 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_typename", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		LibrariesFolders:  []string{"libraries", "downloaded_libraries"},
@@ -735,7 +719,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -755,7 +739,6 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_ifdef", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -785,14 +768,14 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 5 \""+absoluteSketchLocation+"\"\nvoid elseBranch();\n#line 9 \""+absoluteSketchLocation+"\"\nvoid f1();\n#line 10 \""+absoluteSketchLocation+"\"\nvoid f2();\n#line 12 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 14 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 5 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 
-	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.txt"), context, ctx)
+	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.txt"), ctx)
 	require.Equal(t, expectedSource, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -802,7 +785,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_ifdef", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -832,14 +814,14 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
 	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 2 \""+absoluteSketchLocation+"\"\nvoid ifBranch();\n#line 9 \""+absoluteSketchLocation+"\"\nvoid f1();\n#line 10 \""+absoluteSketchLocation+"\"\nvoid f2();\n#line 12 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 14 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 2 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 
-	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), context, ctx)
+	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), ctx)
 	require.Equal(t, expectedSource, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -849,7 +831,6 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	sketchLocation := filepath.Join("sketch_with_const", "sketch.ino")
 	absoluteSketchLocation := strings.Replace(Abs(t, sketchLocation), "\\", "\\\\", -1)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -879,7 +860,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -890,7 +871,6 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -920,7 +900,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 	// only requires no error as result

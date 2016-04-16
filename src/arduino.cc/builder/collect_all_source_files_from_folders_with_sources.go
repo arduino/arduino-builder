@@ -42,7 +42,7 @@ import (
 
 type CollectAllSourceFilesFromFoldersWithSources struct{}
 
-func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *CollectAllSourceFilesFromFoldersWithSources) Run(ctx *types.Context) error {
 	foldersWithSources := ctx.FoldersWithSourceFiles
 	sourceFiles := ctx.CollectedSourceFiles
 

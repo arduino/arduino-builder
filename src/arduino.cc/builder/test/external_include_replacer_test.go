@@ -71,13 +71,12 @@ var sourceWithPragmas = "#line 1 \"sketch_with_config.ino\"\n" +
 	"}\n"
 
 func TestExternalIncludeReplacerIncludeToPragma(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.Source = sourceWithIncludes
 	ctx.Includes = []string{"/tmp/test184599776/sketch/config.h", "/tmp/test184599776/sketch/includes/de bug.h", "Bridge.h"}
 
 	replacer := builder.ExternalIncludeReplacer{Source: &ctx.Source, Target: &ctx.SourceGccMinusE, From: "#include ", To: "#pragma ___MY_INCLUDE___ "}
-	err := replacer.Run(context, ctx)
+	err := replacer.Run(ctx)
 	NoError(t, err)
 
 	require.Equal(t, sourceWithIncludes, ctx.Source)
@@ -85,13 +84,12 @@ func TestExternalIncludeReplacerIncludeToPragma(t *testing.T) {
 }
 
 func TestExternalIncludeReplacerPragmaToInclude(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.SourceGccMinusE = sourceWithPragmas
 	ctx.Includes = []string{"/tmp/test184599776/sketch/config.h", "/tmp/test184599776/sketch/includes/de bug.h", "Bridge.h"}
 
 	replacer := builder.ExternalIncludeReplacer{Source: &ctx.SourceGccMinusE, Target: &ctx.SourceGccMinusE, From: "#pragma ___MY_INCLUDE___ ", To: "#include "}
-	err := replacer.Run(context, ctx)
+	err := replacer.Run(ctx)
 	NoError(t, err)
 
 	require.Empty(t, ctx.Source)

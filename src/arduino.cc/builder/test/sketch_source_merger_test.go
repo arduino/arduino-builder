@@ -40,7 +40,6 @@ import (
 )
 
 func TestMergeSketch(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 	}
@@ -51,12 +50,12 @@ func TestMergeSketch(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
 	source := ctx.Source
 
-	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), context, ctx)
+	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), ctx)
 	require.Equal(t, expected_source, strings.Replace(source, "\r\n", "\n", -1))
 }

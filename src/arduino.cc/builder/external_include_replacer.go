@@ -42,7 +42,7 @@ type ExternalIncludeReplacer struct {
 	To     string
 }
 
-func (s *ExternalIncludeReplacer) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ExternalIncludeReplacer) Run(ctx *types.Context) error {
 	source := *s.Source
 	nonAbsoluteIncludes := findNonAbsoluteIncludes(ctx.Includes)
 

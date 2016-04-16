@@ -207,5 +207,5 @@ func LibraryToSourceFolder(library *Library) []SourceFolder {
 }
 
 type Command interface {
-	Run(context map[string]interface{}, ctx *Context) error
+	Run(ctx *Context) error
 }

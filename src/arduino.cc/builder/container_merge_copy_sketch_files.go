@@ -36,7 +36,7 @@ import (
 
 type ContainerMergeCopySketchFiles struct{}
 
-func (s *ContainerMergeCopySketchFiles) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&SketchSourceMerger{},
 		&SketchSaver{},
@@ -45,7 +45,7 @@ func (s *ContainerMergeCopySketchFiles) Run(context map[string]interface{}, ctx 
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)
 		}

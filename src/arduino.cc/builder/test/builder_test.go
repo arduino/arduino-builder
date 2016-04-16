@@ -43,7 +43,6 @@ import (
 func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -61,7 +60,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 	ctx.DebugLevel = 10
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -79,7 +78,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 func TestBuilderBridge(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -95,7 +93,7 @@ func TestBuilderBridge(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -115,7 +113,6 @@ func TestBuilderBridge(t *testing.T) {
 func TestBuilderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -130,7 +127,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -150,7 +147,6 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 func TestBuilderBridgeTwice(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -165,11 +161,11 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	command = builder.Builder{}
-	err = command.Run(context, ctx)
+	err = command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -189,7 +185,6 @@ func TestBuilderBridgeTwice(t *testing.T) {
 func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -206,7 +201,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	ctx.WarningsLevel = "all"
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "syscalls_sam3.c.o"))
@@ -235,7 +230,6 @@ func TestBuilderBridgeSAM(t *testing.T) {
 func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
 		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
@@ -250,7 +244,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
@@ -270,7 +264,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
 		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
@@ -285,14 +278,13 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	require.Error(t, err)
 }
 
 func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
 		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
@@ -307,14 +299,13 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 }
 
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -329,14 +320,13 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 }
 
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -351,14 +341,13 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 	defer os.RemoveAll(buildPath)
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 }
 
 func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -375,7 +364,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	NoError(t, os.MkdirAll(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"), os.FileMode(0755)))
 
 	command := builder.Builder{}
-	err := command.Run(context, ctx)
+	err := command.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"))

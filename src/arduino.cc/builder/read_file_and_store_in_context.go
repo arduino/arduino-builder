@@ -39,7 +39,7 @@ type ReadFileAndStoreInContext struct {
 	Target *string
 }
 
-func (s *ReadFileAndStoreInContext) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *ReadFileAndStoreInContext) Run(ctx *types.Context) error {
 	bytes, err := ioutil.ReadFile(ctx.FileToRead)
 	if err != nil {
 		return i18n.WrapError(err)

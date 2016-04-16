@@ -48,13 +48,12 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
 	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
 	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(context, ctx)
+	err = cmd.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(temp, "SPI"))
@@ -67,13 +66,12 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 }
 
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = filepath.Join(os.TempDir(), "test")
 	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err := cmd.Run(context, ctx)
+	err := cmd.Run(ctx)
 	NoError(t, err)
 }
 
@@ -86,13 +84,12 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
 	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
 	ctx.ImportedLibraries = []*types.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(context, ctx)
+	err = cmd.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(temp, "SPI"))

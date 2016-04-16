@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -38,16 +37,16 @@ import (
 
 type GCCMinusMOutputParser struct{}
 
-func (s *GCCMinusMOutputParser) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *GCCMinusMOutputParser) Run(ctx *types.Context) error {
 	output := ctx.OutputGccMinusM
 
 	rows := strings.Split(output, "\n")
 	includes := make([]string, 0)
 	if len(rows) > 2 {
 		for _, row := range rows[2:] {
-			if !strings.HasPrefix(row, constants.SPACE) {
+			if !strings.HasPrefix(row, " ") {
 				row = strings.TrimSpace(row)
-				if row != constants.EMPTY_STRING {
+				if row != "" {
 					row = strings.TrimSuffix(row, ":")
 					row = strings.Replace(row, "\\ ", " ", -1)
 					includes = append(includes, row)

@@ -40,7 +40,7 @@ import (
 
 type CoreBuilder struct{}
 
-func (s *CoreBuilder) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *CoreBuilder) Run(ctx *types.Context) error {
 	coreBuildPath := ctx.CoreBuildPath
 	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose

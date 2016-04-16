@@ -40,7 +40,7 @@ import (
 
 type LoadVIDPIDSpecificProperties struct{}
 
-func (s *LoadVIDPIDSpecificProperties) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *LoadVIDPIDSpecificProperties) Run(ctx *types.Context) error {
 	if ctx.USBVidPid == "" {
 		return nil
 	}

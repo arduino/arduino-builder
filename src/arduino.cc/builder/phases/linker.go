@@ -42,7 +42,7 @@ import (
 
 type Linker struct{}
 
-func (s *Linker) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *Linker) Run(ctx *types.Context) error {
 	objectFilesSketch := ctx.SketchObjectFiles
 	objectFilesLibraries := ctx.LibrariesObjectFiles
 	objectFilesCore := ctx.CoreObjectsFiles

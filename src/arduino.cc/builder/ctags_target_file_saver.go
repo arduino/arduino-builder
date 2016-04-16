@@ -41,7 +41,7 @@ type CTagsTargetFileSaver struct {
 	TargetFileName string
 }
 
-func (s *CTagsTargetFileSaver) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *CTagsTargetFileSaver) Run(ctx *types.Context) error {
 	source := *s.Source
 
 	preprocPath := ctx.PreprocPath

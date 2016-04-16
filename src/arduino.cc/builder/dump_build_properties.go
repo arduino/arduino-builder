@@ -38,7 +38,7 @@ import (
 
 type DumpBuildProperties struct{}
 
-func (s *DumpBuildProperties) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *DumpBuildProperties) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 
 	keys := utils.KeysOfMapOfString(buildProperties)

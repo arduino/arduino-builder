@@ -37,7 +37,7 @@ import (
 
 type WarnAboutPlatformRewrites struct{}
 
-func (s *WarnAboutPlatformRewrites) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *WarnAboutPlatformRewrites) Run(ctx *types.Context) error {
 	if ctx.DebugLevel < 0 {
 		return nil
 	}

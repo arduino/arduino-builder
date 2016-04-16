@@ -42,7 +42,7 @@ type IncludesFinderWithRegExp struct {
 	Source *string
 }
 
-func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *IncludesFinderWithRegExp) Run(ctx *types.Context) error {
 	source := *s.Source
 
 	matches := INCLUDE_REGEXP.FindAllStringSubmatch(source, -1)

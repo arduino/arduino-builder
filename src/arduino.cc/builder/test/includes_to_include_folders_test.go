@@ -42,7 +42,6 @@ import (
 func TestIncludesToIncludeFolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -67,7 +66,7 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -83,7 +82,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -108,7 +106,7 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -122,7 +120,6 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -147,7 +144,7 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -166,7 +163,6 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -191,7 +187,7 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -210,7 +206,6 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -234,7 +229,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -252,7 +247,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -277,7 +271,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -295,7 +289,6 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
 		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
@@ -320,7 +313,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

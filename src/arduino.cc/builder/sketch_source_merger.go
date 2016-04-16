@@ -38,7 +38,7 @@ import (
 
 type SketchSourceMerger struct{}
 
-func (s *SketchSourceMerger) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *SketchSourceMerger) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 
 	lineOffset := 0

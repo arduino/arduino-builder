@@ -38,7 +38,7 @@ import (
 
 type SketchSaver struct{}
 
-func (s *SketchSaver) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *SketchSaver) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
 

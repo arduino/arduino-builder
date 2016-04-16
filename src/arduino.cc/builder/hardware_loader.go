@@ -41,7 +41,7 @@ import (
 
 type HardwareLoader struct{}
 
-func (s *HardwareLoader) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *HardwareLoader) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 
 	packages := &types.Packages{}

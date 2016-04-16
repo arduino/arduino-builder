@@ -46,7 +46,6 @@ func TestCTagsRunner(t *testing.T) {
 
 	sketchLocation := Abs(t, filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -76,7 +75,7 @@ func TestCTagsRunner(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -97,7 +96,6 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 
 	sketchLocation := Abs(t, filepath.Join("sketch_with_class", "sketch.ino"))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -127,7 +125,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -146,7 +144,6 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 	sketchLocation := Abs(t, filepath.Join("sketch_with_typename", "sketch.ino"))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -176,7 +173,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -194,7 +191,6 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 	sketchLocation := Abs(t, filepath.Join("sketch_with_namespace", "sketch.ino"))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -224,7 +220,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -241,7 +237,6 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 
 	sketchLocation := Abs(t, filepath.Join("sketch_with_templates_and_shift", "template_and_shift.cpp"))
 
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
@@ -271,7 +266,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

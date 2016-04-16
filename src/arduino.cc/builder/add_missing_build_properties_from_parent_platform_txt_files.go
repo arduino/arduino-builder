@@ -35,7 +35,7 @@ import (
 
 type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
 
-func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(ctx *types.Context) error {
 	packages := ctx.Hardware
 	targetPackage := ctx.TargetPackage
 	buildProperties := ctx.BuildProperties

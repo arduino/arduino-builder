@@ -41,7 +41,7 @@ import (
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
 
-func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface{}, ctx *types.Context) error {
+func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	if ctx.BuildOptionsJsonPrevious == "" {
 		return nil
 	}

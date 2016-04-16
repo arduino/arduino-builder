@@ -38,33 +38,30 @@ import (
 )
 
 func TestLoadSketchWithFolder(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: "sketch1",
 	}
 
 	loader := builder.SketchLoader{}
-	err := loader.Run(context, ctx)
+	err := loader.Run(ctx)
 
 	require.Error(t, err)
 	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketchNonExistentPath(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: "asdasd78128123981723981273asdasd",
 	}
 
 	loader := builder.SketchLoader{}
-	err := loader.Run(context, ctx)
+	err := loader.Run(ctx)
 
 	require.Error(t, err)
 	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketch(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
 	}
@@ -74,7 +71,7 @@ func TestLoadSketch(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -94,19 +91,17 @@ func TestLoadSketch(t *testing.T) {
 }
 
 func TestFailToLoadSketchFromFolder(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: "./sketch1",
 	}
 
 	loader := builder.SketchLoader{}
-	err := loader.Run(context, ctx)
+	err := loader.Run(ctx)
 	require.Error(t, err)
 	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketchFromFolder(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: "sketch_with_subfolders",
 	}
@@ -116,7 +111,7 @@ func TestLoadSketchFromFolder(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -133,7 +128,6 @@ func TestLoadSketchFromFolder(t *testing.T) {
 }
 
 func TestLoadSketchWithBackup(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: filepath.Join("sketch_with_backup_files", "sketch.ino"),
 	}
@@ -143,7 +137,7 @@ func TestLoadSketchWithBackup(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -157,7 +151,6 @@ func TestLoadSketchWithBackup(t *testing.T) {
 }
 
 func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		SketchLocation: filepath.Join("sketch_with_macosx_garbage", "sketch.ino"),
 	}
@@ -167,7 +160,7 @@ func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context, ctx)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

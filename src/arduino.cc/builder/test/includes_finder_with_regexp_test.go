@@ -38,7 +38,6 @@ import (
 )
 
 func TestIncludesFinderWithRegExp(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
@@ -48,7 +47,7 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 	ctx.Source = output
 
 	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -57,7 +56,6 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 }
 
 func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := ""
@@ -65,7 +63,7 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 	ctx.Source = output
 
 	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -73,7 +71,6 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 }
 
 func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{
 		Includes: []string{"test.h"},
 	}
@@ -86,7 +83,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	ctx.Source = output
 
 	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -97,7 +94,6 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
@@ -107,7 +103,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	ctx.Source = output
 
 	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -117,7 +113,6 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
@@ -127,7 +122,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	ctx.Source = output
 
 	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
@@ -137,7 +132,6 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
-	context := make(map[string]interface{})
 	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
@@ -146,7 +140,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	ctx.Source = output
 
 	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(context, ctx)
+	err := parser.Run(ctx)
 	NoError(t, err)
 
 	includes := ctx.Includes
