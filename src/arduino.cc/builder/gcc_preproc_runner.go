@@ -64,7 +64,7 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}, ctx *types.Contex
 		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_FILE_PATH_TO_READ] = targetFilePath
+	ctx.FileToRead = targetFilePath
 
 	return nil
 }

@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
@@ -49,7 +48,7 @@ func TestReadFileAndStoreInContext(t *testing.T) {
 
 	context := make(map[string]interface{})
 	ctx := &types.Context{}
-	context[constants.CTX_FILE_PATH_TO_READ] = file.Name()
+	ctx.FileToRead = file.Name()
 
 	command := &builder.ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE}
 	err = command.Run(context, ctx)

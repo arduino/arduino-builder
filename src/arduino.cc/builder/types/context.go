@@ -82,6 +82,9 @@ type Context struct {
 	logger     i18n.Logger
 	DebugLevel int
 
+	// ReadFileAndStoreInContext command
+	FileToRead string
+
 	// For now it is used in conjunction with the old map[string]string, but
 	// it will be slowly populated with all the fields currently used in the
 	// map in the next commits.
