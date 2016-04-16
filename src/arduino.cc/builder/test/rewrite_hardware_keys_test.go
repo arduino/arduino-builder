@@ -57,7 +57,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
-	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
+	ctx.PlatformKeyRewrites = platformKeysRewrite
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -94,7 +94,7 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
 
-	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
+	ctx.PlatformKeyRewrites = platformKeysRewrite
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},

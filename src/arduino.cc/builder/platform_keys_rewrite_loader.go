@@ -79,7 +79,7 @@ func (s *PlatformKeysRewriteLoader) Run(context map[string]interface{}, ctx *typ
 		}
 	}
 
-	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
+	ctx.PlatformKeyRewrites = platformKeysRewrite
 
 	return nil
 }

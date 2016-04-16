@@ -32,19 +32,18 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type RewriteHardwareKeys struct{}
 
 func (s *RewriteHardwareKeys) Run(context map[string]interface{}, ctx *types.Context) error {
-	if !utils.MapHas(context, constants.CTX_PLATFORM_KEYS_REWRITE) {
+	if ctx.PlatformKeyRewrites.Empty() {
 		return nil
 	}
 
 	packages := ctx.Hardware
-	platformKeysRewrite := context[constants.CTX_PLATFORM_KEYS_REWRITE].(types.PlatforKeysRewrite)
-	hardwareRewriteResults := context[constants.CTX_HARDWARE_REWRITE_RESULTS].(map[*types.Platform][]types.PlatforKeyRewrite)
+	platformKeysRewrite := ctx.PlatformKeyRewrites
+	hardwareRewriteResults := ctx.HardwareRewriteResults
 
 	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {

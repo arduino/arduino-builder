@@ -140,6 +140,10 @@ type PlatforKeysRewrite struct {
 	Rewrites []PlatforKeyRewrite
 }
 
+func (p *PlatforKeysRewrite) Empty() bool {
+	return len(p.Rewrites) == 0
+}
+
 type PlatforKeyRewrite struct {
 	Key      string
 	OldValue string

@@ -72,7 +72,7 @@ func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}, ctx 
 	ctx.FoldersWithSourceFiles = &types.UniqueSourceFolderQueue{}
 
 	ctx.LibrariesResolutionResults = make(map[string]types.LibraryResolutionResult)
-	context[constants.CTX_HARDWARE_REWRITE_RESULTS] = make(map[*types.Platform][]types.PlatforKeyRewrite)
+	ctx.HardwareRewriteResults = make(map[*types.Platform][]types.PlatforKeyRewrite)
 
 	return nil
 }

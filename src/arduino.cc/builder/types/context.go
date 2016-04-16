@@ -28,6 +28,9 @@ type Context struct {
 	ActualPlatform *Platform
 	USBVidPid      string
 
+	PlatformKeyRewrites    PlatforKeysRewrite
+	HardwareRewriteResults map[*Platform][]PlatforKeyRewrite
+
 	BuildProperties      props.PropertiesMap
 	BuildCore            string
 	BuildPath            string
