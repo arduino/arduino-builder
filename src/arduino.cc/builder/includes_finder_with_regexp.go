@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"regexp"
@@ -58,7 +57,7 @@ func (s *IncludesFinderWithRegExp) Run(context map[string]interface{}, ctx *type
 		}
 	}
 
-	context[constants.CTX_INCLUDES_JUST_FOUND] = includes
+	ctx.IncludesJustFound = includes
 	ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, includes...)
 	return nil
 }

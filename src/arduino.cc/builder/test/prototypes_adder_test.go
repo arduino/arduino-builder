@@ -32,7 +32,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -83,7 +82,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 33 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 46 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 62 \""+absoluteSketchLocation+"\"\nvoid process(BridgeClient client);\n#line 82 \""+absoluteSketchLocation+"\"\nvoid digitalCommand(BridgeClient client);\n#line 109 \""+absoluteSketchLocation+"\"\nvoid analogCommand(BridgeClient client);\n#line 149 \""+absoluteSketchLocation+"\"\nvoid modeCommand(BridgeClient client);\n#line 33 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 }
 
@@ -419,7 +418,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 13 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 17 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 13 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), context, ctx)
@@ -466,7 +465,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "", ctx.PrototypesSection)
 }
 
@@ -510,7 +509,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "", ctx.PrototypesSection)
 }
 
@@ -554,7 +553,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 4 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 7 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 }
 
@@ -598,7 +597,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 
 	expected := "#line 1 \"" + absoluteSketchLocation + "\"\nvoid setup();\n#line 2 \"" + absoluteSketchLocation + "\"\nvoid loop();\n#line 4 \"" + absoluteSketchLocation + "\"\nshort unsigned int testInt();\n#line 8 \"" + absoluteSketchLocation + "\"\nstatic int8_t testInline();\n#line 12 \"" + absoluteSketchLocation + "\"\n__attribute__((always_inline)) uint8_t testAttribute();\n#line 1 \"" + absoluteSketchLocation + "\"\n"
 	obtained := ctx.PrototypesSection
@@ -653,7 +652,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 1 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 3 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 15 \""+absoluteSketchLocation+"\"\nint8_t adalight();\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 }
 
@@ -697,7 +696,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 5 \""+absoluteSketchLocation+"\"\nvoid ciao();\n#line 10 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 15 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 5 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 }
 
@@ -740,7 +739,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	expected := "#line 6 \"" + absoluteSketchLocation + "\"\nvoid setup();\n#line 10 \"" + absoluteSketchLocation + "\"\nvoid loop();\n#line 12 \"" + absoluteSketchLocation + "\"\ntypename Foo<char>::Bar func();\n#line 6 \"" + absoluteSketchLocation + "\"\n"
 	obtained := ctx.PrototypesSection
 	// ctags based preprocessing ignores line with typename
@@ -790,7 +789,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 5 \""+absoluteSketchLocation+"\"\nvoid elseBranch();\n#line 9 \""+absoluteSketchLocation+"\"\nvoid f1();\n#line 10 \""+absoluteSketchLocation+"\"\nvoid f2();\n#line 12 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 14 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 5 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.txt"), context, ctx)
@@ -837,7 +836,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 2 \""+absoluteSketchLocation+"\"\nvoid ifBranch();\n#line 9 \""+absoluteSketchLocation+"\"\nvoid f1();\n#line 10 \""+absoluteSketchLocation+"\"\nvoid f2();\n#line 12 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 14 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 2 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), context, ctx)
@@ -884,7 +883,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", context[constants.CTX_INCLUDE_SECTION].(string))
+	require.Equal(t, "#include <Arduino.h>\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 1 \""+absoluteSketchLocation+"\"\nvoid setup();\n#line 2 \""+absoluteSketchLocation+"\"\nvoid loop();\n#line 4 \""+absoluteSketchLocation+"\"\nconst __FlashStringHelper* test();\n#line 6 \""+absoluteSketchLocation+"\"\nconst int test3();\n#line 8 \""+absoluteSketchLocation+"\"\nvolatile __FlashStringHelper* test2();\n#line 10 \""+absoluteSketchLocation+"\"\nvolatile int test4();\n#line 1 \""+absoluteSketchLocation+"\"\n", ctx.PrototypesSection)
 }
 

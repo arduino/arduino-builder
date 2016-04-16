@@ -53,7 +53,7 @@ func (s *PrototypesAdder) Run(context map[string]interface{}, ctx *types.Context
 		return nil
 	}
 
-	insertionLine := firstFunctionLine + context[constants.CTX_LINE_OFFSET].(int) - 1
+	insertionLine := firstFunctionLine + ctx.LineOffset - 1
 	firstFunctionChar := len(strings.Join(sourceRows[:insertionLine], "\n")) + 1
 	prototypeSection := composePrototypeSection(firstFunctionLine, ctx.Prototypes)
 	ctx.PrototypesSection = prototypeSection

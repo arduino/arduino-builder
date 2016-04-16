@@ -31,7 +31,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"regexp"
 	"strings"
@@ -50,7 +49,7 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}, ctx *types.Cont
 	}
 	includeSection += "#line 1 \"" + strings.Replace((&sketch.MainFile).Name, "\\", "\\\\", -1) + "\"\n"
 	lineOffset++
-	context[constants.CTX_INCLUDE_SECTION] = includeSection
+	ctx.IncludeSection = includeSection
 
 	source := includeSection
 	source += addSourceWrappedWithLineDirective(&sketch.MainFile)
@@ -59,7 +58,7 @@ func (s *SketchSourceMerger) Run(context map[string]interface{}, ctx *types.Cont
 		source += addSourceWrappedWithLineDirective(&file)
 	}
 
-	context[constants.CTX_LINE_OFFSET] = lineOffset
+	ctx.LineOffset = lineOffset
 	ctx.Source = source
 
 	return nil

@@ -114,14 +114,14 @@ func findIncludesUntilDone(context map[string]interface{}, ctx *types.Context, s
 				return i18n.WrapError(err)
 			}
 		}
-		if len(context[constants.CTX_INCLUDES_JUST_FOUND].([]string)) == 0 {
+		if len(ctx.IncludesJustFound) == 0 {
 			done = true
 		} else if len(ctx.ImportedLibraries) == len(importedLibraries) {
 			err := runCommand(context, ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return i18n.WrapError(err)
 		}
 		importedLibraries = ctx.ImportedLibraries
-		context[constants.CTX_INCLUDES_JUST_FOUND] = []string{}
+		ctx.IncludesJustFound = []string{}
 	}
 	return nil
 }

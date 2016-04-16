@@ -58,6 +58,7 @@ type Context struct {
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
+	IncludesJustFound          []string
 	IncludeFolders             []string
 	OutputGccMinusM            string
 
@@ -67,6 +68,8 @@ type Context struct {
 	CTagsOfSource               []*CTag
 	CTagsOfPreprocessedSource   []*CTag
 	CTagsCollected              []*CTag
+	IncludeSection              string
+	LineOffset                  int
 	PrototypesSection           string
 	PrototypesLineWhereToInsert int
 	Prototypes                  []*Prototype
