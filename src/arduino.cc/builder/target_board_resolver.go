@@ -42,6 +42,9 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
 	fqbn := context[constants.CTX_FQBN].(string)
 
 	fqbnParts := strings.Split(fqbn, ":")
+	if len(fqbnParts) < 3 {
+		return utils.Errorf(context, constants.MSG_FQBN_INVALID, fqbn)
+	}
 	targetPackageName := fqbnParts[0]
 	targetPlatformName := fqbnParts[1]
 	targetBoardName := fqbnParts[2]
