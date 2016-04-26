@@ -30,16 +30,16 @@
 package builder_utils
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/utils"
 	"bytes"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
+	"arduino.cc/builder/utils"
 )
 
 func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
@@ -321,7 +321,7 @@ func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, remo
 	}
 
 	if echoCommandLine {
-		fmt.Println(commandLine)
+		logger.Println("info", commandLine)
 	}
 
 	return command, nil

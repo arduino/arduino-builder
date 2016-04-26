@@ -30,15 +30,16 @@
 package types
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
 	"path/filepath"
 	"strconv"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/props"
 )
 
 type SketchFile struct {
-	Name   string
-	Source string
+	Name   string `json:"name"`
+	Source string `json:"source"`
 }
 
 type SketchFileSortByName []SketchFile
@@ -56,9 +57,9 @@ func (s SketchFileSortByName) Less(i, j int) bool {
 }
 
 type Sketch struct {
-	MainFile         SketchFile
-	OtherSketchFiles []SketchFile
-	AdditionalFiles  []SketchFile
+	MainFile         SketchFile   `json:"main_file"`
+	OtherSketchFiles []SketchFile `json:"other_sketch_files"`
+	AdditionalFiles  []SketchFile `json:"additional_files"`
 }
 
 type Packages struct {
