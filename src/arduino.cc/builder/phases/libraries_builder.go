@@ -82,6 +82,9 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 }
 
 func compileLibrary(library *types.Library, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+	if verbose {
+		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
+	}
 	libraryBuildPath := filepath.Join(buildPath, library.Name)
 
 	err := utils.EnsureFolderExists(libraryBuildPath)

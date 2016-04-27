@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"crypto/md5"
 	"encoding/hex"
 	"io/ioutil"
@@ -365,4 +366,26 @@ func NULLFile() string {
 func MD5Sum(data []byte) string {
 	md5sumBytes := md5.Sum(data)
 	return hex.EncodeToString(md5sumBytes[:])
+}
+
+type loggerAction struct {
+	onlyIfVerbose bool
+	level         string
+	format        string
+	args          []interface{}
+}
+
+func (l *loggerAction) Run(ctx *types.Context) error {
+	if !l.onlyIfVerbose || ctx.Verbose {
+		ctx.GetLogger().Println(l.level, l.format, l.args...)
+	}
+	return nil
+}
+
+func LogIfVerbose(level string, format string, args ...interface{}) types.Command {
+	return &loggerAction{true, level, format, args}
+}
+
+func LogThis(level string, format string, args ...interface{}) types.Command {
+	return &loggerAction{false, level, format, args}
 }
