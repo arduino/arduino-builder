@@ -31,7 +31,6 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -89,13 +88,8 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 func collectAllSketchFiles(from string) ([]string, error) {
 	filePaths := []string{}
-	checkExtensionFunc := func(filePath string) bool {
-		name := filepath.Base(filePath)
-		ext := strings.ToLower(filepath.Ext(filePath))
-		return !strings.HasPrefix(name, ".") && MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext]
-	}
-	walkFunc := utils.CollectAllReadableFiles(&filePaths, checkExtensionFunc)
-	err := gohasissues.Walk(from, walkFunc)
+	extensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
+	err := utils.FindFilesInFolder(&filePaths, from, extensions, /* recurse */ true)
 	return filePaths, i18n.WrapError(err)
 }
 

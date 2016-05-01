@@ -106,7 +106,6 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
 	foldersWithSources := &types.UniqueSourceFolderQueue{}
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs")), Recurse: false})
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs", "utility")), Recurse: false})
-	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, "non existent folder"), Recurse: false})
 	ctx.FoldersWithSourceFiles = foldersWithSources
 
 	commands := []types.Command{

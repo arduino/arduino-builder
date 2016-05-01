@@ -304,30 +304,48 @@ func FilterOutFoldersByNames(folders []os.FileInfo, names ...string) []os.FileIn
 	return filtered
 }
 
-type CheckFilePathFunc func(filePath string) bool
+type CheckExtensionFunc func(ext string) bool
 
-func CollectAllReadableFiles(collector *[]string, test CheckFilePathFunc) filepath.WalkFunc {
-	walkFunc := func(currentPath string, info os.FileInfo, err error) error {
+func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
+	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
+		// Skip source control and hidden files and directories
+		if IsSCCSOrHiddenFile(info) {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		// Skip directories unless recurse is on, or this is the
+		// root directory
 		if info.IsDir() {
+			if recurse || path == folder {
+				return nil
+			} else {
+				return filepath.SkipDir
+			}
+		}
+
+		// Check (lowercased) extension against list of extensions
+		if extensions != nil && !extensions(strings.ToLower(filepath.Ext(path))) {
 			return nil
 		}
-		if !test(currentPath) {
-			return nil
-		}
-		currentFile, err := os.Open(currentPath)
+
+		// See if the file is readable by opening it
+		currentFile, err := os.Open(path)
 		if err != nil {
 			return nil
 		}
 		currentFile.Close()
 
-		*collector = append(*collector, currentPath)
+		*files = append(*files, path)
 		return nil
 	}
-	return walkFunc
+	return gohasissues.Walk(folder, walkFunc)
 }
 
 func AppendIfNotPresent(target []string, elements ...string) []string {
