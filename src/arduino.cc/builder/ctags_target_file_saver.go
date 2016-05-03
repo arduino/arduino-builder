@@ -79,10 +79,10 @@ func saveLinesContainingDirectivesAndSketch(src string, tofind []string) string 
 		if saveLine || startsWithHashtag(line) {
 			minimizedString += line + "\n"
 		}
-		if containsAny(line, tofind) && isPreprocessorLineMarker(line) {
+		if containsAny(line, tofind) && isLineMarker(line) {
 			saveLine = true
 		}
-		if saveLine && !containsAny(line, tofind) && isPreprocessorLineMarker(line) {
+		if saveLine && !containsAny(line, tofind) && isLineMarker(line) {
 			saveLine = false
 		}
 	}
@@ -106,10 +106,10 @@ func startsWithHashtag(src string) bool {
 	return false
 }
 
-func isPreprocessorLineMarker(src string) bool {
+func isLineMarker(src string) bool {
 	trimmedStr := strings.TrimSpace(src)
 	splittedStr := strings.Split(trimmedStr, " ")
-	if len(splittedStr) > 2 && splittedStr[0] == "#" {
+	if len(splittedStr) > 2 && splittedStr[0][0] == '#' {
 		_, err := strconv.Atoi(splittedStr[1])
 		if err == nil {
 			return true
