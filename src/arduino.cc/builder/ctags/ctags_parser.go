@@ -130,7 +130,7 @@ func removeDuplicate(tags []*types.CTag) {
 	definedPrototypes := make(map[string]bool)
 
 	for _, tag := range tags {
-		if !definedPrototypes[tag.Prototype] {
+		if !definedPrototypes[tag.Prototype] && tag.SkipMe == false {
 			definedPrototypes[tag.Prototype] = true
 		} else {
 			tag.SkipMe = true
