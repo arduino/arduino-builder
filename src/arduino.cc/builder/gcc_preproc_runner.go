@@ -108,7 +108,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string
 		targetFilePath = filepath.Join(preprocPath, targetFilePath)
 	}
 
-	properties := ctx.BuildProperties
+	properties := ctx.BuildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
 

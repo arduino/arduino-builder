@@ -50,7 +50,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
 	}
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.BuildProperties.Clone()
 	verbose := ctx.Verbose
 
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)

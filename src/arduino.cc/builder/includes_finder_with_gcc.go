@@ -45,7 +45,7 @@ type IncludesFinderWithGCC struct {
 }
 
 func (s *IncludesFinderWithGCC) Run(ctx *types.Context) error {
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.BuildProperties.Clone()
 	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
