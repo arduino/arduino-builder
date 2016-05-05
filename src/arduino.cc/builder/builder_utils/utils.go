@@ -222,7 +222,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 	for _, row := range rows {
 		depStat, err := os.Stat(row)
 		if err != nil && !os.IsNotExist(err) {
-			return false, i18n.WrapError(err)
+			// There is probably a parsing error of the dep file
+			// Ignore the error and trigger a full rebuild anyway
+			return false, nil
 		}
 		if os.IsNotExist(err) {
 			return false, nil
