@@ -35,6 +35,7 @@ import (
 	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
@@ -168,6 +169,10 @@ func (aMap PropertiesMap) Clone() PropertiesMap {
 	newMap := make(PropertiesMap)
 	newMap.Merge(aMap)
 	return newMap
+}
+
+func (aMap PropertiesMap) Equals(anotherMap PropertiesMap) bool {
+	return reflect.DeepEqual(aMap, anotherMap)
 }
 
 func MergeMapsOfProperties(target map[string]PropertiesMap, sources ...map[string]PropertiesMap) map[string]PropertiesMap {

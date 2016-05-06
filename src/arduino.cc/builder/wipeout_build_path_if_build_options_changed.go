@@ -33,10 +33,11 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
+	"encoding/json"
 	"os"
 	"path/filepath"
-	"regexp"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
@@ -49,16 +50,18 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 	logger := ctx.GetLogger()
 
-	if buildOptionsJson == previousBuildOptionsJson {
-		return nil
+	var opts props.PropertiesMap
+	var prevOpts props.PropertiesMap
+	json.Unmarshal([]byte(buildOptionsJson), &opts)
+	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
+
+	// If SketchLocation path is different but filename is the same, consider it equal
+	if filepath.Base(opts["sketchLocation"]) == filepath.Base(prevOpts["sketchLocation"]) {
+		delete(opts, "sketchLocation")
+		delete(prevOpts, "sketchLocation")
 	}
 
-	re := regexp.MustCompile("(?m)^.*" + ctx.SketchLocation + ".*$[\r\n]+")
-	buildOptionsJson = re.ReplaceAllString(buildOptionsJson, "")
-	previousBuildOptionsJson = re.ReplaceAllString(previousBuildOptionsJson, "")
-
-	// if the only difference is the sketch path skip deleting everything
-	if buildOptionsJson == previousBuildOptionsJson {
+	if opts.Equals(prevOpts) {
 		return nil
 	}
 
