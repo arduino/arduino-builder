@@ -46,8 +46,8 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	ctx.BuildOptionsJsonPrevious = "old"
-	ctx.BuildOptionsJson = "new"
+	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
+	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_be_deleted.txt"))
 
@@ -77,7 +77,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	ctx.BuildOptionsJson = "new"
+	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
@@ -107,8 +107,8 @@ func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	ctx.BuildOptionsJsonPrevious = "options"
-	ctx.BuildOptionsJson = "options"
+	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
+	ctx.BuildOptionsJson = "{ \"old\":\"old\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
