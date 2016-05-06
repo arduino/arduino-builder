@@ -34,7 +34,6 @@ import (
 	"strings"
 
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"arduino.cc/properties"
@@ -51,10 +50,7 @@ func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 
-	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
-	if err != nil {
-		return i18n.WrapError(err)
-	}
+	newlyImportedLibraries := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
 
 	foldersWithSources := ctx.FoldersWithSourceFiles
 
@@ -89,7 +85,7 @@ func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties p
 }
 
 //FIXME it's also resolving previously resolved libraries
-func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) ([]*types.Library, error) {
+func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) []*types.Library {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, library := range importedLibraries {
 		markImportedLibrary[library] = true
@@ -103,7 +99,7 @@ func resolveLibraries(includes []string, headerToLibraries map[string][]*types.L
 		newlyImportedLibraries = append(newlyImportedLibraries, library)
 	}
 
-	return newlyImportedLibraries, nil
+	return newlyImportedLibraries
 }
 
 func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) {
