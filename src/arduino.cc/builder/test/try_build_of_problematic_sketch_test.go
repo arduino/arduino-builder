@@ -199,6 +199,12 @@ func TestTryBuild038(t *testing.T) {
 	tryBuild(t, "sketch_with_multiline_prototypes", "sketch_with_multiline_prototypes.ino")
 }
 
+func TestTryBuild039(t *testing.T) {
+	ctx := makeDefaultContext(t)
+	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	tryBuildWithContext(t, ctx, "sketch12", "sketch12.ino")
+}
+
 func makeDefaultContext(t *testing.T) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 
