@@ -31,7 +31,6 @@ package builder
 
 import (
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"regexp"
 	"strings"
 )
@@ -50,10 +49,6 @@ func (s *IncludesFinderWithRegExp) Run(ctx *types.Context) error {
 		ctx.IncludeJustFound = strings.TrimSpace(match[1])
 	} else {
 		ctx.IncludeJustFound = findIncludeForOldCompilers(source)
-	}
-
-	if ctx.IncludeJustFound != "" {
-		ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, ctx.IncludeJustFound)
 	}
 
 	return nil

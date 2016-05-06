@@ -42,14 +42,14 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
-	err := runCommand(ctx, &IncludesToIncludeFolders{})
-	if err != nil {
-		return i18n.WrapError(err)
+	ctx.IncludeFolders = append(ctx.IncludeFolders, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
+	if ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {
+		ctx.IncludeFolders = append(ctx.IncludeFolders, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
 	}
 
 	sketchBuildPath := ctx.SketchBuildPath
 	sketch := ctx.Sketch
-	err = findIncludesUntilDone(ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
+	err := findIncludesUntilDone(ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 	if err != nil {
 		return i18n.WrapError(err)
 	}

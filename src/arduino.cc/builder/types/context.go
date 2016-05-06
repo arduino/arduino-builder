@@ -56,7 +56,6 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	Includes                   []string
 	Libraries                  []*Library
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
