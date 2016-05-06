@@ -75,13 +75,36 @@ go build arduino.cc/arduino-builder
 In order to run the tests, type:
 
 ```
-go test -timeout 60m -v ./src/arduino.cc/builder/test/...
+go test arduino.cc/builder/test
+```
+
+This runs all tests, showing any failures and a summary at the end.
+Add the -v option to show each test as it is being ran. Currently,
+arduino-builder itself also generates copious output, even for
+non-failing testcases and without -v, and testing does not stop at the
+first failure, so you probably want to redirect test output so you can
+scroll back to find any failures.
+
+To run a single test, use the -run option, which accepts a regular
+expression (see also go help testflag).
+
+```
+go test arduino.cc/builder/test -run 'TestBuilderEmptySketch'
+go test arduino.cc/builder/test -run 'TestPrototypesAdder.*'
 ```
 
 In jenkins, use
 ```
-go test -timeout 60m -v ./src/arduino.cc/builder/test/... | bin/go-junit-report > report.xml
+go test -v arduino.cc/builder/test | bin/go-junit-report > report.xml
 ```
+
+The first time you run the tests, some needed files (toolchains and
+source files) will be downloaded, which needs about 1GB of space (at the
+time of writing). If you have a slow connection, this download might
+exceed the default 10 minute timeout for a single test. If you run into
+this, add `-timeout 60m` or similar to the commandline to extend the
+timeout. If you are running on slower system (like a rasbperry pi),
+increasing the timeout might be needed as well.
 
 ### License and Copyright
 
