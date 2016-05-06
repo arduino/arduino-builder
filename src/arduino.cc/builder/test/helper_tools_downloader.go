@@ -139,6 +139,8 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 }
 
 func patchFiles(t *testing.T) {
+	err := utils.EnsureFolderExists(PATCHES_FOLDER)
+	NoError(t, err)
 	files, err := ioutil.ReadDir(PATCHES_FOLDER)
 	NoError(t, err)
 
