@@ -41,37 +41,37 @@ import (
 
 type HardwareLoader struct{}
 
-func (s *HardwareLoader) Run(context map[string]interface{}) error {
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+func (s *HardwareLoader) Run(ctx *types.Context) error {
+	logger := ctx.GetLogger()
 
 	packages := &types.Packages{}
 	packages.Packages = make(map[string]*types.Package)
 	packages.Properties = make(map[string]string)
 
-	folders := context[constants.CTX_HARDWARE_FOLDERS].([]string)
+	folders := ctx.HardwareFolders
 	folders, err := utils.AbsolutizePaths(folders)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	for _, folder := range folders {
 		stat, err := os.Stat(folder)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		if !stat.IsDir() {
-			return utils.Errorf(context, constants.MSG_MUST_BE_A_FOLDER, folder)
+			return i18n.ErrorfWithLogger(logger, constants.MSG_MUST_BE_A_FOLDER, folder)
 		}
 
 		hardwarePlatformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		packages.Properties.Merge(hardwarePlatformTxt)
 
 		subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		subfolders = utils.FilterOutFoldersByNames(subfolders, constants.FOLDER_TOOLS)
 
@@ -86,13 +86,13 @@ func (s *HardwareLoader) Run(context map[string]interface{}) error {
 			targetPackage := getOrCreatePackage(packages, packageId)
 			err = loadPackage(targetPackage, subfolderPath, logger)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 			packages.Packages[packageId] = targetPackage
 		}
 	}
 
-	context[constants.CTX_HARDWARE] = packages
+	ctx.Hardware = packages
 
 	return nil
 }
@@ -113,13 +113,13 @@ func getOrCreatePackage(packages *types.Packages, packageId string) *types.Packa
 func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger) error {
 	packagePlatformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	targetPackage.Properties.Merge(packagePlatformTxt)
 
 	subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	subfolders = utils.FilterOutFoldersByNames(subfolders, constants.FOLDER_TOOLS)
@@ -133,7 +133,7 @@ func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger
 		if err != nil && os.IsNotExist(err) {
 			theOnlySubfolder, err := utils.TheOnlySubfolderOf(subfolderPath)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 
 			if theOnlySubfolder != constants.EMPTY_STRING {
@@ -144,7 +144,7 @@ func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger
 		platform := getOrCreatePlatform(platforms, platformId)
 		err = loadPlatform(platform, targetPackage.PackageId, subfolderPath, logger)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		platforms[platformId] = platform
 	}
@@ -169,7 +169,7 @@ func getOrCreatePlatform(platforms map[string]*types.Platform, platformId string
 func loadPlatform(targetPlatform *types.Platform, packageId string, folder string, logger i18n.Logger) error {
 	_, err := os.Stat(filepath.Join(folder, constants.FILE_BOARDS_TXT))
 	if err != nil && !os.IsNotExist(err) {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	if os.IsNotExist(err) {
@@ -180,19 +180,19 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 
 	err = loadBoards(targetPlatform.Boards, packageId, targetPlatform.PlatformId, folder, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	assignDefaultBoardToPlatform(targetPlatform)
 
 	platformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	localPlatformProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_LOCAL_TXT), logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	targetPlatform.Properties = targetPlatform.Properties.Clone()
@@ -201,7 +201,7 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 
 	programmersProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PROGRAMMERS_TXT), logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	targetPlatform.Programmers = props.MergeMapsOfProperties(make(map[string]props.PropertiesMap), targetPlatform.Programmers, programmersProperties.FirstLevelOf())
 
@@ -221,12 +221,12 @@ func assignDefaultBoardToPlatform(targetPlatform *types.Platform) {
 func loadBoards(boards map[string]*types.Board, packageId string, platformId string, folder string, logger i18n.Logger) error {
 	properties, err := props.Load(filepath.Join(folder, constants.FILE_BOARDS_TXT), logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	localProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_BOARDS_LOCAL_TXT), logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	properties = properties.Merge(localProperties)

@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
@@ -40,21 +39,20 @@ import (
 )
 
 func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
-	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
+	ctx.CollectedSourceFiles = sourceFiles
 	foldersWithSources := &types.UniqueSourceFolderQueue{}
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, "sketch_with_config"), Recurse: true})
-	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
+	ctx.FoldersWithSourceFiles = foldersWithSources
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -67,21 +65,20 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 }
 
 func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
-	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
+	ctx.CollectedSourceFiles = sourceFiles
 	foldersWithSources := &types.UniqueSourceFolderQueue{}
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("downloaded_libraries", "Bridge")), Recurse: true})
-	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
+	ctx.FoldersWithSourceFiles = foldersWithSources
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -102,23 +99,22 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfLibrary(t *testing.T) {
 }
 
 func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	sourceFiles := &types.UniqueStringQueue{}
-	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
+	ctx.CollectedSourceFiles = sourceFiles
 	foldersWithSources := &types.UniqueSourceFolderQueue{}
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs")), Recurse: false})
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs", "utility")), Recurse: false})
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, "non existent folder"), Recurse: false})
-	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
+	ctx.FoldersWithSourceFiles = foldersWithSources
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.CollectAllSourceFilesFromFoldersWithSources{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

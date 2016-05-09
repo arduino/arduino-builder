@@ -31,58 +31,48 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
 type AddAdditionalEntriesToContext struct{}
 
-func (s *AddAdditionalEntriesToContext) Run(context map[string]interface{}) error {
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
-		buildPath := context[constants.CTX_BUILD_PATH].(string)
+func (s *AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
+	if ctx.BuildPath != "" {
+		buildPath := ctx.BuildPath
 		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		sketchBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_SKETCH))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		librariesBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_LIBRARIES))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		coreBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_CORE))
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 
-		context[constants.CTX_PREPROC_PATH] = preprocPath
-		context[constants.CTX_SKETCH_BUILD_PATH] = sketchBuildPath
-		context[constants.CTX_LIBRARIES_BUILD_PATH] = librariesBuildPath
-		context[constants.CTX_CORE_BUILD_PATH] = coreBuildPath
+		ctx.PreprocPath = preprocPath
+		ctx.SketchBuildPath = sketchBuildPath
+		ctx.LibrariesBuildPath = librariesBuildPath
+		ctx.CoreBuildPath = coreBuildPath
 	}
 
-	if !utils.MapHas(context, constants.CTX_WARNINGS_LEVEL) {
-		context[constants.CTX_WARNINGS_LEVEL] = DEFAULT_WARNINGS_LEVEL
+	if ctx.WarningsLevel == "" {
+		ctx.WarningsLevel = DEFAULT_WARNINGS_LEVEL
 	}
 
-	if !utils.MapHas(context, constants.CTX_VERBOSE) {
-		context[constants.CTX_VERBOSE] = false
-	}
+	ctx.CollectedSourceFiles = &types.UniqueStringQueue{}
+	ctx.FoldersWithSourceFiles = &types.UniqueSourceFolderQueue{}
 
-	if !utils.MapHas(context, constants.CTX_DEBUG_LEVEL) {
-		context[constants.CTX_DEBUG_LEVEL] = DEFAULT_DEBUG_LEVEL
-	}
-
-	sourceFiles := &types.UniqueStringQueue{}
-	context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE] = sourceFiles
-	foldersWithSources := &types.UniqueSourceFolderQueue{}
-	context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE] = foldersWithSources
-
-	context[constants.CTX_LIBRARY_RESOLUTION_RESULTS] = make(map[string]types.LibraryResolutionResult)
-	context[constants.CTX_HARDWARE_REWRITE_RESULTS] = make(map[*types.Platform][]types.PlatforKeyRewrite)
+	ctx.LibrariesResolutionResults = make(map[string]types.LibraryResolutionResult)
+	ctx.HardwareRewriteResults = make(map[*types.Platform][]types.PlatforKeyRewrite)
 
 	return nil
 }

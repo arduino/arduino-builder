@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -40,30 +41,30 @@ import (
 )
 
 func TestLoadPreviousBuildOptionsMap(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	err := utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), "test")
 	NoError(t, err)
 
 	command := builder.LoadPreviousBuildOptionsMap{}
-	err = command.Run(context)
+	err = command.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test", context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON])
+	require.Equal(t, "test", ctx.BuildOptionsJsonPrevious)
 }
 
 func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
 	command := builder.LoadPreviousBuildOptionsMap{}
-	err := command.Run(context)
+	err := command.Run(ctx)
 	NoError(t, err)
 
-	require.False(t, utils.MapHas(context, constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON))
+	require.Empty(t, ctx.BuildOptionsJsonPrevious)
 }

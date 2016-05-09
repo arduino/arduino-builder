@@ -38,7 +38,7 @@ import (
 )
 
 func TestRewriteHardwareKeys(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	packages := &types.Packages{}
 	packages.Packages = make(map[string]*types.Package)
@@ -52,20 +52,19 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	platform.Properties[constants.PLATFORM_NAME] = "A test platform"
 	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
 
-	context[constants.CTX_HARDWARE] = packages
+	ctx.Hardware = packages
 
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
-	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
+	ctx.PlatformKeyRewrites = platformKeysRewrite
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.RewriteHardwareKeys{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -73,7 +72,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 }
 
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	packages := &types.Packages{}
 	packages.Packages = make(map[string]*types.Package)
@@ -88,21 +87,20 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
 	platform.Properties[constants.REWRITING] = constants.REWRITING_DISABLED
 
-	context[constants.CTX_HARDWARE] = packages
+	ctx.Hardware = packages
 
 	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
 
-	context[constants.CTX_PLATFORM_KEYS_REWRITE] = platformKeysRewrite
+	ctx.PlatformKeyRewrites = platformKeysRewrite
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.RewriteHardwareKeys{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

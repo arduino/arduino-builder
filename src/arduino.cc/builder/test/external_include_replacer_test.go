@@ -31,7 +31,7 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -71,27 +71,27 @@ var sourceWithPragmas = "#line 1 \"sketch_with_config.ino\"\n" +
 	"}\n"
 
 func TestExternalIncludeReplacerIncludeToPragma(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SOURCE] = sourceWithIncludes
-	context[constants.CTX_INCLUDES] = []string{"/tmp/test184599776/sketch/config.h", "/tmp/test184599776/sketch/includes/de bug.h", "Bridge.h"}
+	ctx := &types.Context{}
+	ctx.Source = sourceWithIncludes
+	ctx.Includes = []string{"/tmp/test184599776/sketch/config.h", "/tmp/test184599776/sketch/includes/de bug.h", "Bridge.h"}
 
-	replacer := builder.ExternalIncludeReplacer{SourceKey: constants.CTX_SOURCE, TargetKey: constants.CTX_GCC_MINUS_E_SOURCE, From: "#include ", To: "#pragma ___MY_INCLUDE___ "}
-	err := replacer.Run(context)
+	replacer := builder.ExternalIncludeReplacer{Source: &ctx.Source, Target: &ctx.SourceGccMinusE, From: "#include ", To: "#pragma ___MY_INCLUDE___ "}
+	err := replacer.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, sourceWithIncludes, context[constants.CTX_SOURCE].(string))
-	require.Equal(t, sourceWithPragmas, context[constants.CTX_GCC_MINUS_E_SOURCE].(string))
+	require.Equal(t, sourceWithIncludes, ctx.Source)
+	require.Equal(t, sourceWithPragmas, ctx.SourceGccMinusE)
 }
 
 func TestExternalIncludeReplacerPragmaToInclude(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_GCC_MINUS_E_SOURCE] = sourceWithPragmas
-	context[constants.CTX_INCLUDES] = []string{"/tmp/test184599776/sketch/config.h", "/tmp/test184599776/sketch/includes/de bug.h", "Bridge.h"}
+	ctx := &types.Context{}
+	ctx.SourceGccMinusE = sourceWithPragmas
+	ctx.Includes = []string{"/tmp/test184599776/sketch/config.h", "/tmp/test184599776/sketch/includes/de bug.h", "Bridge.h"}
 
-	replacer := builder.ExternalIncludeReplacer{SourceKey: constants.CTX_GCC_MINUS_E_SOURCE, TargetKey: constants.CTX_GCC_MINUS_E_SOURCE, From: "#pragma ___MY_INCLUDE___ ", To: "#include "}
-	err := replacer.Run(context)
+	replacer := builder.ExternalIncludeReplacer{Source: &ctx.SourceGccMinusE, Target: &ctx.SourceGccMinusE, From: "#pragma ___MY_INCLUDE___ ", To: "#include "}
+	err := replacer.Run(ctx)
 	NoError(t, err)
 
-	require.Nil(t, context[constants.CTX_SOURCE])
-	require.Equal(t, sourceWithIncludes, context[constants.CTX_GCC_MINUS_E_SOURCE].(string))
+	require.Empty(t, ctx.Source)
+	require.Equal(t, sourceWithIncludes, ctx.SourceGccMinusE)
 }

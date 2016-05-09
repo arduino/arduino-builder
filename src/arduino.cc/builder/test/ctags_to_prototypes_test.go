@@ -30,7 +30,6 @@
 package test
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
@@ -39,26 +38,33 @@ import (
 	"testing"
 )
 
+type CollectCtagsFromPreprocSource struct{}
+
+func (*CollectCtagsFromPreprocSource) Run(ctx *types.Context) error {
+	ctx.CTagsCollected = ctx.CTagsOfPreprocessedSource
+	return nil
+}
+
 func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListPrototypes.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -68,30 +74,29 @@ func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 	require.Equal(t, "void analogCommand(YunClient client);", prototypes[3].Prototype)
 	require.Equal(t, "void modeCommand(YunClient client);", prototypes[4].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 33, prototypeLine)
+	require.Equal(t, 33, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListTemplates.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "template <typename T> T minimum (T a, T b);", prototypes[0].Prototype)
@@ -99,30 +104,29 @@ func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
 	require.Equal(t, "void setup();", prototypes[1].Prototype)
 	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 2, prototypeLine)
+	require.Equal(t, 2, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListTemplates2.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 4, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -131,57 +135,55 @@ func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
 	require.Equal(t, "template <class T> int SRAM_writeAnything(int ee, const T& value);", prototypes[2].Prototype)
 	require.Equal(t, "template <class T> int SRAM_readAnything(int ee, T& value);", prototypes[3].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 1, prototypeLine)
+	require.Equal(t, 1, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesShouldDealWithClasses(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithClasses.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 0, len(prototypes))
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 8, prototypeLine)
+	require.Equal(t, 8, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithStructs.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -189,30 +191,29 @@ func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void dostuff(A_NEW_TYPE * bar);", prototypes[2].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 9, prototypeLine)
+	require.Equal(t, 9, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithMacros.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -222,119 +223,115 @@ func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
 	require.Equal(t, "void disabledIsDefined();", prototypes[3].Prototype)
 	require.Equal(t, "int useMyType(MyType type);", prototypes[4].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 18, prototypeLine)
+	require.Equal(t, 18, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealFunctionWithDifferentSignatures.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 1, len(prototypes))
 	require.Equal(t, "boolean getBytes( byte addr, int amount );", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/test260613593/preproc/ctags_target.cpp", prototypes[0].File)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 5031, prototypeLine)
+	require.Equal(t, 5031, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserClassMembersAreFilteredOut.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/test834438754/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 14, prototypeLine)
+	require.Equal(t, 14, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStructWithFunctions.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 16, prototypeLine)
+	require.Equal(t, 16, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserDefaultArguments.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void test(int x = 1);", prototypes[0].Prototype)
@@ -342,60 +339,58 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 	require.Equal(t, "/tmp/test179252494/preproc/ctags_target.cpp", prototypes[1].File)
 	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 2, prototypeLine)
+	require.Equal(t, 2, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesNamespace(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserNamespace.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/test030883150/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 8, prototypeLine)
+	require.Equal(t, 8, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesStatic(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStatic.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -404,30 +399,29 @@ func TestCTagsToPrototypesStatic(t *testing.T) {
 	require.Equal(t, "void doStuff();", prototypes[2].Prototype)
 	require.Equal(t, "static", prototypes[2].Modifiers)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 2, prototypeLine)
+	require.Equal(t, 2, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointer.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
+	prototypes := ctx.Prototypes
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void t1Callback();", prototypes[0].Prototype)
@@ -435,36 +429,33 @@ func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
 	require.Equal(t, "void setup();", prototypes[1].Prototype)
 	require.Equal(t, "void loop();", prototypes[2].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 2, prototypeLine)
+	require.Equal(t, 2, ctx.PrototypesLineWhereToInsert)
 }
 
 func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointers.txt"))
 	NoError(t, err)
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(bytes)
+	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CopyContextKeys{From: constants.CTX_CTAGS_OF_PREPROC_SOURCE, To: constants.CTX_COLLECTED_CTAGS},
+		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	prototypes := context[constants.CTX_PROTOTYPES].([]*types.Prototype)
-
+	prototypes := ctx.Prototypes
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/test907446433/preproc/ctags_target.cpp", prototypes[0].File)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 
-	prototypeLine := context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES].(int)
-	require.Equal(t, 2, prototypeLine)
+	require.Equal(t, 2, ctx.PrototypesLineWhereToInsert)
 }

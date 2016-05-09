@@ -140,6 +140,10 @@ type PlatforKeysRewrite struct {
 	Rewrites []PlatforKeyRewrite
 }
 
+func (p *PlatforKeysRewrite) Empty() bool {
+	return len(p.Rewrites) == 0
+}
+
 type PlatforKeyRewrite struct {
 	Key      string
 	OldValue string
@@ -149,10 +153,6 @@ type PlatforKeyRewrite struct {
 type KeyValuePair struct {
 	Key   string
 	Value string
-}
-
-type Command interface {
-	Run(context map[string]interface{}) error
 }
 
 type Prototype struct {
@@ -204,4 +204,8 @@ func LibraryToSourceFolder(library *Library) []SourceFolder {
 		sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
 	}
 	return sourceFolders
+}
+
+type Command interface {
+	Run(ctx *Context) error
 }

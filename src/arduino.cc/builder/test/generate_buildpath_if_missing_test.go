@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -40,50 +39,48 @@ import (
 )
 
 func TestGenerateBuildPathIfMissing(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_SKETCH_LOCATION] = "test"
+	ctx := &types.Context{
+		SketchLocation: "test",
+	}
 
 	command := builder.GenerateBuildPathIfMissing{}
-	err := command.Run(context)
+	err := command.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), context[constants.CTX_BUILD_PATH])
+	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath)
 	_, err = os.Stat(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 	require.True(t, os.IsNotExist(err))
 }
 
 func TestGenerateBuildPathIfEmpty(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_SKETCH_LOCATION] = "test"
-	context[constants.CTX_BUILD_PATH] = constants.EMPTY_STRING
+	ctx := &types.Context{
+		SketchLocation: "test",
+	}
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
-	err := createBuildPathIfMissing.Run(context)
+	err := createBuildPathIfMissing.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), context[constants.CTX_BUILD_PATH])
+	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath)
 	_, err = os.Stat(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 	require.True(t, os.IsNotExist(err))
 }
 
 func TestDontGenerateBuildPathIfPresent(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_BUILD_PATH] = "test"
+	ctx := &types.Context{}
+	ctx.BuildPath = "test"
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
-	err := createBuildPathIfMissing.Run(context)
+	err := createBuildPathIfMissing.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test", context[constants.CTX_BUILD_PATH])
+	require.Equal(t, "test", ctx.BuildPath)
 }
 
 func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_SKETCH_LOCATION] = "test"
+	ctx := &types.Context{
+		SketchLocation: "test",
+	}
 
 	commands := []types.Command{
 		&builder.GenerateBuildPathIfMissing{},
@@ -91,13 +88,13 @@ func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
 	defer os.RemoveAll(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 
-	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), context[constants.CTX_BUILD_PATH])
+	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath)
 	_, err := os.Stat(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 	NoError(t, err)
 }

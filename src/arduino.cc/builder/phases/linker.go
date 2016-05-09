@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strings"
@@ -41,31 +42,31 @@ import (
 
 type Linker struct{}
 
-func (s *Linker) Run(context map[string]interface{}) error {
-	objectFilesSketch := context[constants.CTX_OBJECT_FILES_SKETCH].([]string)
-	objectFilesLibraries := context[constants.CTX_OBJECT_FILES_LIBRARIES].([]string)
-	objectFilesCore := context[constants.CTX_OBJECT_FILES_CORE].([]string)
+func (s *Linker) Run(ctx *types.Context) error {
+	objectFilesSketch := ctx.SketchObjectFiles
+	objectFilesLibraries := ctx.LibrariesObjectFiles
+	objectFilesCore := ctx.CoreObjectsFiles
 
 	var objectFiles []string
 	objectFiles = append(objectFiles, objectFilesSketch...)
 	objectFiles = append(objectFiles, objectFilesLibraries...)
 	objectFiles = append(objectFiles, objectFilesCore...)
 
-	coreArchiveFilePath := context[constants.CTX_ARCHIVE_FILE_PATH_CORE].(string)
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
+	coreArchiveFilePath := ctx.CoreArchiveFilePath
+	buildPath := ctx.BuildPath
 	coreDotARelPath, err := filepath.Rel(buildPath, coreArchiveFilePath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	buildProperties := ctx.BuildProperties
+	verbose := ctx.Verbose
+	warningsLevel := ctx.WarningsLevel
+	logger := ctx.GetLogger()
 
 	err = link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	return nil

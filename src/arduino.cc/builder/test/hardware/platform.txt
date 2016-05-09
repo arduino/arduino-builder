@@ -1,6 +1,1 @@
-# coan
-# ------------------------------
-tools.coan.path={runtime.tools.coan.path}
-tools.coan.cmd.path={path}/coan
-tools.coan.pattern="{cmd.path}" source -m -E -P -kb {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} "{source_file}"
 

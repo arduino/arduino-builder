@@ -30,24 +30,21 @@
 package ctags
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"strings"
 )
 
 type CTagsToPrototypes struct{}
 
-func (s *CTagsToPrototypes) Run(context map[string]interface{}) error {
-	tags := context[constants.CTX_COLLECTED_CTAGS].([]*types.CTag)
+func (s *CTagsToPrototypes) Run(ctx *types.Context) error {
+	tags := ctx.CTagsCollected
 
 	lineWhereToInsertPrototypes := findLineWhereToInsertPrototypes(tags)
 	if lineWhereToInsertPrototypes != -1 {
-		context[constants.CTX_LINE_WHERE_TO_INSERT_PROTOTYPES] = lineWhereToInsertPrototypes
+		ctx.PrototypesLineWhereToInsert = lineWhereToInsertPrototypes
 	}
 
-	prototypes := toPrototypes(tags)
-	context[constants.CTX_PROTOTYPES] = prototypes
-
+	ctx.Prototypes = toPrototypes(tags)
 	return nil
 }
 

@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
@@ -42,16 +41,16 @@ import (
 
 type MergeSketchWithBootloader struct{}
 
-func (s *MergeSketchWithBootloader) Run(context map[string]interface{}) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
+	buildProperties := ctx.BuildProperties
 	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil
 	}
 
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	buildPath := ctx.BuildPath
+	sketch := ctx.Sketch
 	sketchFileName := filepath.Base(sketch.MainFile.Name)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	logger := ctx.GetLogger()
 
 	sketchInBuildPath := filepath.Join(buildPath, sketchFileName+".hex")
 	sketchInSubfolder := filepath.Join(buildPath, constants.FOLDER_SKETCH, sketchFileName+".hex")
@@ -131,13 +130,13 @@ func extractActualBootloader(bootloader []string) []string {
 func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	sketch, err := utils.ReadFileToRows(builtSketchPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	sketch = sketch[:len(sketch)-2]
 
 	bootloader, err := utils.ReadFileToRows(bootloaderPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	realBootloader := extractActualBootloader(bootloader)

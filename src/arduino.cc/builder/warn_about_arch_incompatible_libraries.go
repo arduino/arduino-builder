@@ -31,24 +31,21 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"strings"
 )
 
 type WarnAboutArchIncompatibleLibraries struct{}
 
-func (s *WarnAboutArchIncompatibleLibraries) Run(context map[string]interface{}) error {
-	if utils.DebugLevel(context) <= 0 {
+func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
+	if ctx.DebugLevel < 0 {
 		return nil
 	}
 
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	targetPlatform := ctx.TargetPlatform
+	buildProperties := ctx.BuildProperties
+	logger := ctx.GetLogger()
 
 	archs := []string{}
 	archs = append(archs, targetPlatform.PlatformId)
@@ -60,8 +57,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(context map[string]interface{})
 		}
 	}
 
-	importedLibraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
-	for _, importedLibrary := range importedLibraries {
+	for _, importedLibrary := range ctx.ImportedLibraries {
 		if !importedLibrary.SupportsArchitectures(archs) {
 			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, importedLibrary.Archs, archs)
 		}

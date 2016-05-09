@@ -30,13 +30,13 @@
 package builder
 
 import (
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type ContainerMergeCopySketchFiles struct{}
 
-func (s *ContainerMergeCopySketchFiles) Run(context map[string]interface{}) error {
+func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&SketchSourceMerger{},
 		&SketchSaver{},
@@ -44,10 +44,10 @@ func (s *ContainerMergeCopySketchFiles) Run(context map[string]interface{}) erro
 	}
 
 	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
+		PrintRingNameIfDebug(ctx, command)
+		err := command.Run(ctx)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 

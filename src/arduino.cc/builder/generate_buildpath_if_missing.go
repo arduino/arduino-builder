@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
@@ -40,26 +41,25 @@ import (
 
 type GenerateBuildPathIfMissing struct{}
 
-func (s *GenerateBuildPathIfMissing) Run(context map[string]interface{}) error {
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) && context[constants.CTX_BUILD_PATH].(string) != constants.EMPTY_STRING {
+func (s *GenerateBuildPathIfMissing) Run(ctx *types.Context) error {
+	if ctx.BuildPath != "" {
 		return nil
 	}
 
-	sketchLocation := context[constants.CTX_SKETCH_LOCATION].(string)
-	md5sum := utils.MD5Sum([]byte(sketchLocation))
+	md5sum := utils.MD5Sum([]byte(ctx.SketchLocation))
 
 	buildPath := filepath.Join(os.TempDir(), "arduino-sketch-"+strings.ToUpper(md5sum))
 	_, err := os.Stat(buildPath)
 	if err != nil && !os.IsNotExist(err) {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	if utils.DebugLevel(context) > 5 {
-		logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	if ctx.DebugLevel > 5 {
+		logger := ctx.GetLogger()
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_SETTING_BUILD_PATH, buildPath)
 	}
 
-	context[constants.CTX_BUILD_PATH] = buildPath
+	ctx.BuildPath = buildPath
 
 	return nil
 }

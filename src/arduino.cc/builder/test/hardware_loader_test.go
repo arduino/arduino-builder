@@ -41,20 +41,20 @@ import (
 )
 
 func TestLoadHardware(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"},
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	require.Equal(t, 2, len(packages.Packages))
 	require.NotNil(t, packages.Packages["arduino"])
 	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms))
@@ -85,11 +85,11 @@ func TestLoadHardware(t *testing.T) {
 }
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"},
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.PlatformKeysRewriteLoader{},
@@ -97,11 +97,11 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
@@ -155,20 +155,20 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 }
 
 func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_board_manager_stuff"},
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 	require.Equal(t, 3, len(packages.Packages))
 	require.NotNil(t, packages.Packages["arduino"])
 	require.Equal(t, 1, len(packages.Packages["arduino"].Platforms))
@@ -178,7 +178,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	require.Equal(t, 0, len(packages.Packages["RFduino"].Platforms))
 
 	samdPlatform := packages.Packages["arduino"].Platforms["samd"]
-	require.Equal(t, 2, len(samdPlatform.Boards))
+	require.Equal(t, 3, len(samdPlatform.Boards))
 
 	require.Equal(t, "arduino_zero_edbg", samdPlatform.Boards["arduino_zero_edbg"].BoardId)
 	require.Equal(t, "arduino_zero_edbg", samdPlatform.Boards["arduino_zero_edbg"].Properties[constants.ID])
@@ -203,21 +203,20 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 }
 
 func TestLoadLotsOfHardware(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"}
+	ctx := &types.Context{
+		HardwareFolders: []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"},
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
@@ -232,7 +231,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms))
 	require.Equal(t, 20, len(packages.Packages["arduino"].Platforms["avr"].Boards))
 	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["sam"].Boards))
-	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["samd"].Boards))
+	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms["samd"].Boards))
 
 	require.Equal(t, 1, len(packages.Packages["my_avr_platform"].Platforms))
 	require.Equal(t, 2, len(packages.Packages["my_avr_platform"].Platforms["avr"].Boards))

@@ -32,7 +32,6 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
@@ -44,19 +43,18 @@ import (
 func TestSetupBuildProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
+		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		FQBN:              "arduino:avr:uno",
+		ArduinoAPIVersion: "10600",
+	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.ToolsLoader{},
@@ -66,11 +64,11 @@ func TestSetupBuildProperties(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 
 	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
 
@@ -82,7 +80,7 @@ func TestSetupBuildProperties(t *testing.T) {
 
 	require.Equal(t, Abs(t, "downloaded_hardware/arduino/avr"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
 	require.Equal(t, Abs(t, "downloaded_hardware/arduino"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
-	require.Equal(t, "10600", buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
+	require.Equal(t, "10600", buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
 	require.NotEmpty(t, buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS])
 
 	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc.path"])
@@ -106,20 +104,20 @@ func TestSetupBuildProperties(t *testing.T) {
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
+		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		FQBN:              "arduino:avr:uno",
+		ArduinoAPIVersion: "10600",
 
-	buildPath := SetupBuildPath(t, context)
+		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
+	}
+
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-	context[constants.CTX_CUSTOM_BUILD_PROPERTIES] = []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
-
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.ToolsLoader{},
@@ -130,11 +128,11 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 
 	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
 
@@ -147,19 +145,18 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
+		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		FQBN:              "my_avr_platform:avr:custom_yun",
+		ArduinoAPIVersion: "10600",
+	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.ToolsLoader{},
@@ -169,11 +166,11 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 
 	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
 
@@ -186,28 +183,27 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
+	ctx := &types.Context{
+		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
+		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		FQBN:              "my_avr_platform:avr:custom_yun",
+		ArduinoAPIVersion: "10600",
+	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "./tools_builtin"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
-
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+	buildProperties := ctx.BuildProperties
 
 	require.Equal(t, "ARDUINO", buildProperties[constants.BUILD_PROPERTIES_SOFTWARE])
 
@@ -217,13 +213,9 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
 
-	coanProps := buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.COAN)
-	require.Equal(t, "{path}/coan", coanProps["cmd.path"])
-	require.Equal(t, "\"{cmd.path}\" source -m -E -P -kb {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} \"{source_file}\"", coanProps[constants.BUILD_PROPERTIES_PATTERN])
-
 	require.Equal(t, Abs(t, "user_hardware/my_avr_platform/avr"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
 	require.Equal(t, Abs(t, "user_hardware/my_avr_platform"), buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH])
-	require.Equal(t, "10600", buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
+	require.Equal(t, "10600", buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION])
 	require.NotEmpty(t, buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS])
 
 	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc.path"])

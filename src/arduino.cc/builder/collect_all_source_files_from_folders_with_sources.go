@@ -30,8 +30,8 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"io/ioutil"
@@ -42,9 +42,9 @@ import (
 
 type CollectAllSourceFilesFromFoldersWithSources struct{}
 
-func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]interface{}) error {
-	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
-	sourceFiles := context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue)
+func (s *CollectAllSourceFilesFromFoldersWithSources) Run(ctx *types.Context) error {
+	foldersWithSources := ctx.FoldersWithSourceFiles
+	sourceFiles := ctx.CollectedSourceFiles
 
 	filePaths := []string{}
 	for !foldersWithSources.Empty() {
@@ -56,7 +56,7 @@ func (s *CollectAllSourceFilesFromFoldersWithSources) Run(context map[string]int
 			err = collectByReadDir(&filePaths, sourceFolder.Folder)
 		}
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 
@@ -75,7 +75,7 @@ func collectByWalk(filePaths *[]string, folder string) error {
 	}
 	walkFunc := utils.CollectAllReadableFiles(filePaths, checkExtensionFunc)
 	err := gohasissues.Walk(folder, walkFunc)
-	return utils.WrapError(err)
+	return i18n.WrapError(err)
 }
 
 func collectByReadDir(filePaths *[]string, folder string) error {
@@ -85,7 +85,7 @@ func collectByReadDir(filePaths *[]string, folder string) error {
 
 	files, err := ioutil.ReadDir(folder)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	for _, file := range files {
 		ext := strings.ToLower(filepath.Ext(file.Name()))

@@ -39,45 +39,40 @@ import (
 )
 
 func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	command := builder.AddAdditionalEntriesToContext{}
-	NoError(t, command.Run(context))
+	NoError(t, command.Run(ctx))
 
-	require.Nil(t, context[constants.CTX_PREPROC_PATH])
-	require.Nil(t, context[constants.CTX_SKETCH_BUILD_PATH])
-	require.Nil(t, context[constants.CTX_LIBRARIES_BUILD_PATH])
-	require.Nil(t, context[constants.CTX_CORE_BUILD_PATH])
+	require.Empty(t, ctx.PreprocPath)
+	require.Empty(t, ctx.SketchBuildPath)
+	require.Empty(t, ctx.LibrariesBuildPath)
+	require.Empty(t, ctx.CoreBuildPath)
 
-	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
-	require.NotNil(t, context[constants.CTX_VERBOSE])
-	require.NotNil(t, context[constants.CTX_DEBUG_LEVEL])
+	require.NotNil(t, ctx.WarningsLevel)
 
-	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
-	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue).Empty())
+	require.True(t, ctx.CollectedSourceFiles.Empty())
+	require.True(t, ctx.FoldersWithSourceFiles.Empty())
 
-	require.Equal(t, 0, len(context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)))
+	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
 }
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_BUILD_PATH] = "folder"
+	ctx := &types.Context{}
+	ctx.BuildPath = "folder"
 
 	command := builder.AddAdditionalEntriesToContext{}
-	NoError(t, command.Run(context))
+	NoError(t, command.Run(ctx))
 
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), context[constants.CTX_PREPROC_PATH])
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), context[constants.CTX_SKETCH_BUILD_PATH])
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_LIBRARIES)), context[constants.CTX_LIBRARIES_BUILD_PATH])
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), context[constants.CTX_CORE_BUILD_PATH])
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), ctx.PreprocPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_LIBRARIES)), ctx.LibrariesBuildPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
 
-	require.NotNil(t, context[constants.CTX_WARNINGS_LEVEL])
-	require.NotNil(t, context[constants.CTX_VERBOSE])
-	require.NotNil(t, context[constants.CTX_DEBUG_LEVEL])
+	require.NotNil(t, ctx.WarningsLevel)
 
-	require.True(t, context[constants.CTX_COLLECTED_SOURCE_FILES_QUEUE].(*types.UniqueStringQueue).Empty())
-	require.True(t, context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue).Empty())
+	require.True(t, ctx.CollectedSourceFiles.Empty())
+	require.True(t, ctx.FoldersWithSourceFiles.Empty())
 
-	require.Equal(t, 0, len(context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)))
+	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
 }

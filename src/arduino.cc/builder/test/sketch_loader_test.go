@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
@@ -39,54 +38,44 @@ import (
 )
 
 func TestLoadSketchWithFolder(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = "sketch1"
-
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context)
-	NoError(t, err)
+	ctx := &types.Context{
+		SketchLocation: "sketch1",
+	}
 
 	loader := builder.SketchLoader{}
-	err = loader.Run(context)
+	err := loader.Run(ctx)
 
 	require.Error(t, err)
-
-	sketch := context[constants.CTX_SKETCH]
-	require.Nil(t, sketch)
+	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketchNonExistentPath(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = "asdasd78128123981723981273asdasd"
-
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context)
-	NoError(t, err)
+	ctx := &types.Context{
+		SketchLocation: "asdasd78128123981723981273asdasd",
+	}
 
 	loader := builder.SketchLoader{}
-	err = loader.Run(context)
+	err := loader.Run(ctx)
 
 	require.Error(t, err)
-
-	sketch := context[constants.CTX_SKETCH]
-	require.Nil(t, sketch)
+	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketch(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
@@ -102,36 +91,31 @@ func TestLoadSketch(t *testing.T) {
 }
 
 func TestFailToLoadSketchFromFolder(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = "./sketch1"
-
-	loggerCommand := builder.SetupHumanLoggerIfMissing{}
-	err := loggerCommand.Run(context)
-	NoError(t, err)
+	ctx := &types.Context{
+		SketchLocation: "./sketch1",
+	}
 
 	loader := builder.SketchLoader{}
-	err = loader.Run(context)
+	err := loader.Run(ctx)
 	require.Error(t, err)
-
-	sketch := context[constants.CTX_SKETCH]
-	require.Nil(t, sketch)
+	require.Nil(t, ctx.Sketch)
 }
 
 func TestLoadSketchFromFolder(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = "sketch_with_subfolders"
+	ctx := &types.Context{
+		SketchLocation: "sketch_with_subfolders",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch_with_subfolders.ino")
@@ -144,20 +128,20 @@ func TestLoadSketchFromFolder(t *testing.T) {
 }
 
 func TestLoadSketchWithBackup(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_backup_files", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch_with_backup_files", "sketch.ino"),
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
@@ -167,20 +151,20 @@ func TestLoadSketchWithBackup(t *testing.T) {
 }
 
 func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch_with_macosx_garbage", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch_with_macosx_garbage", "sketch.ino"),
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
+	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
 	require.Contains(t, sketch.MainFile.Name, "sketch.ino")

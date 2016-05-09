@@ -30,8 +30,7 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"fmt"
 	"sort"
@@ -39,8 +38,8 @@ import (
 
 type DumpBuildProperties struct{}
 
-func (s *DumpBuildProperties) Run(context map[string]interface{}) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
+func (s *DumpBuildProperties) Run(ctx *types.Context) error {
+	buildProperties := ctx.BuildProperties
 
 	keys := utils.KeysOfMapOfString(buildProperties)
 	sort.Strings(keys)

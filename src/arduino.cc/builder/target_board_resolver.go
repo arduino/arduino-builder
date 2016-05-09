@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -38,34 +39,39 @@ import (
 
 type TargetBoardResolver struct{}
 
-func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
-	fqbn := context[constants.CTX_FQBN].(string)
+func (s *TargetBoardResolver) Run(ctx *types.Context) error {
+	logger := ctx.GetLogger()
+
+	fqbn := ctx.FQBN
 
 	fqbnParts := strings.Split(fqbn, ":")
+	if len(fqbnParts) < 3 {
+		return i18n.ErrorfWithLogger(logger, constants.MSG_FQBN_INVALID, fqbn)
+	}
 	targetPackageName := fqbnParts[0]
 	targetPlatformName := fqbnParts[1]
 	targetBoardName := fqbnParts[2]
 
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+	packages := ctx.Hardware
 
 	targetPackage := packages.Packages[targetPackageName]
 	if targetPackage == nil {
-		return utils.Errorf(context, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
 	}
 
 	targetPlatform := targetPackage.Platforms[targetPlatformName]
 	if targetPlatform == nil {
-		return utils.Errorf(context, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
 	}
 
 	targetBoard := targetPlatform.Boards[targetBoardName]
 	if targetBoard == nil {
-		return utils.Errorf(context, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
 	}
 
-	context[constants.CTX_TARGET_PACKAGE] = targetPackage
-	context[constants.CTX_TARGET_PLATFORM] = targetPlatform
-	context[constants.CTX_TARGET_BOARD] = targetBoard
+	ctx.TargetPackage = targetPackage
+	ctx.TargetPlatform = targetPlatform
+	ctx.TargetBoard = targetBoard
 
 	if len(fqbnParts) > 3 {
 		addAdditionalPropertiesToTargetBoard(targetBoard, fqbnParts[3])
@@ -81,7 +87,7 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
 	if len(coreParts) > 1 {
 		core = coreParts[1]
 		if packages.Packages[coreParts[0]] == nil {
-			return utils.Errorf(context, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
+			return i18n.ErrorfWithLogger(logger, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
 
 		}
 		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatform.PlatformId]
@@ -94,8 +100,8 @@ func (s *TargetBoardResolver) Run(context map[string]interface{}) error {
 		actualPlatform = targetPlatform
 	}
 
-	context[constants.CTX_BUILD_CORE] = core
-	context[constants.CTX_ACTUAL_PLATFORM] = actualPlatform
+	ctx.BuildCore = core
+	ctx.ActualPlatform = actualPlatform
 
 	return nil
 }

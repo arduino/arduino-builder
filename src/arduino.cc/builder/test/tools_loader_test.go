@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"sort"
@@ -56,14 +55,15 @@ func (s ByToolIDAndVersion) Less(i, j int) bool {
 func TestLoadTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "tools_builtin"}
+	ctx := &types.Context{
+		ToolsFolders: []string{"downloaded_tools", "tools_builtin"},
+	}
 
 	loader := builder.ToolsLoader{}
-	err := loader.Run(context)
+	err := loader.Run(ctx)
 	NoError(t, err)
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	require.Equal(t, 7, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -93,14 +93,15 @@ func TestLoadTools(t *testing.T) {
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_board_manager_stuff"}
+	ctx := &types.Context{
+		ToolsFolders: []string{"downloaded_board_manager_stuff"},
+	}
 
 	loader := builder.ToolsLoader{}
-	err := loader.Run(context)
+	err := loader.Run(ctx)
 	NoError(t, err)
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	require.Equal(t, 3, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -118,14 +119,15 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 func TestLoadLotsOfTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "tools_builtin", "downloaded_board_manager_stuff"}
+	ctx := &types.Context{
+		ToolsFolders: []string{"downloaded_tools", "tools_builtin", "downloaded_board_manager_stuff"},
+	}
 
 	loader := builder.ToolsLoader{}
-	err := loader.Run(context)
+	err := loader.Run(ctx)
 	NoError(t, err)
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	require.Equal(t, 9, len(tools))
 
 	require.Equal(t, "arm-none-eabi-gcc", tools[0].Name)

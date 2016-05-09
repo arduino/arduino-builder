@@ -44,12 +44,12 @@ type GCCPreprocRunner struct {
 	TargetFileName string
 }
 
-func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(context, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
+func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
+	sketchBuildPath := ctx.SketchBuildPath
+	sketch := ctx.Sketch
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
@@ -57,14 +57,14 @@ func (s *GCCPreprocRunner) Run(context map[string]interface{}) error {
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	verbose := ctx.Verbose
+	logger := ctx.GetLogger()
 	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_FILE_PATH_TO_READ] = targetFilePath
+	ctx.FileToRead = targetFilePath
 
 	return nil
 }
@@ -74,14 +74,14 @@ type GCCPreprocRunnerForDiscoveringIncludes struct {
 	TargetFilePath string
 }
 
-func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interface{}) error {
-	properties, _, err := prepareGCCPreprocRecipeProperties(context, s.SourceFilePath, s.TargetFilePath)
+func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
+	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFilePath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	verbose := ctx.Verbose
+	logger := ctx.GetLogger()
 
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
@@ -90,33 +90,29 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(context map[string]interfac
 
 	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_GCC_MINUS_E_SOURCE] = string(stderr)
+	ctx.SourceGccMinusE = string(stderr)
 
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(context map[string]interface{}, sourceFilePath string, targetFilePath string) (props.PropertiesMap, string, error) {
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string) (props.PropertiesMap, string, error) {
 	if targetFilePath != utils.NULLFile() {
-		preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+		preprocPath := ctx.PreprocPath
 		err := utils.EnsureFolderExists(preprocPath)
 		if err != nil {
-			return nil, "", utils.WrapError(err)
+			return nil, "", i18n.WrapError(err)
 		}
 		targetFilePath = filepath.Join(preprocPath, targetFilePath)
 	}
 
-	properties := make(props.PropertiesMap)
-	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
-		properties = p.(props.PropertiesMap).Clone()
-	}
-
+	properties := ctx.BuildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
 
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)

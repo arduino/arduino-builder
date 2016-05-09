@@ -31,6 +31,7 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -40,30 +41,21 @@ import (
 
 type IncludesToIncludeFolders struct{}
 
-func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
-	includes := []string{}
-	if utils.MapHas(context, constants.CTX_INCLUDES) {
-		includes = context[constants.CTX_INCLUDES].([]string)
-	}
-	headerToLibraries := make(map[string][]*types.Library)
-	if utils.MapHas(context, constants.CTX_HEADER_TO_LIBRARIES) {
-		headerToLibraries = context[constants.CTX_HEADER_TO_LIBRARIES].(map[string][]*types.Library)
-	}
+func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
+	includes := ctx.Includes
+	headerToLibraries := ctx.HeaderToLibraries
 
-	platform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
-	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
+	platform := ctx.TargetPlatform
+	actualPlatform := ctx.ActualPlatform
+	libraryResolutionResults := ctx.LibrariesResolutionResults
+	importedLibraries := ctx.ImportedLibraries
 
-	importedLibraries := []*types.Library{}
-	if utils.MapHas(context, constants.CTX_IMPORTED_LIBRARIES) {
-		importedLibraries = context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
-	}
 	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	foldersWithSources := context[constants.CTX_FOLDERS_WITH_SOURCES_QUEUE].(*types.UniqueSourceFolderQueue)
+	foldersWithSources := ctx.FoldersWithSourceFiles
 
 	for _, newlyImportedLibrary := range newlyImportedLibraries {
 		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
@@ -75,12 +67,8 @@ func (s *IncludesToIncludeFolders) Run(context map[string]interface{}) error {
 		}
 	}
 
-	context[constants.CTX_IMPORTED_LIBRARIES] = importedLibraries
-
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	includeFolders := resolveIncludeFolders(newlyImportedLibraries, buildProperties, verbose)
-	context[constants.CTX_INCLUDE_FOLDERS] = includeFolders
+	ctx.ImportedLibraries = importedLibraries
+	ctx.IncludeFolders = resolveIncludeFolders(newlyImportedLibraries, ctx.BuildProperties, ctx.Verbose)
 
 	return nil
 }

@@ -33,8 +33,7 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/utils"
+	"arduino.cc/builder/types"
 	"os"
 	"sort"
 	"strings"
@@ -45,28 +44,25 @@ type RecipeByPrefixSuffixRunner struct {
 	Suffix string
 }
 
-func (s *RecipeByPrefixSuffixRunner) Run(context map[string]interface{}) error {
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	if utils.DebugLevel(context) >= 10 {
+func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
+	logger := ctx.GetLogger()
+	if ctx.DebugLevel >= 10 {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
 	}
 
-	buildProperties := make(props.PropertiesMap)
-	if p, ok := context[constants.CTX_BUILD_PROPERTIES]; ok {
-		buildProperties = p.(props.PropertiesMap).Clone()
-	}
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	buildProperties := ctx.BuildProperties.Clone()
+	verbose := ctx.Verbose
 
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
 
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		if utils.DebugLevel(context) >= 10 {
+		if ctx.DebugLevel >= 10 {
 			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)
 		}
 		_, err := builder_utils.ExecRecipe(properties, recipe, false, verbose, verbose, logger)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 

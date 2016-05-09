@@ -33,41 +33,44 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/utils"
+	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
+	"encoding/json"
 	"os"
 	"path/filepath"
-	"regexp"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
 
-func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(context map[string]interface{}) error {
-	if !utils.MapHas(context, constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON) {
+func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
+	if ctx.BuildOptionsJsonPrevious == "" {
 		return nil
 	}
-	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
-	previousBuildOptionsJson := context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	buildOptionsJson := ctx.BuildOptionsJson
+	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
+	logger := ctx.GetLogger()
 
-	if buildOptionsJson == previousBuildOptionsJson {
-		return nil
+	var opts props.PropertiesMap
+	var prevOpts props.PropertiesMap
+	json.Unmarshal([]byte(buildOptionsJson), &opts)
+	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
+
+	// If SketchLocation path is different but filename is the same, consider it equal
+	if filepath.Base(opts["sketchLocation"]) == filepath.Base(prevOpts["sketchLocation"]) {
+		delete(opts, "sketchLocation")
+		delete(prevOpts, "sketchLocation")
 	}
 
-	re := regexp.MustCompile("(?m)^.*" + constants.CTX_SKETCH_LOCATION + ".*$[\r\n]+")
-	buildOptionsJson = re.ReplaceAllString(buildOptionsJson, "")
-	previousBuildOptionsJson = re.ReplaceAllString(previousBuildOptionsJson, "")
-
-	// if the only difference is the sketch path skip deleting everything
-	if buildOptionsJson == previousBuildOptionsJson {
+	if opts.Equals(prevOpts) {
 		return nil
 	}
 
 	logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
 
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
+	buildPath := ctx.BuildPath
 	files, err := gohasissues.ReadDir(buildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	for _, file := range files {
 		os.RemoveAll(filepath.Join(buildPath, file.Name()))

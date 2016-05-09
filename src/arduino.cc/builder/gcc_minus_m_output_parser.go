@@ -30,23 +30,23 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
 )
 
 type GCCMinusMOutputParser struct{}
 
-func (s *GCCMinusMOutputParser) Run(context map[string]interface{}) error {
-	output := context[constants.CTX_GCC_MINUS_M_OUTPUT].(string)
+func (s *GCCMinusMOutputParser) Run(ctx *types.Context) error {
+	output := ctx.OutputGccMinusM
 
 	rows := strings.Split(output, "\n")
 	includes := make([]string, 0)
 	if len(rows) > 2 {
 		for _, row := range rows[2:] {
-			if !strings.HasPrefix(row, constants.SPACE) {
+			if !strings.HasPrefix(row, " ") {
 				row = strings.TrimSpace(row)
-				if row != constants.EMPTY_STRING {
+				if row != "" {
 					row = strings.TrimSuffix(row, ":")
 					row = strings.Replace(row, "\\ ", " ", -1)
 					includes = append(includes, row)
@@ -55,12 +55,7 @@ func (s *GCCMinusMOutputParser) Run(context map[string]interface{}) error {
 		}
 	}
 
-	if !utils.MapHas(context, constants.CTX_INCLUDES) {
-		context[constants.CTX_INCLUDES] = includes
-		return nil
-	}
-
-	context[constants.CTX_INCLUDES] = utils.AddStringsToStringsSet(context[constants.CTX_INCLUDES].([]string), includes)
+	ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, includes...)
 
 	return nil
 }

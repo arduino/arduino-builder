@@ -31,35 +31,34 @@ package phases
 
 import (
 	"arduino.cc/builder/builder_utils"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
 type SketchBuilder struct{}
 
-func (s *SketchBuilder) Run(context map[string]interface{}) error {
-	sketchBuildPath := context[constants.CTX_SKETCH_BUILD_PATH].(string)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+func (s *SketchBuilder) Run(ctx *types.Context) error {
+	sketchBuildPath := ctx.SketchBuildPath
+	buildProperties := ctx.BuildProperties
+	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	verbose := ctx.Verbose
+	warningsLevel := ctx.WarningsLevel
+	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	var objectFiles []string
 	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, true, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_OBJECT_FILES_SKETCH] = objectFiles
+	ctx.SketchObjectFiles = objectFiles
 
 	return nil
 }

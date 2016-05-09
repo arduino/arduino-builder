@@ -30,16 +30,13 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"fmt"
 )
 
 type PrintPreprocessedSource struct{}
 
-func (s *PrintPreprocessedSource) Run(context map[string]interface{}) error {
-	source := context[constants.CTX_GCC_MINUS_E_SOURCE].(string)
-
-	fmt.Println(source)
-
+func (s *PrintPreprocessedSource) Run(ctx *types.Context) error {
+	fmt.Println(ctx.SourceGccMinusE)
 	return nil
 }

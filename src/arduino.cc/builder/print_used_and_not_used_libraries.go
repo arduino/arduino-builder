@@ -31,22 +31,20 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"time"
 )
 
 type PrintUsedAndNotUsedLibraries struct{}
 
-func (s *PrintUsedAndNotUsedLibraries) Run(context map[string]interface{}) error {
-	if utils.DebugLevel(context) <= 0 {
+func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
+	if ctx.DebugLevel < 0 {
 		return nil
 	}
 
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	libraryResolutionResults := context[constants.CTX_LIBRARY_RESOLUTION_RESULTS].(map[string]types.LibraryResolutionResult)
+	logger := ctx.GetLogger()
+	libraryResolutionResults := ctx.LibrariesResolutionResults
 
 	for header, libResResult := range libraryResolutionResults {
 		if !libResResult.IsLibraryFromPlatform {

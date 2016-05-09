@@ -30,7 +30,7 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"io/ioutil"
@@ -40,27 +40,26 @@ import (
 
 type UnusedCompiledLibrariesRemover struct{}
 
-func (s *UnusedCompiledLibrariesRemover) Run(context map[string]interface{}) error {
-	librariesBuildPath := context[constants.CTX_LIBRARIES_BUILD_PATH].(string)
-	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
+func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
+	librariesBuildPath := ctx.LibrariesBuildPath
 
 	_, err := os.Stat(librariesBuildPath)
 	if err != nil && os.IsNotExist(err) {
 		return nil
 	}
 
-	libraryNames := toLibraryNames(libraries)
+	libraryNames := toLibraryNames(ctx.ImportedLibraries)
 
 	files, err := ioutil.ReadDir(librariesBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	for _, file := range files {
 		if file.IsDir() {
 			if !utils.SliceContains(libraryNames, file.Name()) {
 				err := os.RemoveAll(filepath.Join(librariesBuildPath, file.Name()))
 				if err != nil {
-					return utils.WrapError(err)
+					return i18n.WrapError(err)
 				}
 			}
 		}

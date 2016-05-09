@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -49,12 +48,12 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
 	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
 
-	context := make(map[string]interface{})
-	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
-	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
+	ctx := &types.Context{}
+	ctx.LibrariesBuildPath = temp
+	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(context)
+	err = cmd.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(temp, "SPI"))
@@ -67,12 +66,12 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 }
 
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_LIBRARIES_BUILD_PATH] = filepath.Join(os.TempDir(), "test")
-	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{&types.Library{Name: "Bridge"}}
+	ctx := &types.Context{}
+	ctx.LibrariesBuildPath = filepath.Join(os.TempDir(), "test")
+	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err := cmd.Run(context)
+	err := cmd.Run(ctx)
 	NoError(t, err)
 }
 
@@ -85,12 +84,12 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
 	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
 
-	context := make(map[string]interface{})
-	context[constants.CTX_LIBRARIES_BUILD_PATH] = temp
-	context[constants.CTX_IMPORTED_LIBRARIES] = []*types.Library{}
+	ctx := &types.Context{}
+	ctx.LibrariesBuildPath = temp
+	ctx.ImportedLibraries = []*types.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(context)
+	err = cmd.Run(ctx)
 	NoError(t, err)
 
 	_, err = os.Stat(filepath.Join(temp, "SPI"))

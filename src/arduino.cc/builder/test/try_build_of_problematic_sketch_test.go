@@ -32,7 +32,7 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"os"
 	"path/filepath"
 	"testing"
@@ -117,9 +117,9 @@ func TestTryBuild019(t *testing.T) {
 }
 
 func TestTryBuild020(t *testing.T) {
-	context := makeDefaultContext(t)
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"dependent_libraries", "libraries"}
-	tryPreprocessWithContext(t, context, "sketch_with_dependend_libraries", "sketch.ino")
+	ctx := makeDefaultContext(t)
+	ctx.OtherLibrariesFolders = []string{"dependent_libraries", "libraries"}
+	tryPreprocessWithContext(t, ctx, "sketch_with_dependend_libraries", "sketch.ino")
 }
 
 func TestTryBuild021(t *testing.T) {
@@ -127,9 +127,9 @@ func TestTryBuild021(t *testing.T) {
 }
 
 func TestTryBuild022(t *testing.T) {
-	context := makeDefaultContext(t)
-	context[constants.CTX_FQBN] = "arduino:samd:arduino_zero_native"
-	tryBuildWithContext(t, context, "sketch_usbhost", "sketch_usbhost.ino")
+	ctx := makeDefaultContext(t)
+	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	tryBuildWithContext(t, ctx, "sketch_usbhost", "sketch_usbhost.ino")
 }
 
 func TestTryBuild023(t *testing.T) {
@@ -186,9 +186,9 @@ func TestTryBuild035(t *testing.T) {
 }
 
 func TestTryBuild036(t *testing.T) {
-	context := makeDefaultContext(t)
-	context[constants.CTX_FQBN] = "arduino:samd:arduino_zero_native"
-	tryBuildWithContext(t, context, "sketch11", "sketch_fastleds.ino")
+	ctx := makeDefaultContext(t)
+	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	tryBuildWithContext(t, ctx, "sketch11", "sketch_fastleds.ino")
 }
 
 func TestTryBuild037(t *testing.T) {
@@ -199,47 +199,53 @@ func TestTryBuild038(t *testing.T) {
 	tryBuild(t, "sketch_with_multiline_prototypes", "sketch_with_multiline_prototypes.ino")
 }
 
-func makeDefaultContext(t *testing.T) map[string]interface{} {
+func TestTryBuild039(t *testing.T) {
+	ctx := makeDefaultContext(t)
+	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	tryBuildWithContext(t, ctx, "sketch12", "sketch12.ino")
+}
+
+func makeDefaultContext(t *testing.T) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	context := make(map[string]interface{})
-	buildPath := SetupBuildPath(t, context)
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
+		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		FQBN:              "arduino:avr:leonardo",
+		ArduinoAPIVersion: "10607",
+		Verbose:           true,
+		DebugPreprocessor: true,
+	}
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools", "downloaded_board_manager_stuff"}
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = []string{"downloaded_libraries"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10607"
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = []string{"libraries"}
-	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_DEBUG_PREPROCESSOR] = true
-
-	return context
+	return ctx
 }
 
 func tryBuild(t *testing.T, sketchPath ...string) {
-	context := makeDefaultContext(t)
-	tryBuildWithContext(t, context, sketchPath...)
+	ctx := makeDefaultContext(t)
+	tryBuildWithContext(t, ctx, sketchPath...)
 }
 
-func tryBuildWithContext(t *testing.T, context map[string]interface{}, sketchPath ...string) {
+func tryBuildWithContext(t *testing.T, ctx *types.Context, sketchPath ...string) {
 	sketchLocation := filepath.Join(sketchPath...)
-	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	ctx.SketchLocation = sketchLocation
 
-	err := builder.RunBuilder(context)
+	err := builder.RunBuilder(ctx)
 	NoError(t, err, "Build error for "+sketchLocation)
 }
 
 func tryPreprocess(t *testing.T, sketchPath ...string) {
-	context := makeDefaultContext(t)
-	tryPreprocessWithContext(t, context, sketchPath...)
+	ctx := makeDefaultContext(t)
+	tryPreprocessWithContext(t, ctx, sketchPath...)
 }
 
-func tryPreprocessWithContext(t *testing.T, context map[string]interface{}, sketchPath ...string) {
+func tryPreprocessWithContext(t *testing.T, ctx *types.Context, sketchPath ...string) {
 	sketchLocation := filepath.Join(sketchPath...)
-	context[constants.CTX_SKETCH_LOCATION] = sketchLocation
+	ctx.SketchLocation = sketchLocation
 
-	err := builder.RunPreprocess(context)
+	err := builder.RunPreprocess(ctx)
 	NoError(t, err, "Build error for "+sketchLocation)
 }

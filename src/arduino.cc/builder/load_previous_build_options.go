@@ -31,7 +31,8 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/utils"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -39,25 +40,23 @@ import (
 
 type LoadPreviousBuildOptionsMap struct{}
 
-func (s *LoadPreviousBuildOptionsMap) Run(context map[string]interface{}) error {
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
-
-	buildOptionsFile := filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE)
+func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
+	buildOptionsFile := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
 
 	_, err := os.Stat(buildOptionsFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
 		}
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	bytes, err := ioutil.ReadFile(buildOptionsFile)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = string(bytes)
+	ctx.BuildOptionsJsonPrevious = string(bytes)
 
 	return nil
 }

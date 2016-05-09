@@ -39,54 +39,54 @@ import (
 )
 
 func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:mymega"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "my_avr_platform:avr:mymega",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 		&builder.AddBuildBoardPropertyIfMissing{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardId)
 	require.Equal(t, constants.EMPTY_STRING, targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MYMEGA", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
 
 func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:mymega:cpu=atmega2560"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "my_avr_platform:avr:mymega:cpu=atmega2560",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 		&builder.AddBuildBoardPropertyIfMissing{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardId)
 	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])

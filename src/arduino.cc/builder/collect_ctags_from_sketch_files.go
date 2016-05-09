@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"strings"
@@ -38,11 +37,10 @@ import (
 
 type CollectCTagsFromSketchFiles struct{}
 
-func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}) error {
-	sketch := context[constants.CTX_SKETCH].(*types.Sketch)
-	sketchFileNames := collectSketchFileNamesFrom(sketch)
+func (s *CollectCTagsFromSketchFiles) Run(ctx *types.Context) error {
+	sketchFileNames := collectSketchFileNamesFrom(ctx.Sketch)
 
-	allCtags := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+	allCtags := ctx.CTagsOfPreprocessedSource
 	ctagsOfSketch := []*types.CTag{}
 	for _, ctag := range allCtags {
 		if utils.SliceContains(sketchFileNames, strings.Replace(ctag.Filename, "\\\\", "\\", -1)) {
@@ -50,7 +48,7 @@ func (s *CollectCTagsFromSketchFiles) Run(context map[string]interface{}) error 
 		}
 	}
 
-	context[constants.CTX_COLLECTED_CTAGS] = ctagsOfSketch
+	ctx.CTagsCollected = ctagsOfSketch
 
 	return nil
 }

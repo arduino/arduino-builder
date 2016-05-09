@@ -29,16 +29,15 @@
 
 package builder
 
-import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
-)
+// XXX: Obsolete?
+
+import "arduino.cc/builder/types"
 
 type ComparePrototypesFromSourceAndPreprocSource struct{}
 
-func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]interface{}) error {
-	ctagsOfSource := context[constants.CTX_CTAGS_OF_SOURCE].([]*types.CTag)
-	ctagsOfPreprocSource := context[constants.CTX_CTAGS_OF_PREPROC_SOURCE].([]*types.CTag)
+func (s *ComparePrototypesFromSourceAndPreprocSource) Run(ctx *types.Context) error {
+	ctagsOfSource := ctx.CTagsOfSource
+	ctagsOfPreprocSource := ctx.CTagsOfPreprocessedSource
 
 	actualCTags := []*types.CTag{}
 	for _, ctagOfPreprocSource := range ctagsOfPreprocSource {
@@ -47,7 +46,7 @@ func (s *ComparePrototypesFromSourceAndPreprocSource) Run(context map[string]int
 		}
 	}
 
-	context[constants.CTX_COLLECTED_CTAGS] = actualCTags
+	ctx.CTagsCollected = actualCTags
 
 	return nil
 }

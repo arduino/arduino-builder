@@ -32,7 +32,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"
@@ -41,22 +40,22 @@ import (
 )
 
 func TestMergeSketch(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch1", "sketch.ino")
+	ctx := &types.Context{
+		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.SketchLoader{},
 		&builder.SketchSourceMerger{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	source := context[constants.CTX_SOURCE].(string)
+	source := ctx.Source
 
-	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), context)
+	expected_source := LoadAndInterpolate(t, filepath.Join("sketch1", "merged_sketch.txt"), ctx)
 	require.Equal(t, expected_source, strings.Replace(source, "\r\n", "\n", -1))
 }

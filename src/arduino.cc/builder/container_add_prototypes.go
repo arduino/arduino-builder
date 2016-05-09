@@ -32,17 +32,17 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/ctags"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 )
 
 type ContainerAddPrototypes struct{}
 
-func (s *ContainerAddPrototypes) Run(context map[string]interface{}) error {
+func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
-		&ReadFileAndStoreInContext{TargetField: constants.CTX_GCC_MINUS_E_SOURCE},
-		&CTagsTargetFileSaver{SourceField: constants.CTX_GCC_MINUS_E_SOURCE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
+		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
+		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&ctags.CTagsRunner{},
 		&ctags.CTagsParser{},
 		&CollectCTagsFromSketchFiles{},
@@ -52,10 +52,10 @@ func (s *ContainerAddPrototypes) Run(context map[string]interface{}) error {
 	}
 
 	for _, command := range commands {
-		PrintRingNameIfDebug(context, command)
-		err := command.Run(context)
+		PrintRingNameIfDebug(ctx, command)
+		err := command.Run(ctx)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 	}
 

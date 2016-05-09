@@ -39,155 +39,155 @@ import (
 )
 
 func TestTargetBoardResolverUno(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:uno"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:avr:uno",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "arduino", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "uno", targetBoard.BoardId)
 	require.Equal(t, "atmega328p", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 }
 
 func TestTargetBoardResolverDue(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:sam:arduino_due_x"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:sam:arduino_due_x",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "arduino", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "sam", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "arduino_due_x", targetBoard.BoardId)
 	require.Equal(t, "cortex-m3", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 }
 
 func TestTargetBoardResolverMega1280(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:mega:cpu=atmega1280"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:avr:mega:cpu=atmega1280",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "arduino", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mega", targetBoard.BoardId)
 	require.Equal(t, "atmega1280", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MEGA", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
 
 func TestTargetBoardResolverMega2560(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_FQBN] = "arduino:avr:mega:cpu=atmega2560"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		FQBN:            "arduino:avr:mega:cpu=atmega2560",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "arduino", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mega", targetBoard.BoardId)
 	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
 
 func TestTargetBoardResolverCustomYun(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "my_avr_platform:avr:custom_yun"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "my_avr_platform:avr:custom_yun",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "custom_yun", targetBoard.BoardId)
 	require.Equal(t, "atmega32u4", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_YUN", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
 
 func TestTargetBoardResolverCustomCore(t *testing.T) {
-	context := make(map[string]interface{})
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"}
-	context[constants.CTX_FQBN] = "watterott:avr:attiny841:core=spencekonde,info=info"
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		FQBN:            "watterott:avr:attiny841:core=spencekonde,info=info",
+	}
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	targetPackage := context[constants.CTX_TARGET_PACKAGE].(*types.Package)
+	targetPackage := ctx.TargetPackage
 	require.Equal(t, "watterott", targetPackage.PackageId)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
+	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.PlatformId)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetBoard := ctx.TargetBoard
 	require.Equal(t, "attiny841", targetBoard.BoardId)
-	require.Equal(t, "tiny841", context[constants.CTX_BUILD_CORE].(string))
+	require.Equal(t, "tiny841", ctx.BuildCore)
 	require.Equal(t, "tiny14", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_VARIANT])
 }

@@ -41,20 +41,21 @@ import (
 )
 
 func TestStoreBuildOptionsMap(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{
+		HardwareFolders:         []string{"hardware"},
+		ToolsFolders:            []string{"tools"},
+		BuiltInLibrariesFolders: []string{"built-in libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          "sketchLocation",
+		FQBN:                    "fqbn",
+		ArduinoAPIVersion:       "ideVersion",
+		CustomBuildProperties:   []string{"custom=prop"},
+		Verbose:                 true,
+		DebugLevel:              5,
+	}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = "hardware"
-	context[constants.CTX_TOOLS_FOLDERS] = "tools"
-	context[constants.CTX_BUILT_IN_LIBRARIES_FOLDERS] = "built-in libraries"
-	context[constants.CTX_OTHER_LIBRARIES_FOLDERS] = "libraries"
-	context[constants.CTX_FQBN] = "fqbn"
-	context[constants.CTX_SKETCH_LOCATION] = "sketchLocation"
-	context[constants.CTX_VERBOSE] = true
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "ideVersion"
-	context[constants.CTX_DEBUG_LEVEL] = 5
 
 	commands := []types.Command{
 		&builder.CreateBuildOptionsMap{},
@@ -62,7 +63,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -74,6 +75,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 
 	require.Equal(t, "{\n"+
 		"  \"builtInLibrariesFolders\": \"built-in libraries\",\n"+
+		"  \"customBuildProperties\": \"custom=prop\",\n"+
 		"  \"fqbn\": \"fqbn\",\n"+
 		"  \"hardwareFolders\": \"hardware\",\n"+
 		"  \"otherLibrariesFolders\": \"libraries\",\n"+

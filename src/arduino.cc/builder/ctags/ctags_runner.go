@@ -32,17 +32,17 @@ package ctags
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"fmt"
 )
 
 type CTagsRunner struct{}
 
-func (s *CTagsRunner) Run(context map[string]interface{}) error {
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	ctagsTargetFilePath := context[constants.CTX_CTAGS_TEMP_FILE_PATH].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+func (s *CTagsRunner) Run(ctx *types.Context) error {
+	buildProperties := ctx.BuildProperties
+	ctagsTargetFilePath := ctx.CTagsTargetFile
+	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
@@ -50,26 +50,26 @@ func (s *CTagsRunner) Run(context map[string]interface{}) error {
 
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
 	if pattern == constants.EMPTY_STRING {
-		return utils.Errorf(context, constants.MSG_PATTERN_MISSING, constants.CTAGS)
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, constants.CTAGS)
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
 	command, err := utils.PrepareCommand(commandLine, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	verbose := context[constants.CTX_VERBOSE].(bool)
+	verbose := ctx.Verbose
 	if verbose {
 		fmt.Println(commandLine)
 	}
 
 	sourceBytes, err := command.Output()
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_CTAGS_OUTPUT] = string(sourceBytes)
+	ctx.CTagsOutput = string(sourceBytes)
 
 	return nil
 }

@@ -34,30 +34,31 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/props"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 )
 
 type CoreBuilder struct{}
 
-func (s *CoreBuilder) Run(context map[string]interface{}) error {
-	coreBuildPath := context[constants.CTX_CORE_BUILD_PATH].(string)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+func (s *CoreBuilder) Run(ctx *types.Context) error {
+	coreBuildPath := ctx.CoreBuildPath
+	buildProperties := ctx.BuildProperties
+	verbose := ctx.Verbose
+	warningsLevel := ctx.WarningsLevel
+	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(coreBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	archiveFile, objectFiles, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_ARCHIVE_FILE_PATH_CORE] = archiveFile
-	context[constants.CTX_OBJECT_FILES_CORE] = objectFiles
+	ctx.CoreArchiveFilePath = archiveFile
+	ctx.CoreObjectsFiles = objectFiles
 
 	return nil
 }
@@ -79,18 +80,18 @@ func compileCore(buildPath string, buildProperties props.PropertiesMap, verbose 
 	if variantFolder != constants.EMPTY_STRING {
 		variantObjectFiles, err = builder_utils.CompileFiles(variantObjectFiles, variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return "", nil, utils.WrapError(err)
+			return "", nil, i18n.WrapError(err)
 		}
 	}
 
 	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return "", nil, utils.WrapError(err)
+		return "", nil, i18n.WrapError(err)
 	}
 
 	archiveFile, err := builder_utils.ArchiveCompiledFiles(buildPath, "core.a", coreObjectFiles, buildProperties, verbose, logger)
 	if err != nil {
-		return "", nil, utils.WrapError(err)
+		return "", nil, i18n.WrapError(err)
 	}
 
 	return archiveFile, variantObjectFiles, nil

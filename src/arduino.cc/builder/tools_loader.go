@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"os"
@@ -41,37 +42,37 @@ import (
 
 type ToolsLoader struct{}
 
-func (s *ToolsLoader) Run(context map[string]interface{}) error {
-	folders := context[constants.CTX_TOOLS_FOLDERS].([]string)
+func (s *ToolsLoader) Run(ctx *types.Context) error {
+	folders := ctx.ToolsFolders
 
 	tools := []*types.Tool{}
 
 	for _, folder := range folders {
 		builtinToolsVersionsFile, err := findBuiltinToolsVersionsFile(folder)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		if builtinToolsVersionsFile != constants.EMPTY_STRING {
 			err = loadToolsFrom(&tools, builtinToolsVersionsFile)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 		} else {
 			subfolders, err := collectAllToolsFolders(folder)
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 
 			for _, subfolder := range subfolders {
 				err = loadToolsFromFolderStructure(&tools, subfolder)
 				if err != nil {
-					return utils.WrapError(err)
+					return i18n.WrapError(err)
 				}
 			}
 		}
 	}
 
-	context[constants.CTX_TOOLS] = tools
+	ctx.Tools = tools
 
 	return nil
 }
@@ -89,7 +90,7 @@ func collectAllToolsFolders(from string) ([]string, error) {
 
 		rel, err := filepath.Rel(from, currentPath)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		depth := len(strings.Split(rel, string(os.PathSeparator)))
 
@@ -107,7 +108,7 @@ func collectAllToolsFolders(from string) ([]string, error) {
 		folders = append(folders, from)
 	}
 
-	return folders, utils.WrapError(err)
+	return folders, i18n.WrapError(err)
 }
 
 func toolsSliceContains(tools *[]*types.Tool, name, version string) bool {
@@ -122,12 +123,12 @@ func toolsSliceContains(tools *[]*types.Tool, name, version string) bool {
 func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) error {
 	rows, err := utils.ReadFileToRows(builtinToolsVersionsFilePath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	folder, err := filepath.Abs(filepath.Dir(builtinToolsVersionsFilePath))
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	for _, row := range rows {
@@ -161,23 +162,23 @@ func findBuiltinToolsVersionsFile(folder string) (string, error) {
 		return nil
 	}
 	err := gohasissues.Walk(folder, findBuiltInToolsVersionsTxt)
-	return builtinToolsVersionsFilePath, utils.WrapError(err)
+	return builtinToolsVersionsFilePath, i18n.WrapError(err)
 }
 
 func loadToolsFromFolderStructure(tools *[]*types.Tool, folder string) error {
 	toolsNames, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 	for _, toolName := range toolsNames {
 		toolVersions, err := utils.ReadDirFiltered(filepath.Join(folder, toolName.Name()), utils.FilterDirs)
 		if err != nil {
-			return utils.WrapError(err)
+			return i18n.WrapError(err)
 		}
 		for _, toolVersion := range toolVersions {
 			toolFolder, err := filepath.Abs(filepath.Join(folder, toolName.Name(), toolVersion.Name()))
 			if err != nil {
-				return utils.WrapError(err)
+				return i18n.WrapError(err)
 			}
 			if !toolsSliceContains(tools, toolName.Name(), toolVersion.Name()) {
 				*tools = append(*tools, &types.Tool{Name: toolName.Name(), Version: toolVersion.Name(), Folder: toolFolder})

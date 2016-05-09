@@ -31,24 +31,21 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 )
 
 type WarnAboutPlatformRewrites struct{}
 
-func (s *WarnAboutPlatformRewrites) Run(context map[string]interface{}) error {
-	warn := utils.DebugLevel(context) > 0
-	if !warn {
+func (s *WarnAboutPlatformRewrites) Run(ctx *types.Context) error {
+	if ctx.DebugLevel < 0 {
 		return nil
 	}
 
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
-	hardwareRewriteResults := context[constants.CTX_HARDWARE_REWRITE_RESULTS].(map[*types.Platform][]types.PlatforKeyRewrite)
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
+	logger := ctx.GetLogger()
+	hardwareRewriteResults := ctx.HardwareRewriteResults
+	targetPlatform := ctx.TargetPlatform
+	actualPlatform := ctx.ActualPlatform
 
 	platforms := []*types.Platform{targetPlatform}
 	if actualPlatform != targetPlatform {

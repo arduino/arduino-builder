@@ -31,7 +31,6 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -42,23 +41,22 @@ import (
 )
 
 func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "old"
-	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
+	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
+	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_be_deleted.txt"))
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -74,22 +72,21 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 }
 
 func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_OPTIONS_JSON] = "new"
+	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
@@ -105,23 +102,22 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 }
 
 func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
-	buildPath := SetupBuildPath(t, context)
+	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	context[constants.CTX_BUILD_OPTIONS_PREVIOUS_JSON] = "options"
-	context[constants.CTX_BUILD_OPTIONS_JSON] = "options"
+	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
+	ctx.BuildOptionsJson = "{ \"old\":\"old\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 

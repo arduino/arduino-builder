@@ -43,20 +43,19 @@ import (
 // and that allows to test if the recipe is actually run
 // So this test is pretty useless
 func TestRecipeRunner(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 	buildProperties := make(props.PropertiesMap)
-	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
+	ctx.BuildProperties = buildProperties
 
 	buildProperties["recipe.hooks.prebuild.1.pattern"] = "echo"
 
 	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 	}
 
 	for _, command := range commands {
-		err := command.Run(context)
+		err := command.Run(ctx)
 		NoError(t, err)
 	}
 }

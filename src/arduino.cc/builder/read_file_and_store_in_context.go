@@ -30,22 +30,22 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/utils"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"io/ioutil"
 )
 
 type ReadFileAndStoreInContext struct {
-	TargetField string
+	Target *string
 }
 
-func (s *ReadFileAndStoreInContext) Run(context map[string]interface{}) error {
-	bytes, err := ioutil.ReadFile(context[constants.CTX_FILE_PATH_TO_READ].(string))
+func (s *ReadFileAndStoreInContext) Run(ctx *types.Context) error {
+	bytes, err := ioutil.ReadFile(ctx.FileToRead)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[s.TargetField] = string(bytes)
+	*s.Target = string(bytes)
 
 	return nil
 }

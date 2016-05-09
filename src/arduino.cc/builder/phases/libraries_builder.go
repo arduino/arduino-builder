@@ -42,27 +42,27 @@ import (
 
 type LibrariesBuilder struct{}
 
-func (s *LibrariesBuilder) Run(context map[string]interface{}) error {
-	librariesBuildPath := context[constants.CTX_LIBRARIES_BUILD_PATH].(string)
-	buildProperties := context[constants.CTX_BUILD_PROPERTIES].(props.PropertiesMap)
-	includes := context[constants.CTX_INCLUDE_FOLDERS].([]string)
+func (s *LibrariesBuilder) Run(ctx *types.Context) error {
+	librariesBuildPath := ctx.LibrariesBuildPath
+	buildProperties := ctx.BuildProperties
+	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	libraries := context[constants.CTX_IMPORTED_LIBRARIES].([]*types.Library)
-	verbose := context[constants.CTX_VERBOSE].(bool)
-	warningsLevel := context[constants.CTX_WARNINGS_LEVEL].(string)
-	logger := context[constants.CTX_LOGGER].(i18n.Logger)
+	libraries := ctx.ImportedLibraries
+	verbose := ctx.Verbose
+	warningsLevel := ctx.WarningsLevel
+	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(librariesBuildPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	objectFiles, err := compileLibraries(libraries, librariesBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_OBJECT_FILES_LIBRARIES] = objectFiles
+	ctx.LibrariesObjectFiles = objectFiles
 
 	return nil
 }
@@ -72,7 +72,7 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 		objectFiles = append(objectFiles, libraryObjectFiles...)
 	}
@@ -86,19 +86,19 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 
 	err := utils.EnsureFolderExists(libraryBuildPath)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	objectFiles := []string{}
 	if library.Layout == types.LIBRARY_RECURSIVE {
 		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 		if library.DotALinkage {
 			archiveFile, err := builder_utils.ArchiveCompiledFiles(libraryBuildPath, library.Name+".a", objectFiles, buildProperties, verbose, logger)
 			if err != nil {
-				return nil, utils.WrapError(err)
+				return nil, i18n.WrapError(err)
 			}
 			objectFiles = []string{archiveFile}
 		}
@@ -110,14 +110,14 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 		}
 		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 
 		if utilitySourcePathErr == nil {
 			utilityBuildPath := filepath.Join(libraryBuildPath, constants.LIBRARY_FOLDER_UTILITY)
 			objectFiles, err = builder_utils.CompileFiles(objectFiles, utilitySourcePath, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 			if err != nil {
-				return nil, utils.WrapError(err)
+				return nil, i18n.WrapError(err)
 			}
 		}
 	}

@@ -30,32 +30,33 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
 type CTagsTargetFileSaver struct {
-	SourceField    string
+	Source         *string
 	TargetFileName string
 }
 
-func (s *CTagsTargetFileSaver) Run(context map[string]interface{}) error {
-	source := context[s.SourceField].(string)
+func (s *CTagsTargetFileSaver) Run(ctx *types.Context) error {
+	source := *s.Source
 
-	preprocPath := context[constants.CTX_PREPROC_PATH].(string)
+	preprocPath := ctx.PreprocPath
 	err := utils.EnsureFolderExists(preprocPath)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
 	ctagsTargetFilePath := filepath.Join(preprocPath, s.TargetFileName)
 	err = utils.WriteFile(ctagsTargetFilePath, source)
 	if err != nil {
-		return utils.WrapError(err)
+		return i18n.WrapError(err)
 	}
 
-	context[constants.CTX_CTAGS_TEMP_FILE_PATH] = ctagsTargetFilePath
+	ctx.CTagsTargetFile = ctagsTargetFilePath
 
 	return nil
 }

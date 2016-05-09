@@ -31,17 +31,14 @@ package builder
 
 import (
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
 )
 
 type StoreBuildOptionsMap struct{}
 
-func (s *StoreBuildOptionsMap) Run(context map[string]interface{}) error {
-	buildPath := context[constants.CTX_BUILD_PATH].(string)
-	buildOptionsJson := context[constants.CTX_BUILD_OPTIONS_JSON].(string)
-
-	utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), buildOptionsJson)
-
+func (s *StoreBuildOptionsMap) Run(ctx *types.Context) error {
+	utils.WriteFile(filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE), ctx.BuildOptionsJson)
 	return nil
 }

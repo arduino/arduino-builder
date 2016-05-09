@@ -31,108 +31,62 @@ package test
 
 import (
 	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
-	"os"
-	"path/filepath"
 	"sort"
 	"testing"
 )
 
-func TestIncludesFinderWithRegExpCoanOutput(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	context := make(map[string]interface{})
-
-	buildPath := SetupBuildPath(t, context)
-	defer os.RemoveAll(buildPath)
-
-	context[constants.CTX_HARDWARE_FOLDERS] = []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"}
-	context[constants.CTX_TOOLS_FOLDERS] = []string{"downloaded_tools"}
-	context[constants.CTX_FQBN] = "arduino:avr:leonardo"
-	context[constants.CTX_SKETCH_LOCATION] = filepath.Join("sketch2", "SketchWithIfDef.ino")
-	context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = "10600"
-	context[constants.CTX_VERBOSE] = true
-
-	commands := []types.Command{
-		&builder.SetupHumanLoggerIfMissing{},
-
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
-		&builder.ContainerMergeCopySketchFiles{},
-
-		&builder.CoanRunner{},
-
-		&builder.IncludesFinderWithRegExp{ContextField: constants.CTX_SOURCE},
-	}
-
-	for _, command := range commands {
-		err := command.Run(context)
-		NoError(t, err)
-	}
-
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
-	require.Equal(t, 3, len(includes))
-	require.Equal(t, "Arduino.h", includes[0])
-	require.Equal(t, "empty_1.h", includes[1])
-	require.Equal(t, "empty_2.h", includes[2])
-}
-
 func TestIncludesFinderWithRegExp(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
-	context["source"] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	require.Equal(t, "SPI.h", includes[0])
 }
 
 func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
-	context := make(map[string]interface{})
+	ctx := &types.Context{}
 
 	output := ""
 
-	context["source"] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 0, len(includes))
 }
 
 func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_INCLUDES] = []string{"test.h"}
+	ctx := &types.Context{
+		Includes: []string{"test.h"},
+	}
 
 	output := "/some/path/sketch.ino:1:17: fatal error: SPI.h: No such file or directory\n" +
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
 
-	context["source"] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 2, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
@@ -140,65 +94,56 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_INCLUDES] = []string{}
+	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
 		" #               include <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	context["source"] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_INCLUDES] = []string{}
+	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: Wire.h: No such file or directory\n" +
 		" #\t\t\tinclude <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	context["source"] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
-	context := make(map[string]interface{})
-
-	context[constants.CTX_INCLUDES] = []string{}
+	ctx := &types.Context{}
 
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
 		"compilation terminated.\n"
 
-	context["source"] = output
+	ctx.Source = output
 
-	parser := builder.IncludesFinderWithRegExp{ContextField: "source"}
-	err := parser.Run(context)
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
 	NoError(t, err)
 
-	require.NotNil(t, context[constants.CTX_INCLUDES])
-	includes := context[constants.CTX_INCLUDES].([]string)
+	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])

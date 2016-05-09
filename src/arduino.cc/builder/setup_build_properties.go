@@ -42,34 +42,34 @@ import (
 
 type SetupBuildProperties struct{}
 
-func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
-	packages := context[constants.CTX_HARDWARE].(*types.Packages)
+func (s *SetupBuildProperties) Run(ctx *types.Context) error {
+	packages := ctx.Hardware
 
-	targetPlatform := context[constants.CTX_TARGET_PLATFORM].(*types.Platform)
-	actualPlatform := context[constants.CTX_ACTUAL_PLATFORM].(*types.Platform)
-	targetBoard := context[constants.CTX_TARGET_BOARD].(*types.Board)
+	targetPlatform := ctx.TargetPlatform
+	actualPlatform := ctx.ActualPlatform
+	targetBoard := ctx.TargetBoard
 
 	buildProperties := make(props.PropertiesMap)
 	buildProperties.Merge(actualPlatform.Properties)
 	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(targetBoard.Properties)
 
-	if utils.MapHas(context, constants.CTX_BUILD_PATH) {
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH] = context[constants.CTX_BUILD_PATH].(string)
+	if ctx.BuildPath != "" {
+		buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH] = ctx.BuildPath
 	}
-	if utils.MapHas(context, constants.CTX_SKETCH) {
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_NAME] = filepath.Base(context[constants.CTX_SKETCH].(*types.Sketch).MainFile.Name)
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_PATH] = filepath.Dir(context[constants.CTX_SKETCH].(*types.Sketch).MainFile.Name)
+	if ctx.Sketch != nil {
+		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_NAME] = filepath.Base(ctx.Sketch.MainFile.Name)
+		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_PATH] = filepath.Dir(ctx.Sketch.MainFile.Name)
 	}
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.PlatformId)
 
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = context[constants.CTX_BUILD_CORE].(string)
+	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = ctx.BuildCore
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(targetPlatform.Folder, "..")
-	buildProperties[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION].(string)
-	buildProperties[constants.IDE_VERSION] = context[constants.CTX_BUILD_PROPERTIES_RUNTIME_IDE_VERSION].(string)
+	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ctx.ArduinoAPIVersion
+	buildProperties[constants.IDE_VERSION] = ctx.ArduinoAPIVersion
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS] = utils.PrettyOSName()
 
 	variant := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT]
@@ -87,7 +87,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] = filepath.Join(variantPlatform.Folder, constants.FOLDER_VARIANTS, variant)
 	}
 
-	tools := context[constants.CTX_TOOLS].([]*types.Tool)
+	tools := ctx.Tools
 	for _, tool := range tools {
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Version+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
@@ -97,8 +97,8 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 		buildProperties[constants.BUILD_PROPERTIES_SOFTWARE] = DEFAULT_SOFTWARE
 	}
 
-	if utils.MapHas(context, constants.CTX_SKETCH_LOCATION) {
-		sourcePath, err := filepath.Abs(context[constants.CTX_SKETCH_LOCATION].(string))
+	if ctx.SketchLocation != "" {
+		sourcePath, err := filepath.Abs(ctx.SketchLocation)
 		if err != nil {
 			return err
 		}
@@ -112,7 +112,7 @@ func (s *SetupBuildProperties) Run(context map[string]interface{}) error {
 	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = strconv.Itoa(utils.TimezoneOffset())
 	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = strconv.Itoa(utils.DaylightSavingsOffset(now))
 
-	context[constants.CTX_BUILD_PROPERTIES] = buildProperties
+	ctx.BuildProperties = buildProperties
 
 	return nil
 }

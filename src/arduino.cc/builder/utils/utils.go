@@ -35,12 +35,10 @@ import (
 	"arduino.cc/builder/i18n"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"reflect"
 	"runtime"
 	"strings"
 )
@@ -59,23 +57,6 @@ func KeysOfMapOfString(input map[string]string) []string {
 		keys = append(keys, key)
 	}
 	return keys
-}
-
-func KeysOfMapOfStringBool(input map[string]bool) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
-
-func MergeMapsOfStringBool(target map[string]bool, sources ...map[string]bool) map[string]bool {
-	for _, source := range sources {
-		for key, value := range source {
-			target[key] = value
-		}
-	}
-	return target
 }
 
 func PrettyOSName() string {
@@ -126,7 +107,7 @@ func ParseCommandLine(input string, logger i18n.Logger) ([]string, error) {
 	}
 
 	if escapingChar != constants.EMPTY_STRING {
-		return nil, ErrorfWithLogger(logger, constants.MSG_INVALID_QUOTING, escapingChar)
+		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_INVALID_QUOTING, escapingChar)
 	}
 
 	return parts, nil
@@ -137,7 +118,7 @@ type filterFiles func([]os.FileInfo) []os.FileInfo
 func ReadDirFiltered(folder string, fn filterFiles) ([]os.FileInfo, error) {
 	files, err := gohasissues.ReadDir(folder)
 	if err != nil {
-		return nil, WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	return fn(files), nil
 }
@@ -234,7 +215,7 @@ type argFilterFunc func(int, string, []string) bool
 func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger) (*exec.Cmd, error) {
 	parts, err := ParseCommandLine(pattern, logger)
 	if err != nil {
-		return nil, WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	command := parts[0]
 	parts = parts[1:]
@@ -256,33 +237,6 @@ func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
 	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger)
 }
 
-func WrapError(err error) error {
-	if err == nil {
-		return nil
-	}
-	return errors.Wrap(err, 0)
-}
-
-func Logger(context map[string]interface{}) i18n.Logger {
-	if MapHas(context, constants.CTX_LOGGER) {
-		return context[constants.CTX_LOGGER].(i18n.Logger)
-	}
-	return i18n.HumanLogger{}
-}
-
-func Errorf(context map[string]interface{}, format string, a ...interface{}) *errors.Error {
-	log := Logger(context)
-	return ErrorfWithLogger(log, format, a...)
-}
-
-func ErrorfWithLogger(log i18n.Logger, format string, a ...interface{}) *errors.Error {
-	if log.Name() == "machine" {
-		log.Fprintln(os.Stderr, constants.LOG_LEVEL_ERROR, format, a...)
-		return errors.Errorf(constants.EMPTY_STRING)
-	}
-	return errors.Errorf(i18n.Format(format, a...))
-}
-
 func MapHas(aMap map[string]interface{}, key string) bool {
 	_, ok := aMap[key]
 	return ok
@@ -291,13 +245,6 @@ func MapHas(aMap map[string]interface{}, key string) bool {
 func MapStringStringHas(aMap map[string]string, key string) bool {
 	_, ok := aMap[key]
 	return ok
-}
-
-func DebugLevel(context map[string]interface{}) int {
-	if MapHas(context, constants.CTX_DEBUG_LEVEL) && reflect.TypeOf(context[constants.CTX_DEBUG_LEVEL]).Kind() == reflect.Int {
-		return context[constants.CTX_DEBUG_LEVEL].(int)
-	}
-	return 0
 }
 
 func SliceToMapStringBool(keys []string, value bool) map[string]bool {
@@ -312,7 +259,7 @@ func AbsolutizePaths(files []string) ([]string, error) {
 	for idx, file := range files {
 		absFile, err := filepath.Abs(file)
 		if err != nil {
-			return nil, WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 		files[idx] = absFile
 	}
@@ -323,7 +270,7 @@ func AbsolutizePaths(files []string) ([]string, error) {
 func ReadFileToRows(file string) ([]string, error) {
 	bytes, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	txt := string(bytes)
 	txt = strings.Replace(txt, "\r\n", "\n", -1)
@@ -334,7 +281,7 @@ func ReadFileToRows(file string) ([]string, error) {
 func TheOnlySubfolderOf(folder string) (string, error) {
 	subfolders, err := ReadDirFiltered(folder, FilterDirs)
 	if err != nil {
-		return constants.EMPTY_STRING, WrapError(err)
+		return constants.EMPTY_STRING, i18n.WrapError(err)
 	}
 
 	if len(subfolders) != 1 {
@@ -390,15 +337,6 @@ func AppendIfNotPresent(target []string, elements ...string) []string {
 		}
 	}
 	return target
-}
-
-func AddStringsToStringsSet(accumulator []string, stringsToAdd []string) []string {
-	previousStringsSet := SliceToMapStringBool(accumulator, true)
-	stringsSetToAdd := SliceToMapStringBool(stringsToAdd, true)
-
-	newStringsSet := MergeMapsOfStringBool(previousStringsSet, stringsSetToAdd)
-
-	return KeysOfMapOfStringBool(newStringsSet)
 }
 
 func EnsureFolderExists(folder string) error {

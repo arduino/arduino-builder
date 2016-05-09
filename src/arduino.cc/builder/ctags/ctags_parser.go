@@ -32,13 +32,12 @@ package ctags
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
+	"bufio"
 	"os"
 	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
-	"bufio"
 )
 
 const KIND_PROTOTYPE = "prototype"
@@ -57,8 +56,8 @@ var KNOWN_TAG_KINDS = map[string]bool{
 
 type CTagsParser struct{}
 
-func (s *CTagsParser) Run(context map[string]interface{}) error {
-	rows := strings.Split(context[constants.CTX_CTAGS_OUTPUT].(string), "\n")
+func (s *CTagsParser) Run(ctx *types.Context) error {
+	rows := strings.Split(ctx.CTagsOutput, "\n")
 
 	rows = removeEmpty(rows)
 
@@ -67,14 +66,14 @@ func (s *CTagsParser) Run(context map[string]interface{}) error {
 		tags = append(tags, parseTag(row))
 	}
 
-	skipTagsWhere(tags, tagIsUnknown, context)
-	skipTagsWhere(tags, tagIsUnhandled, context)
+	skipTagsWhere(tags, tagIsUnknown, ctx)
+	skipTagsWhere(tags, tagIsUnhandled, ctx)
 	addPrototypes(tags)
-	removeDefinedProtypes(tags, context)
+	removeDefinedProtypes(tags, ctx)
 	removeDuplicate(tags)
-	skipTagsWhere(tags, prototypeAndCodeDontMatch, context)
+	skipTagsWhere(tags, prototypeAndCodeDontMatch, ctx)
 
-	context[constants.CTX_CTAGS_OF_PREPROC_SOURCE] = tags
+	ctx.CTagsOfPreprocessedSource = tags
 
 	return nil
 }
@@ -109,7 +108,7 @@ func addPrototype(tag *types.CTag) {
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
-func removeDefinedProtypes(tags []*types.CTag, context map[string]interface{}) {
+func removeDefinedProtypes(tags []*types.CTag, ctx *types.Context) {
 	definedPrototypes := make(map[string]bool)
 	for _, tag := range tags {
 		if tag.Kind == KIND_PROTOTYPE {
@@ -119,8 +118,8 @@ func removeDefinedProtypes(tags []*types.CTag, context map[string]interface{}) {
 
 	for _, tag := range tags {
 		if definedPrototypes[tag.Prototype] {
-			if utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
+			if ctx.DebugLevel >= 10 {
+				ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
 			}
 			tag.SkipMe = true
 		}
@@ -141,12 +140,12 @@ func removeDuplicate(tags []*types.CTag) {
 
 type skipFuncType func(tag *types.CTag) bool
 
-func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, context map[string]interface{}) {
+func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, ctx *types.Context) {
 	for _, tag := range tags {
 		if !tag.SkipMe {
 			skip := skipFunc(tag)
-			if skip && utils.DebugLevel(context) >= 10 {
-				utils.Logger(context).Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
+			if skip && ctx.DebugLevel >= 10 {
+				ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
 			}
 			tag.SkipMe = skip
 		}
@@ -172,12 +171,12 @@ func prototypeAndCodeDontMatch(tag *types.CTag) bool {
 
 			// skip lines until we get to the start of this tag
 			for scanner.Scan() && line < tag.Line {
-				line++;
+				line++
 			}
 
 			// read up to 10 lines in search of a closing paren
 			newcode := scanner.Text()
-			for scanner.Scan() && line < (tag.Line + 10) && strings.Index(newcode, ")") == -1 {
+			for scanner.Scan() && line < (tag.Line+10) && strings.Index(newcode, ")") == -1 {
 				newcode += scanner.Text()
 			}
 

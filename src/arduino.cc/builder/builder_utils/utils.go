@@ -45,18 +45,18 @@ import (
 func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles, err := CompileFiles(objectFiles, sourcePath, false, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	for _, folder := range folders {
 		objectFiles, err = CompileFilesRecursive(objectFiles, filepath.Join(sourcePath, folder.Name()), filepath.Join(buildPath, folder.Name()), buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 	}
 
@@ -66,15 +66,15 @@ func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath st
 func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles, err := compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	return objectFiles, nil
 }
@@ -82,7 +82,7 @@ func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPa
 func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties props.PropertiesMap, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	return compileFilesWithRecipe(objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 }
@@ -90,7 +90,7 @@ func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string
 func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]string, error) {
 	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFilesWithExtension(extension))
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 	var sources []string
 	for _, file := range files {
@@ -100,13 +100,13 @@ func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]str
 	if recurse {
 		folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 
 		for _, folder := range folders {
 			otherSources, err := findFilesInFolder(filepath.Join(sourcePath, folder.Name()), extension, recurse)
 			if err != nil {
-				return nil, utils.WrapError(err)
+				return nil, i18n.WrapError(err)
 			}
 			sources = append(sources, otherSources...)
 		}
@@ -119,7 +119,7 @@ func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []s
 	for _, source := range sources {
 		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 
 		objectFiles = append(objectFiles, objectFile)
@@ -134,24 +134,24 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source
 	relativeSource, err := filepath.Rel(sourcePath, source)
 	if err != nil {
-		return "", utils.WrapError(err)
+		return "", i18n.WrapError(err)
 	}
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = filepath.Join(buildPath, relativeSource+".o")
 
 	err = utils.EnsureFolderExists(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]))
 	if err != nil {
-		return "", utils.WrapError(err)
+		return "", i18n.WrapError(err)
 	}
 
 	objIsUpToDate, err := ObjFileIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
 	if err != nil {
-		return "", utils.WrapError(err)
+		return "", i18n.WrapError(err)
 	}
 
 	if !objIsUpToDate {
 		_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
 		if err != nil {
-			return "", utils.WrapError(err)
+			return "", i18n.WrapError(err)
 		}
 	} else if verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
@@ -167,7 +167,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 
 	sourceFileStat, err := os.Stat(sourceFile)
 	if err != nil {
-		return false, utils.WrapError(err)
+		return false, i18n.WrapError(err)
 	}
 
 	objectFileStat, err := os.Stat(objectFile)
@@ -175,7 +175,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 		if os.IsNotExist(err) {
 			return false, nil
 		} else {
-			return false, utils.WrapError(err)
+			return false, i18n.WrapError(err)
 		}
 	}
 
@@ -184,7 +184,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 		if os.IsNotExist(err) {
 			return false, nil
 		} else {
-			return false, utils.WrapError(err)
+			return false, i18n.WrapError(err)
 		}
 	}
 
@@ -197,7 +197,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 
 	rows, err := utils.ReadFileToRows(dependencyFile)
 	if err != nil {
-		return false, utils.WrapError(err)
+		return false, i18n.WrapError(err)
 	}
 
 	rows = utils.Map(rows, removeEndingBackSlash)
@@ -222,7 +222,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 	for _, row := range rows {
 		depStat, err := os.Stat(row)
 		if err != nil && !os.IsNotExist(err) {
-			return false, utils.WrapError(err)
+			// There is probably a parsing error of the dep file
+			// Ignore the error and trigger a full rebuild anyway
+			return false, nil
 		}
 		if os.IsNotExist(err) {
 			return false, nil
@@ -260,7 +262,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 	if _, err := os.Stat(archiveFilePath); err == nil {
 		err = os.Remove(archiveFilePath)
 		if err != nil {
-			return "", utils.WrapError(err)
+			return "", i18n.WrapError(err)
 		}
 	}
 
@@ -272,7 +274,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 
 		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, verbose, verbose, logger)
 		if err != nil {
-			return "", utils.WrapError(err)
+			return "", i18n.WrapError(err)
 		}
 	}
 
@@ -282,7 +284,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 func ExecRecipe(properties props.PropertiesMap, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
 	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	if echoOutput {
@@ -293,17 +295,17 @@ func ExecRecipe(properties props.PropertiesMap, recipe string, removeUnsetProper
 
 	if echoOutput {
 		err := command.Run()
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	bytes, err := command.Output()
-	return bytes, utils.WrapError(err)
+	return bytes, i18n.WrapError(err)
 }
 
 func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
 	pattern := properties[recipe]
 	if pattern == constants.EMPTY_STRING {
-		return nil, utils.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
+		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
 	}
 
 	var err error
@@ -311,13 +313,13 @@ func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, remo
 	if removeUnsetProperties {
 		commandLine, err = props.DeleteUnexpandedPropsFromString(commandLine)
 		if err != nil {
-			return nil, utils.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 	}
 
 	command, err := utils.PrepareCommand(commandLine, logger)
 	if err != nil {
-		return nil, utils.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	if echoCommandLine {
@@ -330,7 +332,7 @@ func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, remo
 func ExecRecipeCollectStdErr(properties props.PropertiesMap, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
 	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
 	if err != nil {
-		return "", utils.WrapError(err)
+		return "", i18n.WrapError(err)
 	}
 
 	buffer := &bytes.Buffer{}
