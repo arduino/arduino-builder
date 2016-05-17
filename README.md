@@ -67,7 +67,6 @@ Once done, run the following commands:
 go get github.com/go-errors/errors
 go get github.com/stretchr/testify
 go get github.com/jstemmer/go-junit-report
-go get golang.org/x/codereview/patch
 go build arduino.cc/arduino-builder
 ```
 
