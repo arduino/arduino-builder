@@ -34,6 +34,8 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 type CTagsTargetFileSaver struct {
@@ -50,6 +52,12 @@ func (s *CTagsTargetFileSaver) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
+	// drop every line which is not part of user sketch or a define/ifdef/endif/etc
+	var searchSlice []string
+	searchSlice = append(searchSlice, filepath.Dir(ctx.SketchLocation))
+	searchSlice = append(searchSlice, filepath.Dir(ctx.BuildPath))
+	source = saveLinesContainingDirectivesAndSketch(source, searchSlice)
+
 	ctagsTargetFilePath := filepath.Join(preprocPath, s.TargetFileName)
 	err = utils.WriteFile(ctagsTargetFilePath, source)
 	if err != nil {
@@ -59,4 +67,53 @@ func (s *CTagsTargetFileSaver) Run(ctx *types.Context) error {
 	ctx.CTagsTargetFile = ctagsTargetFilePath
 
 	return nil
+}
+
+func saveLinesContainingDirectivesAndSketch(src string, tofind []string) string {
+	lines := strings.Split(src, "\n")
+
+	saveLine := false
+	minimizedString := ""
+
+	for _, line := range lines {
+		if saveLine || startsWithHashtag(line) {
+			minimizedString += line + "\n"
+		}
+		if containsAny(line, tofind) && isLineMarker(line) {
+			saveLine = true
+		}
+		if saveLine && !containsAny(line, tofind) && isLineMarker(line) {
+			saveLine = false
+		}
+	}
+	return minimizedString
+}
+
+func containsAny(src string, tofind []string) bool {
+	for _, str := range tofind {
+		if strings.Contains(src, str) {
+			return true
+		}
+	}
+	return false
+}
+
+func startsWithHashtag(src string) bool {
+	trimmedStr := strings.TrimSpace(src)
+	if len(trimmedStr) > 0 && trimmedStr[0] == '#' {
+		return true
+	}
+	return false
+}
+
+func isLineMarker(src string) bool {
+	trimmedStr := strings.TrimSpace(src)
+	splittedStr := strings.Split(trimmedStr, " ")
+	if len(splittedStr) > 2 && splittedStr[0][0] == '#' {
+		_, err := strconv.Atoi(splittedStr[1])
+		if err == nil {
+			return true
+		}
+	}
+	return false
 }
