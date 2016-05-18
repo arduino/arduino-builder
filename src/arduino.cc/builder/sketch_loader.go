@@ -88,8 +88,21 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 func collectAllSketchFiles(from string) ([]string, error) {
 	filePaths := []string{}
-	extensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
-	err := utils.FindFilesInFolder(&filePaths, from, extensions, /* recurse */ true)
+	// Source files in the root are compiled, non-recursively. This
+	// is the only place where .ino files can be present.
+	rootExtensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
+	err := utils.FindFilesInFolder(&filePaths, from, rootExtensions, /* recurse */ false)
+	if err != nil {
+		return nil, i18n.WrapError(err)
+	}
+
+	// The "src/" subdirectory of a sketch is compiled recursively
+	// (but .ino files are *not* compiled)
+	srcPath := filepath.Join(from, constants.SKETCH_FOLDER_SRC)
+	if info, err := os.Stat(srcPath); err == nil && info.IsDir() {
+		srcExtensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
+		err = utils.FindFilesInFolder(&filePaths, srcPath, srcExtensions, /* recurse */ true)
+	}
 	return filePaths, i18n.WrapError(err)
 }
 

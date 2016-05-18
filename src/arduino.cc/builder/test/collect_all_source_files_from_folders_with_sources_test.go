@@ -60,7 +60,7 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 	require.Equal(t, 0, len(*foldersWithSources))
 	sort.Strings(*sourceFiles)
 
-	require.Equal(t, Abs(t, filepath.Join("sketch_with_config", "includes", "de bug.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("sketch_with_config", "src", "includes", "de bug.cpp")), sourceFiles.Pop())
 	require.Equal(t, 0, len(*sourceFiles))
 }
 
