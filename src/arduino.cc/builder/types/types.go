@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/props"
 	"path/filepath"
 	"strconv"
+	"os"
 )
 
 type SketchFile struct {
@@ -201,7 +202,9 @@ func LibraryToSourceFolder(library *Library) []SourceFolder {
 	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
 	if library.Layout == LIBRARY_FLAT {
 		utility := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
-		sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
+		if info, err := os.Stat(utility); err == nil && info.IsDir() {
+			sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
+		}
 	}
 	return sourceFolders
 }

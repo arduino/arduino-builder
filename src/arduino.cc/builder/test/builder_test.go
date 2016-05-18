@@ -373,3 +373,32 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge"))
 	NoError(t, err)
 }
+
+func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
+	}
+
+	var err error
+	ctx.BuildPath, err = filepath.Abs(filepath.Join("sketch1", "build"))
+	NoError(t, err)
+	defer os.RemoveAll(ctx.BuildPath)
+
+	command := builder.Builder{}
+	err = command.Run(ctx)
+	NoError(t, err)
+
+	// Run build twice, to verify the build still works when the
+	// build directory is present at the start
+	err = command.Run(ctx)
+	NoError(t, err)
+}

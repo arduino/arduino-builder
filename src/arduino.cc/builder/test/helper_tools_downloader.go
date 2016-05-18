@@ -38,7 +38,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-errors/errors"
-	"golang.org/x/codereview/patch"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -140,19 +139,26 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 }
 
 func patchFiles(t *testing.T) {
+	err := utils.EnsureFolderExists(PATCHES_FOLDER)
+	NoError(t, err)
 	files, err := ioutil.ReadDir(PATCHES_FOLDER)
 	NoError(t, err)
 
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".patch" {
-			data, err := ioutil.ReadFile(Abs(t, filepath.Join(PATCHES_FOLDER, file.Name())))
-			NoError(t, err)
-			patchSet, err := patch.Parse(data)
-			NoError(t, err)
-			operations, err := patchSet.Apply(ioutil.ReadFile)
-			for _, op := range operations {
-				utils.WriteFileBytes(op.Dst, op.Data)
-			}
+			panic("Patching for downloaded tools is not available! (see https://github.com/arduino/arduino-builder/issues/147)")
+			// XXX: find an alternative to x/codereview/patch
+			// https://github.com/arduino/arduino-builder/issues/147
+			/*
+				data, err := ioutil.ReadFile(Abs(t, filepath.Join(PATCHES_FOLDER, file.Name())))
+				NoError(t, err)
+				patchSet, err := patch.Parse(data)
+				NoError(t, err)
+				operations, err := patchSet.Apply(ioutil.ReadFile)
+				for _, op := range operations {
+					utils.WriteFileBytes(op.Dst, op.Data)
+				}
+			*/
 		}
 	}
 }

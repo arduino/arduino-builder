@@ -100,6 +100,11 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		actualPlatform = targetPlatform
 	}
 
+	if ctx.Verbose {
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.Folder)
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CORE, core, actualPlatform.Folder)
+	}
+
 	ctx.BuildCore = core
 	ctx.ActualPlatform = actualPlatform
 

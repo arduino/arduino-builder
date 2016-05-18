@@ -34,6 +34,9 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"arduino.cc/builder/constants"
+	"path/filepath"
+	"os"
 )
 
 type SketchBuilder struct{}
@@ -53,9 +56,18 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	}
 
 	var objectFiles []string
-	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, true, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, false, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
 		return i18n.WrapError(err)
+	}
+
+	// The "src/" subdirectory of a sketch is compiled recursively
+	sketchSrcPath := filepath.Join(sketchBuildPath, constants.SKETCH_FOLDER_SRC)
+	if info, err := os.Stat(sketchSrcPath); err == nil && info.IsDir() {
+		objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchSrcPath, true, sketchSrcPath, buildProperties, includes, verbose, warningsLevel, logger)
+		if err != nil {
+			return i18n.WrapError(err)
+		}
 	}
 
 	ctx.SketchObjectFiles = objectFiles

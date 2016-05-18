@@ -33,6 +33,7 @@ import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 	"crypto/md5"
 	"encoding/hex"
 	"io/ioutil"
@@ -304,30 +305,48 @@ func FilterOutFoldersByNames(folders []os.FileInfo, names ...string) []os.FileIn
 	return filtered
 }
 
-type CheckFilePathFunc func(filePath string) bool
+type CheckExtensionFunc func(ext string) bool
 
-func CollectAllReadableFiles(collector *[]string, test CheckFilePathFunc) filepath.WalkFunc {
-	walkFunc := func(currentPath string, info os.FileInfo, err error) error {
+func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
+	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
+		// Skip source control and hidden files and directories
+		if IsSCCSOrHiddenFile(info) {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		// Skip directories unless recurse is on, or this is the
+		// root directory
 		if info.IsDir() {
+			if recurse || path == folder {
+				return nil
+			} else {
+				return filepath.SkipDir
+			}
+		}
+
+		// Check (lowercased) extension against list of extensions
+		if extensions != nil && !extensions(strings.ToLower(filepath.Ext(path))) {
 			return nil
 		}
-		if !test(currentPath) {
-			return nil
-		}
-		currentFile, err := os.Open(currentPath)
+
+		// See if the file is readable by opening it
+		currentFile, err := os.Open(path)
 		if err != nil {
 			return nil
 		}
 		currentFile.Close()
 
-		*collector = append(*collector, currentPath)
+		*files = append(*files, path)
 		return nil
 	}
-	return walkFunc
+	return gohasissues.Walk(folder, walkFunc)
 }
 
 func AppendIfNotPresent(target []string, elements ...string) []string {
@@ -365,4 +384,26 @@ func NULLFile() string {
 func MD5Sum(data []byte) string {
 	md5sumBytes := md5.Sum(data)
 	return hex.EncodeToString(md5sumBytes[:])
+}
+
+type loggerAction struct {
+	onlyIfVerbose bool
+	level         string
+	format        string
+	args          []interface{}
+}
+
+func (l *loggerAction) Run(ctx *types.Context) error {
+	if !l.onlyIfVerbose || ctx.Verbose {
+		ctx.GetLogger().Println(l.level, l.format, l.args...)
+	}
+	return nil
+}
+
+func LogIfVerbose(level string, format string, args ...interface{}) types.Command {
+	return &loggerAction{true, level, format, args}
+}
+
+func LogThis(level string, format string, args ...interface{}) types.Command {
+	return &loggerAction{false, level, format, args}
 }

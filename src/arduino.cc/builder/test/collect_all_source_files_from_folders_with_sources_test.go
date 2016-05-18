@@ -60,7 +60,7 @@ func TestCollectAllSourceFilesFromFoldersWithSources(t *testing.T) {
 	require.Equal(t, 0, len(*foldersWithSources))
 	sort.Strings(*sourceFiles)
 
-	require.Equal(t, Abs(t, filepath.Join("sketch_with_config", "includes", "de bug.cpp")), sourceFiles.Pop())
+	require.Equal(t, Abs(t, filepath.Join("sketch_with_config", "src", "includes", "de bug.cpp")), sourceFiles.Pop())
 	require.Equal(t, 0, len(*sourceFiles))
 }
 
@@ -106,7 +106,6 @@ func TestCollectAllSourceFilesFromFoldersWithSourcesOfOldLibrary(t *testing.T) {
 	foldersWithSources := &types.UniqueSourceFolderQueue{}
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs")), Recurse: false})
 	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, filepath.Join("libraries", "ShouldNotRecurseWithOldLibs", "utility")), Recurse: false})
-	foldersWithSources.Push(types.SourceFolder{Folder: Abs(t, "non existent folder"), Recurse: false})
 	ctx.FoldersWithSourceFiles = foldersWithSources
 
 	commands := []types.Command{
