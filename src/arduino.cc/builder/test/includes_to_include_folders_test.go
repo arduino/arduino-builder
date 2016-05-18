@@ -73,10 +73,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["Bridge.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
@@ -112,9 +108,6 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 
 	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 0, len(importedLibraries))
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
 }
 
 func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
@@ -153,11 +146,6 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	require.Equal(t, 2, len(importedLibraries))
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
 	require.Equal(t, "IRremote", importedLibraries[1].Name)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["Bridge.h"].IsLibraryFromPlatform)
-	require.False(t, libraryResolutionResults["IRremote.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
@@ -196,11 +184,6 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	require.Equal(t, 2, len(importedLibraries))
 	require.Equal(t, "ANewLibrary-master", importedLibraries[0].Name)
 	require.Equal(t, "IRremote", importedLibraries[1].Name)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["anewlibrary.h"].IsLibraryFromPlatform)
-	require.False(t, libraryResolutionResults["IRremote.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
@@ -238,10 +221,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI")), importedLibraries[0].SrcFolder)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.True(t, libraryResolutionResults["SPI.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform(t *testing.T) {
@@ -280,10 +259,6 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("libraries", "SPI")), importedLibraries[0].SrcFolder)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["SPI.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
@@ -322,8 +297,4 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "USBHost", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("libraries", "USBHost", "src")), importedLibraries[0].SrcFolder)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["Usb.h"].IsLibraryFromPlatform)
 }

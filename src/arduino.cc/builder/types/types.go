@@ -174,7 +174,6 @@ type SourceFolder struct {
 
 type LibraryResolutionResult struct {
 	Library               *Library
-	IsLibraryFromPlatform bool
 	NotUsedLibraries      []*Library
 }
 
