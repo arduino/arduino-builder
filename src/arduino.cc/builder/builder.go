@@ -34,6 +34,7 @@ import (
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/phases"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"os"
 	"reflect"
 	"strconv"
@@ -81,25 +82,31 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ContainerMergeCopySketchFiles{},
 
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Detecting libraries used..."),
 		&ContainerFindIncludes{},
 
 		&WarnAboutArchIncompatibleLibraries{},
 
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Generating function prototypes..."),
 		&ContainerAddPrototypes{},
 
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling sketch..."),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.SketchBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling libraries..."),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&UnusedCompiledLibrariesRemover{},
 		&phases.LibrariesBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling core..."),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.CoreBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Linking everything together..."),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_PRELINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.Linker{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_POSTLINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
