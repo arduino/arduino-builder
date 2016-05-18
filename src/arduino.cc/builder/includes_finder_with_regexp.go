@@ -63,11 +63,13 @@ func (s *IncludesFinderWithRegExp) Run(ctx *types.Context) error {
 }
 
 func findIncludesForOldCompilers(source string) string {
-	firstLine := strings.Split(source, "\n")[0]
-	splittedLine := strings.Split(firstLine, ":")
-	for i, _ := range splittedLine {
-		if strings.Contains(splittedLine[i], "fatal error") {
-			return strings.TrimSpace(splittedLine[i+1])
+	lines := strings.Split(source, "\n")
+	for _, line := range lines {
+		splittedLine := strings.Split(line, ":")
+		for i, _ := range splittedLine {
+			if strings.Contains(splittedLine[i], "fatal error") {
+				return strings.TrimSpace(splittedLine[i+1])
+			}
 		}
 	}
 	return ""
