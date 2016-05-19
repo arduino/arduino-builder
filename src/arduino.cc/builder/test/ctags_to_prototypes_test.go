@@ -38,13 +38,6 @@ import (
 	"testing"
 )
 
-type CollectCtagsFromPreprocSource struct{}
-
-func (*CollectCtagsFromPreprocSource) Run(ctx *types.Context) error {
-	ctx.CTagsCollected = ctx.CTagsOfPreprocessedSource
-	return nil
-}
-
 func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 	ctx := &types.Context{}
 
@@ -55,7 +48,6 @@ func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -87,7 +79,6 @@ func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -117,7 +108,6 @@ func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -148,7 +138,6 @@ func TestCTagsToPrototypesShouldDealWithClasses(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -174,7 +163,6 @@ func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -204,7 +192,6 @@ func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -236,7 +223,6 @@ func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -264,7 +250,6 @@ func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -293,7 +278,6 @@ func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -322,7 +306,6 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -352,7 +335,6 @@ func TestCTagsToPrototypesNamespace(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -381,7 +363,6 @@ func TestCTagsToPrototypesStatic(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -412,7 +393,6 @@ func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -442,7 +422,6 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 
 	commands := []types.Command{
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 

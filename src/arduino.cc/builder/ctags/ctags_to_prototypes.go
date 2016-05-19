@@ -37,7 +37,7 @@ import (
 type CTagsToPrototypes struct{}
 
 func (s *CTagsToPrototypes) Run(ctx *types.Context) error {
-	tags := ctx.CTagsCollected
+	tags := ctx.CTagsOfPreprocessedSource
 
 	lineWhereToInsertPrototypes := findLineWhereToInsertPrototypes(tags)
 	if lineWhereToInsertPrototypes != -1 {
