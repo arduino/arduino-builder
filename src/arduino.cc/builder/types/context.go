@@ -65,7 +65,6 @@ type Context struct {
 	// C++ Parsing
 	CTagsOutput                 string
 	CTagsTargetFile             string
-	CTagsOfSource               []*CTag
 	CTagsOfPreprocessedSource   []*CTag
 	CTagsCollected              []*CTag
 	IncludeSection              string
