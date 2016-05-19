@@ -416,3 +416,47 @@ func QuoteCppString(str string) string {
 	str = strings.Replace(str, "\"", "\\\"", -1)
 	return "\"" + str + "\""
 }
+
+// Parse a C-preprocessor string as emitted by the preprocessor. This
+// is a string contained in double quotes, with any backslashes or
+// quotes escaped with a backslash. If a valid string was present at the
+// start of the given line, returns the unquoted string contents, the
+// remaineder of the line (everything after the closing "), and true.
+// Otherwise, returns the empty string, the entire line and false.
+func ParseCppString(line string) (string, string, bool) {
+	// For details about how these strings are output by gcc, see:
+	// https://github.com/gcc-mirror/gcc/blob/a588355ab948cf551bc9d2b89f18e5ae5140f52c/libcpp/macro.c#L491-L511
+	// Note that the documentaiton suggests all non-printable
+	// characters are also escaped, but the implementation does not
+	// actually do this. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51259
+	if len(line) < 1 || line[0] != '"' {
+		return "", line, false
+	}
+
+	i := 1
+	res := ""
+	for {
+		if i >= len(line) {
+			return "", line, false
+		}
+
+		switch (line[i]) {
+			// Backslash, next character is used unmodified
+			case '\\':
+				i++
+				if i >= len(line) {
+					return "", line, false
+				}
+				res += string(line[i])
+				break
+			// Quote, end of string
+			case '"':
+				return res, line[i+1:], true
+			default:
+				res += string(line[i])
+				break
+		}
+
+		i++
+	}
+}
