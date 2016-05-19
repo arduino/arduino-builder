@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 /* START CODE */
 
 struct A_NEW_TYPE {
@@ -9,13 +9,13 @@ struct A_NEW_TYPE {
   int c;
 } foo;
 
-#line 9 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 9 {{QuoteCppString .sketch.MainFile.Name}}
 void setup();
-#line 13 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 13 {{QuoteCppString .sketch.MainFile.Name}}
 void loop();
-#line 17 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 17 {{QuoteCppString .sketch.MainFile.Name}}
 void dostuff (A_NEW_TYPE * bar);
-#line 9 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 9 {{QuoteCppString .sketch.MainFile.Name}}
 void setup() {
 
 }
