@@ -32,6 +32,7 @@ package builder
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -87,7 +88,7 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 	str := joinPrototypes(prototypes)
 	str += "\n#line "
 	str += strconv.Itoa(line)
-	str += " \"" + prototypes[0].File + "\""
+	str += " " + utils.QuoteCppString(prototypes[0].File)
 	str += "\n"
 
 	return str
@@ -99,7 +100,7 @@ func joinPrototypes(prototypes []*types.Prototype) string {
 		if signatureContainsaDefaultArg(proto) {
 			continue
 		}
-		prototypesSlice = append(prototypesSlice, "#line "+strconv.Itoa(proto.Line)+" \""+proto.File+"\"")
+		prototypesSlice = append(prototypesSlice, "#line "+strconv.Itoa(proto.Line)+" "+utils.QuoteCppString(proto.File))
 		prototypeParts := []string{}
 		if proto.Modifiers != "" {
 			prototypeParts = append(prototypeParts, proto.Modifiers)

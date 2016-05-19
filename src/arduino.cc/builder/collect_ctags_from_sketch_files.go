@@ -32,7 +32,6 @@ package builder
 import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"strings"
 )
 
 type CollectCTagsFromSketchFiles struct{}
@@ -43,7 +42,7 @@ func (s *CollectCTagsFromSketchFiles) Run(ctx *types.Context) error {
 	allCtags := ctx.CTagsOfPreprocessedSource
 	ctagsOfSketch := []*types.CTag{}
 	for _, ctag := range allCtags {
-		if utils.SliceContains(sketchFileNames, strings.Replace(ctag.Filename, "\\\\", "\\", -1)) {
+		if utils.SliceContains(sketchFileNames, ctag.Filename) {
 			ctagsOfSketch = append(ctagsOfSketch, ctag)
 		}
 	}
