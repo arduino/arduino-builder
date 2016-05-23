@@ -148,3 +148,21 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
 }
+
+func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
+	ctx := &types.Context{}
+
+	output := "In file included from /tmp/arduino_modified_sketch_815412/binouts.ino:52:0:\n" +
+		"/tmp/arduino_build_static/sketch/regtable.h:31:22: fatal error: register.h: No such file or directory\n"
+
+	ctx.Source = output
+
+	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
+	err := parser.Run(ctx)
+	NoError(t, err)
+
+	includes := ctx.Includes
+	require.Equal(t, 1, len(includes))
+	sort.Strings(includes)
+	require.Equal(t, "register.h", includes[0])
+}
