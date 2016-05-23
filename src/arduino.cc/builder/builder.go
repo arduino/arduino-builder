@@ -123,7 +123,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 	mainErr := runCommands(ctx, commands, true)
 
 	commands = []types.Command{
-		&PrintUsedAndNotUsedLibraries{},
+		&PrintUsedAndNotUsedLibraries{ SketchError: mainErr != nil },
 
 		&PrintUsedLibrariesIfVerbose{},
 	}

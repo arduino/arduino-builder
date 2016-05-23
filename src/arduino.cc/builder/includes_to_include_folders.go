@@ -123,8 +123,6 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 
 	reverse(libraries)
 
-	librariesInPlatforms := librariesInSomePlatform(libraries, platforms)
-
 	var library *types.Library
 
 	for _, platform := range platforms {
@@ -149,8 +147,7 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 
 	library = useAlreadyImportedLibraryWithSameNameIfExists(library, markImportedLibrary)
 
-	isLibraryFromPlatform := findLibraryIn(librariesInPlatforms, library) != nil
-	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, IsLibraryFromPlatform: isLibraryFromPlatform, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
+	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
 
 	markImportedLibrary[library] = true
 }
@@ -160,17 +157,6 @@ func reverse(data []*types.Library) {
 	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
 		data[i], data[j] = data[j], data[i]
 	}
-}
-
-func librariesInSomePlatform(libraries []*types.Library, platforms []*types.Platform) []*types.Library {
-	librariesInPlatforms := []*types.Library{}
-	for _, platform := range platforms {
-		if platform != nil {
-			librariesWithinSpecifiedPlatform := librariesWithinPlatform(libraries, platform)
-			librariesInPlatforms = append(librariesInPlatforms, librariesWithinSpecifiedPlatform...)
-		}
-	}
-	return librariesInPlatforms
 }
 
 func markImportedLibraryContainsOneOfCandidates(markImportedLibrary map[*types.Library]bool, libraries []*types.Library) bool {

@@ -36,10 +36,20 @@ import (
 	"time"
 )
 
-type PrintUsedAndNotUsedLibraries struct{}
+type PrintUsedAndNotUsedLibraries struct {
+	// Was there an error while compiling the sketch?
+	SketchError bool
+}
 
 func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
-	if ctx.DebugLevel < 0 {
+	var logLevel string
+	// Print this message as warning when the sketch didn't compile,
+	// as info when we're verbose and not all otherwise
+	if s.SketchError {
+		logLevel = constants.LOG_LEVEL_WARN
+	} else if ctx.Verbose {
+		logLevel = constants.LOG_LEVEL_INFO
+	} else {
 		return nil
 	}
 
@@ -47,12 +57,10 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 
 	for header, libResResult := range libraryResolutionResults {
-		if !libResResult.IsLibraryFromPlatform {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
-			for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
-			}
+		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
+		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
+		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
+			logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
 		}
 	}
 
