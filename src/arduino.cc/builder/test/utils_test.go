@@ -87,3 +87,44 @@ func TestMapTrimSpace(t *testing.T) {
 	require.Equal(t, "how are", parts[2])
 	require.Equal(t, "you?", parts[3])
 }
+
+func TestQuoteCppString(t *testing.T) {
+	cases := map[string]string {
+		`foo`: `"foo"`,
+		`foo\bar`: `"foo\\bar"`,
+		`foo "is" quoted and \\bar"" escaped\`: `"foo \"is\" quoted and \\\\bar\"\" escaped\\"`,
+		// ASCII 0x20 - 0x7e, excluding `
+		` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~`: `" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~"`,
+	}
+	for input, expected := range cases {
+		require.Equal(t, expected, utils.QuoteCppString(input))
+	}
+}
+
+func TestParseCppString(t *testing.T) {
+	str, rest, ok := utils.ParseCppString(`foo`)
+	require.Equal(t, false, ok)
+
+	str, rest, ok = utils.ParseCppString(`"foo`)
+	require.Equal(t, false, ok)
+
+	str, rest, ok = utils.ParseCppString(`"foo"`)
+	require.Equal(t, true, ok)
+	require.Equal(t, `foo`, str)
+	require.Equal(t, ``, rest)
+
+	str, rest, ok = utils.ParseCppString(`"foo\\bar"`)
+	require.Equal(t, true, ok)
+	require.Equal(t, `foo\bar`, str)
+	require.Equal(t, ``, rest)
+
+	str, rest, ok = utils.ParseCppString(`"foo \"is\" quoted and \\\\bar\"\" escaped\\" and "then" some`)
+	require.Equal(t, true, ok)
+	require.Equal(t, `foo "is" quoted and \\bar"" escaped\`, str)
+	require.Equal(t, ` and "then" some`, rest)
+
+	str, rest, ok = utils.ParseCppString(`" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~"`,)
+	require.Equal(t, true, ok)
+	require.Equal(t, ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~`, str)
+	require.Equal(t, ``, rest)
+}

@@ -1,21 +1,21 @@
 #include <Arduino.h>
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 #if __SAM3X8E__
 void ifBranch() {
 }
 #else
-#line 5 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 5 {{QuoteCppString .sketch.MainFile.Name}}
 void elseBranch();
-#line 9 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 9 {{QuoteCppString .sketch.MainFile.Name}}
 void f1();
-#line 10 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 10 {{QuoteCppString .sketch.MainFile.Name}}
 void f2();
-#line 12 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 12 {{QuoteCppString .sketch.MainFile.Name}}
 void setup();
-#line 14 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 14 {{QuoteCppString .sketch.MainFile.Name}}
 void loop();
-#line 5 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 5 {{QuoteCppString .sketch.MainFile.Name}}
 void elseBranch() {
 }
 #endif

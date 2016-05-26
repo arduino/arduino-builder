@@ -33,22 +33,20 @@ package test
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"bytes"
 	"fmt"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"path/filepath"
-	"strings"
 	"testing"
 	"text/template"
 )
 
 func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
 	funcsMap := template.FuncMap{
-		"EscapeBackSlashes": func(s string) string {
-			return strings.Replace(s, "\\", "\\\\", -1)
-		},
+		"QuoteCppString": utils.QuoteCppString,
 	}
 
 	tpl, err := template.New(filepath.Base(filename)).Funcs(funcsMap).ParseFiles(filename)

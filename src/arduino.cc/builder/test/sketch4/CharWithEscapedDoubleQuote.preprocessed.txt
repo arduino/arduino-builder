@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 #include <SoftwareSerial.h> // required to send and receive AT commands from the GPRS Shield
 #include <Wire.h> // required for I2C communication with the RTC
 
@@ -39,49 +39,49 @@ Code Exclusively for GPRS shield:
 //  Default set of instructions for GPRS Shield power control
 //
 
-#line 39 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 39 {{QuoteCppString .sketch.MainFile.Name}}
 void setPowerStateTo( int newState );
-#line 64 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 64 {{QuoteCppString .sketch.MainFile.Name}}
 int getPowerState();
-#line 75 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 75 {{QuoteCppString .sketch.MainFile.Name}}
 void powerUpOrDown();
-#line 90 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 90 {{QuoteCppString .sketch.MainFile.Name}}
 void clearBufferArray();
-#line 96 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 96 {{QuoteCppString .sketch.MainFile.Name}}
 void makeMissedCall( char num[] );
-#line 111 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 111 {{QuoteCppString .sketch.MainFile.Name}}
 void sendTextMessage( char number[], char messg[] );
-#line 129 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 129 {{QuoteCppString .sketch.MainFile.Name}}
 void analise(byte incoming[], int length);
-#line 179 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 179 {{QuoteCppString .sketch.MainFile.Name}}
 byte decToBcd( byte b );
-#line 184 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 184 {{QuoteCppString .sketch.MainFile.Name}}
 boolean getBit( byte addr, int pos );
-#line 190 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 190 {{QuoteCppString .sketch.MainFile.Name}}
 void setBit( byte addr, int pos, boolean newBit );
-#line 204 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 204 {{QuoteCppString .sketch.MainFile.Name}}
 byte getByte( byte addr );
-#line 213 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 213 {{QuoteCppString .sketch.MainFile.Name}}
 boolean getBytes( byte addr, int amount );
-#line 230 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 230 {{QuoteCppString .sketch.MainFile.Name}}
 void setByte( byte addr, byte newByte );
-#line 235 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 235 {{QuoteCppString .sketch.MainFile.Name}}
 void setBytes( byte addr, byte newBytes[], int amount );
-#line 244 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 244 {{QuoteCppString .sketch.MainFile.Name}}
 void getTime();
-#line 260 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 260 {{QuoteCppString .sketch.MainFile.Name}}
 void setTime( byte newTime[ 7 ] );
-#line 267 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 267 {{QuoteCppString .sketch.MainFile.Name}}
 void getRTCTemperature();
-#line 277 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 277 {{QuoteCppString .sketch.MainFile.Name}}
 void gprsListen();
-#line 294 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 294 {{QuoteCppString .sketch.MainFile.Name}}
 void printTime();
-#line 317 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 317 {{QuoteCppString .sketch.MainFile.Name}}
 void setup();
-#line 334 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 334 {{QuoteCppString .sketch.MainFile.Name}}
 void loop();
-#line 39 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 39 {{QuoteCppString .sketch.MainFile.Name}}
 void setPowerStateTo( int newState )
 {
   if( newState != 1 && newState != 0 ) { // tests for an invalid state. In this case no change is made to powerstate
