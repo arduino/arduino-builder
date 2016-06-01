@@ -107,8 +107,9 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 		}
 	} else {
 		utilitySourcePath := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
-		_, utilitySourcePathErr := os.Stat(utilitySourcePath)
-		if utilitySourcePathErr == nil {
+		stat, err := os.Stat(utilitySourcePath)
+		haveUtilityDir := err == nil && stat.IsDir()
+		if haveUtilityDir {
 			includes = append(includes, utils.WrapWithHyphenI(utilitySourcePath))
 		}
 		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
@@ -116,7 +117,7 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 			return nil, i18n.WrapError(err)
 		}
 
-		if utilitySourcePathErr == nil {
+		if haveUtilityDir {
 			utilityBuildPath := filepath.Join(libraryBuildPath, constants.LIBRARY_FOLDER_UTILITY)
 			objectFiles, err = builder_utils.CompileFiles(objectFiles, utilitySourcePath, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 			if err != nil {
