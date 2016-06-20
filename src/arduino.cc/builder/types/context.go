@@ -66,7 +66,6 @@ type Context struct {
 	CTagsOutput                 string
 	CTagsTargetFile             string
 	CTagsOfPreprocessedSource   []*CTag
-	CTagsCollected              []*CTag
 	IncludeSection              string
 	LineOffset                  int
 	PrototypesSection           string
