@@ -32,9 +32,9 @@ package types
 import (
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/props"
+	"os"
 	"path/filepath"
 	"strconv"
-	"os"
 )
 
 type SketchFile struct {
@@ -174,8 +174,8 @@ type SourceFolder struct {
 }
 
 type LibraryResolutionResult struct {
-	Library               *Library
-	NotUsedLibraries      []*Library
+	Library          *Library
+	NotUsedLibraries []*Library
 }
 
 type CTag struct {

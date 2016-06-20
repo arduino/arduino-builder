@@ -31,12 +31,12 @@ package phases
 
 import (
 	"arduino.cc/builder/builder_utils"
+	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"arduino.cc/builder/constants"
-	"path/filepath"
 	"os"
+	"path/filepath"
 )
 
 type SketchBuilder struct{}

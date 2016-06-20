@@ -440,21 +440,21 @@ func ParseCppString(line string) (string, string, bool) {
 			return "", line, false
 		}
 
-		switch (line[i]) {
-			// Backslash, next character is used unmodified
-			case '\\':
-				i++
-				if i >= len(line) {
-					return "", line, false
-				}
-				res += string(line[i])
-				break
-			// Quote, end of string
-			case '"':
-				return res, line[i+1:], true
-			default:
-				res += string(line[i])
-				break
+		switch line[i] {
+		// Backslash, next character is used unmodified
+		case '\\':
+			i++
+			if i >= len(line) {
+				return "", line, false
+			}
+			res += string(line[i])
+			break
+		// Quote, end of string
+		case '"':
+			return res, line[i+1:], true
+		default:
+			res += string(line[i])
+			break
 		}
 
 		i++

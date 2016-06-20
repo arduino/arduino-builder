@@ -30,10 +30,11 @@
 package test
 
 import (
-	"arduino.cc/builder/utils"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"arduino.cc/builder/utils"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTime(t *testing.T) {

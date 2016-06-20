@@ -30,15 +30,16 @@
 package builder
 
 import (
+	"os"
+	"reflect"
+	"strconv"
+	"time"
+
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/phases"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"os"
-	"reflect"
-	"strconv"
-	"time"
 )
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
@@ -123,7 +124,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 	mainErr := runCommands(ctx, commands, true)
 
 	commands = []types.Command{
-		&PrintUsedAndNotUsedLibraries{ SketchError: mainErr != nil },
+		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
 
 		&PrintUsedLibrariesIfVerbose{},
 	}

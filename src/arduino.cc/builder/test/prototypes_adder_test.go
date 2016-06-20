@@ -82,7 +82,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "#include <Arduino.h>\n#line 1 " + quotedSketchLocation + "\n", ctx.IncludeSection)
+	require.Equal(t, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n", ctx.IncludeSection)
 	require.Equal(t, "#line 33 "+quotedSketchLocation+"\nvoid setup();\n#line 46 "+quotedSketchLocation+"\nvoid loop();\n#line 62 "+quotedSketchLocation+"\nvoid process(BridgeClient client);\n#line 82 "+quotedSketchLocation+"\nvoid digitalCommand(BridgeClient client);\n#line 109 "+quotedSketchLocation+"\nvoid analogCommand(BridgeClient client);\n#line 149 "+quotedSketchLocation+"\nvoid modeCommand(BridgeClient client);\n#line 33 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 }
 

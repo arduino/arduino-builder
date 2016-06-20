@@ -89,8 +89,8 @@ func TestMapTrimSpace(t *testing.T) {
 }
 
 func TestQuoteCppString(t *testing.T) {
-	cases := map[string]string {
-		`foo`: `"foo"`,
+	cases := map[string]string{
+		`foo`:     `"foo"`,
 		`foo\bar`: `"foo\\bar"`,
 		`foo "is" quoted and \\bar"" escaped\`: `"foo \"is\" quoted and \\\\bar\"\" escaped\\"`,
 		// ASCII 0x20 - 0x7e, excluding `
@@ -123,7 +123,7 @@ func TestParseCppString(t *testing.T) {
 	require.Equal(t, `foo "is" quoted and \\bar"" escaped\`, str)
 	require.Equal(t, ` and "then" some`, rest)
 
-	str, rest, ok = utils.ParseCppString(`" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~"`,)
+	str, rest, ok = utils.ParseCppString(`" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~"`)
 	require.Equal(t, true, ok)
 	require.Equal(t, ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~`, str)
 	require.Equal(t, ``, rest)
