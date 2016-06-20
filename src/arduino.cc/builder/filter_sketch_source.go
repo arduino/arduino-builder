@@ -30,19 +30,19 @@
 package builder
 
 import (
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
+	"bufio"
 	"strconv"
 	"strings"
+
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 )
 
 type FilterSketchSource struct {
-	Source         *string
+	Source *string
 }
 
 func (s *FilterSketchSource) Run(ctx *types.Context) error {
-	lines := strings.Split(*s.Source, "\n")
-
 	fileNames := []string{ctx.Sketch.MainFile.Name}
 	for _, file := range ctx.Sketch.OtherSketchFiles {
 		fileNames = append(fileNames, file.Name)
@@ -51,7 +51,9 @@ func (s *FilterSketchSource) Run(ctx *types.Context) error {
 	inSketch := false
 	filtered := ""
 
-	for _, line := range lines {
+	scanner := bufio.NewScanner(strings.NewReader(*s.Source))
+	for scanner.Scan() {
+		line := scanner.Text()
 		filename := parseLineMarker(line)
 		if filename != "" {
 			inSketch = utils.SliceContains(fileNames, filename)
@@ -96,4 +98,3 @@ func parseLineMarker(line string) string {
 	}
 	return ""
 }
-
