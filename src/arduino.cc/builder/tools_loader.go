@@ -111,9 +111,9 @@ func collectAllToolsFolders(from string) ([]string, error) {
 	return folders, i18n.WrapError(err)
 }
 
-func toolsSliceContains(tools *[]*types.Tool, name, version string) bool {
+func toolsSliceContains(tools *[]*types.Tool, name, version string, platform string) bool {
 	for _, tool := range *tools {
-		if name == tool.Name && version == tool.Version {
+		if name == tool.Name && version == tool.Version && platform == tool.PlatformId {
 			return true
 		}
 	}
@@ -137,7 +137,7 @@ func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) er
 			rowParts := strings.Split(row, "=")
 			toolName := strings.Split(rowParts[0], ".")[1]
 			toolVersion := rowParts[1]
-			if !toolsSliceContains(tools, toolName, toolVersion) {
+			if !toolsSliceContains(tools, toolName, toolVersion, constants.EMPTY_STRING) {
 				*tools = append(*tools, &types.Tool{Name: toolName, Version: toolVersion, Folder: folder})
 			}
 		}
@@ -175,13 +175,14 @@ func loadToolsFromFolderStructure(tools *[]*types.Tool, folder string) error {
 		if err != nil {
 			return i18n.WrapError(err)
 		}
+		_, toolPlatform := filepath.Split(filepath.Join(folder, ".."))
 		for _, toolVersion := range toolVersions {
 			toolFolder, err := filepath.Abs(filepath.Join(folder, toolName.Name(), toolVersion.Name()))
 			if err != nil {
 				return i18n.WrapError(err)
 			}
-			if !toolsSliceContains(tools, toolName.Name(), toolVersion.Name()) {
-				*tools = append(*tools, &types.Tool{Name: toolName.Name(), Version: toolVersion.Name(), Folder: toolFolder})
+			if !toolsSliceContains(tools, toolName.Name(), toolVersion.Name(), toolPlatform) {
+				*tools = append(*tools, &types.Tool{Name: toolName.Name(), Version: toolVersion.Name(), Folder: toolFolder, PlatformId: toolPlatform})
 			}
 		}
 	}

@@ -143,6 +143,30 @@ func (aMap PropertiesMap) SubTree(key string) PropertiesMap {
 	return aMap.FirstLevelOf()[key]
 }
 
+func (aMap PropertiesMap) ExpandPropsInStringWithSpecifier(str string, _package string) string {
+	replaced := true
+	for i := 0; i < 10 && replaced; i++ {
+		replaced = false
+		for key, _ := range aMap {
+			// runtime path keys MAY be expressed as subkey.vendor.arch.path
+			// try this before the standard substitution
+			if strings.Contains(key, constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX) &&
+				strings.Contains(key, constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX) {
+
+				specifiedKey := strings.Replace(key, constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX, "", -1)
+				specifiedKey = strings.Replace(specifiedKey, constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX, "", -1)
+				specifiedKey = constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX +
+					specifiedKey + "." + _package + constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX
+
+				newStr := strings.Replace(str, "{"+key+"}", aMap[specifiedKey], -1)
+				replaced = replaced || str != newStr
+				str = newStr
+			}
+		}
+	}
+	return str
+}
+
 func (aMap PropertiesMap) ExpandPropsInString(str string) string {
 	replaced := true
 	for i := 0; i < 10 && replaced; i++ {
