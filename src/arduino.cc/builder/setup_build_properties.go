@@ -47,6 +47,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	targetPlatform := ctx.TargetPlatform
 	actualPlatform := ctx.ActualPlatform
+	targetPackage := ctx.TargetPackage
 	targetBoard := ctx.TargetBoard
 
 	buildProperties := make(props.PropertiesMap)
@@ -67,6 +68,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(targetPlatform.Folder, "..")
+	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE] = targetPackage.PackageId
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ctx.ArduinoAPIVersion
 	buildProperties[constants.IDE_VERSION] = ctx.ArduinoAPIVersion
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS] = utils.PrettyOSName()
@@ -90,6 +92,8 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	for _, tool := range tools {
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Version+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
+		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"."+tool.PlatformId+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
+		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Version+"."+tool.PlatformId+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
 	}
 
 	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_SOFTWARE) {

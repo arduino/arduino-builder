@@ -309,7 +309,10 @@ func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, remo
 	}
 
 	var err error
-	commandLine := properties.ExpandPropsInString(pattern)
+	// 1st pass with platform specifiers
+	commandLine := properties.ExpandPropsInStringWithSpecifier(pattern, properties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE])
+	// 2nd pass, raw
+	commandLine = properties.ExpandPropsInString(commandLine)
 	if removeUnsetProperties {
 		commandLine, err = props.DeleteUnexpandedPropsFromString(commandLine)
 		if err != nil {

@@ -88,9 +88,10 @@ type Board struct {
 }
 
 type Tool struct {
-	Name    string
-	Version string
-	Folder  string
+	Name       string
+	Version    string
+	Folder     string
+	PlatformId string
 }
 
 type LibraryLayout uint16
