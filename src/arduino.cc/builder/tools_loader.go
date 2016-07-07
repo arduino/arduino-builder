@@ -137,7 +137,7 @@ func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) er
 			rowParts := strings.Split(row, "=")
 			toolName := strings.Split(rowParts[0], ".")[1]
 			toolVersion := rowParts[1]
-			if !toolsSliceContains(tools, toolName, toolVersion, constants.EMPTY_STRING) {
+			if !toolsSliceContains(tools, toolName, toolVersion, constants.ARDUINO_STRING) {
 				*tools = append(*tools, &types.Tool{Name: toolName, Version: toolVersion, Folder: folder})
 			}
 		}
