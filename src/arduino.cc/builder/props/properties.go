@@ -49,6 +49,8 @@ func init() {
 	switch value := runtime.GOOS; value {
 	case "linux":
 		OSNAME = runtime.GOOS
+	case "freebsd":
+		OSNAME = runtime.GOOS
 	case "windows":
 		OSNAME = runtime.GOOS
 	case "darwin":
