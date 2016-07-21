@@ -45,24 +45,21 @@ type IncludesFinderWithRegExp struct {
 func (s *IncludesFinderWithRegExp) Run(ctx *types.Context) error {
 	source := *s.Source
 
-	matches := INCLUDE_REGEXP.FindAllStringSubmatch(source, -1)
-	includes := []string{}
-	for _, match := range matches {
-		includes = append(includes, strings.TrimSpace(match[1]))
-	}
-	if len(includes) == 0 {
-		include := findIncludesForOldCompilers(source)
-		if include != "" {
-			includes = append(includes, include)
-		}
+	match := INCLUDE_REGEXP.FindStringSubmatch(source)
+	if match != nil {
+		ctx.IncludeJustFound = strings.TrimSpace(match[1])
+	} else {
+		ctx.IncludeJustFound = findIncludeForOldCompilers(source)
 	}
 
-	ctx.IncludesJustFound = includes
-	ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, includes...)
+	if ctx.IncludeJustFound != "" {
+		ctx.Includes = utils.AppendIfNotPresent(ctx.Includes, ctx.IncludeJustFound)
+	}
+
 	return nil
 }
 
-func findIncludesForOldCompilers(source string) string {
+func findIncludeForOldCompilers(source string) string {
 	lines := strings.Split(source, "\n")
 	for _, line := range lines {
 		splittedLine := strings.Split(line, ":")
