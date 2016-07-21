@@ -53,6 +53,7 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 	includes := ctx.Includes
 	require.Equal(t, 1, len(includes))
 	require.Equal(t, "SPI.h", includes[0])
+	require.Equal(t, "SPI.h", ctx.IncludeJustFound)
 }
 
 func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
@@ -68,6 +69,7 @@ func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 
 	includes := ctx.Includes
 	require.Equal(t, 0, len(includes))
+	require.Equal(t, "", ctx.IncludeJustFound)
 }
 
 func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
@@ -91,6 +93,7 @@ func TestIncludesFinderWithRegExpPreviousIncludes(t *testing.T) {
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
 	require.Equal(t, "test.h", includes[1])
+	require.Equal(t, "SPI.h", ctx.IncludeJustFound)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
@@ -110,6 +113,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
+	require.Equal(t, "Wire.h", ctx.IncludeJustFound)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
@@ -129,6 +133,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "Wire.h", includes[0])
+	require.Equal(t, "Wire.h", ctx.IncludeJustFound)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
@@ -147,6 +152,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "SPI.h", includes[0])
+	require.Equal(t, "SPI.h", ctx.IncludeJustFound)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
@@ -165,4 +171,5 @@ func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
 	require.Equal(t, 1, len(includes))
 	sort.Strings(includes)
 	require.Equal(t, "register.h", includes[0])
+	require.Equal(t, "register.h", ctx.IncludeJustFound)
 }
