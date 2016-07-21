@@ -42,7 +42,6 @@ type IncludesToIncludeFolders struct{}
 
 func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 	include := ctx.IncludeJustFound
-	includes := []string{include}
 	includeFolders := ctx.IncludeFolders
 	headerToLibraries := ctx.HeaderToLibraries
 
@@ -55,19 +54,19 @@ func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 		return nil;
 	}
 
-	newlyImportedLibraries := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
+	newlyImportedLibrary := resolveLibrary(include, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
+	if newlyImportedLibrary == nil {
+		return nil;
+	}
+
 	foldersWithSources := ctx.FoldersWithSourceFiles
 
-	for _, newlyImportedLibrary := range newlyImportedLibraries {
-		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
-			importedLibraries = append(importedLibraries, newlyImportedLibrary)
-			sourceFolders := types.LibraryToSourceFolder(newlyImportedLibrary)
-			for _, sourceFolder := range sourceFolders {
-				foldersWithSources.Push(sourceFolder)
-			}
-			includeFolders = append(includeFolders, newlyImportedLibrary.SrcFolder)
-		}
+	importedLibraries = append(importedLibraries, newlyImportedLibrary)
+	sourceFolders := types.LibraryToSourceFolder(newlyImportedLibrary)
+	for _, sourceFolder := range sourceFolders {
+		foldersWithSources.Push(sourceFolder)
 	}
+	includeFolders = append(includeFolders, newlyImportedLibrary.SrcFolder)
 
 	ctx.ImportedLibraries = importedLibraries
 	ctx.IncludeFolders = includeFolders
@@ -75,23 +74,12 @@ func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 	return nil
 }
 
-func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) []*types.Library {
+func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) *types.Library {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, library := range importedLibraries {
 		markImportedLibrary[library] = true
 	}
-	var newlyImportedLibraries []*types.Library
-	for _, header := range includes {
-		library := resolveLibrary(header, headerToLibraries, markImportedLibrary, platforms, libraryResolutionResults)
-		if library != nil {
-			newlyImportedLibraries = append(newlyImportedLibraries, library)
-		}
-	}
 
-	return newlyImportedLibraries
-}
-
-func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) *types.Library {
 	libraries := append([]*types.Library{}, headerToLibraries[header]...)
 
 	if libraries == nil || len(libraries) == 0 {
