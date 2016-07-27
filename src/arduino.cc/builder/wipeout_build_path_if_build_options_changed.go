@@ -30,14 +30,15 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/gohasissues"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/properties"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
@@ -50,8 +51,8 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 	logger := ctx.GetLogger()
 
-	var opts props.PropertiesMap
-	var prevOpts props.PropertiesMap
+	var opts properties.Map
+	var prevOpts properties.Map
 	json.Unmarshal([]byte(buildOptionsJson), &opts)
 	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
 

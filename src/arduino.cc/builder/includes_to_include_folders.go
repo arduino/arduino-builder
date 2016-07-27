@@ -30,13 +30,14 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
 type IncludesToIncludeFolders struct{}
@@ -73,7 +74,7 @@ func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 	return nil
 }
 
-func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties props.PropertiesMap, verbose bool) []string {
+func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties properties.Map, verbose bool) []string {
 	var includeFolders []string
 	includeFolders = append(includeFolders, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
 	if buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {

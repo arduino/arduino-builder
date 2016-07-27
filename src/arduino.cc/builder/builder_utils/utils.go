@@ -30,19 +30,20 @@
 package builder_utils
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/utils"
 	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
-func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles, err := CompileFiles(objectFiles, sourcePath, false, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -63,7 +64,7 @@ func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath st
 	return objectFiles, nil
 }
 
-func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles, err := compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -79,7 +80,7 @@ func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPa
 	return objectFiles, nil
 }
 
-func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties props.PropertiesMap, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -115,7 +116,7 @@ func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]str
 	return sources, nil
 }
 
-func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties props.PropertiesMap, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	for _, source := range sources {
 		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 		if err != nil {
@@ -127,7 +128,7 @@ func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []s
 	return objectFiles, nil
 }
 
-func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties props.PropertiesMap, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
+func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
 	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
@@ -257,7 +258,7 @@ func nonEmptyString(s string) bool {
 	return s != constants.EMPTY_STRING
 }
 
-func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties props.PropertiesMap, verbose bool, logger i18n.Logger) (string, error) {
+func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {
 	archiveFilePath := filepath.Join(buildPath, archiveFile)
 	if _, err := os.Stat(archiveFilePath); err == nil {
 		err = os.Remove(archiveFilePath)
@@ -281,7 +282,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(properties props.PropertiesMap, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
+func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
 	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -302,16 +303,16 @@ func ExecRecipe(properties props.PropertiesMap, recipe string, removeUnsetProper
 	return bytes, i18n.WrapError(err)
 }
 
-func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
-	pattern := properties[recipe]
+func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
+	pattern := buildProperties[recipe]
 	if pattern == constants.EMPTY_STRING {
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
 	}
 
 	var err error
-	commandLine := properties.ExpandPropsInString(pattern)
+	commandLine := buildProperties.ExpandPropsInString(pattern)
 	if removeUnsetProperties {
-		commandLine, err = props.DeleteUnexpandedPropsFromString(commandLine)
+		commandLine, err = properties.DeleteUnexpandedPropsFromString(commandLine)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -329,8 +330,8 @@ func PrepareCommandForRecipe(properties props.PropertiesMap, recipe string, remo
 	return command, nil
 }
 
-func ExecRecipeCollectStdErr(properties props.PropertiesMap, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
-	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
+	command, err := PrepareCommandForRecipe(buildProperties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}
@@ -341,6 +342,6 @@ func ExecRecipeCollectStdErr(properties props.PropertiesMap, recipe string, remo
 	return string(buffer.Bytes()), nil
 }
 
-func RemoveHyphenMDDFlagFromGCCCommandLine(properties props.PropertiesMap) {
-	properties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(properties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
+func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
+	buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
 }

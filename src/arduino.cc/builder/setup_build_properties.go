@@ -30,14 +30,15 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
 type SetupBuildProperties struct{}
@@ -49,7 +50,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	actualPlatform := ctx.ActualPlatform
 	targetBoard := ctx.TargetBoard
 
-	buildProperties := make(props.PropertiesMap)
+	buildProperties := make(properties.Map)
 	buildProperties.Merge(actualPlatform.Properties)
 	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(targetBoard.Properties)

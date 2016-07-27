@@ -30,11 +30,12 @@
 package types
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/properties"
 )
 
 type SketchFile struct {
@@ -63,13 +64,13 @@ type Sketch struct {
 }
 
 type Packages struct {
-	Properties props.PropertiesMap
+	Properties properties.Map
 	Packages   map[string]*Package
 }
 
 type Package struct {
 	PackageId  string
-	Properties props.PropertiesMap
+	Properties properties.Map
 	Platforms  map[string]*Platform
 }
 
@@ -78,13 +79,13 @@ type Platform struct {
 	Folder       string
 	DefaultBoard *Board
 	Boards       map[string]*Board
-	Properties   props.PropertiesMap
-	Programmers  map[string]props.PropertiesMap
+	Properties   properties.Map
+	Programmers  map[string]properties.Map
 }
 
 type Board struct {
 	BoardId    string
-	Properties props.PropertiesMap
+	Properties properties.Map
 }
 
 type Tool struct {

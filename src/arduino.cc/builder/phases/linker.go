@@ -30,14 +30,15 @@
 package phases
 
 import (
+	"path/filepath"
+	"strings"
+
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"path/filepath"
-	"strings"
+	"arduino.cc/properties"
 )
 
 type Linker struct{}
@@ -72,7 +73,7 @@ func (s *Linker) Run(ctx *types.Context) error {
 	return nil
 }
 
-func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties props.PropertiesMap, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	objectFiles = utils.Map(objectFiles, wrapWithDoubleQuotes)
@@ -93,7 +94,7 @@ func wrapWithDoubleQuotes(value string) string {
 	return "\"" + value + "\""
 }
 
-func addRelaxTrickIfATMEGA2560(buildProperties props.PropertiesMap) string {
+func addRelaxTrickIfATMEGA2560(buildProperties properties.Map) string {
 	if buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU] == "atmega2560" {
 		return ",--relax"
 	}

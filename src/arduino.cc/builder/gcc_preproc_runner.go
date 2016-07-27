@@ -30,14 +30,15 @@
 package builder
 
 import (
+	"path/filepath"
+	"strings"
+
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"path/filepath"
-	"strings"
+	"arduino.cc/properties"
 )
 
 type GCCPreprocRunner struct {
@@ -98,7 +99,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string) (props.PropertiesMap, string, error) {
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string) (properties.Map, string, error) {
 	if targetFilePath != utils.NULLFile() {
 		preprocPath := ctx.PreprocPath
 		err := utils.EnsureFolderExists(preprocPath)

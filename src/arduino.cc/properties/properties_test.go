@@ -1,6 +1,8 @@
 /*
  * This file is part of Arduino Builder.
  *
+ * Copyright 2016 Arduino LLC (http://www.arduino.cc/)
+ *
  * Arduino Builder is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,57 +25,54 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package test
+package properties
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"github.com/stretchr/testify/require"
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"arduino.cc/builder/i18n"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPropertiesBoardsTxt(t *testing.T) {
-	properties, err := props.Load(filepath.Join("props", "boards.txt"), i18n.HumanLogger{})
+	p, err := Load(filepath.Join("testdata", "boards.txt"), i18n.HumanLogger{})
 
-	NoError(t, err)
+	require.NoError(t, err)
 
-	require.Equal(t, "Processor", properties["menu.cpu"])
-	require.Equal(t, "32256", properties["ethernet.upload.maximum_size"])
-	require.Equal(t, "{build.usb_flags}", properties["robotMotor.build.extra_flags"])
+	require.Equal(t, "Processor", p["menu.cpu"])
+	require.Equal(t, "32256", p["ethernet.upload.maximum_size"])
+	require.Equal(t, "{build.usb_flags}", p["robotMotor.build.extra_flags"])
 
-	ethernet := properties.SubTree("ethernet")
-	require.Equal(t, "Arduino Ethernet", ethernet[constants.LIBRARY_NAME])
+	ethernet := p.SubTree("ethernet")
+	require.Equal(t, "Arduino Ethernet", ethernet["name"])
 }
 
 func TestPropertiesTestTxt(t *testing.T) {
-	properties, err := props.Load(filepath.Join("props", "test.txt"), i18n.HumanLogger{})
+	p, err := Load(filepath.Join("testdata", "test.txt"), i18n.HumanLogger{})
 
-	NoError(t, err)
+	require.NoError(t, err)
 
-	require.Equal(t, 4, len(properties))
-	require.Equal(t, "value = 1", properties["key"])
+	require.Equal(t, 4, len(p))
+	require.Equal(t, "value = 1", p["key"])
 
 	switch value := runtime.GOOS; value {
 	case "linux":
-		require.Equal(t, "is linux", properties["which.os"])
+		require.Equal(t, "is linux", p["which.os"])
 	case "windows":
-		require.Equal(t, "is windows", properties["which.os"])
+		require.Equal(t, "is windows", p["which.os"])
 	case "darwin":
-		require.Equal(t, "is macosx", properties["which.os"])
+		require.Equal(t, "is macosx", p["which.os"])
 	default:
 		require.FailNow(t, "unsupported OS")
 	}
 }
 
 func TestExpandPropsInString(t *testing.T) {
-	aMap := make(props.PropertiesMap)
+	aMap := make(Map)
 	aMap["key1"] = "42"
 	aMap["key2"] = "{key1}"
 
@@ -84,57 +83,57 @@ func TestExpandPropsInString(t *testing.T) {
 }
 
 func TestExpandPropsInString2(t *testing.T) {
-	aMap := make(props.PropertiesMap)
-	aMap["key2"] = "{key2}"
-	aMap["key1"] = "42"
+	p := make(Map)
+	p["key2"] = "{key2}"
+	p["key1"] = "42"
 
 	str := "{key1} == {key2} == true"
 
-	str = aMap.ExpandPropsInString(str)
+	str = p.ExpandPropsInString(str)
 	require.Equal(t, "42 == {key2} == true", str)
 }
 
 func TestDeleteUnexpandedPropsFromString(t *testing.T) {
-	aMap := make(props.PropertiesMap)
-	aMap["key1"] = "42"
-	aMap["key2"] = "{key1}"
+	p := make(Map)
+	p["key1"] = "42"
+	p["key2"] = "{key1}"
 
 	str := "{key1} == {key2} == {key3} == true"
 
-	str = aMap.ExpandPropsInString(str)
-	str, err := props.DeleteUnexpandedPropsFromString(str)
-	NoError(t, err)
+	str = p.ExpandPropsInString(str)
+	str, err := DeleteUnexpandedPropsFromString(str)
+	require.NoError(t, err)
 	require.Equal(t, "42 == 42 ==  == true", str)
 }
 
 func TestDeleteUnexpandedPropsFromString2(t *testing.T) {
-	aMap := make(props.PropertiesMap)
-	aMap["key2"] = "42"
+	p := make(Map)
+	p["key2"] = "42"
 
 	str := "{key1} == {key2} == {key3} == true"
 
-	str = aMap.ExpandPropsInString(str)
-	str, err := props.DeleteUnexpandedPropsFromString(str)
-	NoError(t, err)
+	str = p.ExpandPropsInString(str)
+	str, err := DeleteUnexpandedPropsFromString(str)
+	require.NoError(t, err)
 	require.Equal(t, " == 42 ==  == true", str)
 }
 
 func TestPropertiesRedBeearLabBoardsTxt(t *testing.T) {
-	properties, err := props.Load(filepath.Join("props", "redbearlab_boards.txt"), i18n.HumanLogger{})
+	p, err := Load(filepath.Join("testdata", "redbearlab_boards.txt"), i18n.HumanLogger{})
 
-	NoError(t, err)
+	require.NoError(t, err)
 
-	require.Equal(t, 83, len(properties))
-	require.Equal(t, "Blend", properties["blend.name"])
-	require.Equal(t, "arduino:arduino", properties["blend.build.core"])
-	require.Equal(t, "0x2404", properties["blendmicro16.pid.0"])
+	require.Equal(t, 83, len(p))
+	require.Equal(t, "Blend", p["blend.name"])
+	require.Equal(t, "arduino:arduino", p["blend.build.core"])
+	require.Equal(t, "0x2404", p["blendmicro16.pid.0"])
 
-	ethernet := properties.SubTree("blend")
-	require.Equal(t, "arduino:arduino", ethernet[constants.BUILD_PROPERTIES_BUILD_CORE])
+	ethernet := p.SubTree("blend")
+	require.Equal(t, "arduino:arduino", ethernet["build.core"])
 }
 
 func TestPropertiesBroken(t *testing.T) {
-	_, err := props.Load(filepath.Join("props", "broken.txt"), i18n.HumanLogger{})
+	_, err := Load(filepath.Join("testdata", "broken.txt"), i18n.HumanLogger{})
 
 	require.Error(t, err)
 }

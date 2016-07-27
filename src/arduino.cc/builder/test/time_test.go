@@ -41,15 +41,13 @@ func TestTime(t *testing.T) {
 	loc, err := time.LoadLocation("CET")
 	NoError(t, err)
 
-	firstJanuary2015 := time.Date(2015, 1, 1, 0, 0, 0, 0, loc)
-	require.Equal(t, int64(1420066800), firstJanuary2015.Unix())
-	require.Equal(t, int64(1420066800+3600), utils.LocalUnix(firstJanuary2015))
-	require.Equal(t, 3600, utils.TimezoneOffset())
-	require.Equal(t, 0, utils.DaylightSavingsOffset(firstJanuary2015))
+	firstJanuary2015CET := time.Date(2015, 1, 1, 0, 0, 0, 0, loc)
+	require.Equal(t, int64(1420066800), firstJanuary2015CET.Unix())
+	require.Equal(t, int64(1420066800+3600), utils.LocalUnix(firstJanuary2015CET))
+	require.Equal(t, 0, utils.DaylightSavingsOffset(firstJanuary2015CET))
 
-	thisFall := time.Date(2015, 9, 23, 0, 0, 0, 0, loc)
-	require.Equal(t, int64(1442959200), thisFall.Unix())
-	require.Equal(t, int64(1442959200+3600+3600), utils.LocalUnix(thisFall))
-	require.Equal(t, 3600, utils.TimezoneOffset())
-	require.Equal(t, 3600, utils.DaylightSavingsOffset(thisFall))
+	fall2015CET := time.Date(2015, 9, 23, 0, 0, 0, 0, loc)
+	require.Equal(t, int64(1442959200), fall2015CET.Unix())
+	require.Equal(t, int64(1442959200+3600+3600), utils.LocalUnix(fall2015CET))
+	require.Equal(t, 3600, utils.DaylightSavingsOffset(fall2015CET))
 }

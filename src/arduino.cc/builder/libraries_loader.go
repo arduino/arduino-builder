@@ -30,14 +30,15 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
 type LibrariesLoader struct{}
@@ -113,18 +114,18 @@ func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*typ
 }
 
 func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*types.Library, error) {
-	properties, err := props.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES), logger)
+	libProperties, err := properties.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES), logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	if properties[constants.LIBRARY_MAINTAINER] == constants.EMPTY_STRING && properties[constants.LIBRARY_EMAIL] != constants.EMPTY_STRING {
-		properties[constants.LIBRARY_MAINTAINER] = properties[constants.LIBRARY_EMAIL]
+	if libProperties[constants.LIBRARY_MAINTAINER] == constants.EMPTY_STRING && libProperties[constants.LIBRARY_EMAIL] != constants.EMPTY_STRING {
+		libProperties[constants.LIBRARY_MAINTAINER] = libProperties[constants.LIBRARY_EMAIL]
 	}
 
 	for _, propName := range LIBRARY_NOT_SO_MANDATORY_PROPERTIES {
-		if properties[propName] == constants.EMPTY_STRING {
-			properties[propName] = "-"
+		if libProperties[propName] == constants.EMPTY_STRING {
+			libProperties[propName] = "-"
 		}
 	}
 
@@ -146,43 +147,43 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		for _, subFolder := range subFolders {
 			if utils.IsSCCSOrHiddenFile(subFolder) {
 				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
-					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), properties[constants.LIBRARY_NAME])
+					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), libProperties[constants.LIBRARY_NAME])
 				}
 			}
 		}
 	}
 
-	if properties[constants.LIBRARY_ARCHITECTURES] == constants.EMPTY_STRING {
-		properties[constants.LIBRARY_ARCHITECTURES] = constants.LIBRARY_ALL_ARCHS
+	if libProperties[constants.LIBRARY_ARCHITECTURES] == constants.EMPTY_STRING {
+		libProperties[constants.LIBRARY_ARCHITECTURES] = constants.LIBRARY_ALL_ARCHS
 	}
 	library.Archs = []string{}
-	for _, arch := range strings.Split(properties[constants.LIBRARY_ARCHITECTURES], ",") {
+	for _, arch := range strings.Split(libProperties[constants.LIBRARY_ARCHITECTURES], ",") {
 		library.Archs = append(library.Archs, strings.TrimSpace(arch))
 	}
 
-	properties[constants.LIBRARY_CATEGORY] = strings.TrimSpace(properties[constants.LIBRARY_CATEGORY])
-	if !LIBRARY_CATEGORIES[properties[constants.LIBRARY_CATEGORY]] {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_LIB_INVALID_CATEGORY, properties[constants.LIBRARY_CATEGORY], properties[constants.LIBRARY_NAME], constants.LIB_CATEGORY_UNCATEGORIZED)
-		properties[constants.LIBRARY_CATEGORY] = constants.LIB_CATEGORY_UNCATEGORIZED
+	libProperties[constants.LIBRARY_CATEGORY] = strings.TrimSpace(libProperties[constants.LIBRARY_CATEGORY])
+	if !LIBRARY_CATEGORIES[libProperties[constants.LIBRARY_CATEGORY]] {
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_LIB_INVALID_CATEGORY, libProperties[constants.LIBRARY_CATEGORY], libProperties[constants.LIBRARY_NAME], constants.LIB_CATEGORY_UNCATEGORIZED)
+		libProperties[constants.LIBRARY_CATEGORY] = constants.LIB_CATEGORY_UNCATEGORIZED
 	}
-	library.Category = properties[constants.LIBRARY_CATEGORY]
+	library.Category = libProperties[constants.LIBRARY_CATEGORY]
 
-	if properties[constants.LIBRARY_LICENSE] == constants.EMPTY_STRING {
-		properties[constants.LIBRARY_LICENSE] = constants.LIB_LICENSE_UNSPECIFIED
+	if libProperties[constants.LIBRARY_LICENSE] == constants.EMPTY_STRING {
+		libProperties[constants.LIBRARY_LICENSE] = constants.LIB_LICENSE_UNSPECIFIED
 	}
-	library.License = properties[constants.LIBRARY_LICENSE]
+	library.License = libProperties[constants.LIBRARY_LICENSE]
 
 	library.Folder = libraryFolder
 	library.Name = filepath.Base(libraryFolder)
-	library.Version = strings.TrimSpace(properties[constants.LIBRARY_VERSION])
-	library.Author = strings.TrimSpace(properties[constants.LIBRARY_AUTHOR])
-	library.Maintainer = strings.TrimSpace(properties[constants.LIBRARY_MAINTAINER])
-	library.Sentence = strings.TrimSpace(properties[constants.LIBRARY_SENTENCE])
-	library.Paragraph = strings.TrimSpace(properties[constants.LIBRARY_PARAGRAPH])
-	library.URL = strings.TrimSpace(properties[constants.LIBRARY_URL])
+	library.Version = strings.TrimSpace(libProperties[constants.LIBRARY_VERSION])
+	library.Author = strings.TrimSpace(libProperties[constants.LIBRARY_AUTHOR])
+	library.Maintainer = strings.TrimSpace(libProperties[constants.LIBRARY_MAINTAINER])
+	library.Sentence = strings.TrimSpace(libProperties[constants.LIBRARY_SENTENCE])
+	library.Paragraph = strings.TrimSpace(libProperties[constants.LIBRARY_PARAGRAPH])
+	library.URL = strings.TrimSpace(libProperties[constants.LIBRARY_URL])
 	library.IsLegacy = false
-	library.DotALinkage = strings.TrimSpace(properties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
-	library.Properties = properties
+	library.DotALinkage = strings.TrimSpace(libProperties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
+	library.Properties = libProperties
 
 	return library, nil
 }

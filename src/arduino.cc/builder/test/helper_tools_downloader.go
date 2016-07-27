@@ -30,14 +30,8 @@
 package test
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/gohasissues"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/utils"
 	"encoding/json"
 	"fmt"
-	"github.com/go-errors/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -47,6 +41,13 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
+	"github.com/go-errors/errors"
 )
 
 const HARDWARE_FOLDER = "downloaded_hardware"
@@ -378,7 +379,7 @@ func coreAlreadyDownloadedAndUnpacked(targetPath string, core Core) (bool, error
 	if os.IsNotExist(err) {
 		return false, nil
 	}
-	platform, err := props.Load(filepath.Join(corePath, "platform.txt"), i18n.HumanLogger{})
+	platform, err := properties.Load(filepath.Join(corePath, "platform.txt"), i18n.HumanLogger{})
 	if err != nil {
 		return false, i18n.WrapError(err)
 	}
@@ -434,7 +435,7 @@ func libraryAlreadyDownloadedAndUnpacked(targetPath string, library Library) boo
 		return false
 	}
 
-	libProps, err := props.Load(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1), "library.properties"), i18n.HumanLogger{})
+	libProps, err := properties.Load(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1), "library.properties"), i18n.HumanLogger{})
 	if err != nil {
 		return false
 	}

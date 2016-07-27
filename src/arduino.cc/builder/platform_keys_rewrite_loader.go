@@ -30,16 +30,17 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
 type PlatformKeysRewriteLoader struct{}
@@ -59,7 +60,7 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 	platformKeysRewrite := types.PlatforKeysRewrite{}
 	platformKeysRewrite.Rewrites = []types.PlatforKeyRewrite{}
 
-	txt, err := props.Load(platformKeysRewriteTxtPath, logger)
+	txt, err := properties.Load(platformKeysRewriteTxtPath, logger)
 	keys := utils.KeysOfMapOfString(txt)
 	sort.Strings(keys)
 

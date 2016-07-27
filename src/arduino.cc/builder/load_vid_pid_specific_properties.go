@@ -30,12 +30,13 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
 	"strconv"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/properties"
 )
 
 type LoadVIDPIDSpecificProperties struct{}
@@ -66,7 +67,7 @@ func (s *LoadVIDPIDSpecificProperties) Run(ctx *types.Context) error {
 	return nil
 }
 
-func findVIDPIDIndex(buildProperties props.PropertiesMap, vid, pid string) (int, error) {
+func findVIDPIDIndex(buildProperties properties.Map, vid, pid string) (int, error) {
 	for key, value := range buildProperties.SubTree(constants.BUILD_PROPERTIES_VID) {
 		if !strings.Contains(key, ".") {
 			if vid == strings.ToLower(value) && pid == strings.ToLower(buildProperties[constants.BUILD_PROPERTIES_PID+"."+key]) {

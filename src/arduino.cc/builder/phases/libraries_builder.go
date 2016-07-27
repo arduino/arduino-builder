@@ -30,14 +30,15 @@
 package phases
 
 import (
+	"os"
+	"path/filepath"
+
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"os"
-	"path/filepath"
+	"arduino.cc/properties"
 )
 
 type LibrariesBuilder struct{}
@@ -67,7 +68,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileLibraries(libraries []*types.Library, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibraries(libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles := []string{}
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
@@ -81,7 +82,7 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 
 }
 
-func compileLibrary(library *types.Library, buildPath string, buildProperties props.PropertiesMap, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibrary(library *types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	if verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
 	}

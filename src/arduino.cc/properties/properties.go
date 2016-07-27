@@ -1,6 +1,8 @@
 /*
  * This file is part of Arduino Builder.
  *
+ * Copyright 2016 Arduino LLC (http://www.arduino.cc/)
+ *
  * Arduino Builder is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,25 +25,25 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package props
+package properties
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"github.com/go-errors/errors"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+
+	"github.com/go-errors/errors"
 )
 
-type PropertiesMap map[string]string
+type Map map[string]string
 
 var OSNAME string
 
@@ -58,7 +60,7 @@ func init() {
 	}
 }
 
-func Load(filepath string, logger i18n.Logger) (PropertiesMap, error) {
+func Load(filepath string, logger i18n.Logger) (Map, error) {
 	bytes, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, err
@@ -68,7 +70,7 @@ func Load(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	text = strings.Replace(text, "\r\n", "\n", -1)
 	text = strings.Replace(text, "\r", "\n", -1)
 
-	properties := make(PropertiesMap)
+	properties := make(Map)
 
 	for _, line := range strings.Split(text, "\n") {
 		err := properties.loadSingleLine(line)
@@ -80,8 +82,8 @@ func Load(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	return properties, nil
 }
 
-func LoadFromSlice(lines []string, logger i18n.Logger) (PropertiesMap, error) {
-	properties := make(PropertiesMap)
+func LoadFromSlice(lines []string, logger i18n.Logger) (Map, error) {
+	properties := make(Map)
 
 	for _, line := range lines {
 		err := properties.loadSingleLine(line)
@@ -93,7 +95,7 @@ func LoadFromSlice(lines []string, logger i18n.Logger) (PropertiesMap, error) {
 	return properties, nil
 }
 
-func (properties PropertiesMap) loadSingleLine(line string) error {
+func (properties Map) loadSingleLine(line string) error {
 	line = strings.TrimSpace(line)
 
 	if len(line) > 0 && line[0] != '#' {
@@ -111,10 +113,10 @@ func (properties PropertiesMap) loadSingleLine(line string) error {
 	return nil
 }
 
-func SafeLoad(filepath string, logger i18n.Logger) (PropertiesMap, error) {
+func SafeLoad(filepath string, logger i18n.Logger) (Map, error) {
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		return make(PropertiesMap), nil
+		return make(Map), nil
 	}
 
 	properties, err := Load(filepath, logger)
@@ -124,26 +126,26 @@ func SafeLoad(filepath string, logger i18n.Logger) (PropertiesMap, error) {
 	return properties, nil
 }
 
-func (aMap PropertiesMap) FirstLevelOf() map[string]PropertiesMap {
-	newMap := make(map[string]PropertiesMap)
+func (aMap Map) FirstLevelOf() map[string]Map {
+	newMap := make(map[string]Map)
 	for key, value := range aMap {
 		if strings.Index(key, ".") == -1 {
 			continue
 		}
 		keyParts := strings.SplitN(key, ".", 2)
 		if newMap[keyParts[0]] == nil {
-			newMap[keyParts[0]] = make(PropertiesMap)
+			newMap[keyParts[0]] = make(Map)
 		}
 		newMap[keyParts[0]][keyParts[1]] = value
 	}
 	return newMap
 }
 
-func (aMap PropertiesMap) SubTree(key string) PropertiesMap {
+func (aMap Map) SubTree(key string) Map {
 	return aMap.FirstLevelOf()[key]
 }
 
-func (aMap PropertiesMap) ExpandPropsInString(str string) string {
+func (aMap Map) ExpandPropsInString(str string) string {
 	replaced := true
 	for i := 0; i < 10 && replaced; i++ {
 		replaced = false
@@ -156,7 +158,7 @@ func (aMap PropertiesMap) ExpandPropsInString(str string) string {
 	return str
 }
 
-func (target PropertiesMap) Merge(sources ...PropertiesMap) PropertiesMap {
+func (target Map) Merge(sources ...Map) Map {
 	for _, source := range sources {
 		for key, value := range source {
 			target[key] = value
@@ -165,17 +167,17 @@ func (target PropertiesMap) Merge(sources ...PropertiesMap) PropertiesMap {
 	return target
 }
 
-func (aMap PropertiesMap) Clone() PropertiesMap {
-	newMap := make(PropertiesMap)
+func (aMap Map) Clone() Map {
+	newMap := make(Map)
 	newMap.Merge(aMap)
 	return newMap
 }
 
-func (aMap PropertiesMap) Equals(anotherMap PropertiesMap) bool {
+func (aMap Map) Equals(anotherMap Map) bool {
 	return reflect.DeepEqual(aMap, anotherMap)
 }
 
-func MergeMapsOfProperties(target map[string]PropertiesMap, sources ...map[string]PropertiesMap) map[string]PropertiesMap {
+func MergeMapsOfProperties(target map[string]Map, sources ...map[string]Map) map[string]Map {
 	for _, source := range sources {
 		for key, value := range source {
 			target[key] = value

@@ -31,8 +31,8 @@ package builder
 
 import (
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
+	"arduino.cc/properties"
 )
 
 type SetCustomBuildProperties struct{}
@@ -40,7 +40,7 @@ type SetCustomBuildProperties struct{}
 func (s *SetCustomBuildProperties) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 	buildProperties := ctx.BuildProperties
-	customBuildProperties, err := props.LoadFromSlice(ctx.CustomBuildProperties, logger)
+	customBuildProperties, err := properties.LoadFromSlice(ctx.CustomBuildProperties, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
