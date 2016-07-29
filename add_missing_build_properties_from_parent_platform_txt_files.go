@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-builder/json_package_index"
 	"github.com/arduino/arduino-builder/types"
 )
 
@@ -45,6 +46,30 @@ func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(ctx *types.Con
 	newBuildProperties.Merge(buildProperties)
 
 	ctx.BuildProperties = newBuildProperties
+
+	return nil
+}
+
+type OverridePropertiesWithJsonInfo struct{}
+
+func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
+
+	if ctx.JsonFolders != nil {
+
+		jsonProperties, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.JsonFolders)
+
+		if err != nil {
+			// doesn't matter, log the broken package in verbose mode
+		}
+
+		newBuildProperties := jsonProperties[ctx.TargetPackage.PackageId+":"+ctx.TargetPlatform.PlatformId+":"+ctx.TargetPlatform.Properties["version"]]
+
+		buildProperties := ctx.BuildProperties.Clone()
+
+		buildProperties.Merge(newBuildProperties)
+
+		ctx.BuildProperties = buildProperties
+	}
 
 	return nil
 }

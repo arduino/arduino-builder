@@ -52,6 +52,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		&LoadVIDPIDSpecificProperties{},
 		&SetCustomBuildProperties{},
 		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
+		&OverridePropertiesWithJsonInfo{},
 	}
 
 	for _, command := range commands {
