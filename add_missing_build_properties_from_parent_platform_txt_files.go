@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/json_package_index"
 	"github.com/arduino/arduino-builder/types"
 )
@@ -67,6 +68,13 @@ func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
 		buildProperties := ctx.BuildProperties.Clone()
 
 		buildProperties.Merge(newBuildProperties)
+
+		// HACK!!! To overcome AVR core 1.6.12 lto problems, replace avr-gcc-4.8.1-arduino5 with
+		// 4.9.2-atmel3.5.3-arduino2 if it exists
+		if buildProperties[constants.HACK_PROPERTIES_AVR_GCC_NEW] != "" {
+			buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD] =
+				"{" + constants.HACK_PROPERTIES_AVR_GCC_NEW + "}"
+		}
 
 		ctx.BuildProperties = buildProperties
 	}
