@@ -13,7 +13,7 @@ install:
 
 script:
   - go build -v arduino.cc/arduino-builder
-  - go test -v -timeout 30m -covermode=count -coverprofile=coverage.out arduino.cc/builder/test
+  - go test -v -timeout 30m -covermode=count -coverprofile=coverage.out arduino.cc/...
   - bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 env:
