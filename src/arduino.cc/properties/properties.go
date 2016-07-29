@@ -43,18 +43,19 @@ import (
 	"github.com/go-errors/errors"
 )
 
+// Map is a properties container
 type Map map[string]string
 
-var OSNAME string
+var osSuffix string
 
 func init() {
 	switch value := runtime.GOOS; value {
 	case "linux":
-		OSNAME = runtime.GOOS
+		osSuffix = runtime.GOOS
 	case "windows":
-		OSNAME = runtime.GOOS
+		osSuffix = runtime.GOOS
 	case "darwin":
-		OSNAME = "macosx"
+		osSuffix = "macosx"
 	default:
 		panic("Unsupported OS")
 	}
@@ -106,7 +107,7 @@ func (properties Map) loadSingleLine(line string) error {
 		key := strings.TrimSpace(lineParts[0])
 		value := strings.TrimSpace(lineParts[1])
 
-		key = strings.Replace(key, "."+OSNAME, constants.EMPTY_STRING, 1)
+		key = strings.Replace(key, "."+osSuffix, constants.EMPTY_STRING, 1)
 		properties[key] = value
 	}
 

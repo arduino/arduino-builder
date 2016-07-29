@@ -1,0 +1,15 @@
+language: go
+
+go:
+  - 1.6.3
+
+install:
+  - export GOPATH=`pwd`:$GOPATH
+  - go get github.com/go-errors/errors
+  - go get github.com/stretchr/testify
+  - go get github.com/jstemmer/go-junit-report
+
+script:
+  - go build -v arduino.cc/arduino-builder
+  - go test -v -timeout 30m arduino.cc/builder/test
+
