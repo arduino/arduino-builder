@@ -10,10 +10,13 @@ install:
   - go get github.com/jstemmer/go-junit-report
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
+  - go get github.com/wadey/gocovmerge
 
 script:
   - go build -v arduino.cc/arduino-builder
-  - go test -v -timeout 30m -covermode=count -coverprofile=coverage.out arduino.cc/...
+  - export TEST_PACKAGES=`go list arduino.cc/...`
+  - I=0; for PKG in $TEST_PACKAGES; do go test -v -timeout 30m -covermode=count -coverprofile=coverage.$I.out $PKG; ((I++)); done
+  - bin/gocovmerge coverage.*.out > coverage.out
   - bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 env:
