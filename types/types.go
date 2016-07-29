@@ -153,6 +153,7 @@ type Tool struct {
 	Name    string
 	Version string
 	Folder  string
+	Vendor  string
 }
 
 type LibraryLayout uint16

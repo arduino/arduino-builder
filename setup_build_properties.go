@@ -93,6 +93,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	for _, tool := range tools {
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
 		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Version+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
+		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Vendor+"-"+tool.Version+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
 	}
 
 	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_SOFTWARE) {
