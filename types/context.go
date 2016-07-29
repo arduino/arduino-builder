@@ -15,6 +15,7 @@ type Context struct {
 	LibrariesFolders        []string
 	BuiltInLibrariesFolders []string
 	OtherLibrariesFolders   []string
+	JsonFolders             []string
 	SketchLocation          string
 	ArduinoAPIVersion       string
 	FQBN                    string
