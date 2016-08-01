@@ -85,8 +85,7 @@ func runCommand(ctx *types.Context, command types.Command) error {
 func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 	targetFilePath := utils.NULLFile()
 	importedLibraries := ctx.ImportedLibraries
-	done := false
-	for !done {
+	for {
 		commands := []types.Command{
 			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFilePath: targetFilePath},
 			&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
@@ -99,12 +98,14 @@ func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 			}
 		}
 		if ctx.IncludeJustFound == "" {
-			done = true
-		} else if len(ctx.ImportedLibraries) == len(importedLibraries) {
+			// No missing includes found, we're done
+			return nil
+		}
+
+		if len(ctx.ImportedLibraries) == len(importedLibraries) {
 			err := runCommand(ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return i18n.WrapError(err)
 		}
 		importedLibraries = ctx.ImportedLibraries
 	}
-	return nil
 }
