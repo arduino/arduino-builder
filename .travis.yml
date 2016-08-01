@@ -12,6 +12,7 @@ install:
   - go get github.com/wadey/gocovmerge
   - go get github.com/arduino/go-properties-map
   - go get github.com/arduino/go-timeutils
+  - go get github.com/blang/semver
 
 script:
   - go build -o $HOME/arduino-builder -v github.com/arduino/arduino-builder/arduino-builder
