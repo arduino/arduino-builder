@@ -37,6 +37,7 @@ import (
 	"path/filepath"
 	"sort"
 	"testing"
+	"fmt"
 )
 
 func TestIncludesToIncludeFolders(t *testing.T) {
@@ -298,3 +299,44 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	require.Equal(t, "USBHost", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("libraries", "USBHost", "src")), importedLibraries[0].SrcFolder)
 }
+
+func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"),
+		FQBN:                    "arduino:avr:leonardo",
+		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
+	}
+
+	buildPath := SetupBuildPath(t, ctx)
+	defer os.RemoveAll(buildPath)
+
+	commands := []types.Command{
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(ctx)
+		NoError(t, err)
+	}
+
+	importedLibraries := ctx.ImportedLibraries
+	sort.Sort(ByLibraryName(importedLibraries))
+	fmt.Println(importedLibraries)
+	require.Equal(t, 3, len(importedLibraries))
+	require.Equal(t, "testlib1", importedLibraries[0].Name)
+	require.Equal(t, "testlib2", importedLibraries[1].Name)
+	require.Equal(t, "testlib3", importedLibraries[2].Name)
+}
+
