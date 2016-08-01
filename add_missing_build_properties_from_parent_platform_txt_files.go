@@ -77,6 +77,11 @@ func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
 		if ctx.TargetBoard.Properties["build.core"] == "arduino:arduino" && buildProperties[constants.HACK_PROPERTIES_AVR_GCC_NEW] != "" {
 			buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD] =
 				"{" + constants.HACK_PROPERTIES_AVR_GCC_NEW + "}"
+			// if base runtime property is fully specified it needs to be replaced
+			if !strings.HasPrefix(buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD_2], "{") {
+				buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD_2] =
+					"{" + constants.HACK_PROPERTIES_AVR_GCC_NEW + "}"
+			}
 		}
 
 		ctx.BuildProperties = buildProperties
