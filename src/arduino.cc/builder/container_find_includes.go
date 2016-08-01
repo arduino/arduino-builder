@@ -30,11 +30,13 @@
 package builder
 
 import (
+	"os"
+	"path/filepath"
+
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"path/filepath"
 )
 
 type ContainerFindIncludes struct{}
@@ -53,7 +55,11 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	}
 
 	foldersWithSources := ctx.FoldersWithSourceFiles
-	foldersWithSources.Push(types.SourceFolder{Folder: ctx.SketchBuildPath, Recurse: true})
+	foldersWithSources.Push(types.SourceFolder{Folder: ctx.SketchBuildPath, Recurse: false})
+	srcSubfolderPath := filepath.Join(ctx.SketchBuildPath, constants.SKETCH_FOLDER_SRC)
+	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
+		foldersWithSources.Push(types.SourceFolder{Folder: srcSubfolderPath, Recurse: true})
+	}
 	if len(ctx.ImportedLibraries) > 0 {
 		for _, library := range ctx.ImportedLibraries {
 			sourceFolders := types.LibraryToSourceFolder(library)
