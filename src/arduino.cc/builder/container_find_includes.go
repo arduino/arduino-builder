@@ -84,12 +84,10 @@ func runCommand(ctx *types.Context, command types.Command) error {
 
 func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 	targetFilePath := utils.NULLFile()
-	importedLibraries := ctx.ImportedLibraries
 	for {
 		commands := []types.Command{
 			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFilePath: targetFilePath},
 			&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
-			&IncludesToIncludeFolders{},
 		}
 		for _, command := range commands {
 			err := runCommand(ctx, command)
@@ -102,10 +100,21 @@ func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 			return nil
 		}
 
-		if len(ctx.ImportedLibraries) == len(importedLibraries) {
+		library := ResolveLibrary(ctx, ctx.IncludeJustFound)
+		if library == nil {
+			// Library could not be resolved, show error
 			err := runCommand(ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return i18n.WrapError(err)
 		}
-		importedLibraries = ctx.ImportedLibraries
+
+		// Add this library to the list of libraries, the
+		// include path and queue its source files for further
+		// include scanning
+		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
+		ctx.IncludeFolders = append(ctx.IncludeFolders, library.SrcFolder)
+		sourceFolders := types.LibraryToSourceFolder(library)
+		for _, sourceFolder := range sourceFolders {
+			QueueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
+		}
 	}
 }

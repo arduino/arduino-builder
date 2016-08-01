@@ -38,41 +38,12 @@ import (
 	"arduino.cc/builder/utils"
 )
 
-type IncludesToIncludeFolders struct{}
-
-func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
-	include := ctx.IncludeJustFound
-	includeFolders := ctx.IncludeFolders
+func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 	headerToLibraries := ctx.HeaderToLibraries
-
-	platform := ctx.TargetPlatform
-	actualPlatform := ctx.ActualPlatform
+	platforms := []*types.Platform{ctx.ActualPlatform, ctx.TargetPlatform}
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 
-	if include == "" {
-		return nil;
-	}
-
-	newlyImportedLibrary := resolveLibrary(include, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
-	if newlyImportedLibrary == nil {
-		return nil;
-	}
-
-	importedLibraries = append(importedLibraries, newlyImportedLibrary)
-	sourceFolders := types.LibraryToSourceFolder(newlyImportedLibrary)
-	for _, sourceFolder := range sourceFolders {
-		QueueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
-	}
-	includeFolders = append(includeFolders, newlyImportedLibrary.SrcFolder)
-
-	ctx.ImportedLibraries = importedLibraries
-	ctx.IncludeFolders = includeFolders
-
-	return nil
-}
-
-func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) *types.Library {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, library := range importedLibraries {
 		markImportedLibrary[library] = true
