@@ -118,7 +118,7 @@ func TestCoreDependencyProperty(t *testing.T) {
 		NoError(t, err)
 	}
 
-	p, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.Hardware, paths)
+	p, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.Hardware, paths, []string{"package_index.json"})
 	require.NoError(t, err)
 
 	version := ctx.Hardware.Packages["arduino"].Platforms["avr"].Properties["version"]
@@ -127,5 +127,41 @@ func TestCoreDependencyProperty(t *testing.T) {
 		require.Equal(t, "{runtime.tools.avr-gcc-4.9.2-atmel3.5.3-arduino2.path}", p["attiny:avr:1.0.2"]["runtime.tools.avr-gcc.path"])
 	} else {
 		require.Equal(t, "{runtime.tools.avr-gcc-4.8.1-arduino5.path}", p["attiny:avr:1.0.2"]["runtime.tools.avr-gcc.path"])
+	}
+}
+
+func TestCoreOutOfBoardManagerDependencyProperty(t *testing.T) {
+	var paths []string
+	path, _ := filepath.Abs(filepath.Join("..", "..", "json_package_index", "testdata"))
+	paths = append(paths, path)
+
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := &types.Context{
+		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		ToolsFolders:    []string{"downloaded_tools"},
+		FQBN:            "my_avr_platform:avr:mymega:cpu=atmega2560",
+	}
+
+	commands := []types.Command{
+		&builder.HardwareLoader{},
+		&builder.ToolsLoader{},
+		&builder.TargetBoardResolver{},
+		&builder.AddBuildBoardPropertyIfMissing{},
+		&builder.SetupBuildProperties{},
+		&builder.OverridePropertiesWithJsonInfo{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(ctx)
+		NoError(t, err)
+	}
+
+	version := ctx.Hardware.Packages["arduino"].Platforms["avr"].Properties["version"]
+
+	if json_package_index.CompareVersions(version, "1.6.12") >= 0 {
+		require.Equal(t, "{runtime.tools.avr-gcc-4.9.2-atmel3.5.3-arduino2.path}", ctx.BuildProperties["runtime.tools.avr-gcc.path"])
+	} else {
+		require.Equal(t, ctx.BuildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"], ctx.BuildProperties["runtime.tools.avr-gcc.path"])
 	}
 }

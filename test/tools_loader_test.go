@@ -64,7 +64,7 @@ func TestLoadTools(t *testing.T) {
 	NoError(t, err)
 
 	tools := ctx.Tools
-	require.Equal(t, 6, len(tools))
+	require.Equal(t, 8, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
@@ -77,9 +77,17 @@ func TestLoadTools(t *testing.T) {
 	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
 	idx++
+	require.Equal(t, "avr-gcc", tools[idx].Name)
+	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
+	idx++
 	require.Equal(t, "avrdude", tools[idx].Name)
 	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "avrdude", tools[idx].Name)
+	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "bossac", tools[idx].Name)
 	require.Equal(t, "1.5-arduino", tools[idx].Version)
@@ -136,7 +144,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 	NoError(t, err)
 
 	tools := ctx.Tools
-	require.Equal(t, 8, len(tools))
+	require.Equal(t, 11, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
@@ -149,9 +157,21 @@ func TestLoadLotsOfTools(t *testing.T) {
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
 	idx++
+	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
+	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
+	idx++
 	require.Equal(t, "avr-gcc", tools[idx].Name)
 	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "avr-gcc", tools[idx].Name)
+	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "avrdude", tools[idx].Name)
+	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "avrdude", tools[idx].Name)
 	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)

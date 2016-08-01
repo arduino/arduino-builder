@@ -191,7 +191,7 @@ func loadToolsFromFolderStructure(tools *[]*types.Tool, folder string) error {
 			if err != nil {
 				return i18n.WrapError(err)
 			}
-			toolVendor := filepath.Base(strings.Replace(folder, filepath.Base(folder), "", -1))
+			_, toolVendor := filepath.Split(filepath.Join(folder, ".."))
 			if !toolsSliceContains(tools, toolName.Name(), toolVersion.Name(), toolVendor) {
 				*tools = append(*tools, &types.Tool{Name: toolName.Name(), Vendor: toolVendor, Version: toolVersion.Name(), Folder: toolFolder})
 			}

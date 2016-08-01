@@ -47,7 +47,7 @@ func TestPackageIndexFoldersToPropertiesMap(t *testing.T) {
 	var paths []string
 	paths = append(paths, "testdata")
 
-	p, err := PackageIndexFoldersToPropertiesMap(nil, paths)
+	p, err := PackageIndexFoldersToPropertiesMap(nil, paths, []string{"package_index.json"})
 	require.NoError(t, err)
 
 	require.Equal(t, "{runtime.tools.avr-gcc-4.9.2-atmel3.5.3-arduino2.path}", p["arduino:avr:1.6.12"]["runtime.tools.avr-gcc.path"])
