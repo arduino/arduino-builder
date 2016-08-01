@@ -49,10 +49,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 
 	sketchBuildPath := ctx.SketchBuildPath
 	sketch := ctx.Sketch
-	err := findIncludesUntilDone(ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
-	if err != nil {
-		return i18n.WrapError(err)
-	}
+	ctx.CollectedSourceFiles.Push(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 
 	foldersWithSources := ctx.FoldersWithSourceFiles
 	foldersWithSources.Push(types.SourceFolder{Folder: ctx.SketchBuildPath, Recurse: false})
@@ -61,7 +58,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 		foldersWithSources.Push(types.SourceFolder{Folder: srcSubfolderPath, Recurse: true})
 	}
 
-	err = runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
+	err := runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
 	if err != nil {
 		return i18n.WrapError(err)
 	}
