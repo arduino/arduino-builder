@@ -30,6 +30,8 @@
 package builder
 
 import (
+	"strings"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/json_package_index"
 	"github.com/arduino/arduino-builder/types"
@@ -57,7 +59,8 @@ func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
 
 	if ctx.JsonFolders != nil {
 
-		jsonProperties, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.Hardware, ctx.JsonFolders)
+		allowedJsons := strings.Split(ctx.BuildProperties[constants.ADDITIONALE_BOARD_MANAGER_JSON], ",")
+		jsonProperties, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.Hardware, ctx.JsonFolders, allowedJsons)
 
 		if err != nil {
 			// doesn't matter, log the broken package in verbose mode

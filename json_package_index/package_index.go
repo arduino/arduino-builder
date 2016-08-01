@@ -43,7 +43,8 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	_ "github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	properties "github.com/arduino/go-properties-map"
+	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-properties-map"
 )
 
 type core struct {
@@ -101,7 +102,7 @@ var systems = map[string]string{
 
 var globalProperties map[string]properties.Map
 
-func PackageIndexFoldersToPropertiesMap(packages *types.Packages, folders []string) (map[string]properties.Map, error) {
+func PackageIndexFoldersToPropertiesMap(packages *types.Packages, folders []string, specifiedFilenames []string) (map[string]properties.Map, error) {
 
 	var paths []string
 
@@ -113,7 +114,13 @@ func PackageIndexFoldersToPropertiesMap(packages *types.Packages, folders []stri
 		files, _ := ioutil.ReadDir(folder)
 		for _, f := range files {
 			if strings.HasPrefix(f.Name(), "package") && strings.HasSuffix(f.Name(), "index.json") {
-				paths = append(paths, filepath.Join(folder, f.Name()))
+				// if a list of required json has been provided only add them
+				if specifiedFilenames != nil && len(specifiedFilenames) > 1 &&
+					!utils.SliceContains(specifiedFilenames, f.Name()) {
+					continue
+				} else {
+					paths = append(paths, filepath.Join(folder, f.Name()))
+				}
 			}
 		}
 	}
