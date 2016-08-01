@@ -51,26 +51,3 @@ func (queue *UniqueStringQueue) Pop() interface{} {
 func (queue *UniqueStringQueue) Empty() bool {
 	return queue.Len() == 0
 }
-
-type UniqueSourceFolderQueue []SourceFolder
-
-func (queue UniqueSourceFolderQueue) Len() int           { return len(queue) }
-func (queue UniqueSourceFolderQueue) Less(i, j int) bool { return false }
-func (queue UniqueSourceFolderQueue) Swap(i, j int)      { panic("Who called me?!?") }
-
-func (queue *UniqueSourceFolderQueue) Push(value SourceFolder) {
-	if !sliceContainsSourceFolder(*queue, value) {
-		*queue = append(*queue, value)
-	}
-}
-
-func (queue *UniqueSourceFolderQueue) Pop() interface{} {
-	old := *queue
-	x := old[0]
-	*queue = old[1:]
-	return x
-}
-
-func (queue *UniqueSourceFolderQueue) Empty() bool {
-	return queue.Len() == 0
-}

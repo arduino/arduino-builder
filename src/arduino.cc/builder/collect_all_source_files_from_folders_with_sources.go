@@ -35,24 +35,17 @@ import (
 	"arduino.cc/builder/utils"
 )
 
-type CollectAllSourceFilesFromFoldersWithSources struct{}
-
-func (s *CollectAllSourceFilesFromFoldersWithSources) Run(ctx *types.Context) error {
-	foldersWithSources := ctx.FoldersWithSourceFiles
-	sourceFiles := ctx.CollectedSourceFiles
+func QueueSourceFilesFromFolder(queue *types.UniqueStringQueue, folder string, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 
 	filePaths := []string{}
-	for !foldersWithSources.Empty() {
-		sourceFolder := foldersWithSources.Pop().(types.SourceFolder)
-		err := utils.FindFilesInFolder(&filePaths, sourceFolder.Folder, extensions, sourceFolder.Recurse)
-		if err != nil {
-			return i18n.WrapError(err)
-		}
+	err := utils.FindFilesInFolder(&filePaths, folder, extensions, recurse)
+	if err != nil {
+		return i18n.WrapError(err)
 	}
 
 	for _, filePath := range filePaths {
-		sourceFiles.Push(filePath)
+		queue.Push(filePath)
 	}
 
 	return nil

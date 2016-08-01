@@ -47,7 +47,6 @@ type Context struct {
 	SketchObjectFiles    []string
 
 	CollectedSourceFiles   *UniqueStringQueue
-	FoldersWithSourceFiles *UniqueSourceFolderQueue
 
 	Sketch          *Sketch
 	Source          string

@@ -51,32 +51,21 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 	ctx.CollectedSourceFiles.Push(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 
-	foldersWithSources := ctx.FoldersWithSourceFiles
-	foldersWithSources.Push(types.SourceFolder{Folder: ctx.SketchBuildPath, Recurse: false})
+	sourceFilePaths := ctx.CollectedSourceFiles
+	QueueSourceFilesFromFolder(sourceFilePaths, ctx.SketchBuildPath, /* recurse */ false)
 	srcSubfolderPath := filepath.Join(ctx.SketchBuildPath, constants.SKETCH_FOLDER_SRC)
 	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
-		foldersWithSources.Push(types.SourceFolder{Folder: srcSubfolderPath, Recurse: true})
+		QueueSourceFilesFromFolder(sourceFilePaths, srcSubfolderPath, /* recurse */ true)
 	}
-
-	err := runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
-	if err != nil {
-		return i18n.WrapError(err)
-	}
-
-	sourceFilePaths := ctx.CollectedSourceFiles
 
 	for !sourceFilePaths.Empty() {
-		err = findIncludesUntilDone(ctx, sourceFilePaths.Pop().(string))
-		if err != nil {
-			return i18n.WrapError(err)
-		}
-		err := runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
+		err := findIncludesUntilDone(ctx, sourceFilePaths.Pop().(string))
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 	}
 
-	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
+	err := runCommand(ctx, &FailIfImportedLibraryIsWrong{})
 	if err != nil {
 		return i18n.WrapError(err)
 	}

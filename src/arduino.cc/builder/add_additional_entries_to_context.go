@@ -69,7 +69,6 @@ func (s *AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 	}
 
 	ctx.CollectedSourceFiles = &types.UniqueStringQueue{}
-	ctx.FoldersWithSourceFiles = &types.UniqueSourceFolderQueue{}
 
 	ctx.LibrariesResolutionResults = make(map[string]types.LibraryResolutionResult)
 	ctx.HardwareRewriteResults = make(map[*types.Platform][]types.PlatforKeyRewrite)

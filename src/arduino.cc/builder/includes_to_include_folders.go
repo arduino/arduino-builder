@@ -59,12 +59,10 @@ func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
 		return nil;
 	}
 
-	foldersWithSources := ctx.FoldersWithSourceFiles
-
 	importedLibraries = append(importedLibraries, newlyImportedLibrary)
 	sourceFolders := types.LibraryToSourceFolder(newlyImportedLibrary)
 	for _, sourceFolder := range sourceFolders {
-		foldersWithSources.Push(sourceFolder)
+		QueueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
 	}
 	includeFolders = append(includeFolders, newlyImportedLibrary.SrcFolder)
 
