@@ -71,7 +71,7 @@ func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
 
 		// HACK!!! To overcome AVR core 1.6.12 lto problems, replace avr-gcc-4.8.1-arduino5 with
 		// 4.9.2-atmel3.5.3-arduino2 if it exists
-		if buildProperties[constants.HACK_PROPERTIES_AVR_GCC_NEW] != "" {
+		if ctx.TargetBoard.Properties["build.core"] == "arduino:arduino" && buildProperties[constants.HACK_PROPERTIES_AVR_GCC_NEW] != "" {
 			buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD] =
 				"{" + constants.HACK_PROPERTIES_AVR_GCC_NEW + "}"
 		}
