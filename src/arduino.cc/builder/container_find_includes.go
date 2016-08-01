@@ -60,14 +60,6 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
 		foldersWithSources.Push(types.SourceFolder{Folder: srcSubfolderPath, Recurse: true})
 	}
-	if len(ctx.ImportedLibraries) > 0 {
-		for _, library := range ctx.ImportedLibraries {
-			sourceFolders := types.LibraryToSourceFolder(library)
-			for _, sourceFolder := range sourceFolders {
-				foldersWithSources.Push(sourceFolder)
-			}
-		}
-	}
 
 	err = runCommand(ctx, &CollectAllSourceFilesFromFoldersWithSources{})
 	if err != nil {
