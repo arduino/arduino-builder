@@ -31,6 +31,8 @@ package json_package_index
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/blang/semver"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -55,6 +57,10 @@ type core struct {
 		Name     string `json:"name"`
 		Version  string `json:"version"`
 	} `json:"toolsDependencies"`
+	CoreDependencies []struct {
+		Packager string `json:"packager"`
+		Name     string `json:"name"`
+	} `json:"coreDependencies"`
 }
 
 type tool struct {
@@ -114,6 +120,7 @@ func PackageIndexFoldersToPropertiesMap(folders []string) (map[string]properties
 func PackageIndexesToPropertiesMap(urls []string) (map[string]properties.Map, error) {
 
 	globalProperties = make(map[string]properties.Map)
+	coreDependencyMap := make(map[string]string)
 
 	data, err := PackageIndexesToGlobalIndex(urls)
 
@@ -128,10 +135,47 @@ func PackageIndexesToPropertiesMap(urls []string) (map[string]properties.Map, er
 						"{" + constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX + dep.Name + "-" + dep.Packager + "-" + dep.Version + constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX + "}"
 				}
 			}
+			for _, coredep := range a.CoreDependencies {
+				// inherit all the tools from latest coredep
+				version, err := findLatestCore(data, coredep.Packager, coredep.Name)
+				if err == nil {
+					coreDependencyMap[p.Name+":"+a.Architecture+":"+a.Version] =
+						coredep.Packager + ":" + coredep.Name + ":" + version
+				}
+			}
 			globalProperties[p.Name+":"+a.Architecture+":"+a.Version] = localProperties.Clone()
 		}
 	}
+
+	for idx, parentCore := range coreDependencyMap {
+		if (globalProperties[parentCore]) != nil {
+			globalProperties[idx] = globalProperties[parentCore].Clone()
+		}
+	}
+
 	return globalProperties, err
+}
+
+func findLatestCore(data index, Packager string, Name string) (string, error) {
+	latest, _ := semver.Make("0.0.0")
+	for _, p := range data.Packages {
+		for _, a := range p.Platforms {
+			if p.Name == Packager && a.Architecture == Name {
+				test, _ := semver.Make(a.Version)
+				if test.GT(latest) {
+					latest = test
+				}
+			}
+		}
+	}
+	var err error
+	test, _ := semver.Make("0.0.0")
+	if latest.EQ(test) {
+		err = errors.New("No such core available")
+	} else {
+		err = nil
+	}
+	return latest.String(), err
 }
 
 func PackageIndexesToGlobalIndex(urls []string) (index, error) {

@@ -53,3 +53,13 @@ func TestPackageIndexFoldersToPropertiesMap(t *testing.T) {
 
 	require.Equal(t, "{runtime.tools.avr-gcc-4.9.2-atmel3.5.3-arduino2.path}", p["arduino:avr:1.6.12"]["runtime.tools.avr-gcc.path"])
 }
+
+func TestCoreDependencyProperty(t *testing.T) {
+	var paths []string
+	paths = append(paths, "testdata")
+
+	p, err := PackageIndexFoldersToPropertiesMap(paths)
+	require.NoError(t, err)
+
+	require.Equal(t, "{runtime.tools.avr-gcc-4.9.2-atmel3.5.3-arduino2.path}", p["attiny:avr:1.0.2"]["runtime.tools.avr-gcc.path"])
+}
