@@ -32,15 +32,17 @@ package json_package_index
 import (
 	"encoding/json"
 	"errors"
-	"github.com/blang/semver"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/blang/semver"
+
 	"github.com/arduino/arduino-builder/constants"
 	_ "github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/types"
 	properties "github.com/arduino/go-properties-map"
 )
 
@@ -52,6 +54,7 @@ type core struct {
 	Name         string `json:"archiveFileName"`
 	Checksum     string `json:"checksum"`
 	destination  string
+	installed    bool
 	Dependencies []struct {
 		Packager string `json:"packager"`
 		Name     string `json:"name"`
@@ -59,7 +62,6 @@ type core struct {
 	} `json:"toolsDependencies"`
 	CoreDependencies []struct {
 		Packager string `json:"packager"`
-		Name     string `json:"name"`
 	} `json:"coreDependencies"`
 }
 
@@ -99,9 +101,10 @@ var systems = map[string]string{
 
 var globalProperties map[string]properties.Map
 
-func PackageIndexFoldersToPropertiesMap(folders []string) (map[string]properties.Map, error) {
+func PackageIndexFoldersToPropertiesMap(packages *types.Packages, folders []string) (map[string]properties.Map, error) {
 
 	var paths []string
+
 	for _, folder := range folders {
 		folder, err := filepath.Abs(folder)
 		if err != nil {
@@ -114,15 +117,15 @@ func PackageIndexFoldersToPropertiesMap(folders []string) (map[string]properties
 			}
 		}
 	}
-	return PackageIndexesToPropertiesMap(paths)
+	return PackageIndexesToPropertiesMap(packages, paths)
 }
 
-func PackageIndexesToPropertiesMap(urls []string) (map[string]properties.Map, error) {
+func PackageIndexesToPropertiesMap(packages *types.Packages, urls []string) (map[string]properties.Map, error) {
 
 	globalProperties = make(map[string]properties.Map)
 	coreDependencyMap := make(map[string]string)
 
-	data, err := PackageIndexesToGlobalIndex(urls)
+	data, err := PackageIndexesToGlobalIndex(packages, urls)
 
 	for _, p := range data.Packages {
 		for _, a := range p.Platforms {
@@ -137,10 +140,9 @@ func PackageIndexesToPropertiesMap(urls []string) (map[string]properties.Map, er
 			}
 			for _, coredep := range a.CoreDependencies {
 				// inherit all the tools from latest coredep
-				version, err := findLatestCore(data, coredep.Packager, coredep.Name)
 				if err == nil {
 					coreDependencyMap[p.Name+":"+a.Architecture+":"+a.Version] =
-						coredep.Packager + ":" + coredep.Name + ":" + version
+						coredep.Packager + ":" + a.Architecture
 				}
 			}
 			globalProperties[p.Name+":"+a.Architecture+":"+a.Version] = localProperties.Clone()
@@ -148,21 +150,22 @@ func PackageIndexesToPropertiesMap(urls []string) (map[string]properties.Map, er
 	}
 
 	for idx, parentCore := range coreDependencyMap {
-		if (globalProperties[parentCore]) != nil {
-			globalProperties[idx] = globalProperties[parentCore].Clone()
+		version, err := findLatestInstalledCore(data, strings.Split(parentCore, ":")[0], strings.Split(parentCore, ":")[1])
+		if err == nil {
+			globalProperties[idx] = globalProperties[parentCore+":"+version].Clone()
 		}
 	}
 
 	return globalProperties, err
 }
 
-func findLatestCore(data index, Packager string, Name string) (string, error) {
+func findLatestInstalledCore(data index, Packager string, Name string) (string, error) {
 	latest, _ := semver.Make("0.0.0")
 	for _, p := range data.Packages {
 		for _, a := range p.Platforms {
 			if p.Name == Packager && a.Architecture == Name {
 				test, _ := semver.Make(a.Version)
-				if test.GT(latest) {
+				if test.GT(latest) && a.installed {
 					latest = test
 				}
 			}
@@ -178,9 +181,9 @@ func findLatestCore(data index, Packager string, Name string) (string, error) {
 	return latest.String(), err
 }
 
-func PackageIndexesToGlobalIndex(urls []string) (index, error) {
+func PackageIndexesToGlobalIndex(packages *types.Packages, urls []string) (index, error) {
 
-	// firststub of arduino-pdpm
+	// first stub of arduino-pdpm
 	var data index
 	var err error
 
@@ -211,5 +214,29 @@ func PackageIndexesToGlobalIndex(urls []string) (index, error) {
 			data.Packages = append(data.Packages, entry)
 		}
 	}
+
+	for i, p := range data.Packages {
+		for j, a := range p.Platforms {
+			if packages != nil && packages.Packages[p.Name] != nil &&
+				packages.Packages[p.Name].Platforms[a.Architecture] != nil &&
+				packages.Packages[p.Name].Platforms[a.Architecture].Properties["version"] == a.Version {
+				data.Packages[i].Platforms[j].installed = true
+			}
+		}
+	}
+
 	return data, err
+}
+
+func CompareVersions(fv string, sv string) int {
+	v1, _ := semver.Make(fv)
+	v2, _ := semver.Make(sv)
+	if v1.EQ(v2) {
+		return 0
+	}
+	if v1.GT(v2) {
+		return 1
+	} else {
+		return -1
+	}
 }

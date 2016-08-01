@@ -57,7 +57,7 @@ func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
 
 	if ctx.JsonFolders != nil {
 
-		jsonProperties, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.JsonFolders)
+		jsonProperties, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.Hardware, ctx.JsonFolders)
 
 		if err != nil {
 			// doesn't matter, log the broken package in verbose mode
