@@ -59,14 +59,61 @@ be processed as well. When the preprocessor completes without showing an
 the next. When no library can be found for a included filename, an error
 is shown and the process is aborted.
 
+Caching
+
+Since this process is fairly slow (requiring at least one invocation of
+the preprocessor per source file), its results are cached.
+
+Just caching the complete result (i.e. the resulting list of imported
+libraries) seems obvious, but such a cache is hard to invalidate. Making
+a list of all the source and header files used to create the list and
+check if any of them changed is probably feasible, but this would also
+require caching the full list of libraries to invalidate the cache when
+the include to library resolution might have a different result. Another
+downside of a complete cache is that any changes requires re-running
+everything, even if no includes were actually changed.
+
+Instead, caching happens by keeping a sort of "journal" of the steps in
+the include detection, essentially tracing each file processed and each
+include path entry added. The cache is used by retracing these steps:
+The include detection process is executed normally, except that instead
+of running the preprocessor, the include filenames are (when possible)
+read from the cache. Then, the include file to library resolution is
+again executed normally. The results are checked against the cache and
+as long as the results match, the cache is considered valid.
+
+When a source file (or any of the files it includes, as indicated by the
+.d file) is changed, the preprocessor is executed as normal for the
+file, ignoring any includes from the cache. This does not, however,
+invalidate the cache: If the results from the preprocessor match the
+entries in the cache, the cache remains valid and can again be used for
+the next (unchanged) file.
+
+The cache file uses the JSON format and contains a list of entries. Each
+entry represents a discovered library and contains:
+ - Sourcefile: The source file that the include was found in
+ - Include: The included filename found
+ - Includepath: The addition to the include path
+
+There are also some special entries:
+ - When adding the initial include path entries, such as for the core
+   and variant paths.  These are not discovered, so the Sourcefile and
+   Include fields will be empty.
+ - When a file contains no (more) missing includes, an entry with an
+   empty Include and IncludePath is generated.
+
 */
 
 package builder
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
+	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
@@ -76,9 +123,12 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
-	appendIncludeFolder(ctx, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
+	cachePath := filepath.Join(ctx.BuildPath, constants.FILE_INCLUDES_CACHE)
+	cache := readCache(cachePath)
+
+	appendIncludeFolder(ctx, cache, "", "", ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
 	if ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {
-		appendIncludeFolder(ctx, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
+		appendIncludeFolder(ctx, cache, "", "", ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
 	}
 
 	sketch := ctx.Sketch
@@ -96,10 +146,18 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	}
 
 	for !sourceFilePaths.Empty() {
-		err := findIncludesUntilDone(ctx, sourceFilePaths.Pop())
+		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
 		if err != nil {
+			os.Remove(cachePath)
 			return i18n.WrapError(err)
 		}
+	}
+
+	// Finalize the cache
+	cache.ExpectEnd()
+	err = writeCache(cache, cachePath)
+	if err != nil {
+		return i18n.WrapError(err)
 	}
 
 	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
@@ -110,9 +168,14 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	return nil
 }
 
-// Append the given folder to the include path.
-func appendIncludeFolder(ctx *types.Context, folder string) {
+// Append the given folder to the include path and match or append it to
+// the cache. sourceFilePath and include indicate the source of this
+// include (e.g. what #include line in what file it was resolved from)
+// and should be the empty string for the default include folders, like
+// the core or variant.
+func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath string, include string, folder string) {
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
+	cache.ExpectEntry(sourceFilePath, include, folder)
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -124,25 +187,157 @@ func runCommand(ctx *types.Context, command types.Command) error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, sourceFile types.SourceFile) error {
+type includeCacheEntry struct {
+	Sourcefile  string
+	Include     string
+	Includepath string
+}
+
+type includeCache struct {
+	// Are the cache contents valid so far?
+	valid   bool
+	// Index into entries of the next entry to be processed. Unused
+	// when the cache is invalid.
+	next    int
+	entries []includeCacheEntry
+}
+
+// Return the next cache entry. Should only be called when the cache is
+// valid and a next entry is available (the latter can be checked with
+// ExpectFile). Does not advance the cache.
+func (cache *includeCache) Next() includeCacheEntry {
+	return cache.entries[cache.next]
+}
+
+// Check that the next cache entry is about the given file. If it is
+// not, or no entry is available, the cache is invalidated. Does not
+// advance the cache.
+func (cache *includeCache) ExpectFile(sourcefile string) {
+	if cache.valid && cache.next < len(cache.entries) && cache.Next().Sourcefile != sourcefile {
+		cache.valid = false
+		cache.entries = cache.entries[:cache.next]
+	}
+}
+
+// Check that the next entry matches the given values. If so, advance
+// the cache. If not, the cache is invalidated. If the cache is
+// invalidated, or was already invalid, an entry with the given values
+// is appended.
+func (cache *includeCache) ExpectEntry(sourcefile string, include string, librarypath string) {
+	entry := includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
+	if cache.valid {
+		if cache.next < len(cache.entries) && cache.Next() == entry {
+			cache.next++
+		} else {
+			cache.valid = false
+			cache.entries = cache.entries[:cache.next]
+		}
+	}
+
+	if !cache.valid {
+		cache.entries = append(cache.entries, entry)
+	}
+}
+
+// Check that the cache is completely consumed. If not, the cache is
+// invalidated.
+func (cache *includeCache) ExpectEnd() {
+	if cache.valid && cache.next < len(cache.entries) {
+		cache.valid = false
+		cache.entries = cache.entries[:cache.next]
+	}
+}
+
+// Read the cache from the given file
+func readCache(path string) *includeCache {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		// Return an empty, invalid cache
+		return &includeCache{}
+	}
+	result := &includeCache{}
+	err = json.Unmarshal(bytes, &result.entries)
+	if err != nil {
+		// Return an empty, invalid cache
+		return &includeCache{}
+	}
+	result.valid = true
+	return result
+}
+
+// Write the given cache to the given file if it is invalidated. If the
+// cache is still valid, just update the timestamps of the file.
+func writeCache(cache *includeCache, path string) error {
+	// If the cache was still valid all the way, just touch its file
+	// (in case any source file changed without influencing the
+	// includes). If it was invalidated, overwrite the cache with
+	// the new contents.
+	if cache.valid {
+		os.Chtimes(path, time.Now(), time.Now())
+	} else {
+		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+		err = utils.WriteFileBytes(path, bytes)
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+	}
+	return nil
+}
+
+func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
+	sourcePath := sourceFile.SourcePath(ctx)
 	targetFilePath := utils.NULLFile()
+
+	// TODO: This should perhaps also compare against the
+	// include.cache file timestamp. Now, it only checks if the file
+	// changed after the object file was generated, but if it
+	// changed between generating the cache and the object file,
+	// this could show the file as unchanged when it really is
+	// changed. Changing files during a build isn't really
+	// supported, but any problems from it should at least be
+	// resolved when doing another build, which is not currently the
+	// case.
+	// TODO: This reads the dependency file, but the actual building
+	// does it again. Should the result be somehow cached? Perhaps
+	// remove the object file if it is found to be stale?
+	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx))
+	if err != nil {
+		return i18n.WrapError(err)
+	}
+
+	first := true
 	for {
-		commands := []types.Command{
-			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFile.SourcePath(ctx), TargetFilePath: targetFilePath},
-			&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
-		}
-		for _, command := range commands {
-			err := runCommand(ctx, command)
-			if err != nil {
-				return i18n.WrapError(err)
+		var include string
+		cache.ExpectFile(sourcePath)
+		if unchanged && cache.valid {
+			include = cache.Next().Include
+			if first && ctx.Verbose {
+				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
 			}
+		} else {
+			commands := []types.Command{
+				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath},
+				&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
+			}
+			for _, command := range commands {
+				err := runCommand(ctx, command)
+				if err != nil {
+					return i18n.WrapError(err)
+				}
+			}
+			include = ctx.IncludeJustFound
 		}
-		if ctx.IncludeJustFound == "" {
+
+		if include == "" {
 			// No missing includes found, we're done
+			cache.ExpectEntry(sourcePath, "", "")
 			return nil
 		}
 
-		library := ResolveLibrary(ctx, ctx.IncludeJustFound)
+		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
 			err := runCommand(ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
@@ -153,11 +348,12 @@ func findIncludesUntilDone(ctx *types.Context, sourceFile types.SourceFile) erro
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		appendIncludeFolder(ctx, library.SrcFolder)
+		appendIncludeFolder(ctx, cache, sourcePath, include, library.SrcFolder)
 		sourceFolders := types.LibraryToSourceFolder(library)
 		for _, sourceFolder := range sourceFolders {
 			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceFolder.Folder, sourceFolder.Recurse)
 		}
+		first = false
 	}
 }
 
