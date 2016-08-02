@@ -38,3 +38,12 @@ func sliceContains(slice []string, target string) bool {
 	}
 	return false
 }
+
+func sliceContainsSourceFile(slice []SourceFile, target SourceFile) bool {
+	for _, elem := range slice {
+		if elem.Origin == target.Origin && elem.RelativePath == target.RelativePath {
+			return true
+		}
+	}
+	return false
+}
