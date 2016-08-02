@@ -47,25 +47,28 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 		appendIncludeFolder(ctx, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
 	}
 
-	sketchBuildPath := ctx.SketchBuildPath
 	sketch := ctx.Sketch
-	ctx.CollectedSourceFiles.Push(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
+	mergedfile, err := types.MakeSourceFile(ctx, sketch, filepath.Base(sketch.MainFile.Name)+".cpp")
+	if err != nil {
+		return i18n.WrapError(err)
+	}
+	ctx.CollectedSourceFiles.Push(mergedfile)
 
 	sourceFilePaths := ctx.CollectedSourceFiles
-	queueSourceFilesFromFolder(sourceFilePaths, ctx.SketchBuildPath, /* recurse */ false)
+	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, /* recurse */ false)
 	srcSubfolderPath := filepath.Join(ctx.SketchBuildPath, constants.SKETCH_FOLDER_SRC)
 	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
-		queueSourceFilesFromFolder(sourceFilePaths, srcSubfolderPath, /* recurse */ true)
+		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, /* recurse */ true)
 	}
 
 	for !sourceFilePaths.Empty() {
-		err := findIncludesUntilDone(ctx, sourceFilePaths.Pop().(string))
+		err := findIncludesUntilDone(ctx, sourceFilePaths.Pop())
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 	}
 
-	err := runCommand(ctx, &FailIfImportedLibraryIsWrong{})
+	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -87,11 +90,11 @@ func runCommand(ctx *types.Context, command types.Command) error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
+func findIncludesUntilDone(ctx *types.Context, sourceFile types.SourceFile) error {
 	targetFilePath := utils.NULLFile()
 	for {
 		commands := []types.Command{
-			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFilePath, TargetFilePath: targetFilePath},
+			&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourceFile.SourcePath(ctx), TargetFilePath: targetFilePath},
 			&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
 		}
 		for _, command := range commands {
@@ -119,12 +122,12 @@ func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 		appendIncludeFolder(ctx, library.SrcFolder)
 		sourceFolders := types.LibraryToSourceFolder(library)
 		for _, sourceFolder := range sourceFolders {
-			queueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
+			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceFolder.Folder, sourceFolder.Recurse)
 		}
 	}
 }
 
-func queueSourceFilesFromFolder(queue *types.UniqueStringQueue, folder string, recurse bool) error {
+func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder string, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 
 	filePaths := []string{}
@@ -134,7 +137,11 @@ func queueSourceFilesFromFolder(queue *types.UniqueStringQueue, folder string, r
 	}
 
 	for _, filePath := range filePaths {
-		queue.Push(filePath)
+		sourceFile, err := types.MakeSourceFile(ctx, origin, filePath)
+		if (err != nil) {
+			return i18n.WrapError(err)
+		}
+		queue.Push(sourceFile)
 	}
 
 	return nil
