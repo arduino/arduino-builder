@@ -42,9 +42,9 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
-	ctx.IncludeFolders = append(ctx.IncludeFolders, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
+	appendIncludeFolder(ctx, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
 	if ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {
-		ctx.IncludeFolders = append(ctx.IncludeFolders, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
+		appendIncludeFolder(ctx, ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
 	}
 
 	sketchBuildPath := ctx.SketchBuildPath
@@ -71,6 +71,11 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	}
 
 	return nil
+}
+
+// Append the given folder to the include path.
+func appendIncludeFolder(ctx *types.Context, folder string) {
+	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -111,7 +116,7 @@ func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		ctx.IncludeFolders = append(ctx.IncludeFolders, library.SrcFolder)
+		appendIncludeFolder(ctx, library.SrcFolder)
 		sourceFolders := types.LibraryToSourceFolder(library)
 		for _, sourceFolder := range sourceFolders {
 			queueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
