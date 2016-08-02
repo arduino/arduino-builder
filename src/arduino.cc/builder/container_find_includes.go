@@ -52,10 +52,10 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	ctx.CollectedSourceFiles.Push(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"))
 
 	sourceFilePaths := ctx.CollectedSourceFiles
-	QueueSourceFilesFromFolder(sourceFilePaths, ctx.SketchBuildPath, /* recurse */ false)
+	queueSourceFilesFromFolder(sourceFilePaths, ctx.SketchBuildPath, /* recurse */ false)
 	srcSubfolderPath := filepath.Join(ctx.SketchBuildPath, constants.SKETCH_FOLDER_SRC)
 	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
-		QueueSourceFilesFromFolder(sourceFilePaths, srcSubfolderPath, /* recurse */ true)
+		queueSourceFilesFromFolder(sourceFilePaths, srcSubfolderPath, /* recurse */ true)
 	}
 
 	for !sourceFilePaths.Empty() {
@@ -114,7 +114,23 @@ func findIncludesUntilDone(ctx *types.Context, sourceFilePath string) error {
 		ctx.IncludeFolders = append(ctx.IncludeFolders, library.SrcFolder)
 		sourceFolders := types.LibraryToSourceFolder(library)
 		for _, sourceFolder := range sourceFolders {
-			QueueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
+			queueSourceFilesFromFolder(ctx.CollectedSourceFiles, sourceFolder.Folder, sourceFolder.Recurse)
 		}
 	}
+}
+
+func queueSourceFilesFromFolder(queue *types.UniqueStringQueue, folder string, recurse bool) error {
+	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
+
+	filePaths := []string{}
+	err := utils.FindFilesInFolder(&filePaths, folder, extensions, recurse)
+	if err != nil {
+		return i18n.WrapError(err)
+	}
+
+	for _, filePath := range filePaths {
+		queue.Push(filePath)
+	}
+
+	return nil
 }
