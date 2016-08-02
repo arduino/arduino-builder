@@ -27,6 +27,40 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
+/*
+
+Include detection
+
+This code is responsible for figuring out what libraries the current
+sketch needs an populates both Context.ImportedLibraries with a list of
+Library objects, and Context.IncludeFolders with a list of folders to
+put on the include path.
+
+Simply put, every #include in a source file pulls in the library that
+provides that source file. This includes source files in the selected
+libraries, so libraries can recursively include other libraries as well.
+
+To implement this, the gcc preprocessor is used. A queue is created
+containing, at first, the source files in the sketch. Each of the files
+in the queue is processed in turn by running the preprocessor on it. If
+the preprocessor provides an error, the output is examined to see if the
+error is a missing header file originating from a #include directive.
+
+The filename is extracted from that #include directive, and a library is
+found that provides it. If multiple libraries provide the same file, one
+is slected (how this selection works is not described here, see the
+ResolveLibrary function for that). The library selected in this way is
+added to the include path through Context.IncludeFolders and the list of
+libraries to include in the link through Context.ImportedLibraries.
+
+Furthermore, all of the library source files are added to the queue, to
+be processed as well. When the preprocessor completes without showing an
+#include error, processing of the file is complete and it advances to
+the next. When no library can be found for a included filename, an error
+is shown and the process is aborted.
+
+*/
+
 package builder
 
 import (
