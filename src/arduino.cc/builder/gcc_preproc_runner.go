@@ -44,10 +44,11 @@ import (
 type GCCPreprocRunner struct {
 	SourceFilePath string
 	TargetFileName string
+	Includes []string
 }
 
 func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFileName)
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFileName, s.Includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -72,10 +73,11 @@ func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
 type GCCPreprocRunnerForDiscoveringIncludes struct {
 	SourceFilePath string
 	TargetFilePath string
+	Includes []string
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
-	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFilePath)
+	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFilePath, s.Includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -98,7 +100,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string) (properties.Map, string, error) {
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, string, error) {
 	if targetFilePath != utils.NULLFile() {
 		preprocPath := ctx.PreprocPath
 		err := utils.EnsureFolderExists(preprocPath)
@@ -112,7 +114,6 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
 
-	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)

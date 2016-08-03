@@ -312,6 +312,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	for {
 		var include string
 		cache.ExpectFile(sourcePath)
+
+		includes := ctx.IncludeFolders
+		if library, ok := sourceFile.Origin.(*types.Library); ok && library.UtilityFolder != "" {
+			includes = append(includes, library.UtilityFolder)
+		}
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
@@ -319,7 +324,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			}
 		} else {
 			commands := []types.Command{
-				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath},
+				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath, Includes: includes},
 				&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
 			}
 			for _, command := range commands {
@@ -340,7 +345,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
+			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: includes})
 			return i18n.WrapError(err)
 		}
 
