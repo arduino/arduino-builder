@@ -42,13 +42,12 @@ import (
 )
 
 type GCCPreprocRunner struct {
+	SourceFilePath string
 	TargetFileName string
 }
 
 func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
-	sketchBuildPath := ctx.SketchBuildPath
-	sketch := ctx.Sketch
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), s.TargetFileName)
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFileName)
 	if err != nil {
 		return i18n.WrapError(err)
 	}

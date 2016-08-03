@@ -340,7 +340,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := runCommand(ctx, &GCCPreprocRunner{TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
+			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E})
 			return i18n.WrapError(err)
 		}
 
