@@ -30,7 +30,6 @@
 package types
 
 import (
-	"os"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -166,6 +165,7 @@ const (
 type Library struct {
 	Folder      string
 	SrcFolder   string
+	UtilityFolder string
 	Layout      LibraryLayout
 	Name        string
 	Archs       []string
@@ -262,11 +262,8 @@ func LibraryToSourceFolder(library *Library) []SourceFolder {
 	sourceFolders := []SourceFolder{}
 	recurse := library.Layout == LIBRARY_RECURSIVE
 	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
-	if library.Layout == LIBRARY_FLAT {
-		utility := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
-		if info, err := os.Stat(utility); err == nil && info.IsDir() {
-			sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
-		}
+	if library.UtilityFolder != "" {
+		sourceFolders = append(sourceFolders, SourceFolder{Folder: library.UtilityFolder, Recurse: false})
 	}
 	return sourceFolders
 }
