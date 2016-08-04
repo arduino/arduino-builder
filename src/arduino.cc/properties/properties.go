@@ -52,6 +52,8 @@ func init() {
 	switch value := runtime.GOOS; value {
 	case "linux":
 		osSuffix = runtime.GOOS
+	case "freebsd":
+		osSuffix = runtime.GOOS
 	case "windows":
 		osSuffix = runtime.GOOS
 	case "darwin":

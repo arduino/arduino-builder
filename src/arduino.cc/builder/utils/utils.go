@@ -64,6 +64,8 @@ func PrettyOSName() string {
 	switch osName := runtime.GOOS; osName {
 	case "darwin":
 		return "macosx"
+	case "freebsd":
+		return "freebsd"
 	case "linux":
 		return "linux"
 	case "windows":
