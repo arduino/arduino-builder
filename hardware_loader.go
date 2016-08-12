@@ -32,6 +32,7 @@ package builder
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -132,9 +133,14 @@ func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger
 
 		_, err := os.Stat(filepath.Join(subfolderPath, constants.FILE_BOARDS_TXT))
 		if err != nil && os.IsNotExist(err) {
-			theOnlySubfolder, err := utils.TheOnlySubfolderOf(subfolderPath)
+			theOnlySubfolder, numSubfolders, err := utils.TheOnlySubfolderOf(subfolderPath)
 			if err != nil {
 				return i18n.WrapError(err)
+			}
+
+			if numSubfolders > 1 {
+				i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_MULTIPLE_CORES,
+					subfolderPath, strconv.Itoa(numSubfolders), platformId)
 			}
 
 			if theOnlySubfolder != constants.EMPTY_STRING {

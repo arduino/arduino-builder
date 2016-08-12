@@ -295,17 +295,17 @@ func ReadFileToRows(file string) ([]string, error) {
 	return strings.Split(txt, "\n"), nil
 }
 
-func TheOnlySubfolderOf(folder string) (string, error) {
+func TheOnlySubfolderOf(folder string) (string, int, error) {
 	subfolders, err := ReadDirFiltered(folder, FilterDirs)
 	if err != nil {
-		return constants.EMPTY_STRING, i18n.WrapError(err)
+		return constants.EMPTY_STRING, 0, i18n.WrapError(err)
 	}
 
-	if len(subfolders) != 1 {
-		return constants.EMPTY_STRING, nil
+	if len(subfolders) == 0 {
+		return constants.EMPTY_STRING, 0, nil
 	}
 
-	return subfolders[0].Name(), nil
+	return subfolders[0].Name(), len(subfolders), nil
 }
 
 func FilterOutFoldersByNames(folders []os.FileInfo, names ...string) []os.FileInfo {
