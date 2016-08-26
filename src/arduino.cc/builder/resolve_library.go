@@ -34,92 +34,34 @@ import (
 	"strings"
 
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
-	"arduino.cc/properties"
 )
 
-type IncludesToIncludeFolders struct{}
-
-func (s *IncludesToIncludeFolders) Run(ctx *types.Context) error {
-	includes := ctx.Includes
+func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 	headerToLibraries := ctx.HeaderToLibraries
-
-	platform := ctx.TargetPlatform
-	actualPlatform := ctx.ActualPlatform
+	platforms := []*types.Platform{ctx.ActualPlatform, ctx.TargetPlatform}
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 
-	newlyImportedLibraries, err := resolveLibraries(includes, headerToLibraries, importedLibraries, []*types.Platform{actualPlatform, platform}, libraryResolutionResults)
-	if err != nil {
-		return i18n.WrapError(err)
-	}
-
-	foldersWithSources := ctx.FoldersWithSourceFiles
-
-	for _, newlyImportedLibrary := range newlyImportedLibraries {
-		if !sliceContainsLibrary(importedLibraries, newlyImportedLibrary) {
-			importedLibraries = append(importedLibraries, newlyImportedLibrary)
-			sourceFolders := types.LibraryToSourceFolder(newlyImportedLibrary)
-			for _, sourceFolder := range sourceFolders {
-				foldersWithSources.Push(sourceFolder)
-			}
-		}
-	}
-
-	ctx.ImportedLibraries = importedLibraries
-	ctx.IncludeFolders = resolveIncludeFolders(newlyImportedLibraries, ctx.BuildProperties, ctx.Verbose)
-
-	return nil
-}
-
-func resolveIncludeFolders(importedLibraries []*types.Library, buildProperties properties.Map, verbose bool) []string {
-	var includeFolders []string
-	includeFolders = append(includeFolders, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
-	if buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {
-		includeFolders = append(includeFolders, buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
-	}
-
-	for _, library := range importedLibraries {
-		includeFolders = append(includeFolders, library.SrcFolder)
-	}
-
-	return includeFolders
-}
-
-//FIXME it's also resolving previously resolved libraries
-func resolveLibraries(includes []string, headerToLibraries map[string][]*types.Library, importedLibraries []*types.Library, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) ([]*types.Library, error) {
 	markImportedLibrary := make(map[*types.Library]bool)
 	for _, library := range importedLibraries {
 		markImportedLibrary[library] = true
 	}
-	for _, header := range includes {
-		resolveLibrary(header, headerToLibraries, markImportedLibrary, platforms, libraryResolutionResults)
-	}
 
-	var newlyImportedLibraries []*types.Library
-	for library, _ := range markImportedLibrary {
-		newlyImportedLibraries = append(newlyImportedLibraries, library)
-	}
-
-	return newlyImportedLibraries, nil
-}
-
-func resolveLibrary(header string, headerToLibraries map[string][]*types.Library, markImportedLibrary map[*types.Library]bool, platforms []*types.Platform, libraryResolutionResults map[string]types.LibraryResolutionResult) {
 	libraries := append([]*types.Library{}, headerToLibraries[header]...)
 
 	if libraries == nil || len(libraries) == 0 {
-		return
+		return nil
 	}
 
 	if len(libraries) == 1 {
 		markImportedLibrary[libraries[0]] = true
-		return
+		return libraries[0]
 	}
 
 	if markImportedLibraryContainsOneOfCandidates(markImportedLibrary, libraries) {
-		return
+		return nil
 	}
 
 	reverse(libraries)
@@ -151,6 +93,7 @@ func resolveLibrary(header string, headerToLibraries map[string][]*types.Library
 	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
 
 	markImportedLibrary[library] = true
+	return library
 }
 
 //facepalm. sort.Reverse needs an Interface that implements Len/Less/Swap. It's a slice! What else for reversing it?!?

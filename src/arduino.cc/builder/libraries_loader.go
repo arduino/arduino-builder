@@ -113,6 +113,14 @@ func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*typ
 	return makeNewLibrary(libraryFolder, debugLevel, logger)
 }
 
+func addUtilityFolder(library *types.Library) {
+	utilitySourcePath := filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)
+	stat, err := os.Stat(utilitySourcePath)
+	if err == nil && stat.IsDir() {
+		library.UtilityFolder = utilitySourcePath
+	}
+}
+
 func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*types.Library, error) {
 	libProperties, err := properties.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES), logger)
 	if err != nil {
@@ -130,12 +138,14 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	}
 
 	library := &types.Library{}
+	library.Folder = libraryFolder
 	if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)); err == nil && stat.IsDir() {
 		library.Layout = types.LIBRARY_RECURSIVE
 		library.SrcFolder = filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)
 	} else {
 		library.Layout = types.LIBRARY_FLAT
 		library.SrcFolder = libraryFolder
+		addUtilityFolder(library)
 	}
 
 	subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
@@ -173,7 +183,6 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	}
 	library.License = libProperties[constants.LIBRARY_LICENSE]
 
-	library.Folder = libraryFolder
 	library.Name = filepath.Base(libraryFolder)
 	library.Version = strings.TrimSpace(libProperties[constants.LIBRARY_VERSION])
 	library.Author = strings.TrimSpace(libProperties[constants.LIBRARY_AUTHOR])
@@ -197,6 +206,7 @@ func makeLegacyLibrary(libraryFolder string) (*types.Library, error) {
 		Archs:     []string{constants.LIBRARY_ALL_ARCHS},
 		IsLegacy:  true,
 	}
+	addUtilityFolder(library)
 	return library, nil
 }
 

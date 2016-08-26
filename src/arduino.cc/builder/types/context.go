@@ -46,8 +46,7 @@ type Context struct {
 	PreprocPath          string
 	SketchObjectFiles    []string
 
-	CollectedSourceFiles   *UniqueStringQueue
-	FoldersWithSourceFiles *UniqueSourceFolderQueue
+	CollectedSourceFiles   *UniqueSourceFileQueue
 
 	Sketch          *Sketch
 	Source          string
@@ -56,12 +55,11 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	Includes                   []string
 	Libraries                  []*Library
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludesJustFound          []string
+	IncludeJustFound           string
 	IncludeFolders             []string
 	OutputGccMinusM            string
 
