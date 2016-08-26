@@ -55,7 +55,7 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 ### Building from source
 
-You need [Go 1.5.4](https://golang.org/dl/#go1.5.4).
+You need [Go 1.6.2](https://golang.org/dl/#go1.6.2).
 
 Repo root contains the script `setup_go_env_vars`. Use it as is or as a template for setting up Go environment variables.
 
