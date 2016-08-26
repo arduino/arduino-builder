@@ -32,12 +32,12 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/types"
+	"fmt"
 	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"sort"
 	"testing"
-	"fmt"
 )
 
 func TestIncludesToIncludeFolders(t *testing.T) {
@@ -339,4 +339,3 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 	require.Equal(t, "testlib2", importedLibraries[1].Name)
 	require.Equal(t, "testlib3", importedLibraries[2].Name)
 }
-

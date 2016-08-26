@@ -40,9 +40,9 @@ import (
 
 type SourceFile struct {
 	// Sketch or Library pointer that this source file lives in
-        Origin interface{}
+	Origin interface{}
 	// Path to the source file within the sketch/library root folder
-        RelativePath string
+	RelativePath string
 }
 
 // Create a SourceFile containing the given source file path within the
@@ -63,40 +63,40 @@ func MakeSourceFile(ctx *Context, origin interface{}, path string) (SourceFile, 
 // be placed. Any directories inside SourceFile.RelativePath will be
 // appended here.
 func buildRoot(ctx *Context, origin interface{}) string {
-        switch o := origin.(type) {
-                case *Sketch:
-                        return ctx.SketchBuildPath
-                case *Library:
-			return filepath.Join(ctx.LibrariesBuildPath, o.Name)
-                default:
-                        panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
-        }
+	switch o := origin.(type) {
+	case *Sketch:
+		return ctx.SketchBuildPath
+	case *Library:
+		return filepath.Join(ctx.LibrariesBuildPath, o.Name)
+	default:
+		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	}
 }
 
 // Return the source root for the given origin, where its source files
 // can be found. Prepending this to SourceFile.RelativePath will give
 // the full path to that source file.
 func sourceRoot(ctx *Context, origin interface{}) string {
-        switch o := origin.(type) {
-                case *Sketch:
-                        return ctx.SketchBuildPath
-                case *Library:
-			return o.SrcFolder
-                default:
-                        panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
-        }
+	switch o := origin.(type) {
+	case *Sketch:
+		return ctx.SketchBuildPath
+	case *Library:
+		return o.SrcFolder
+	default:
+		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	}
 }
 
 func (f *SourceFile) SourcePath(ctx *Context) string {
-        return filepath.Join(sourceRoot(ctx, f.Origin), f.RelativePath)
+	return filepath.Join(sourceRoot(ctx, f.Origin), f.RelativePath)
 }
 
 func (f *SourceFile) ObjectPath(ctx *Context) string {
-        return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath + ".o")
+	return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath+".o")
 }
 
 func (f *SourceFile) DepfilePath(ctx *Context) string {
-        return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath + ".d")
+	return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath+".d")
 }
 
 type SketchFile struct {
@@ -163,23 +163,23 @@ const (
 )
 
 type Library struct {
-	Folder      string
-	SrcFolder   string
+	Folder        string
+	SrcFolder     string
 	UtilityFolder string
-	Layout      LibraryLayout
-	Name        string
-	Archs       []string
-	DotALinkage bool
-	IsLegacy    bool
-	Version     string
-	Author      string
-	Maintainer  string
-	Sentence    string
-	Paragraph   string
-	URL         string
-	Category    string
-	License     string
-	Properties  map[string]string
+	Layout        LibraryLayout
+	Name          string
+	Archs         []string
+	DotALinkage   bool
+	IsLegacy      bool
+	Version       string
+	Author        string
+	Maintainer    string
+	Sentence      string
+	Paragraph     string
+	URL           string
+	Category      string
+	License       string
+	Properties    map[string]string
 }
 
 func (library *Library) String() string {

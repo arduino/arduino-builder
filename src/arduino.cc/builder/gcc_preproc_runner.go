@@ -44,7 +44,7 @@ import (
 type GCCPreprocRunner struct {
 	SourceFilePath string
 	TargetFileName string
-	Includes []string
+	Includes       []string
 }
 
 func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
@@ -73,7 +73,7 @@ func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
 type GCCPreprocRunnerForDiscoveringIncludes struct {
 	SourceFilePath string
 	TargetFilePath string
-	Includes []string
+	Includes       []string
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {

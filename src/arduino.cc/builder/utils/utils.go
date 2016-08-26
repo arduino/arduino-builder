@@ -30,10 +30,6 @@
 package utils
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/gohasissues"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/types"
 	"crypto/md5"
 	"encoding/hex"
 	"io/ioutil"
@@ -42,6 +38,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/gohasissues"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
 )
 
 func KeysOfMapOfStringInterface(input map[string]interface{}) []string {

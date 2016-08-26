@@ -46,7 +46,7 @@ type Context struct {
 	PreprocPath          string
 	SketchObjectFiles    []string
 
-	CollectedSourceFiles   *UniqueSourceFileQueue
+	CollectedSourceFiles *UniqueSourceFileQueue
 
 	Sketch          *Sketch
 	Source          string

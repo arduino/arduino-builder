@@ -139,10 +139,10 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	ctx.CollectedSourceFiles.Push(mergedfile)
 
 	sourceFilePaths := ctx.CollectedSourceFiles
-	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, /* recurse */ false)
+	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
 	srcSubfolderPath := filepath.Join(ctx.SketchBuildPath, constants.SKETCH_FOLDER_SRC)
 	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
-		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, /* recurse */ true)
+		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
 	}
 
 	for !sourceFilePaths.Empty() {
@@ -195,7 +195,7 @@ type includeCacheEntry struct {
 
 type includeCache struct {
 	// Are the cache contents valid so far?
-	valid   bool
+	valid bool
 	// Index into entries of the next entry to be processed. Unused
 	// when the cache is invalid.
 	next    int
@@ -373,7 +373,7 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 
 	for _, filePath := range filePaths {
 		sourceFile, err := types.MakeSourceFile(ctx, origin, filePath)
-		if (err != nil) {
+		if err != nil {
 			return i18n.WrapError(err)
 		}
 		queue.Push(sourceFile)
