@@ -30,15 +30,16 @@
 package test
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testing"
+
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
@@ -474,7 +475,6 @@ func TestCTagsRunnerSketchWithClassFunction(t *testing.T) {
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
 		&ctags.CTagsParser{},
-		&CollectCtagsFromPreprocSource{},
 		&ctags.CTagsToPrototypes{},
 	}
 

@@ -160,6 +160,11 @@ func init() {
 func main() {
 	flag.Parse()
 
+	for _, t := range customBuildPropertiesFlag {
+		fmt.Println(t)
+	}
+	return
+
 	if *versionFlag {
 		fmt.Println("Arduino Builder " + VERSION)
 		fmt.Println("Copyright (C) 2015 Arduino LLC and contributors")
