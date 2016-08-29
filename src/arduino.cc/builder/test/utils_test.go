@@ -127,4 +127,14 @@ func TestParseCppString(t *testing.T) {
 	require.Equal(t, true, ok)
 	require.Equal(t, ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~`, str)
 	require.Equal(t, ``, rest)
+
+	str, rest, ok = utils.ParseCppString(`"/home/ççç/"`)
+	require.Equal(t, true, ok)
+	require.Equal(t, `/home/ççç/`, str)
+	require.Equal(t, ``, rest)
+
+	str, rest, ok = utils.ParseCppString(`"/home/ççç/ /$sdsdd\\"`)
+	require.Equal(t, true, ok)
+	require.Equal(t, `/home/ççç/ /$sdsdd\`, str)
+	require.Equal(t, ``, rest)
 }
