@@ -30,11 +30,12 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"arduino.cc/builder"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
-	"path/filepath"
-	"testing"
 )
 
 func TestLoadSketchWithFolder(t *testing.T) {
@@ -122,9 +123,11 @@ func TestLoadSketchFromFolder(t *testing.T) {
 
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))
 
-	require.Equal(t, 2, len(sketch.AdditionalFiles))
-	require.Contains(t, sketch.AdditionalFiles[0].Name, "other.cpp")
-	require.Contains(t, sketch.AdditionalFiles[1].Name, "other.h")
+	require.Equal(t, 4, len(sketch.AdditionalFiles))
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[0].Name), "sketch_with_subfolders/src/subfolder/other.cpp")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[1].Name), "sketch_with_subfolders/src/subfolder/other.h")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[2].Name), "sketch_with_subfolders/subfolder/dont_load_me.cpp")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[3].Name), "sketch_with_subfolders/subfolder/other.h")
 }
 
 func TestLoadSketchWithBackup(t *testing.T) {

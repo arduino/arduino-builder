@@ -1,4 +1,4 @@
-## Arduino Builder
+## Arduino Builder [![Build Status](https://travis-ci.org/arduino/arduino-builder.svg?branch=master)](https://travis-ci.org/arduino/arduino-builder)
 
 A command line tool for compiling Arduino sketches
 
@@ -55,7 +55,7 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 ### Building from source
 
-You need [Go 1.5.4](https://golang.org/dl/#go1.5.4).
+You need [Go 1.6.3](https://golang.org/dl/#go1.6.3).
 
 Repo root contains the script `setup_go_env_vars`. Use it as is or as a template for setting up Go environment variables.
 
@@ -75,7 +75,7 @@ go build arduino.cc/arduino-builder
 In order to run the tests, type:
 
 ```
-go test arduino.cc/builder/test
+go test arduino.cc/...
 ```
 
 This runs all tests, showing any failures and a summary at the end.
@@ -89,13 +89,13 @@ To run a single test, use the -run option, which accepts a regular
 expression (see also go help testflag).
 
 ```
-go test arduino.cc/builder/test -run 'TestBuilderEmptySketch'
-go test arduino.cc/builder/test -run 'TestPrototypesAdder.*'
+go test arduino.cc/... -run 'TestBuilderEmptySketch'
+go test arduino.cc/... -run 'TestPrototypesAdder.*'
 ```
 
 In jenkins, use
 ```
-go test -v arduino.cc/builder/test | bin/go-junit-report > report.xml
+go test -v arduino.cc/... | bin/go-junit-report > report.xml
 ```
 
 The first time you run the tests, some needed files (toolchains and

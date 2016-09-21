@@ -30,15 +30,16 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 )
 
 type SketchLoader struct{}
@@ -91,18 +92,11 @@ func collectAllSketchFiles(from string) ([]string, error) {
 	// Source files in the root are compiled, non-recursively. This
 	// is the only place where .ino files can be present.
 	rootExtensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
-	err := utils.FindFilesInFolder(&filePaths, from, rootExtensions, /* recurse */ false)
+	err := utils.FindFilesInFolder(&filePaths, from, rootExtensions, true /* recurse */)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	// The "src/" subdirectory of a sketch is compiled recursively
-	// (but .ino files are *not* compiled)
-	srcPath := filepath.Join(from, constants.SKETCH_FOLDER_SRC)
-	if info, err := os.Stat(srcPath); err == nil && info.IsDir() {
-		srcExtensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
-		err = utils.FindFilesInFolder(&filePaths, srcPath, srcExtensions, /* recurse */ true)
-	}
 	return filePaths, i18n.WrapError(err)
 }
 

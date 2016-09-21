@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
-#line 1 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
+#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 #define DEBUG 1
 #define DISABLED 0
 
@@ -16,17 +16,17 @@ typedef int MyType;
 
 #include "empty_2.h"
 
-#line 16 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 16 {{QuoteCppString .sketch.MainFile.Name}}
 void setup();
-#line 21 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 21 {{QuoteCppString .sketch.MainFile.Name}}
 void loop();
-#line 33 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 33 {{QuoteCppString .sketch.MainFile.Name}}
 void debug();
-#line 44 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 44 {{QuoteCppString .sketch.MainFile.Name}}
 void disabledIsDefined();
-#line 48 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 48 {{QuoteCppString .sketch.MainFile.Name}}
 int useMyType(MyType type);
-#line 16 "{{EscapeBackSlashes .sketch.MainFile.Name}}"
+#line 16 {{QuoteCppString .sketch.MainFile.Name}}
 void setup() {
   // put your setup code here, to run once:
 

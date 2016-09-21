@@ -1,8 +1,11 @@
 package types
 
-import "strings"
-import "arduino.cc/builder/i18n"
-import "arduino.cc/builder/props"
+import (
+	"strings"
+
+	"arduino.cc/builder/i18n"
+	"arduino.cc/properties"
+)
 
 // Context structure
 type Context struct {
@@ -31,7 +34,7 @@ type Context struct {
 	PlatformKeyRewrites    PlatforKeysRewrite
 	HardwareRewriteResults map[*Platform][]PlatforKeyRewrite
 
-	BuildProperties      props.PropertiesMap
+	BuildProperties      properties.Map
 	BuildCore            string
 	BuildPath            string
 	SketchBuildPath      string
@@ -43,8 +46,7 @@ type Context struct {
 	PreprocPath          string
 	SketchObjectFiles    []string
 
-	CollectedSourceFiles   *UniqueStringQueue
-	FoldersWithSourceFiles *UniqueSourceFolderQueue
+	CollectedSourceFiles *UniqueSourceFileQueue
 
 	Sketch          *Sketch
 	Source          string
@@ -53,21 +55,18 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	Includes                   []string
 	Libraries                  []*Library
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludesJustFound          []string
+	IncludeJustFound           string
 	IncludeFolders             []string
 	OutputGccMinusM            string
 
 	// C++ Parsing
 	CTagsOutput                 string
 	CTagsTargetFile             string
-	CTagsOfSource               []*CTag
 	CTagsOfPreprocessedSource   []*CTag
-	CTagsCollected              []*CTag
 	IncludeSection              string
 	LineOffset                  int
 	PrototypesSection           string
@@ -89,8 +88,8 @@ type Context struct {
 	FileToRead string
 }
 
-func (ctx *Context) ExtractBuildOptions() props.PropertiesMap {
-	opts := make(props.PropertiesMap)
+func (ctx *Context) ExtractBuildOptions() properties.Map {
+	opts := make(properties.Map)
 	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders, ",")
 	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders, ",")
 	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders, ",")
@@ -102,7 +101,7 @@ func (ctx *Context) ExtractBuildOptions() props.PropertiesMap {
 	return opts
 }
 
-func (ctx *Context) InjectBuildOptions(opts props.PropertiesMap) {
+func (ctx *Context) InjectBuildOptions(opts properties.Map) {
 	ctx.HardwareFolders = strings.Split(opts["hardwareFolders"], ",")
 	ctx.ToolsFolders = strings.Split(opts["toolsFolders"], ",")
 	ctx.BuiltInLibrariesFolders = strings.Split(opts["builtInLibrariesFolders"], ",")

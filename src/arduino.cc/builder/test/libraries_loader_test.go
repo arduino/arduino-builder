@@ -30,13 +30,14 @@
 package test
 
 import (
+	"path/filepath"
+	"sort"
+	"testing"
+
 	"arduino.cc/builder"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
-	"path/filepath"
-	"sort"
-	"testing"
 )
 
 func TestLoadLibrariesAVR(t *testing.T) {
@@ -68,7 +69,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
 	libraries := ctx.Libraries
-	require.Equal(t, 20, len(libraries))
+	require.Equal(t, 24, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 
@@ -177,7 +178,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
 	libraries := ctx.Libraries
-	require.Equal(t, 18, len(libraries))
+	require.Equal(t, 22, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 

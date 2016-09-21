@@ -30,13 +30,14 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"os"
 	"path/filepath"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/i18n"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
 type HardwareLoader struct{}
@@ -63,7 +64,7 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 			return i18n.ErrorfWithLogger(logger, constants.MSG_MUST_BE_A_FOLDER, folder)
 		}
 
-		hardwarePlatformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
+		hardwarePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
@@ -111,7 +112,7 @@ func getOrCreatePackage(packages *types.Packages, packageId string) *types.Packa
 }
 
 func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger) error {
-	packagePlatformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
+	packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -161,7 +162,7 @@ func getOrCreatePlatform(platforms map[string]*types.Platform, platformId string
 	targetPlatform.PlatformId = platformId
 	targetPlatform.Boards = make(map[string]*types.Board)
 	targetPlatform.Properties = make(map[string]string)
-	targetPlatform.Programmers = make(map[string]props.PropertiesMap)
+	targetPlatform.Programmers = make(map[string]properties.Map)
 
 	return &targetPlatform
 }
@@ -185,12 +186,12 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 
 	assignDefaultBoardToPlatform(targetPlatform)
 
-	platformTxt, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
+	platformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT), logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	localPlatformProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_LOCAL_TXT), logger)
+	localPlatformProperties, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_LOCAL_TXT), logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -199,11 +200,11 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 	targetPlatform.Properties.Merge(platformTxt)
 	targetPlatform.Properties.Merge(localPlatformProperties)
 
-	programmersProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_PROGRAMMERS_TXT), logger)
+	programmersProperties, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PROGRAMMERS_TXT), logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	targetPlatform.Programmers = props.MergeMapsOfProperties(make(map[string]props.PropertiesMap), targetPlatform.Programmers, programmersProperties.FirstLevelOf())
+	targetPlatform.Programmers = properties.MergeMapsOfProperties(make(map[string]properties.Map), targetPlatform.Programmers, programmersProperties.FirstLevelOf())
 
 	return nil
 }
@@ -219,26 +220,26 @@ func assignDefaultBoardToPlatform(targetPlatform *types.Platform) {
 }
 
 func loadBoards(boards map[string]*types.Board, packageId string, platformId string, folder string, logger i18n.Logger) error {
-	properties, err := props.Load(filepath.Join(folder, constants.FILE_BOARDS_TXT), logger)
+	boardsProperties, err := properties.Load(filepath.Join(folder, constants.FILE_BOARDS_TXT), logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	localProperties, err := props.SafeLoad(filepath.Join(folder, constants.FILE_BOARDS_LOCAL_TXT), logger)
+	localProperties, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_BOARDS_LOCAL_TXT), logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	properties = properties.Merge(localProperties)
+	boardsProperties = boardsProperties.Merge(localProperties)
 
-	propertiesByBoardId := properties.FirstLevelOf()
+	propertiesByBoardId := boardsProperties.FirstLevelOf()
 	delete(propertiesByBoardId, constants.BOARD_PROPERTIES_MENU)
 
-	for boardId, properties := range propertiesByBoardId {
-		properties[constants.ID] = boardId
-		board := getOrCreateBoard(boards, boardId)
-		board.Properties.Merge(properties)
-		boards[boardId] = board
+	for boardID, boardProperties := range propertiesByBoardId {
+		boardProperties[constants.ID] = boardID
+		board := getOrCreateBoard(boards, boardID)
+		board.Properties.Merge(boardProperties)
+		boards[boardID] = board
 	}
 
 	return nil
@@ -251,7 +252,7 @@ func getOrCreateBoard(boards map[string]*types.Board, boardId string) *types.Boa
 
 	board := types.Board{}
 	board.BoardId = boardId
-	board.Properties = make(props.PropertiesMap)
+	board.Properties = make(properties.Map)
 
 	return &board
 }

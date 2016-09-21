@@ -43,13 +43,13 @@ import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 	"github.com/go-errors/errors"
 )
 
-const VERSION = "1.3.18"
+const VERSION = "1.3.21"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
@@ -172,7 +172,7 @@ func main() {
 	ctx := &types.Context{}
 
 	if *buildOptionsFileFlag != "" {
-		buildOptions := make(props.PropertiesMap)
+		buildOptions := make(properties.Map)
 		if _, err := os.Stat(*buildOptionsFileFlag); err == nil {
 			data, err := ioutil.ReadFile(*buildOptionsFileFlag)
 			if err != nil {

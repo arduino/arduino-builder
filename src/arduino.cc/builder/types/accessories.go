@@ -52,25 +52,25 @@ func (queue *UniqueStringQueue) Empty() bool {
 	return queue.Len() == 0
 }
 
-type UniqueSourceFolderQueue []SourceFolder
+type UniqueSourceFileQueue []SourceFile
 
-func (queue UniqueSourceFolderQueue) Len() int           { return len(queue) }
-func (queue UniqueSourceFolderQueue) Less(i, j int) bool { return false }
-func (queue UniqueSourceFolderQueue) Swap(i, j int)      { panic("Who called me?!?") }
+func (queue UniqueSourceFileQueue) Len() int           { return len(queue) }
+func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
+func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
 
-func (queue *UniqueSourceFolderQueue) Push(value SourceFolder) {
-	if !sliceContainsSourceFolder(*queue, value) {
+func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
+	if !sliceContainsSourceFile(*queue, value) {
 		*queue = append(*queue, value)
 	}
 }
 
-func (queue *UniqueSourceFolderQueue) Pop() interface{} {
+func (queue *UniqueSourceFileQueue) Pop() SourceFile {
 	old := *queue
 	x := old[0]
 	*queue = old[1:]
 	return x
 }
 
-func (queue *UniqueSourceFolderQueue) Empty() bool {
+func (queue *UniqueSourceFileQueue) Empty() bool {
 	return queue.Len() == 0
 }

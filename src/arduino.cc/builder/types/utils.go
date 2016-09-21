@@ -39,9 +39,9 @@ func sliceContains(slice []string, target string) bool {
 	return false
 }
 
-func sliceContainsSourceFolder(slice []SourceFolder, target SourceFolder) bool {
+func sliceContainsSourceFile(slice []SourceFile, target SourceFile) bool {
 	for _, elem := range slice {
-		if elem.Folder == target.Folder {
+		if elem.Origin == target.Origin && elem.RelativePath == target.RelativePath {
 			return true
 		}
 	}

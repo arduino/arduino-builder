@@ -30,14 +30,16 @@
 package builder
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
+	"arduino.cc/timeutils"
 )
 
 type SetupBuildProperties struct{}
@@ -49,7 +51,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	actualPlatform := ctx.ActualPlatform
 	targetBoard := ctx.TargetBoard
 
-	buildProperties := make(props.PropertiesMap)
+	buildProperties := make(properties.Map)
 	buildProperties.Merge(actualPlatform.Properties)
 	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(targetBoard.Properties)
@@ -108,9 +110,9 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	now := time.Now()
 	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_UTC] = strconv.FormatInt(now.Unix(), 10)
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL] = strconv.FormatInt(utils.LocalUnix(now), 10)
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = strconv.Itoa(utils.TimezoneOffset())
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = strconv.Itoa(utils.DaylightSavingsOffset(now))
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL] = strconv.FormatInt(timeutils.LocalUnix(now), 10)
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = strconv.Itoa(timeutils.TimezoneOffsetNoDST(now))
+	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = strconv.Itoa(timeutils.DaylightSavingsOffset(now))
 
 	ctx.BuildProperties = buildProperties
 

@@ -30,12 +30,74 @@
 package types
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/props"
+	"fmt"
 	"path/filepath"
 	"strconv"
-	"os"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/properties"
 )
+
+type SourceFile struct {
+	// Sketch or Library pointer that this source file lives in
+	Origin interface{}
+	// Path to the source file within the sketch/library root folder
+	RelativePath string
+}
+
+// Create a SourceFile containing the given source file path within the
+// given origin. The given path can be absolute, or relative within the
+// origin's root source folder
+func MakeSourceFile(ctx *Context, origin interface{}, path string) (SourceFile, error) {
+	if filepath.IsAbs(path) {
+		var err error
+		path, err = filepath.Rel(sourceRoot(ctx, origin), path)
+		if err != nil {
+			return SourceFile{}, err
+		}
+	}
+	return SourceFile{Origin: origin, RelativePath: path}, nil
+}
+
+// Return the build root for the given origin, where build products will
+// be placed. Any directories inside SourceFile.RelativePath will be
+// appended here.
+func buildRoot(ctx *Context, origin interface{}) string {
+	switch o := origin.(type) {
+	case *Sketch:
+		return ctx.SketchBuildPath
+	case *Library:
+		return filepath.Join(ctx.LibrariesBuildPath, o.Name)
+	default:
+		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	}
+}
+
+// Return the source root for the given origin, where its source files
+// can be found. Prepending this to SourceFile.RelativePath will give
+// the full path to that source file.
+func sourceRoot(ctx *Context, origin interface{}) string {
+	switch o := origin.(type) {
+	case *Sketch:
+		return ctx.SketchBuildPath
+	case *Library:
+		return o.SrcFolder
+	default:
+		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	}
+}
+
+func (f *SourceFile) SourcePath(ctx *Context) string {
+	return filepath.Join(sourceRoot(ctx, f.Origin), f.RelativePath)
+}
+
+func (f *SourceFile) ObjectPath(ctx *Context) string {
+	return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath+".o")
+}
+
+func (f *SourceFile) DepfilePath(ctx *Context) string {
+	return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath+".d")
+}
 
 type SketchFile struct {
 	Name   string
@@ -63,13 +125,13 @@ type Sketch struct {
 }
 
 type Packages struct {
-	Properties props.PropertiesMap
+	Properties properties.Map
 	Packages   map[string]*Package
 }
 
 type Package struct {
 	PackageId  string
-	Properties props.PropertiesMap
+	Properties properties.Map
 	Platforms  map[string]*Platform
 }
 
@@ -78,13 +140,13 @@ type Platform struct {
 	Folder       string
 	DefaultBoard *Board
 	Boards       map[string]*Board
-	Properties   props.PropertiesMap
-	Programmers  map[string]props.PropertiesMap
+	Properties   properties.Map
+	Programmers  map[string]properties.Map
 }
 
 type Board struct {
 	BoardId    string
-	Properties props.PropertiesMap
+	Properties properties.Map
 }
 
 type Tool struct {
@@ -101,22 +163,23 @@ const (
 )
 
 type Library struct {
-	Folder      string
-	SrcFolder   string
-	Layout      LibraryLayout
-	Name        string
-	Archs       []string
-	DotALinkage bool
-	IsLegacy    bool
-	Version     string
-	Author      string
-	Maintainer  string
-	Sentence    string
-	Paragraph   string
-	URL         string
-	Category    string
-	License     string
-	Properties  map[string]string
+	Folder        string
+	SrcFolder     string
+	UtilityFolder string
+	Layout        LibraryLayout
+	Name          string
+	Archs         []string
+	DotALinkage   bool
+	IsLegacy      bool
+	Version       string
+	Author        string
+	Maintainer    string
+	Sentence      string
+	Paragraph     string
+	URL           string
+	Category      string
+	License       string
+	Properties    map[string]string
 }
 
 func (library *Library) String() string {
@@ -174,9 +237,8 @@ type SourceFolder struct {
 }
 
 type LibraryResolutionResult struct {
-	Library               *Library
-	IsLibraryFromPlatform bool
-	NotUsedLibraries      []*Library
+	Library          *Library
+	NotUsedLibraries []*Library
 }
 
 type CTag struct {
@@ -200,11 +262,8 @@ func LibraryToSourceFolder(library *Library) []SourceFolder {
 	sourceFolders := []SourceFolder{}
 	recurse := library.Layout == LIBRARY_RECURSIVE
 	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
-	if library.Layout == LIBRARY_FLAT {
-		utility := filepath.Join(library.SrcFolder, constants.LIBRARY_FOLDER_UTILITY)
-		if info, err := os.Stat(utility); err == nil && info.IsDir() {
-			sourceFolders = append(sourceFolders, SourceFolder{Folder: utility, Recurse: false})
-		}
+	if library.UtilityFolder != "" {
+		sourceFolders = append(sourceFolders, SourceFolder{Folder: library.UtilityFolder, Recurse: false})
 	}
 	return sourceFolders
 }

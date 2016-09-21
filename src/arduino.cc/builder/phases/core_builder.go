@@ -33,9 +33,9 @@ import (
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
-	"arduino.cc/builder/props"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
+	"arduino.cc/properties"
 )
 
 type CoreBuilder struct{}
@@ -63,7 +63,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileCore(buildPath string, buildProperties props.PropertiesMap, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
+func compileCore(buildPath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
 

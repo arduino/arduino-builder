@@ -1,6 +1,8 @@
 /*
  * This file is part of Arduino Builder.
  *
+ * Copyright 2016 Arduino LLC (http://www.arduino.cc/)
+ *
  * Arduino Builder is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,39 +25,31 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package timeutils
 
-// XXX: Obsolete?
+import "time"
 
-import "arduino.cc/builder/types"
-
-type ComparePrototypesFromSourceAndPreprocSource struct{}
-
-func (s *ComparePrototypesFromSourceAndPreprocSource) Run(ctx *types.Context) error {
-	ctagsOfSource := ctx.CTagsOfSource
-	ctagsOfPreprocSource := ctx.CTagsOfPreprocessedSource
-
-	actualCTags := []*types.CTag{}
-	for _, ctagOfPreprocSource := range ctagsOfPreprocSource {
-		if sliceContainsCTag(ctagsOfSource, ctagOfPreprocSource) {
-			actualCTags = append(actualCTags, ctagOfPreprocSource)
-		}
+// TimezoneOffsetNoDST returns the timezone offset without the DST component
+func TimezoneOffsetNoDST(t time.Time) int {
+	_, winterOffset := time.Date(t.Year(), 1, 1, 0, 0, 0, 0, t.Location()).Zone()
+	_, summerOffset := time.Date(t.Year(), 7, 1, 0, 0, 0, 0, t.Location()).Zone()
+	if winterOffset > summerOffset {
+		winterOffset, summerOffset = summerOffset, winterOffset
 	}
-
-	ctx.CTagsCollected = actualCTags
-
-	return nil
+	return winterOffset
 }
 
-func sliceContainsCTag(slice []*types.CTag, target *types.CTag) bool {
-	for _, value := range slice {
-		if value.FunctionName == target.FunctionName {
-			return true
-		}
-	}
-	return false
+// DaylightSavingsOffset returns the DST offset of the specified time
+func DaylightSavingsOffset(t time.Time) int {
+	_, offset := t.Zone()
+	return offset - TimezoneOffsetNoDST(t)
+}
+
+// LocalUnix returns the unix timestamp of the specified time with the
+// local timezone offset and DST added
+func LocalUnix(t time.Time) int64 {
+	_, offset := t.Zone()
+	return t.Unix() + int64(offset)
 }

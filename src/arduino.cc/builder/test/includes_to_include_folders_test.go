@@ -32,6 +32,7 @@ package test
 import (
 	"arduino.cc/builder"
 	"arduino.cc/builder/types"
+	"fmt"
 	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
@@ -73,10 +74,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["Bridge.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
@@ -112,9 +109,6 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 
 	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 0, len(importedLibraries))
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
 }
 
 func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
@@ -153,11 +147,6 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	require.Equal(t, 2, len(importedLibraries))
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
 	require.Equal(t, "IRremote", importedLibraries[1].Name)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["Bridge.h"].IsLibraryFromPlatform)
-	require.False(t, libraryResolutionResults["IRremote.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
@@ -196,11 +185,6 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	require.Equal(t, 2, len(importedLibraries))
 	require.Equal(t, "ANewLibrary-master", importedLibraries[0].Name)
 	require.Equal(t, "IRremote", importedLibraries[1].Name)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["anewlibrary.h"].IsLibraryFromPlatform)
-	require.False(t, libraryResolutionResults["IRremote.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
@@ -238,10 +222,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI")), importedLibraries[0].SrcFolder)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.True(t, libraryResolutionResults["SPI.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform(t *testing.T) {
@@ -280,10 +260,6 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("libraries", "SPI")), importedLibraries[0].SrcFolder)
-
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["SPI.h"].IsLibraryFromPlatform)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
@@ -322,8 +298,44 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "USBHost", importedLibraries[0].Name)
 	require.Equal(t, Abs(t, filepath.Join("libraries", "USBHost", "src")), importedLibraries[0].SrcFolder)
+}
 
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-	require.NotNil(t, libraryResolutionResults)
-	require.False(t, libraryResolutionResults["Usb.h"].IsLibraryFromPlatform)
+func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"),
+		FQBN:                    "arduino:avr:leonardo",
+		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
+	}
+
+	buildPath := SetupBuildPath(t, ctx)
+	defer os.RemoveAll(buildPath)
+
+	commands := []types.Command{
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(ctx)
+		NoError(t, err)
+	}
+
+	importedLibraries := ctx.ImportedLibraries
+	sort.Sort(ByLibraryName(importedLibraries))
+	fmt.Println(importedLibraries)
+	require.Equal(t, 3, len(importedLibraries))
+	require.Equal(t, "testlib1", importedLibraries[0].Name)
+	require.Equal(t, "testlib2", importedLibraries[1].Name)
+	require.Equal(t, "testlib3", importedLibraries[2].Name)
 }
