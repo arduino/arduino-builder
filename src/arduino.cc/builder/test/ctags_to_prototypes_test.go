@@ -51,7 +51,7 @@ func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -82,7 +82,7 @@ func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -111,7 +111,7 @@ func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -141,7 +141,7 @@ func TestCTagsToPrototypesShouldDealWithClasses(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -166,7 +166,7 @@ func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -195,7 +195,7 @@ func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -226,7 +226,7 @@ func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -253,7 +253,7 @@ func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -281,7 +281,7 @@ func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -309,7 +309,7 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -338,7 +338,7 @@ func TestCTagsToPrototypesNamespace(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -366,7 +366,7 @@ func TestCTagsToPrototypesStatic(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -396,7 +396,7 @@ func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -425,7 +425,7 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 	ctx.CTagsOutput = string(bytes)
 
 	commands := []types.Command{
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 
@@ -474,7 +474,7 @@ func TestCTagsRunnerSketchWithClassFunction(t *testing.T) {
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
 		&ctags.CTagsRunner{},
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 	}
 

@@ -48,7 +48,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&ctags.CTagsRunner{},
-		&ctags.CTagsParser{},
+		&ctags.CTags{},
 		&ctags.CTagsToPrototypes{},
 		&PrototypesAdder{},
 		&SketchSaver{},
