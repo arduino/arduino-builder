@@ -31,12 +31,9 @@ package test
 
 import (
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"testing"
 
-	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
 	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
@@ -214,45 +211,7 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 }
 
 func TestCTagsRunnerSketchWithClassFunction(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	sketchLocation := Abs(t, filepath.Join("sketch_class_function", "sketch_class_function.ino"))
-
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          sketchLocation,
-		FQBN:                    "arduino:avr:leonardo",
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
-
-	commands := []types.Command{
-
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
-		&builder.ContainerMergeCopySketchFiles{},
-
-		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
-		&ctags.CTagsRunner{},
-		&ctags.CTags{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	prototypes := ctx.Prototypes
+	prototypes, _ := producePrototypes(t, "TestCTagsRunnerSketchWithClassFunction.txt")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
