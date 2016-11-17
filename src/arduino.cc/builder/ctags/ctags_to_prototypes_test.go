@@ -27,23 +27,22 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package test
+package ctags
 
 import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
-	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/types"
 	"github.com/stretchr/testify/require"
 )
 
 func producePrototypes(t *testing.T, filename string) ([]*types.Prototype, int) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", filename))
-	NoError(t, err)
+	bytes, err := ioutil.ReadFile(filepath.Join("test_data", filename))
+	require.NoError(t, err)
 
-	parser := &ctags.CTagsParser{}
+	parser := &CTagsParser{}
 	parser.Parse(string(bytes))
 	return parser.GeneratePrototypes()
 }

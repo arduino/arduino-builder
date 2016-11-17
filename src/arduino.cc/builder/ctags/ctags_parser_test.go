@@ -27,23 +27,28 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package test
+package ctags
 
 import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
-	"arduino.cc/builder/ctags"
+	"arduino.cc/builder/types"
+
 	"github.com/stretchr/testify/require"
 )
 
-func TestCTagsParserShouldListPrototypes(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListPrototypes.txt"))
-	NoError(t, err)
+func produceTags(t *testing.T, filename string) []*types.CTag {
+	bytes, err := ioutil.ReadFile(filepath.Join("test_data", filename))
+	require.NoError(t, err)
 
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	parser := CTagsParser{}
+	return parser.Parse(string(bytes))
+}
+
+func TestCTagsParserShouldListPrototypes(t *testing.T) {
+	tags := produceTags(t, "TestCTagsParserShouldListPrototypes.txt")
 
 	require.Equal(t, 8, len(tags))
 	idx := 0
@@ -81,11 +86,7 @@ func TestCTagsParserShouldListPrototypes(t *testing.T) {
 }
 
 func TestCTagsParserShouldListTemplates(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListTemplates.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserShouldListTemplates.txt")
 
 	require.Equal(t, 3, len(tags))
 	idx := 0
@@ -103,11 +104,7 @@ func TestCTagsParserShouldListTemplates(t *testing.T) {
 }
 
 func TestCTagsParserShouldListTemplates2(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldListTemplates2.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserShouldListTemplates2.txt")
 
 	require.Equal(t, 4, len(tags))
 	idx := 0
@@ -127,11 +124,7 @@ func TestCTagsParserShouldListTemplates2(t *testing.T) {
 }
 
 func TestCTagsParserShouldDealWithClasses(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithClasses.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserShouldDealWithClasses.txt")
 
 	require.Equal(t, 2, len(tags))
 	idx := 0
@@ -143,11 +136,7 @@ func TestCTagsParserShouldDealWithClasses(t *testing.T) {
 }
 
 func TestCTagsParserShouldDealWithStructs(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithStructs.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserShouldDealWithStructs.txt")
 
 	require.Equal(t, 5, len(tags))
 	idx := 0
@@ -169,11 +158,7 @@ func TestCTagsParserShouldDealWithStructs(t *testing.T) {
 }
 
 func TestCTagsParserShouldDealWithMacros(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealWithMacros.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserShouldDealWithMacros.txt")
 
 	require.Equal(t, 8, len(tags))
 	idx := 0
@@ -203,11 +188,7 @@ func TestCTagsParserShouldDealWithMacros(t *testing.T) {
 }
 
 func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserShouldDealFunctionWithDifferentSignatures.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserShouldDealFunctionWithDifferentSignatures.txt")
 
 	require.Equal(t, 3, len(tags))
 	idx := 0
@@ -222,11 +203,7 @@ func TestCTagsParserShouldDealFunctionWithDifferentSignatures(t *testing.T) {
 }
 
 func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserClassMembersAreFilteredOut.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserClassMembersAreFilteredOut.txt")
 
 	require.Equal(t, 5, len(tags))
 	idx := 0
@@ -250,11 +227,7 @@ func TestCTagsParserClassMembersAreFilteredOut(t *testing.T) {
 }
 
 func TestCTagsParserStructWithFunctions(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStructWithFunctions.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserStructWithFunctions.txt")
 
 	require.Equal(t, 8, len(tags))
 	idx := 0
@@ -286,11 +259,7 @@ func TestCTagsParserStructWithFunctions(t *testing.T) {
 }
 
 func TestCTagsParserDefaultArguments(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserDefaultArguments.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserDefaultArguments.txt")
 
 	require.Equal(t, 3, len(tags))
 	idx := 0
@@ -306,11 +275,7 @@ func TestCTagsParserDefaultArguments(t *testing.T) {
 }
 
 func TestCTagsParserNamespace(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserNamespace.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserNamespace.txt")
 
 	require.Equal(t, 3, len(tags))
 	idx := 0
@@ -326,11 +291,7 @@ func TestCTagsParserNamespace(t *testing.T) {
 }
 
 func TestCTagsParserStatic(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserStatic.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserStatic.txt")
 
 	require.Equal(t, 3, len(tags))
 	idx := 0
@@ -345,11 +306,7 @@ func TestCTagsParserStatic(t *testing.T) {
 }
 
 func TestCTagsParserFunctionPointer(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointer.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserFunctionPointer.txt")
 
 	require.Equal(t, 4, len(tags))
 	idx := 0
@@ -367,11 +324,7 @@ func TestCTagsParserFunctionPointer(t *testing.T) {
 }
 
 func TestCTagsParserFunctionPointers(t *testing.T) {
-	bytes, err := ioutil.ReadFile(filepath.Join("ctags_output", "TestCTagsParserFunctionPointers.txt"))
-	NoError(t, err)
-
-	ctagsParser := ctags.CTagsParser{}
-	tags := ctagsParser.Parse(string(bytes))
+	tags := produceTags(t, "TestCTagsParserFunctionPointers.txt")
 
 	require.Equal(t, 5, len(tags))
 	idx := 0
