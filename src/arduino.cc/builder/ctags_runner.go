@@ -27,12 +27,13 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package ctags
+package builder
 
 import (
 	"fmt"
 
 	"arduino.cc/builder/constants"
+	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
@@ -72,7 +73,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	ctx.CTagsOutput = string(sourceBytes)
 
-	parser := &CTagsParser{}
+	parser := &ctags.CTagsParser{}
 	ctx.CTagsOfPreprocessedSource = parser.Parse(ctx.CTagsOutput)
 	protos, line := parser.GeneratePrototypes()
 	if line != -1 {

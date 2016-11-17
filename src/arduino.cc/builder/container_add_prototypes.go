@@ -33,7 +33,6 @@ import (
 	"path/filepath"
 
 	"arduino.cc/builder/constants"
-	"arduino.cc/builder/ctags"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
 )
@@ -47,7 +46,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
-		&ctags.CTagsRunner{},
+		&CTagsRunner{},
 		&PrototypesAdder{},
 		&SketchSaver{},
 	}
