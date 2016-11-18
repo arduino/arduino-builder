@@ -209,6 +209,16 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 	require.Equal(t, 2, line)
 }
 
+func TestCTagsToPrototypesFunctionPointersNoIndirect(t *testing.T) {
+	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointersNoIndirect.txt")
+	require.Equal(t, 5, len(prototypes))
+	require.Equal(t, "void setup();", prototypes[0].Prototype)
+	require.Equal(t, "/tmp/test547238273/preproc/bug_callback.ino", prototypes[0].File)
+	require.Equal(t, "void loop();", prototypes[1].Prototype)
+
+	require.Equal(t, 10, line)
+}
+
 func TestCTagsRunnerSketchWithClassFunction(t *testing.T) {
 	prototypes, _ := producePrototypes(t, "TestCTagsRunnerSketchWithClassFunction.txt")
 
