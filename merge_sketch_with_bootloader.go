@@ -92,6 +92,17 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader"+extension)
 
+	// make sure that sketch and bootloader have the same format
+
+	if (!strings.HasSuffix(bootloaderPath, extension)) {
+		// oops, need to retrieve the .hex version of the bootloader
+		if _, err := os.Stat(strings.TrimSuffix(bootloaderPath, ".bin") + extension); err != nil {
+			return nil
+		} else {
+			bootloaderPath = strings.TrimSuffix(bootloaderPath, ".bin") + extension
+		}
+	}
+
 	var err error
 	if extension == ".hex" {
 		err = mergeHex(builtSketchPath, bootloaderPath, mergedSketchPath)
