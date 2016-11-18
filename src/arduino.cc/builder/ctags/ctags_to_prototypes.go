@@ -70,6 +70,9 @@ func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionNames []string
 		if strings.Index(tag.Code, "&"+functionName) != -1 {
 			return true
 		}
+		if strings.Index(tag.Code, functionName) != -1 {
+			return true
+		}
 	}
 	return false
 }
