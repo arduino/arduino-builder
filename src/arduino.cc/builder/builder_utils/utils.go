@@ -260,10 +260,31 @@ func nonEmptyString(s string) bool {
 
 func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {
 	archiveFilePath := filepath.Join(buildPath, archiveFile)
-	if _, err := os.Stat(archiveFilePath); err == nil {
-		err = os.Remove(archiveFilePath)
-		if err != nil {
-			return "", i18n.WrapError(err)
+
+	rebuildArchive := false
+
+	if archiveFileStat, err := os.Stat(archiveFilePath); err == nil {
+
+		for _, objectFile := range objectFiles {
+			objectFileStat, _ := os.Stat(objectFile)
+			if objectFileStat.ModTime().After(archiveFileStat.ModTime()) {
+				// need to rebuild the archive
+				rebuildArchive = true
+				break
+			}
+		}
+
+		// something changed, rebuild the core archive
+		if rebuildArchive {
+			err = os.Remove(archiveFilePath)
+			if err != nil {
+				return "", i18n.WrapError(err)
+			}
+		} else {
+			if verbose {
+				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, archiveFilePath)
+			}
+			return archiveFilePath, nil
 		}
 	}
 
