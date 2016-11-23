@@ -105,13 +105,13 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 		Tool{Name: "avrdude", Version: "6.0.1-arduino5"},
 		Tool{Name: "avr-gcc", Version: "4.8.1-arduino5"},
 		Tool{Name: "arm-none-eabi-gcc", Version: "4.8.3-2014q1"},
-		Tool{Name: "ctags", Version: "5.8-arduino10",
+		Tool{Name: "ctags", Version: "5.8-arduino11",
 			OsUrls: []OsUrl{
-				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino10-i686-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino10-x86_64-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino10-i686-mingw32.zip"},
-				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino10-x86_64-apple-darwin.zip"},
-				OsUrl{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino10-armv6-linux-gnueabihf.tar.bz2"},
+				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-pc-linux-gnu.tar.bz2"},
+				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-pc-linux-gnu.tar.bz2"},
+				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-mingw32.zip"},
+				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-apple-darwin.zip"},
+				OsUrl{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-armv6-linux-gnueabihf.tar.bz2"},
 			}},
 	}
 
