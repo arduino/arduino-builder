@@ -30,14 +30,17 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode/utf8"
 
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
@@ -436,30 +439,105 @@ func ParseCppString(line string) (string, string, bool) {
 		return "", line, false
 	}
 
+	s, rem, err := consumeQuotedString(line)
+
+	return s, rem, err == nil
+}
+
+// from package net/mail/message.go
+// consumeQuotedString parses the quoted string at the start of p.
+func consumeQuotedString(s string) (qs string, rem string, err error) {
+	// Assume first byte is '"'.
 	i := 1
-	res := ""
+	qsb := make([]rune, 0, 10)
+
+	escaped := false
+
+Loop:
 	for {
-		if i >= len(line) {
-			return "", line, false
-		}
+		r, size := utf8.DecodeRuneInString(s[i:])
 
-		switch line[i] {
-		// Backslash, next character is used unmodified
-		case '\\':
-			i++
-			if i >= len(line) {
-				return "", line, false
+		switch {
+		case size == 0:
+			return "", s, errors.New("Unclosed quoted-string")
+
+		case size == 1 && r == utf8.RuneError:
+			return "", s, errors.New("Invalid utf-8 in quoted-string")
+
+		case escaped:
+			//  quoted-pair = ("\" (VCHAR / WSP))
+
+			if !isVchar(r) && !isWSP(r) {
+				return "", s, errors.New("Bad character in quoted-string")
 			}
-			res += string(line[i])
-			break
-		// Quote, end of string
-		case '"':
-			return res, line[i+1:], true
+
+			qsb = append(qsb, r)
+			escaped = false
+
+		case isQtext(r) || isWSP(r):
+			// qtext (printable US-ASCII excluding " and \), or
+			// FWS (almost; we're ignoring CRLF)
+			qsb = append(qsb, r)
+
+		case r == '"':
+			break Loop
+
+		case r == '\\':
+			escaped = true
+
 		default:
-			res += string(line[i])
-			break
+			return "", s, errors.New("Bad character in quoted-string")
+
 		}
 
-		i++
+		i += size
 	}
+	s = s[i+1:]
+	if len(qsb) == 0 {
+		return "", s, errors.New("Empty quoted-string")
+	}
+	return string(qsb), s, nil
+}
+
+// isQtext reports whether r is an RFC 5322 qtext character.
+func isQtext(r rune) bool {
+	// Printable US-ASCII, excluding backslash or quote.
+	if r == '\\' || r == '"' {
+		return false
+	}
+	return isVchar(r)
+}
+
+// quoteString renders a string as an RFC 5322 quoted-string.
+func quoteString(s string) string {
+	var buf bytes.Buffer
+	buf.WriteByte('"')
+	for _, r := range s {
+		if isQtext(r) || isWSP(r) {
+			buf.WriteRune(r)
+		} else if isVchar(r) {
+			buf.WriteByte('\\')
+			buf.WriteRune(r)
+		}
+	}
+	buf.WriteByte('"')
+	return buf.String()
+}
+
+// isVchar reports whether r is an RFC 5322 VCHAR character.
+func isVchar(r rune) bool {
+	// Visible (printing) characters.
+	return '!' <= r && r <= '~' || isMultibyte(r)
+}
+
+// isMultibyte reports whether r is a multi-byte UTF-8 character
+// as supported by RFC 6532
+func isMultibyte(r rune) bool {
+	return r >= utf8.RuneSelf
+}
+
+// isWSP reports whether r is a WSP (white space).
+// WSP is a space or horizontal tab (RFC 5234 Appendix B).
+func isWSP(r rune) bool {
+	return r == ' ' || r == '\t'
 }
