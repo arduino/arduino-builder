@@ -130,59 +130,47 @@ func execSizeReceipe(properties properties.Map, logger i18n.Logger) (textSize in
 	// force multiline match prepending "(?m)" to the actual regexp
 	// return an error if RECIPE_SIZE_REGEXP doesn't exist
 
-	if len(properties[constants.RECIPE_SIZE_REGEXP]) > 0 {
-		textRegexp, err := regexp.Compile("(?m)" + properties[constants.RECIPE_SIZE_REGEXP])
-		if err != nil {
-			resErr = errors.New("Invalid size regexp: " + err.Error())
-			return
-		}
-		result := textRegexp.FindAllSubmatch(out, -1)
-		for _, b := range result {
-			for _, c := range b {
-				if res, err := strconv.Atoi(string(c)); err == nil {
-					textSize += res
-				}
-			}
-		}
-	} else {
+	textSize, err = computeSize(properties[constants.RECIPE_SIZE_REGEXP], out)
+	if err != nil {
+		resErr = errors.New("Invalid size regexp: " + err.Error())
+		return
+	}
+	if textSize == -1 {
 		resErr = errors.New("Missing size regexp")
 		return
 	}
 
-	if len(properties[constants.RECIPE_SIZE_REGEXP_DATA]) > 0 {
-		dataRegexp, err := regexp.Compile("(?m)" + properties[constants.RECIPE_SIZE_REGEXP_DATA])
-		if err != nil {
-			resErr = errors.New("Invalid data size regexp: " + err.Error())
-			return
-		}
-		result := dataRegexp.FindAllSubmatch(out, -1)
-		for _, b := range result {
-			for _, c := range b {
-				if res, err := strconv.Atoi(string(c)); err == nil {
-					dataSize += res
-				}
-			}
-		}
-	} else {
-		dataSize = -1
+	dataSize, err = computeSize(properties[constants.RECIPE_SIZE_REGEXP_DATA], out)
+	if err != nil {
+		resErr = errors.New("Invalid data size regexp: " + err.Error())
+		return
 	}
 
-	if len(properties[constants.RECIPE_SIZE_REGEXP_EEPROM]) > 0 {
-		eepromRegexp, err := regexp.Compile("(?m)" + properties[constants.RECIPE_SIZE_REGEXP_EEPROM])
-		if err != nil {
-			resErr = errors.New("Invalid eeprom size regexp: " + err.Error())
-			return
-		}
-		result := eepromRegexp.FindAllSubmatch(out, -1)
-		for _, b := range result {
-			for _, c := range b {
-				if res, err := strconv.Atoi(string(c)); err == nil {
-					eepromSize += res
-				}
+	eepromSize, err = computeSize(properties[constants.RECIPE_SIZE_REGEXP_EEPROM], out)
+	if err != nil {
+		resErr = errors.New("Invalid eeprom size regexp: " + err.Error())
+		return
+	}
+
+	return
+}
+
+func computeSize(re string, output []byte) (int, error) {
+	if re == "" {
+		return -1, nil
+	}
+	r, err := regexp.Compile("(?m)" + re)
+	if err != nil {
+		return -1, err
+	}
+	result := r.FindAllSubmatch(output, -1)
+	size := 0
+	for _, b := range result {
+		for _, c := range b {
+			if res, err := strconv.Atoi(string(c)); err == nil {
+				size += res
 			}
 		}
-	} else {
-		eepromSize = -1
 	}
-	return
+	return size, nil
 }
