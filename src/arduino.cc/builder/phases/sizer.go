@@ -41,9 +41,16 @@ import (
 	"arduino.cc/properties"
 )
 
-type Sizer struct{}
+type Sizer struct {
+	SketchError bool
+}
 
 func (s *Sizer) Run(ctx *types.Context) error {
+
+	if s.SketchError {
+		return nil
+	}
+
 	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel
