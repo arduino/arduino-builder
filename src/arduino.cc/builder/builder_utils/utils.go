@@ -89,7 +89,7 @@ func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string
 }
 
 func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]string, error) {
-	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFilesWithExtension(extension))
+	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFilesWithExtensions(extension))
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}

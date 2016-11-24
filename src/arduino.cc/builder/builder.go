@@ -43,7 +43,7 @@ import (
 )
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
-var ADDITIONAL_FILE_VALID_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".cpp": true, ".s": true}
+var ADDITIONAL_FILE_VALID_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".s": true}
 var ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS = map[string]bool{".c": true, ".cpp": true, ".s": true}
 
 var LIBRARY_MANDATORY_PROPERTIES = []string{constants.LIBRARY_NAME, constants.LIBRARY_VERSION, constants.LIBRARY_AUTHOR, constants.LIBRARY_MAINTAINER}

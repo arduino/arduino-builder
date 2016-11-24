@@ -138,11 +138,11 @@ func FilterDirs(files []os.FileInfo) []os.FileInfo {
 	return filtered
 }
 
-func FilterFilesWithExtension(extension string) filterFiles {
+func FilterFilesWithExtensions(extensions ...string) filterFiles {
 	return func(files []os.FileInfo) []os.FileInfo {
 		var filtered []os.FileInfo
 		for _, file := range files {
-			if !file.IsDir() && filepath.Ext(file.Name()) == extension {
+			if !file.IsDir() && SliceContains(extensions, filepath.Ext(file.Name())) {
 				filtered = append(filtered, file)
 			}
 		}
