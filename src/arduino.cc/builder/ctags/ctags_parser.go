@@ -96,9 +96,9 @@ func addPrototype(tag *types.CTag) {
 	if strings.Index(tag.Code, STATIC+" ") != -1 {
 		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + STATIC
 	}
-	if strings.Index(tag.Code, EXTERN+" ") != -1 {
-		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + EXTERN
-	}
+
+	// Extern "C" modifier is now added in FixCLinkageTagsDeclarations
+
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 

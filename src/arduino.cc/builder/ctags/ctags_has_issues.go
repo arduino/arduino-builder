@@ -65,9 +65,8 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 
 	code := removeSpacesAndTabs(tag.Code)
 
-	// original code is multi-line, which tags doesn't have - could we find this code in the
-	// original source file, for purposes of checking here?
 	if strings.Index(code, ")") == -1 {
+		// Add to code non-whitespace non-comments tokens until we find a closing round bracket
 		file, err := os.Open(tag.Filename)
 		if err == nil {
 			defer file.Close()
@@ -81,17 +80,18 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 			}
 
 			// read up to 10 lines in search of a closing paren
-			newcode := scanner.Text()
-			for scanner.Scan() && line < (tag.Line+10) && strings.Index(newcode, ")") == -1 {
-				newcode += scanner.Text()
-			}
+			multilinecomment := false
+			temp := ""
 
-			// don't bother replacing the code text if we haven't found a closing paren
-			if strings.Index(newcode, ")") != -1 {
-				code = removeSpacesAndTabs(newcode)
+			code, multilinecomment = removeComments(scanner.Text(), multilinecomment)
+			for scanner.Scan() && line < (tag.Line+10) && strings.Index(temp, ")") == -1 {
+				temp, multilinecomment = removeComments(scanner.Text(), multilinecomment)
+				code += temp
 			}
 		}
 	}
+
+	code = removeSpacesAndTabs(code)
 
 	prototype := removeSpacesAndTabs(tag.Prototype)
 	prototype = removeTralingSemicolon(prototype)
@@ -150,36 +150,41 @@ func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int
 			line = line - 1
 			text := textBuffer[line]
 
-			// Remove C++ style comments
-			if strings.Index(text, "//") != -1 {
-				text = text[0:strings.Index(text, "//")]
-			}
-
-			// Remove C style comments
-			if strings.Index(text, "*/") != -1 {
-				if strings.Index(text, "/*") != -1 {
-					// C style comments on the same line
-					text = text[0:strings.Index(text, "/*")] + text[strings.Index(text, "*/")+1:len(text)-1]
-				} else {
-					text = text[strings.Index(text, "*/")+1 : len(text)-1]
-					multilinecomment = true
-				}
-			}
-
-			if multilinecomment {
-				if strings.Index(text, "/*") != -1 {
-					text = text[0:strings.Index(text, "/*")]
-					multilinecomment = false
-				} else {
-					text = ""
-				}
-			}
+			text, multilinecomment = removeComments(text, multilinecomment)
 
 			code = text + code
 			code = removeSpacesAndTabs(code)
 		}
 	}
 	return code
+}
+
+func removeComments(text string, multilinecomment bool) (string, bool) {
+	// Remove C++ style comments
+	if strings.Index(text, "//") != -1 {
+		text = text[0:strings.Index(text, "//")]
+	}
+
+	// Remove C style comments
+	if strings.Index(text, "*/") != -1 {
+		if strings.Index(text, "/*") != -1 {
+			// C style comments on the same line
+			text = text[0:strings.Index(text, "/*")] + text[strings.Index(text, "*/")+1:len(text)-1]
+		} else {
+			text = text[strings.Index(text, "*/")+1 : len(text)-1]
+			multilinecomment = true
+		}
+	}
+
+	if multilinecomment {
+		if strings.Index(text, "/*") != -1 {
+			text = text[0:strings.Index(text, "/*")]
+			multilinecomment = false
+		} else {
+			text = ""
+		}
+	}
+	return text, multilinecomment
 }
 
 /* This function scans the source files searching for "extern C" context
