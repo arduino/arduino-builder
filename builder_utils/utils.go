@@ -31,15 +31,16 @@ package builder_utils
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
@@ -146,15 +147,48 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 }
 
 func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+	if len(sources) == 0 {
+		return objectFiles, nil
+	}
+	objectFilesChan := make(chan string)
+	errorsChan := make(chan error)
+	doneChan := make(chan struct{})
+
+	var wg sync.WaitGroup
+	wg.Add(len(sources))
+
 	for _, source := range sources {
-		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
-		if err != nil {
+		go func(source string) {
+			defer wg.Done()
+			objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+			if err != nil {
+				errorsChan <- err
+			} else {
+				objectFilesChan <- objectFile
+			}
+		}(source)
+	}
+
+	go func() {
+		wg.Wait()
+		doneChan <- struct{}{}
+	}()
+
+	for {
+		select {
+		case objectFile := <-objectFilesChan:
+			objectFiles = append(objectFiles, objectFile)
+		case err := <-errorsChan:
 			return nil, i18n.WrapError(err)
+		case <-doneChan:
+			close(objectFilesChan)
+			for objectFile := range objectFilesChan {
+				objectFiles = append(objectFiles, objectFile)
+			}
+			return objectFiles, nil
 		}
 
-		objectFiles = append(objectFiles, objectFile)
 	}
-	return objectFiles, nil
 }
 
 func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
@@ -361,10 +395,20 @@ func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties 
 	}
 
 	if echoOutput {
-		command.Stdout = os.Stdout
+		printToStdOut := func(data []byte) {
+			logger.UnformattedWrite(os.Stdout, data)
+		}
+		stdout := &types.BufferedUntilNewLineWriter{PrintFunc: printToStdOut, Buffer: bytes.Buffer{}}
+		defer stdout.Flush()
+		command.Stdout = stdout
 	}
 
-	command.Stderr = os.Stderr
+	printToStdErr := func(data []byte) {
+		logger.UnformattedWrite(os.Stderr, data)
+	}
+	stderr := &types.BufferedUntilNewLineWriter{PrintFunc: printToStdErr, Buffer: bytes.Buffer{}}
+	defer stderr.Flush()
+	command.Stderr = stderr
 
 	if echoOutput {
 		err := command.Run()
@@ -393,7 +437,7 @@ func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, remo
 	}
 
 	if echoCommandLine {
-		fmt.Println(commandLine)
+		logger.UnformattedFprintln(os.Stdout, commandLine)
 	}
 
 	return command, nil
