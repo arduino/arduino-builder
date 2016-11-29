@@ -75,6 +75,8 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	parser := &ctags.CTagsParser{}
 	ctx.CTagsOfPreprocessedSource = parser.Parse(ctx.CTagsOutput)
+
+	parser.FixCLinkageTagsDeclarations(ctx.CTagsOfPreprocessedSource)
 	protos, line := parser.GeneratePrototypes()
 	if line != -1 {
 		ctx.PrototypesLineWhereToInsert = line
