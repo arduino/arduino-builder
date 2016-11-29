@@ -96,7 +96,90 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 	prototype := removeSpacesAndTabs(tag.Prototype)
 	prototype = removeTralingSemicolon(prototype)
 
-	return strings.Index(code, prototype) == -1
+	// Prototype matches exactly with the code?
+	ret := strings.Index(code, prototype)
+
+	if ret == -1 {
+		// If the definition is multiline ctags uses the function name as line number
+		// Try to match functions in the form
+		// void
+		// foo() {}
+
+		// Add to code n non-whitespace non-comments tokens before the code line
+
+		code = removeEverythingAfterClosingRoundBracket(code)
+		// Get how many characters are "missing"
+		n := strings.Index(prototype, code)
+		// Add these characters to "code" string
+		code = getFunctionProtoWithNPreviousCharacters(tag, code, n)
+		// Check again for perfect matching
+		ret = strings.Index(code, prototype)
+	}
+
+	return ret == -1
+}
+
+func removeEverythingAfterClosingRoundBracket(s string) string {
+	n := strings.Index(s, ")")
+	return s[0 : n+1]
+}
+
+func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int) string {
+
+	/* FIXME I'm ugly */
+	expectedPrototypeLen := len(code) + n
+
+	file, err := os.Open(tag.Filename)
+	if err == nil {
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		line := 0
+		multilinecomment := false
+		var textBuffer []string
+
+		// buffer lines until we get to the start of this tag
+		for scanner.Scan() && line < (tag.Line-1) {
+			line++
+			text := scanner.Text()
+			textBuffer = append(textBuffer, text)
+		}
+
+		for line > 0 && len(code) < expectedPrototypeLen {
+
+			line = line - 1
+			text := textBuffer[line]
+
+			// Remove C++ style comments
+			if strings.Index(text, "//") != -1 {
+				text = text[0:strings.Index(text, "//")]
+			}
+
+			// Remove C style comments
+			if strings.Index(text, "*/") != -1 {
+				if strings.Index(text, "/*") != -1 {
+					// C style comments on the same line
+					text = text[0:strings.Index(text, "/*")] + text[strings.Index(text, "*/")+1:len(text)-1]
+				} else {
+					text = text[strings.Index(text, "*/")+1 : len(text)-1]
+					multilinecomment = true
+				}
+			}
+
+			if multilinecomment {
+				if strings.Index(text, "/*") != -1 {
+					text = text[0:strings.Index(text, "/*")]
+					multilinecomment = false
+				} else {
+					text = ""
+				}
+			}
+
+			code = text + code
+			code = removeSpacesAndTabs(code)
+		}
+	}
+	return code
 }
 
 /* This function scans the source files searching for "extern C" context
