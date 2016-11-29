@@ -6,6 +6,7 @@ void setup() {
 	test7();
 	test8();
 	test9(42, 42);
+	test10(0,0,0);
 }
 
 void myctagstestfunc(int a,
@@ -45,3 +46,8 @@ test8() {}
  /* comment */
  test9(int a, 
     int b) {} 
+
+void test10(int a, // this 
+			int b, // doesn't 
+			int c  // work
+			) {} 
