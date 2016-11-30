@@ -53,6 +53,10 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 		return nil
 	}
 
+	if ctx.Jobs > 1 {
+		time.Sleep(100 * time.Millisecond)
+	}
+
 	logger := ctx.GetLogger()
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 
@@ -63,8 +67,6 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 			logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
 		}
 	}
-
-	time.Sleep(100 * time.Millisecond)
 
 	return nil
 }

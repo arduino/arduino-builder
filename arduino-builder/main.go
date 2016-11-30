@@ -177,12 +177,6 @@ func main() {
 		return
 	}
 
-	if *jobsFlag > 0 {
-		runtime.GOMAXPROCS(*jobsFlag)
-	} else {
-		runtime.GOMAXPROCS(runtime.NumCPU())
-	}
-
 	ctx := &types.Context{}
 
 	if *buildOptionsFileFlag != "" {
@@ -199,6 +193,14 @@ func main() {
 		}
 		ctx.InjectBuildOptions(buildOptions)
 	}
+
+	// Parallel Jobs flag
+	if *jobsFlag > 0 {
+		ctx.Jobs = *jobsFlag
+	} else {
+		ctx.Jobs = runtime.NumCPU()
+	}
+	runtime.GOMAXPROCS(ctx.Jobs)
 
 	// FLAG_HARDWARE
 	if hardwareFolders, err := toSliceOfUnquoted(hardwareFoldersFlag); err != nil {
