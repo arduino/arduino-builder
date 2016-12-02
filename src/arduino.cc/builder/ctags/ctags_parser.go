@@ -81,14 +81,20 @@ func (p *CTagsParser) addPrototypes() {
 }
 
 func addPrototype(tag *types.CTag) {
-	if strings.Index(tag.Prototype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
-		code := tag.Code
-		if strings.Contains(code, "{") {
-			code = code[:strings.Index(code, "{")]
+	if strings.Index(tag.Prototype, TEMPLATE) == 0 {
+		if strings.Index(tag.Code, TEMPLATE) == 0 {
+			code := tag.Code
+			if strings.Contains(code, "{") {
+				code = code[:strings.Index(code, "{")]
+			} else {
+				code = code[:strings.LastIndex(code, ")")+1]
+			}
+			tag.Prototype = code + ";"
 		} else {
-			code = code[:strings.LastIndex(code, ")")+1]
+			//tag.Code is 99% multiline, recreate it
+			code := findTemplateMultiline(tag)
+			tag.Prototype = code + ";"
 		}
-		tag.Prototype = code + ";"
 		return
 	}
 

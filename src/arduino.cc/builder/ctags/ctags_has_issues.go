@@ -110,13 +110,22 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 		code = removeEverythingAfterClosingRoundBracket(code)
 		// Get how many characters are "missing"
 		n := strings.Index(prototype, code)
+		line := 0
 		// Add these characters to "code" string
-		code = getFunctionProtoWithNPreviousCharacters(tag, code, n)
+		code, line = getFunctionProtoWithNPreviousCharacters(tag, code, n)
 		// Check again for perfect matching
 		ret = strings.Index(code, prototype)
+		if ret != -1 {
+			tag.Line = line
+		}
 	}
 
 	return ret == -1
+}
+
+func findTemplateMultiline(tag *types.CTag) string {
+	code, _ := getFunctionProtoUntilTemplateToken(tag, tag.Code)
+	return removeEverythingAfterClosingRoundBracket(code)
 }
 
 func removeEverythingAfterClosingRoundBracket(s string) string {
@@ -124,17 +133,50 @@ func removeEverythingAfterClosingRoundBracket(s string) string {
 	return s[0 : n+1]
 }
 
-func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int) string {
+func getFunctionProtoUntilTemplateToken(tag *types.CTag, code string) (string, int) {
 
 	/* FIXME I'm ugly */
-	expectedPrototypeLen := len(code) + n
+	line := 0
 
 	file, err := os.Open(tag.Filename)
 	if err == nil {
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
-		line := 0
+		multilinecomment := false
+		var textBuffer []string
+
+		// buffer lines until we get to the start of this tag
+		for scanner.Scan() && line < (tag.Line-1) {
+			line++
+			text := scanner.Text()
+			textBuffer = append(textBuffer, text)
+		}
+
+		for line > 0 && !strings.Contains(code, TEMPLATE) {
+
+			line = line - 1
+			text := textBuffer[line]
+
+			text, multilinecomment = removeComments(text, multilinecomment)
+
+			code = text + code
+		}
+	}
+	return code, line
+}
+
+func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int) (string, int) {
+
+	/* FIXME I'm ugly */
+	expectedPrototypeLen := len(code) + n
+	line := 0
+
+	file, err := os.Open(tag.Filename)
+	if err == nil {
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
 		multilinecomment := false
 		var textBuffer []string
 
@@ -156,7 +198,7 @@ func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int
 			code = removeSpacesAndTabs(code)
 		}
 	}
-	return code
+	return code, line
 }
 
 func removeComments(text string, multilinecomment bool) (string, bool) {
