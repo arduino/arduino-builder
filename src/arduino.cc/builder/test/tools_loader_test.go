@@ -90,8 +90,8 @@ func TestLoadTools(t *testing.T) {
 	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "ctags", tools[idx].Name)
-	require.Equal(t, "5.8-arduino10", tools[idx].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino10"), tools[idx].Folder)
+	require.Equal(t, "5.8-arduino11", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino11"), tools[idx].Folder)
 }
 
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
@@ -166,8 +166,8 @@ func TestLoadLotsOfTools(t *testing.T) {
 	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "ctags", tools[idx].Name)
-	require.Equal(t, "5.8-arduino10", tools[idx].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino10"), tools[idx].Folder)
+	require.Equal(t, "5.8-arduino11", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino11"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "openocd", tools[idx].Name)
 	require.Equal(t, "0.9.0-arduino", tools[idx].Version)

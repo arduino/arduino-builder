@@ -65,7 +65,7 @@ func (s HumanLogger) Fprintln(w io.Writer, level string, format string, a ...int
 }
 
 func (s HumanLogger) Println(level string, format string, a ...interface{}) {
-	s.Fprintln(os.Stdout, level, Format(format, a...))
+	s.Fprintln(os.Stdout, level, format, a...)
 }
 
 func (s HumanLogger) Name() string {
