@@ -246,7 +246,7 @@ func (p *CTagsParser) FindCLinkageLines(tags []*types.CTag) map[string][]int {
 		if err == nil {
 			defer file.Close()
 
-			lines[tag.Filename] = append(lines[tag.Filename], 0)
+			lines[tag.Filename] = append(lines[tag.Filename], -1)
 
 			scanner := bufio.NewScanner(file)
 
