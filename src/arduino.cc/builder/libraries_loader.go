@@ -148,11 +148,6 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		addUtilityFolder(library)
 	}
 
-	subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
-	if err != nil {
-		return nil, i18n.WrapError(err)
-	}
-
 	if libProperties[constants.LIBRARY_ARCHITECTURES] == constants.EMPTY_STRING {
 		libProperties[constants.LIBRARY_ARCHITECTURES] = constants.LIBRARY_ALL_ARCHS
 	}
