@@ -153,16 +153,6 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		return nil, i18n.WrapError(err)
 	}
 
-	if debugLevel >= 0 {
-		for _, subFolder := range subFolders {
-			if utils.IsSCCSOrHiddenFile(subFolder) {
-				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
-					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), libProperties[constants.LIBRARY_NAME])
-				}
-			}
-		}
-	}
-
 	if libProperties[constants.LIBRARY_ARCHITECTURES] == constants.EMPTY_STRING {
 		libProperties[constants.LIBRARY_ARCHITECTURES] = constants.LIBRARY_ALL_ARCHS
 	}

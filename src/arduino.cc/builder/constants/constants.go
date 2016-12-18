@@ -192,7 +192,6 @@ const MSG_USING_CACHED_INCLUDES = "Using cached library dependencies for file: {
 const MSG_WARNING_LIB_INVALID_CATEGORY = "WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'"
 const MSG_WARNING_PLATFORM_MISSING_VALUE = "Warning: platform.txt from core '{0}' misses property '{1}', using default value '{2}'. Consider upgrading this core."
 const MSG_WARNING_PLATFORM_OLD_VALUES = "Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."
-const MSG_WARNING_SPURIOUS_FILE_IN_LIB = "WARNING: Spurious {0} folder in '{1}' library"
 const MSG_WRONG_PROPERTIES_FILE = "Property line '{0}' in file {1} is invalid"
 const MSG_WRONG_PROPERTIES = "Property line '{0}' is invalid"
 const PACKAGE_NAME = "name"
