@@ -48,10 +48,12 @@ func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
 		} else {
 			return firstFunctionPointerAsArgument
 		}
-	} else if firstFunctionLine == -1 {
+	} else if firstFunctionLine != -1 {
+		return firstFunctionLine
+	} else if firstFunctionPointerAsArgument != -1 {
 		return firstFunctionPointerAsArgument
 	} else {
-		return firstFunctionLine
+		return 0
 	}
 }
 
@@ -90,7 +92,7 @@ func (p *CTagsParser) collectFunctions() []*types.CTag {
 
 func (p *CTagsParser) firstFunctionAtLine() int {
 	for _, tag := range p.tags {
-		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION {
+		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION && tag.Filename == p.mainFile {
 			return tag.Line
 		}
 	}
