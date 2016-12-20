@@ -38,17 +38,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func producePrototypes(t *testing.T, filename string) ([]*types.Prototype, int) {
+func producePrototypes(t *testing.T, filename string, mainFile string) ([]*types.Prototype, int) {
 	bytes, err := ioutil.ReadFile(filepath.Join("test_data", filename))
 	require.NoError(t, err)
 
 	parser := &CTagsParser{}
-	parser.Parse(string(bytes))
+	parser.Parse(string(bytes), mainFile)
 	return parser.GeneratePrototypes()
 }
 
 func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldListPrototypes.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldListPrototypes.txt", "/tmp/sketch7210316334309249705.cpp")
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/sketch7210316334309249705.cpp", prototypes[0].File)
@@ -61,7 +61,7 @@ func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {
 }
 
 func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldListTemplates.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldListTemplates.txt", "/tmp/sketch8398023134925534708.cpp")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "template <typename T> T minimum (T a, T b);", prototypes[0].Prototype)
@@ -73,7 +73,7 @@ func TestCTagsToPrototypesShouldListTemplates(t *testing.T) {
 }
 
 func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldListTemplates2.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldListTemplates2.txt", "/tmp/sketch463160524247569568.cpp")
 
 	require.Equal(t, 4, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -86,7 +86,7 @@ func TestCTagsToPrototypesShouldListTemplates2(t *testing.T) {
 }
 
 func TestCTagsToPrototypesShouldDealWithClasses(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealWithClasses.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealWithClasses.txt", "/tmp/sketch9043227824785312266.cpp")
 
 	require.Equal(t, 0, len(prototypes))
 
@@ -94,7 +94,7 @@ func TestCTagsToPrototypesShouldDealWithClasses(t *testing.T) {
 }
 
 func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealWithStructs.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealWithStructs.txt", "/tmp/sketch8930345717354294915.cpp")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -106,7 +106,7 @@ func TestCTagsToPrototypesShouldDealWithStructs(t *testing.T) {
 }
 
 func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealWithMacros.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealWithMacros.txt", "/tmp/sketch5976699731718729500.cpp")
 
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -120,7 +120,7 @@ func TestCTagsToPrototypesShouldDealWithMacros(t *testing.T) {
 }
 
 func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealFunctionWithDifferentSignatures.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserShouldDealFunctionWithDifferentSignatures.txt", "/tmp/test260613593/preproc/ctags_target.cpp")
 
 	require.Equal(t, 1, len(prototypes))
 	require.Equal(t, "boolean getBytes( byte addr, int amount );", prototypes[0].Prototype)
@@ -130,7 +130,7 @@ func TestCTagsToPrototypesShouldDealFunctionWithDifferentSignatures(t *testing.T
 }
 
 func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserClassMembersAreFilteredOut.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserClassMembersAreFilteredOut.txt", "/tmp/test834438754/preproc/ctags_target.cpp")
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -141,7 +141,7 @@ func TestCTagsToPrototypesClassMembersAreFilteredOut(t *testing.T) {
 }
 
 func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserStructWithFunctions.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserStructWithFunctions.txt", "/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp")
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -152,7 +152,7 @@ func TestCTagsToPrototypesStructWithFunctions(t *testing.T) {
 }
 
 func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserDefaultArguments.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserDefaultArguments.txt", "/tmp/test179252494/preproc/ctags_target.cpp")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void test(int x = 1);", prototypes[0].Prototype)
@@ -164,7 +164,7 @@ func TestCTagsToPrototypesDefaultArguments(t *testing.T) {
 }
 
 func TestCTagsToPrototypesNamespace(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserNamespace.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserNamespace.txt", "/tmp/test030883150/preproc/ctags_target.cpp")
 
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -175,7 +175,7 @@ func TestCTagsToPrototypesNamespace(t *testing.T) {
 }
 
 func TestCTagsToPrototypesStatic(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserStatic.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserStatic.txt", "/tmp/test542833488/preproc/ctags_target.cpp")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
@@ -188,7 +188,7 @@ func TestCTagsToPrototypesStatic(t *testing.T) {
 }
 
 func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointer.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointer.txt", "/tmp/test547238273/preproc/ctags_target.cpp")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void t1Callback();", prototypes[0].Prototype)
@@ -200,7 +200,7 @@ func TestCTagsToPrototypesFunctionPointer(t *testing.T) {
 }
 
 func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointers.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointers.txt", "/tmp/test907446433/preproc/ctags_target.cpp")
 	require.Equal(t, 2, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/test907446433/preproc/ctags_target.cpp", prototypes[0].File)
@@ -210,7 +210,7 @@ func TestCTagsToPrototypesFunctionPointers(t *testing.T) {
 }
 
 func TestCTagsToPrototypesFunctionPointersNoIndirect(t *testing.T) {
-	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointersNoIndirect.txt")
+	prototypes, line := producePrototypes(t, "TestCTagsParserFunctionPointersNoIndirect.txt", "/tmp/test547238273/preproc/bug_callback.ino")
 	require.Equal(t, 5, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "/tmp/test547238273/preproc/bug_callback.ino", prototypes[0].File)
@@ -220,10 +220,19 @@ func TestCTagsToPrototypesFunctionPointersNoIndirect(t *testing.T) {
 }
 
 func TestCTagsRunnerSketchWithClassFunction(t *testing.T) {
-	prototypes, _ := producePrototypes(t, "TestCTagsRunnerSketchWithClassFunction.txt")
+	prototypes, _ := producePrototypes(t, "TestCTagsRunnerSketchWithClassFunction.txt", "/home/megabug/Workspace/arduino-builder/src/arduino.cc/builder/test/sketch_class_function/sketch_class_function.ino")
 
 	require.Equal(t, 3, len(prototypes))
 	require.Equal(t, "void setup();", prototypes[0].Prototype)
 	require.Equal(t, "void loop();", prototypes[1].Prototype)
 	require.Equal(t, "void asdf();", prototypes[2].Prototype)
+}
+
+func TestCTagsRunnerSketchWithMultiFile(t *testing.T) {
+	prototypes, line := producePrototypes(t, "TestCTagsRunnerSketchWithMultifile.txt", "/tmp/apUNI8a/main.ino")
+
+	require.Equal(t, 0, line)
+	require.Equal(t, "void A7105_Setup();", prototypes[0].Prototype)
+	require.Equal(t, "void A7105_Reset();", prototypes[1].Prototype)
+	require.Equal(t, "int A7105_calibrate_VCB(uint8_t channel);", prototypes[2].Prototype)
 }
