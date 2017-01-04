@@ -134,7 +134,15 @@ var loggerFlag *string
 var versionFlag *bool
 var vidPidFlag *string
 
+var Usage = func(){
+    fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+    fmt.Fprintf(os.Stderr, "\n\tarduino_builder -hardware <hardware_dir> -tools <toosl_dir> -fqbn <family:arch:model> [options] sketch_to_Compile\n\n")
+    fmt.Fprintf(os.Stderr, "Available flags:\n")
+    flag.PrintDefaults()
+}
+
 func init() {
+    flag.Usage = Usage
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
 	preprocessFlag = flag.Bool(FLAG_ACTION_PREPROCESS, false, "preprocess the given sketch")
 	dumpPrefsFlag = flag.Bool(FLAG_ACTION_DUMP_PREFS, false, "dumps build properties used when compiling")
