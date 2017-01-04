@@ -136,7 +136,7 @@ var vidPidFlag *string
 
 var Usage = func(){
     fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-    fmt.Fprintf(os.Stderr, "\n\tarduino_builder -hardware <hardware_dir> -tools <toosl_dir> -fqbn <family:arch:model> [options] sketch_to_Compile\n\n")
+    fmt.Fprintf(os.Stderr, "\n\tarduino_builder -hardware <hardware_dir> -tools <tools_dir> -fqbn <family:arch:model> [options] sketch_to_Compile\n\n")
     fmt.Fprintf(os.Stderr, "Available flags:\n")
     flag.PrintDefaults()
 }
