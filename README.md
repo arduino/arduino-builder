@@ -33,7 +33,7 @@ This tool generates function prototypes and gathers library paths, providing `gc
 
 * `-core-api-version`: Optional, defaults to "10600". The version of the Arduino IDE which is using this tool.
 
-* `-logger`: Optional, can be "human" or "machine". Defaults to "human". If "machine", messages emitted will be in a format which the Arduino IDE understands and that it uses for I18N.
+* `-logger`: Optional, can be "human", "humantags" or "machine". Defaults to "human". If "humantags" the messages are qualified with a prefix that indicates their level (info, debug, error). If "machine", messages emitted will be in a format which the Arduino IDE understands and that it uses for I18N.
 
 * `-version`: if specified, prints version and exits.
 
