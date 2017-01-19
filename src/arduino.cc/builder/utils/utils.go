@@ -38,6 +38,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode/utf8"
 
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
@@ -137,11 +138,11 @@ func FilterDirs(files []os.FileInfo) []os.FileInfo {
 	return filtered
 }
 
-func FilterFilesWithExtension(extension string) filterFiles {
+func FilterFilesWithExtensions(extensions ...string) filterFiles {
 	return func(files []os.FileInfo) []os.FileInfo {
 		var filtered []os.FileInfo
 		for _, file := range files {
-			if !file.IsDir() && filepath.Ext(file.Name()) == extension {
+			if !file.IsDir() && SliceContains(extensions, filepath.Ext(file.Name())) {
 				filtered = append(filtered, file)
 			}
 		}
@@ -443,10 +444,12 @@ func ParseCppString(line string) (string, string, bool) {
 			return "", line, false
 		}
 
-		switch line[i] {
+		c, width := utf8.DecodeRuneInString(line[i:])
+
+		switch c {
 		// Backslash, next character is used unmodified
 		case '\\':
-			i++
+			i += width
 			if i >= len(line) {
 				return "", line, false
 			}
@@ -454,12 +457,12 @@ func ParseCppString(line string) (string, string, bool) {
 			break
 		// Quote, end of string
 		case '"':
-			return res, line[i+1:], true
+			return res, line[i+width:], true
 		default:
-			res += string(line[i])
+			res += string(c)
 			break
 		}
 
-		i++
+		i += width
 	}
 }

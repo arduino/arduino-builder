@@ -30,14 +30,12 @@
 package ctags
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
 	"bufio"
 	"os"
-	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
+
+	"arduino.cc/builder/types"
 )
 
 const KIND_PROTOTYPE = "prototype"
@@ -54,32 +52,30 @@ var KNOWN_TAG_KINDS = map[string]bool{
 	"function":  true,
 }
 
-type CTagsParser struct{}
-
-func (s *CTagsParser) Run(ctx *types.Context) error {
-	rows := strings.Split(ctx.CTagsOutput, "\n")
-
-	rows = removeEmpty(rows)
-
-	var tags []*types.CTag
-	for _, row := range rows {
-		tags = append(tags, parseTag(row))
-	}
-
-	skipTagsWhere(tags, tagIsUnknown, ctx)
-	skipTagsWhere(tags, tagIsUnhandled, ctx)
-	addPrototypes(tags)
-	removeDefinedProtypes(tags, ctx)
-	removeDuplicate(tags)
-	skipTagsWhere(tags, prototypeAndCodeDontMatch, ctx)
-
-	ctx.CTagsOfPreprocessedSource = tags
-
-	return nil
+type CTagsParser struct {
+	tags []*types.CTag
 }
 
-func addPrototypes(tags []*types.CTag) {
-	for _, tag := range tags {
+func (p *CTagsParser) Parse(ctagsOutput string) []*types.CTag {
+	rows := strings.Split(ctagsOutput, "\n")
+	rows = removeEmpty(rows)
+
+	for _, row := range rows {
+		p.tags = append(p.tags, parseTag(row))
+	}
+
+	p.skipTagsWhere(tagIsUnknown)
+	p.skipTagsWhere(tagIsUnhandled)
+	p.addPrototypes()
+	p.removeDefinedProtypes()
+	p.skipDuplicates()
+	p.skipTagsWhere(prototypeAndCodeDontMatch)
+
+	return p.tags
+}
+
+func (p *CTagsParser) addPrototypes() {
+	for _, tag := range p.tags {
 		if !tag.SkipMe {
 			addPrototype(tag)
 		}
@@ -108,28 +104,28 @@ func addPrototype(tag *types.CTag) {
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
-func removeDefinedProtypes(tags []*types.CTag, ctx *types.Context) {
+func (p *CTagsParser) removeDefinedProtypes() {
 	definedPrototypes := make(map[string]bool)
-	for _, tag := range tags {
+	for _, tag := range p.tags {
 		if tag.Kind == KIND_PROTOTYPE {
 			definedPrototypes[tag.Prototype] = true
 		}
 	}
 
-	for _, tag := range tags {
+	for _, tag := range p.tags {
 		if definedPrototypes[tag.Prototype] {
-			if ctx.DebugLevel >= 10 {
-				ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
-			}
+			//if ctx.DebugLevel >= 10 {
+			//	ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
+			//}
 			tag.SkipMe = true
 		}
 	}
 }
 
-func removeDuplicate(tags []*types.CTag) {
+func (p *CTagsParser) skipDuplicates() {
 	definedPrototypes := make(map[string]bool)
 
-	for _, tag := range tags {
+	for _, tag := range p.tags {
 		if !definedPrototypes[tag.Prototype] && tag.SkipMe == false {
 			definedPrototypes[tag.Prototype] = true
 		} else {
@@ -140,13 +136,13 @@ func removeDuplicate(tags []*types.CTag) {
 
 type skipFuncType func(tag *types.CTag) bool
 
-func skipTagsWhere(tags []*types.CTag, skipFunc skipFuncType, ctx *types.Context) {
-	for _, tag := range tags {
+func (p *CTagsParser) skipTagsWhere(skipFunc skipFuncType) {
+	for _, tag := range p.tags {
 		if !tag.SkipMe {
 			skip := skipFunc(tag)
-			if skip && ctx.DebugLevel >= 10 {
-				ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
-			}
+			//if skip && p.debugLevel >= 10 {
+			//	ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
+			//}
 			tag.SkipMe = skip
 		}
 	}

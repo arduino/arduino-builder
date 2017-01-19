@@ -30,27 +30,18 @@
 package ctags
 
 import (
-	"arduino.cc/builder/types"
 	"strings"
+
+	"arduino.cc/builder/types"
 )
 
-type CTagsToPrototypes struct{}
-
-func (s *CTagsToPrototypes) Run(ctx *types.Context) error {
-	tags := ctx.CTagsOfPreprocessedSource
-
-	lineWhereToInsertPrototypes := findLineWhereToInsertPrototypes(tags)
-	if lineWhereToInsertPrototypes != -1 {
-		ctx.PrototypesLineWhereToInsert = lineWhereToInsertPrototypes
-	}
-
-	ctx.Prototypes = toPrototypes(tags)
-	return nil
+func (p *CTagsParser) GeneratePrototypes() ([]*types.Prototype, int) {
+	return p.toPrototypes(), p.findLineWhereToInsertPrototypes()
 }
 
-func findLineWhereToInsertPrototypes(tags []*types.CTag) int {
-	firstFunctionLine := firstFunctionAtLine(tags)
-	firstFunctionPointerAsArgument := firstFunctionPointerUsedAsArgument(tags)
+func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
+	firstFunctionLine := p.firstFunctionAtLine()
+	firstFunctionPointerAsArgument := p.firstFunctionPointerUsedAsArgument()
 	if firstFunctionLine != -1 && firstFunctionPointerAsArgument != -1 {
 		if firstFunctionLine < firstFunctionPointerAsArgument {
 			return firstFunctionLine
@@ -64,9 +55,9 @@ func findLineWhereToInsertPrototypes(tags []*types.CTag) int {
 	}
 }
 
-func firstFunctionPointerUsedAsArgument(tags []*types.CTag) int {
-	functionNames := collectFunctionNames(tags)
-	for _, tag := range tags {
+func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
+	functionNames := p.collectFunctionNames()
+	for _, tag := range p.tags {
 		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
 			return tag.Line
 		}
@@ -83,9 +74,9 @@ func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionNames []string
 	return false
 }
 
-func collectFunctionNames(tags []*types.CTag) []string {
+func (p *CTagsParser) collectFunctionNames() []string {
 	names := []string{}
-	for _, tag := range tags {
+	for _, tag := range p.tags {
 		if tag.Kind == KIND_FUNCTION {
 			names = append(names, tag.FunctionName)
 		}
@@ -93,8 +84,8 @@ func collectFunctionNames(tags []*types.CTag) []string {
 	return names
 }
 
-func firstFunctionAtLine(tags []*types.CTag) int {
-	for _, tag := range tags {
+func (p *CTagsParser) firstFunctionAtLine() int {
+	for _, tag := range p.tags {
 		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION {
 			return tag.Line
 		}
@@ -102,9 +93,9 @@ func firstFunctionAtLine(tags []*types.CTag) int {
 	return -1
 }
 
-func toPrototypes(tags []*types.CTag) []*types.Prototype {
+func (p *CTagsParser) toPrototypes() []*types.Prototype {
 	prototypes := []*types.Prototype{}
-	for _, tag := range tags {
+	for _, tag := range p.tags {
 		if strings.TrimSpace(tag.Prototype) == "" {
 			continue
 		}
