@@ -56,32 +56,32 @@ func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
 }
 
 func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
-	functionNames := p.collectFunctionNames()
+	functionTags := p.collectFunctions()
 	for _, tag := range p.tags {
-		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
+		if functionNameUsedAsFunctionPointerIn(tag, functionTags) {
 			return tag.Line
 		}
 	}
 	return -1
 }
 
-func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionNames []string) bool {
-	for _, functionName := range functionNames {
-		if strings.Index(tag.Code, "&"+functionName) != -1 {
+func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionTags []*types.CTag) bool {
+	for _, functionTag := range functionTags {
+		if tag.Line != functionTag.Line && strings.Index(tag.Code, "&"+functionTag.FunctionName) != -1 {
 			return true
 		}
 	}
 	return false
 }
 
-func (p *CTagsParser) collectFunctionNames() []string {
-	names := []string{}
+func (p *CTagsParser) collectFunctions() []*types.CTag {
+	functionTags := []*types.CTag{}
 	for _, tag := range p.tags {
 		if tag.Kind == KIND_FUNCTION {
-			names = append(names, tag.FunctionName)
+			functionTags = append(functionTags, tag)
 		}
 	}
-	return names
+	return functionTags
 }
 
 func (p *CTagsParser) firstFunctionAtLine() int {
