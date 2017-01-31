@@ -84,7 +84,10 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 
 	library = useAlreadyImportedLibraryWithSameNameIfExists(library, importedLibraries)
 
-	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
+	libraryResolutionResults[header] = types.LibraryResolutionResult{
+		Library:          library,
+		NotUsedLibraries: filterOutLibraryFrom(libraries, library),
+	}
 
 	return library
 }
