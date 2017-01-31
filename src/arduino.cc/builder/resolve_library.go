@@ -44,18 +44,13 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 
-	markImportedLibrary := make(map[*types.Library]bool)
-	for _, library := range importedLibraries {
-		markImportedLibrary[library] = true
-	}
-
 	libraries := append([]*types.Library{}, headerToLibraries[header]...)
 
 	if libraries == nil || len(libraries) == 0 {
 		return nil
 	}
 
-	if markImportedLibraryContainsOneOfCandidates(markImportedLibrary, libraries) {
+	if importedLibraryContainsOneOfCandidates(importedLibraries, libraries) {
 		return nil
 	}
 
@@ -87,7 +82,7 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 		library = libraries[0]
 	}
 
-	library = useAlreadyImportedLibraryWithSameNameIfExists(library, markImportedLibrary)
+	library = useAlreadyImportedLibraryWithSameNameIfExists(library, importedLibraries)
 
 	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
 
@@ -101,10 +96,10 @@ func reverse(data []*types.Library) {
 	}
 }
 
-func markImportedLibraryContainsOneOfCandidates(markImportedLibrary map[*types.Library]bool, libraries []*types.Library) bool {
-	for markedLibrary, _ := range markImportedLibrary {
-		for _, library := range libraries {
-			if markedLibrary == library {
+func importedLibraryContainsOneOfCandidates(imported []*types.Library, candidates []*types.Library) bool {
+	for _, i := range imported {
+		for _, j := range candidates {
+			if i == j {
 				return true
 			}
 		}
@@ -112,8 +107,8 @@ func markImportedLibraryContainsOneOfCandidates(markImportedLibrary map[*types.L
 	return false
 }
 
-func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, markImportedLibrary map[*types.Library]bool) *types.Library {
-	for lib, _ := range markImportedLibrary {
+func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, imported []*types.Library) *types.Library {
+	for _, lib := range imported {
 		if lib.Name == library.Name {
 			return lib
 		}
