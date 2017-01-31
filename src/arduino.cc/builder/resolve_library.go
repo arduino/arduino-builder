@@ -55,12 +55,12 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 		return nil
 	}
 
-	if len(libraries) == 1 {
-		return libraries[0]
-	}
-
 	if markImportedLibraryContainsOneOfCandidates(markImportedLibrary, libraries) {
 		return nil
+	}
+
+	if len(libraries) == 1 {
+		return libraries[0]
 	}
 
 	reverse(libraries)
