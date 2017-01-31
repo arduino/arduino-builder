@@ -218,7 +218,7 @@ func findBestLibraryWithHeader(header string, libraries []*types.Library) *types
 
 func findLibWithName(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if library.Name == name {
+		if simplifyName(library.Name) == simplifyName(name) {
 			return library
 		}
 	}
@@ -227,7 +227,7 @@ func findLibWithName(name string, libraries []*types.Library) *types.Library {
 
 func findLibWithNameStartingWith(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if strings.HasPrefix(library.Name, name) {
+		if strings.HasPrefix(simplifyName(library.Name), simplifyName(name)) {
 			return library
 		}
 	}
@@ -236,7 +236,7 @@ func findLibWithNameStartingWith(name string, libraries []*types.Library) *types
 
 func findLibWithNameEndingWith(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if strings.HasSuffix(library.Name, name) {
+		if strings.HasSuffix(simplifyName(library.Name), simplifyName(name)) {
 			return library
 		}
 	}
@@ -245,11 +245,15 @@ func findLibWithNameEndingWith(name string, libraries []*types.Library) *types.L
 
 func findLibWithNameContaining(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if strings.Contains(library.Name, name) {
+		if strings.Contains(simplifyName(library.Name), simplifyName(name)) {
 			return library
 		}
 	}
 	return nil
+}
+
+func simplifyName(name string) string {
+	return strings.ToLower(strings.Replace(name, "_", " ", -1))
 }
 
 // thank you golang: I can not use/recycle/adapt utils.SliceContains
