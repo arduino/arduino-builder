@@ -56,7 +56,6 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 	}
 
 	if len(libraries) == 1 {
-		markImportedLibrary[libraries[0]] = true
 		return libraries[0]
 	}
 
@@ -92,7 +91,6 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 
 	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
 
-	markImportedLibrary[library] = true
 	return library
 }
 
