@@ -255,13 +255,3 @@ func findLibWithNameContaining(name string, libraries []*types.Library) *types.L
 func simplifyName(name string) string {
 	return strings.ToLower(strings.Replace(name, "_", " ", -1))
 }
-
-// thank you golang: I can not use/recycle/adapt utils.SliceContains
-func sliceContainsLibrary(slice []*types.Library, target *types.Library) bool {
-	for _, value := range slice {
-		if value.SrcFolder == target.SrcFolder {
-			return true
-		}
-	}
-	return false
-}
