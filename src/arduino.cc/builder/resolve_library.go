@@ -44,24 +44,18 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 
-	markImportedLibrary := make(map[*types.Library]bool)
-	for _, library := range importedLibraries {
-		markImportedLibrary[library] = true
-	}
-
 	libraries := append([]*types.Library{}, headerToLibraries[header]...)
 
 	if libraries == nil || len(libraries) == 0 {
 		return nil
 	}
 
-	if len(libraries) == 1 {
-		markImportedLibrary[libraries[0]] = true
-		return libraries[0]
+	if importedLibraryContainsOneOfCandidates(importedLibraries, libraries) {
+		return nil
 	}
 
-	if markImportedLibraryContainsOneOfCandidates(markImportedLibrary, libraries) {
-		return nil
+	if len(libraries) == 1 {
+		return libraries[0]
 	}
 
 	reverse(libraries)
@@ -88,11 +82,13 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 		library = libraries[0]
 	}
 
-	library = useAlreadyImportedLibraryWithSameNameIfExists(library, markImportedLibrary)
+	library = useAlreadyImportedLibraryWithSameNameIfExists(library, importedLibraries)
 
-	libraryResolutionResults[header] = types.LibraryResolutionResult{Library: library, NotUsedLibraries: filterOutLibraryFrom(libraries, library)}
+	libraryResolutionResults[header] = types.LibraryResolutionResult{
+		Library:          library,
+		NotUsedLibraries: filterOutLibraryFrom(libraries, library),
+	}
 
-	markImportedLibrary[library] = true
 	return library
 }
 
@@ -103,10 +99,10 @@ func reverse(data []*types.Library) {
 	}
 }
 
-func markImportedLibraryContainsOneOfCandidates(markImportedLibrary map[*types.Library]bool, libraries []*types.Library) bool {
-	for markedLibrary, _ := range markImportedLibrary {
-		for _, library := range libraries {
-			if markedLibrary == library {
+func importedLibraryContainsOneOfCandidates(imported []*types.Library, candidates []*types.Library) bool {
+	for _, i := range imported {
+		for _, j := range candidates {
+			if i == j {
 				return true
 			}
 		}
@@ -114,8 +110,8 @@ func markImportedLibraryContainsOneOfCandidates(markImportedLibrary map[*types.L
 	return false
 }
 
-func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, markImportedLibrary map[*types.Library]bool) *types.Library {
-	for lib, _ := range markImportedLibrary {
+func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, imported []*types.Library) *types.Library {
+	for _, lib := range imported {
 		if lib.Name == library.Name {
 			return lib
 		}
@@ -222,7 +218,7 @@ func findBestLibraryWithHeader(header string, libraries []*types.Library) *types
 
 func findLibWithName(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if library.Name == name {
+		if simplifyName(library.Name) == simplifyName(name) {
 			return library
 		}
 	}
@@ -231,7 +227,7 @@ func findLibWithName(name string, libraries []*types.Library) *types.Library {
 
 func findLibWithNameStartingWith(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if strings.HasPrefix(library.Name, name) {
+		if strings.HasPrefix(simplifyName(library.Name), simplifyName(name)) {
 			return library
 		}
 	}
@@ -240,7 +236,7 @@ func findLibWithNameStartingWith(name string, libraries []*types.Library) *types
 
 func findLibWithNameEndingWith(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if strings.HasSuffix(library.Name, name) {
+		if strings.HasSuffix(simplifyName(library.Name), simplifyName(name)) {
 			return library
 		}
 	}
@@ -249,19 +245,13 @@ func findLibWithNameEndingWith(name string, libraries []*types.Library) *types.L
 
 func findLibWithNameContaining(name string, libraries []*types.Library) *types.Library {
 	for _, library := range libraries {
-		if strings.Contains(library.Name, name) {
+		if strings.Contains(simplifyName(library.Name), simplifyName(name)) {
 			return library
 		}
 	}
 	return nil
 }
 
-// thank you golang: I can not use/recycle/adapt utils.SliceContains
-func sliceContainsLibrary(slice []*types.Library, target *types.Library) bool {
-	for _, value := range slice {
-		if value.SrcFolder == target.SrcFolder {
-			return true
-		}
-	}
-	return false
+func simplifyName(name string) string {
+	return strings.ToLower(strings.Replace(name, "_", " ", -1))
 }
