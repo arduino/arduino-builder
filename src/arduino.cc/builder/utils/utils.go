@@ -365,6 +365,16 @@ func FindFilesInFolder(files *[]string, folder string, extensions CheckExtension
 	return gohasissues.Walk(folder, walkFunc)
 }
 
+func GetParentFolder(basefolder string, n int) string {
+	tempFolder := basefolder
+	i := 0
+	for i < n {
+		tempFolder = filepath.Dir(tempFolder)
+		i++
+	}
+	return tempFolder
+}
+
 func AppendIfNotPresent(target []string, elements ...string) []string {
 	for _, element := range elements {
 		if !SliceContains(target, element) {

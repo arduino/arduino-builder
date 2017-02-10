@@ -84,8 +84,11 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 		}
 	}
 
+	// Recreate the archive if ANY of the core files (including platform.txt) has changed
+	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
+
 	targetArchivedCore := builder_utils.GetCoreArchivePath(buildProperties[constants.BUILD_PROPERTIES_FQBN])
-	noNeedToRecompile := builder_utils.CheckIfRecompileIsAvoidable(coreFolder, targetArchivedCore)
+	noNeedToRecompile := builder_utils.CheckIfRecompileIsAvoidable(realCoreFolder, targetArchivedCore)
 
 	if noNeedToRecompile {
 		// use archived core
