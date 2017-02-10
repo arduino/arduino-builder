@@ -130,6 +130,10 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	// Cleanup cached core
+	coreFile := builder_utils.GetCoreArchivePath(ctx.FQBN)
+	os.Remove(coreFile)
+
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
@@ -167,6 +171,10 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	command = builder.Builder{}
 	err = command.Run(ctx)
 	NoError(t, err)
+
+	// Cleanup cached core
+	coreFile := builder_utils.GetCoreArchivePath(ctx.FQBN)
+	os.Remove(coreFile)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
 	NoError(t, err)
