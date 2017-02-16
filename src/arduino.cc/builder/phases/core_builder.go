@@ -36,6 +36,7 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"arduino.cc/properties"
+	"strings"
 )
 
 type CoreBuilder struct{}
@@ -67,6 +68,8 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
 
+	targetCoreFolder := buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH]
+
 	includes := []string{}
 	includes = append(includes, coreFolder)
 	if variantFolder != constants.EMPTY_STRING {
@@ -89,6 +92,11 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 
 	targetArchivedCore := builder_utils.GetCoreArchivePath(buildProperties[constants.BUILD_PROPERTIES_FQBN])
 	noNeedToRecompile := builder_utils.CheckIfRecompileIsAvoidable(realCoreFolder, targetArchivedCore)
+
+	if !strings.EqualFold(realCoreFolder, targetCoreFolder) {
+		// targetCoreFolder is not a parent of realCoreFolder, so check it for modifications
+		noNeedToRecompile = noNeedToRecompile && builder_utils.CheckIfRecompileIsAvoidable(targetCoreFolder, targetArchivedCore)
+	}
 
 	if noNeedToRecompile {
 		// use archived core
