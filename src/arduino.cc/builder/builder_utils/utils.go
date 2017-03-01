@@ -366,3 +366,9 @@ func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, remo
 func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
 	buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
 }
+
+func GetCoreArchivePath(fqbn string) string {
+	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
+	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
+	return os.TempDir() + "/core_" + fqbnToUnderscore + ".a"
+}
