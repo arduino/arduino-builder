@@ -84,6 +84,17 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 		}
 	}
 
+	targetArchivedCore := builder_utils.GetCoreArchivePath(buildProperties[constants.BUILD_PROPERTIES_FQBN])
+	noNeedToRecompile := builder_utils.CheckIfRecompileIsAvoidable(coreFolder, targetArchivedCore)
+
+	if noNeedToRecompile {
+		// use archived core
+		if verbose {
+			logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core")
+		}
+		return targetArchivedCore, variantObjectFiles, nil
+	}
+
 	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
 		return "", nil, i18n.WrapError(err)
@@ -93,6 +104,9 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 	if err != nil {
 		return "", nil, i18n.WrapError(err)
 	}
+
+	// archive core.a
+	builder_utils.CopyFile(archiveFile, targetArchivedCore)
 
 	return archiveFile, variantObjectFiles, nil
 }

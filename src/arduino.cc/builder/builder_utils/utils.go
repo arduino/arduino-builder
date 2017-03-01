@@ -32,6 +32,7 @@ package builder_utils
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -106,6 +107,34 @@ func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]str
 
 		for _, folder := range folders {
 			otherSources, err := findFilesInFolder(filepath.Join(sourcePath, folder.Name()), extension, recurse)
+			if err != nil {
+				return nil, i18n.WrapError(err)
+			}
+			sources = append(sources, otherSources...)
+		}
+	}
+
+	return sources, nil
+}
+
+func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
+	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFiles())
+	if err != nil {
+		return nil, i18n.WrapError(err)
+	}
+	var sources []string
+	for _, file := range files {
+		sources = append(sources, filepath.Join(sourcePath, file.Name()))
+	}
+
+	if recurse {
+		folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
+		if err != nil {
+			return nil, i18n.WrapError(err)
+		}
+
+		for _, folder := range folders {
+			otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}
@@ -258,6 +287,24 @@ func nonEmptyString(s string) bool {
 	return s != constants.EMPTY_STRING
 }
 
+func CheckIfRecompileIsAvoidable(corePath string, archiveFile string) bool {
+	archiveFileStat, err := os.Stat(archiveFile)
+	if err == nil {
+		files, err := findAllFilesInFolder(corePath, true)
+		if err != nil {
+			return false
+		}
+		for _, file := range files {
+			fileStat, err := os.Stat(file)
+			if err != nil || fileStat.ModTime().After(archiveFileStat.ModTime()) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {
 	archiveFilePath := filepath.Join(buildPath, archiveFile)
 
@@ -365,6 +412,50 @@ func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, remo
 
 func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
 	buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
+}
+
+// CopyFile copies the contents of the file named src to the file named
+// by dst. The file will be created if it does not already exist. If the
+// destination file exists, all it's contents will be replaced by the contents
+// of the source file. The file mode will be copied from the source and
+// the copied data is synced/flushed to stable storage.
+func CopyFile(src, dst string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer func() {
+		if e := out.Close(); e != nil {
+			err = e
+		}
+	}()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return
+	}
+
+	err = out.Sync()
+	if err != nil {
+		return
+	}
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return
+	}
+	err = os.Chmod(dst, si.Mode())
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func GetCoreArchivePath(fqbn string) string {
