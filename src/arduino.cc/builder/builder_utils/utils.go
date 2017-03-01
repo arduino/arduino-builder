@@ -287,22 +287,26 @@ func nonEmptyString(s string) bool {
 	return s != constants.EMPTY_STRING
 }
 
-func CheckIfRecompileIsAvoidable(corePath string, archiveFile string) bool {
-	archiveFileStat, err := os.Stat(archiveFile)
+func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile string) bool {
+
+	targetFileStat, err := os.Stat(targetFile)
 	if err == nil {
 		files, err := findAllFilesInFolder(corePath, true)
 		if err != nil {
-			return false
+			return true
 		}
 		for _, file := range files {
 			fileStat, err := os.Stat(file)
-			if err != nil || fileStat.ModTime().After(archiveFileStat.ModTime()) {
-				return false
+			if err != nil || fileStat.ModTime().After(targetFileStat.ModTime()) {
+				return true
 			}
 		}
-		return true
+		if targetCorePath != constants.EMPTY_STRING && !strings.EqualFold(corePath, targetCorePath) {
+			return CoreOrReferencedCoreHasChanged(targetCorePath, constants.EMPTY_STRING, targetFile)
+		}
+		return false
 	}
-	return false
+	return true
 }
 
 func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {

@@ -36,7 +36,6 @@ import (
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"arduino.cc/properties"
-	"strings"
 )
 
 type CoreBuilder struct{}
@@ -91,14 +90,9 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
 
 	targetArchivedCore := builder_utils.GetCoreArchivePath(buildProperties[constants.BUILD_PROPERTIES_FQBN])
-	noNeedToRecompile := builder_utils.CheckIfRecompileIsAvoidable(realCoreFolder, targetArchivedCore)
+	canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
 
-	if !strings.EqualFold(realCoreFolder, targetCoreFolder) {
-		// targetCoreFolder is not a parent of realCoreFolder, so check it for modifications
-		noNeedToRecompile = noNeedToRecompile && builder_utils.CheckIfRecompileIsAvoidable(targetCoreFolder, targetArchivedCore)
-	}
-
-	if noNeedToRecompile {
+	if canUseArchivedCore {
 		// use archived core
 		if verbose {
 			logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core")
