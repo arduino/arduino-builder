@@ -30,14 +30,17 @@
 package test
 
 import (
-	"arduino.cc/builder"
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
-	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"time"
+
+	"arduino.cc/builder"
+	"arduino.cc/builder/builder_utils"
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBuilderEmptySketch(t *testing.T) {
@@ -409,4 +412,53 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	// build directory is present at the start
 	err = command.Run(ctx)
 	NoError(t, err)
+}
+
+func TestBuilderCacheCoreAFile(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10801",
+	}
+	SetupBuildPath(t, ctx)
+	defer os.RemoveAll(ctx.BuildPath)
+
+	// Cleanup cached core
+	coreFile := builder_utils.GetCoreArchivePath(ctx.FQBN)
+	os.Remove(coreFile)
+
+	// Run build
+	bldr := builder.Builder{}
+	err := bldr.Run(ctx)
+	NoError(t, err)
+	coreStatBefore, err := os.Stat(coreFile)
+	require.NoError(t, err)
+
+	// Run build again, to verify that the builder skips rebuilding core.a
+	err = bldr.Run(ctx)
+	NoError(t, err)
+
+	coreStatAfterRebuild, err := os.Stat(coreFile)
+	require.NoError(t, err)
+	require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
+
+	// Touch a file of the core and check if the builder invalidate the cache
+	time.Sleep(time.Second)
+	now := time.Now().Local()
+	err = os.Chtimes(filepath.Join("downloaded_hardware", "arduino", "avr", "cores", "arduino", "Arduino.h"), now, now)
+	require.NoError(t, err)
+
+	// Run build again, to verify that the builder rebuilds core.a
+	err = bldr.Run(ctx)
+	NoError(t, err)
+
+	coreStatAfterTouch, err := os.Stat(coreFile)
+	require.NoError(t, err)
+	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
 }
