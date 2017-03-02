@@ -166,6 +166,10 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 	objectFile = filepath.Clean(objectFile)
 	dependencyFile = filepath.Clean(dependencyFile)
 
+	if debugLevel >= 20 {
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Checking previous results for {0} (result = {1}, dep = {2})", sourceFile, objectFile, dependencyFile)
+	}
+
 	sourceFileStat, err := os.Stat(sourceFile)
 	if err != nil {
 		return false, i18n.WrapError(err)
@@ -174,6 +178,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 	objectFileStat, err := os.Stat(objectFile)
 	if err != nil {
 		if os.IsNotExist(err) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", objectFile)
+			}
 			return false, nil
 		} else {
 			return false, i18n.WrapError(err)
@@ -183,6 +190,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 	dependencyFileStat, err := os.Stat(dependencyFile)
 	if err != nil {
 		if os.IsNotExist(err) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", dependencyFile)
+			}
 			return false, nil
 		} else {
 			return false, i18n.WrapError(err)
@@ -190,9 +200,15 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 	}
 
 	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, objectFile)
+		}
 		return false, nil
 	}
 	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, dependencyFile)
+		}
 		return false, nil
 	}
 
@@ -212,10 +228,16 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 
 	firstRow := rows[0]
 	if !strings.HasSuffix(firstRow, ":") {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "No colon in first line of depfile")
+		}
 		return false, nil
 	}
 	objFileInDepFile := firstRow[:len(firstRow)-1]
 	if objFileInDepFile != objectFile {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Depfile is about different file: {0}", objFileInDepFile)
+		}
 		return false, nil
 	}
 
@@ -225,12 +247,22 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 		if err != nil && !os.IsNotExist(err) {
 			// There is probably a parsing error of the dep file
 			// Ignore the error and trigger a full rebuild anyway
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Failed to read: {0}", row)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, i18n.WrapError(err).Error())
+			}
 			return false, nil
 		}
 		if os.IsNotExist(err) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", row)
+			}
 			return false, nil
 		}
 		if depStat.ModTime().After(objectFileStat.ModTime()) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", row, objectFile)
+			}
 			return false, nil
 		}
 	}
