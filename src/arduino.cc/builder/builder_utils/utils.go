@@ -144,7 +144,7 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 		return "", i18n.WrapError(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"), debugLevel, logger)
+	objIsUpToDate, err := BuildResultIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"), debugLevel, logger)
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}
@@ -161,13 +161,14 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
 }
 
-func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel int, logger i18n.Logger) (bool, error) {
+func BuildResultIsUpToDate(sourceFile, resultFile, objectFile, dependencyFile string, debugLevel int, logger i18n.Logger) (bool, error) {
 	sourceFile = filepath.Clean(sourceFile)
+	resultFile = filepath.Clean(resultFile)
 	objectFile = filepath.Clean(objectFile)
 	dependencyFile = filepath.Clean(dependencyFile)
 
 	if debugLevel >= 20 {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Checking previous results for {0} (result = {1}, dep = {2})", sourceFile, objectFile, dependencyFile)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Checking build results for {0} (result = {1}, dep = {2})", sourceFile, objectFile, dependencyFile)
 	}
 
 	sourceFileStat, err := os.Stat(sourceFile)
@@ -175,11 +176,11 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 		return false, i18n.WrapError(err)
 	}
 
-	objectFileStat, err := os.Stat(objectFile)
+	resultFileStat, err := os.Stat(resultFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", objectFile)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", resultFile)
 			}
 			return false, nil
 		} else {
@@ -199,9 +200,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 		}
 	}
 
-	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
+	if sourceFileStat.ModTime().After(resultFileStat.ModTime()) {
 		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, objectFile)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, resultFile)
 		}
 		return false, nil
 	}
@@ -259,9 +260,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string, debugLevel
 			}
 			return false, nil
 		}
-		if depStat.ModTime().After(objectFileStat.ModTime()) {
+		if depStat.ModTime().After(resultFileStat.ModTime()) {
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", row, objectFile)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", row, resultFile)
 			}
 			return false, nil
 		}
