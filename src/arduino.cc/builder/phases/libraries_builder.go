@@ -50,6 +50,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	libraries := ctx.ImportedLibraries
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel
+	debugLevel := ctx.DebugLevel
 	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(librariesBuildPath)
@@ -57,7 +58,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	objectFiles, err := compileLibraries(libraries, librariesBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	objectFiles, err := compileLibraries(libraries, librariesBuildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -67,10 +68,10 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileLibraries(libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibraries(libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, debugLevel int, logger i18n.Logger) ([]string, error) {
 	objectFiles := []string{}
 	for _, library := range libraries {
-		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -81,7 +82,7 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 
 }
 
-func compileLibrary(library *types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibrary(library *types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, debugLevel int, logger i18n.Logger) ([]string, error) {
 	if verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
 	}
@@ -94,7 +95,7 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 
 	objectFiles := []string{}
 	if library.Layout == types.LIBRARY_RECURSIVE {
-		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -109,14 +110,14 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 		if library.UtilityFolder != "" {
 			includes = append(includes, utils.WrapWithHyphenI(library.UtilityFolder))
 		}
-		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 
 		if library.UtilityFolder != "" {
 			utilityBuildPath := filepath.Join(libraryBuildPath, constants.LIBRARY_FOLDER_UTILITY)
-			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}

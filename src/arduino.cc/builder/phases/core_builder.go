@@ -52,7 +52,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	archiveFile, objectFiles, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, logger)
+	archiveFile, objectFiles, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, ctx.DebugLevel, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -63,7 +63,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileCore(buildPath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
+func compileCore(buildPath string, buildProperties properties.Map, verbose bool, warningsLevel string, debugLevel int, logger i18n.Logger) (string, []string, error) {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
 
@@ -78,13 +78,13 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 
 	variantObjectFiles := []string{}
 	if variantFolder != constants.EMPTY_STRING {
-		variantObjectFiles, err = builder_utils.CompileFiles(variantObjectFiles, variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		variantObjectFiles, err = builder_utils.CompileFiles(variantObjectFiles, variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 		if err != nil {
 			return "", nil, i18n.WrapError(err)
 		}
 	}
 
-	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 	if err != nil {
 		return "", nil, i18n.WrapError(err)
 	}

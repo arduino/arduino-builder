@@ -48,6 +48,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel
+	debugLevel := ctx.DebugLevel
 	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(sketchBuildPath)
@@ -56,7 +57,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	}
 
 	var objectFiles []string
-	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, false, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, false, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -64,7 +65,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	// The "src/" subdirectory of a sketch is compiled recursively
 	sketchSrcPath := filepath.Join(sketchBuildPath, constants.SKETCH_FOLDER_SRC)
 	if info, err := os.Stat(sketchSrcPath); err == nil && info.IsDir() {
-		objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchSrcPath, true, sketchSrcPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchSrcPath, true, sketchSrcPath, buildProperties, includes, verbose, warningsLevel, debugLevel, logger)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
