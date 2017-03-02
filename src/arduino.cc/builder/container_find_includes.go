@@ -289,6 +289,8 @@ func writeCache(cache *includeCache, path string) error {
 
 func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
+	depPath := sourceFile.DepfilePath(ctx)
+	objPath := sourceFile.ObjectPath(ctx)
 	targetFilePath := utils.NULLFile()
 
 	// TODO: This should perhaps also compare against the
@@ -303,7 +305,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx), ctx.DebugLevel, ctx.GetLogger())
+	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, objPath, depPath, ctx.DebugLevel, ctx.GetLogger())
 	if err != nil {
 		return i18n.WrapError(err)
 	}
