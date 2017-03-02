@@ -138,6 +138,7 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 		return "", i18n.WrapError(err)
 	}
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = filepath.Join(buildPath, relativeSource+".o")
+	properties[constants.BUILD_PROPERTIES_DEP_FILE] = filepath.Join(buildPath, relativeSource+".d")
 
 	err = utils.EnsureFolderExists(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]))
 	if err != nil {
