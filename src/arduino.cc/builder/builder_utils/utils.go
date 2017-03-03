@@ -462,8 +462,14 @@ func CopyFile(src, dst string) (err error) {
 	return
 }
 
-func GetCoreArchivePath(fqbn string) string {
+// GetCachedCoreArchiveFileName returns the filename to be used to store
+// the global cached core.a.
+func GetCachedCoreArchiveFileName(fqbn, coreFolder string) string {
 	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
 	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
-	return os.TempDir() + "/core_" + fqbnToUnderscore + ".a"
+	if absCoreFolder, err := filepath.Abs(coreFolder); err == nil {
+		coreFolder = absCoreFolder
+	} // silently continue if absolute path can't be detected
+	hash := utils.MD5Sum([]byte(coreFolder))
+	return os.TempDir() + "/core_" + fqbnToUnderscore + "_" + hash + ".a"
 }

@@ -62,6 +62,12 @@ func TestBuilderEmptySketch(t *testing.T) {
 
 	ctx.DebugLevel = 10
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -95,6 +101,12 @@ func TestBuilderBridge(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -129,13 +141,15 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
-
-	// Cleanup cached core
-	coreFile := builder_utils.GetCoreArchivePath(ctx.FQBN)
-	os.Remove(coreFile)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
 	NoError(t, err)
@@ -167,17 +181,20 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	// Run builder again
 	command = builder.Builder{}
 	err = command.Run(ctx)
 	NoError(t, err)
-
-	// Cleanup cached core
-	coreFile := builder_utils.GetCoreArchivePath(ctx.FQBN)
-	os.Remove(coreFile)
 
 	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
 	NoError(t, err)
@@ -211,6 +228,12 @@ func TestBuilderBridgeSAM(t *testing.T) {
 
 	ctx.WarningsLevel = "all"
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "sam")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -254,6 +277,12 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -404,9 +433,18 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	NoError(t, err)
 	defer os.RemoveAll(ctx.BuildPath)
 
+	// Cleanup cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	os.Remove(coreFile)
+
+	// Run build
 	command := builder.Builder{}
 	err = command.Run(ctx)
 	NoError(t, err)
+
+	// Cleanup cached core
+	os.Remove(coreFile)
 
 	// Run build twice, to verify the build still works when the
 	// build directory is present at the start
@@ -430,7 +468,8 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 	defer os.RemoveAll(ctx.BuildPath)
 
 	// Cleanup cached core
-	coreFile := builder_utils.GetCoreArchivePath(ctx.FQBN)
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
 	os.Remove(coreFile)
 
 	// Run build
@@ -451,7 +490,7 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 	// Touch a file of the core and check if the builder invalidate the cache
 	time.Sleep(time.Second)
 	now := time.Now().Local()
-	err = os.Chtimes(filepath.Join("downloaded_hardware", "arduino", "avr", "cores", "arduino", "Arduino.h"), now, now)
+	err = os.Chtimes(filepath.Join(coreFolder, "cores", "arduino", "Arduino.h"), now, now)
 	require.NoError(t, err)
 
 	// Run build again, to verify that the builder rebuilds core.a
