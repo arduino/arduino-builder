@@ -43,24 +43,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestBuilderEmptySketch(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
+func prepareBuilderTestContext(sketchPath, fqbn string) *types.Context {
+	return &types.Context{
+		SketchLocation:          sketchPath,
+		FQBN:                    fqbn,
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
 		ToolsFolders:            []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
 		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
+		Verbose:                 false,
 	}
+}
+func TestBuilderEmptySketch(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := prepareBuilderTestContext(filepath.Join("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx.DebugLevel = 10
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	ctx.DebugLevel = 10
 
 	// Cleanup cached core
 	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
@@ -87,16 +89,7 @@ func TestBuilderEmptySketch(t *testing.T) {
 func TestBuilderBridge(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
-		FQBN:                    "arduino:avr:leonardo",
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -128,15 +121,7 @@ func TestBuilderBridge(t *testing.T) {
 func TestBuilderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_with_config", "sketch_with_config.ino"),
-		FQBN:                    "arduino:avr:leonardo",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_config", "sketch_with_config.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -168,15 +153,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 func TestBuilderBridgeTwice(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
-		FQBN:                    "arduino:avr:leonardo",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -213,15 +190,7 @@ func TestBuilderBridgeTwice(t *testing.T) {
 func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
-		FQBN:                    "arduino:sam:arduino_due_x_dbg",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -264,16 +233,9 @@ func TestBuilderBridgeSAM(t *testing.T) {
 func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
-		FQBN:                    "RedBearLab:avr:blend",
-		ArduinoAPIVersion:       "10600",
-	}
-
+	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
+	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
+	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
@@ -304,15 +266,9 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_no_functions", "main.ino"),
-		FQBN:                    "RedBearLab:avr:blend",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch_no_functions", "main.ino"), "RedBearLab:avr:blend")
+	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
+	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -325,15 +281,9 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_with_backup_files", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_backup_files", "sketch.ino"), "arduino:avr:uno")
+	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
+	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -346,15 +296,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_with_old_lib", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_old_lib", "sketch.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -367,15 +309,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"),
-		FQBN:                    "arduino:avr:uno",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -388,15 +322,7 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
-		FQBN:                    "arduino:avr:leonardo",
-		ArduinoAPIVersion:       "10600",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
@@ -417,16 +343,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch1", "sketch.ino"), "arduino:avr:uno")
 
 	var err error
 	ctx.BuildPath, err = filepath.Abs(filepath.Join("sketch1", "build"))
@@ -455,15 +372,8 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 func TestBuilderCacheCoreAFile(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch1", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
-		ArduinoAPIVersion:       "10801",
-	}
+	ctx := prepareBuilderTestContext(filepath.Join("sketch1", "sketch.ino"), "arduino:avr:uno")
+
 	SetupBuildPath(t, ctx)
 	defer os.RemoveAll(ctx.BuildPath)
 
