@@ -64,6 +64,7 @@ const FLAG_FQBN = "fqbn"
 const FLAG_IDE_VERSION = "ide-version"
 const FLAG_CORE_API_VERSION = "core-api-version"
 const FLAG_BUILD_PATH = "build-path"
+const FLAG_BUILD_CACHE = "build-cache"
 const FLAG_VERBOSE = "verbose"
 const FLAG_QUIET = "quiet"
 const FLAG_DEBUG_LEVEL = "debug-level"
@@ -126,6 +127,7 @@ var fqbnFlag *string
 var coreAPIVersionFlag *string
 var ideVersionFlag *string
 var buildPathFlag *string
+var buildCachePathFlag *string
 var verboseFlag *bool
 var quietFlag *bool
 var debugLevelFlag *int
@@ -148,6 +150,7 @@ func init() {
 	coreAPIVersionFlag = flag.String(FLAG_CORE_API_VERSION, "10600", "version of core APIs (used to populate ARDUINO #define)")
 	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "[deprecated] use '"+FLAG_CORE_API_VERSION+"' instead")
 	buildPathFlag = flag.String(FLAG_BUILD_PATH, "", "build path")
+	buildCachePathFlag = flag.String(FLAG_BUILD_CACHE, "", "builds of 'core.a' are saved into this folder to be cached and reused")
 	verboseFlag = flag.Bool(FLAG_VERBOSE, false, "if 'true' prints lots of stuff")
 	quietFlag = flag.Bool(FLAG_QUIET, false, "if 'true' doesn't print any warnings or progress or whatever")
 	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
@@ -255,6 +258,25 @@ func main() {
 		}
 	}
 	ctx.BuildPath = buildPath
+
+	// FLAG_BUILD_CACHE
+	buildCachePath, err := gohasissues.Unquote(*buildCachePathFlag)
+	if err != nil {
+		printCompleteError(err)
+	}
+	if buildCachePath != "" {
+		_, err := os.Stat(buildCachePath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		err = utils.EnsureFolderExists(buildCachePath)
+		if err != nil {
+			printCompleteError(err)
+		}
+	}
+	ctx.BuildCachePath = buildCachePath
 
 	// FLAG_VID_PID
 	if *vidPidFlag != "" {

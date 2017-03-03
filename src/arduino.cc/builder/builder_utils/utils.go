@@ -471,5 +471,5 @@ func GetCachedCoreArchiveFileName(fqbn, coreFolder string) string {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected
 	hash := utils.MD5Sum([]byte(coreFolder))
-	return os.TempDir() + "/core_" + fqbnToUnderscore + "_" + hash + ".a"
+	return "core_" + fqbnToUnderscore + "_" + hash + ".a"
 }

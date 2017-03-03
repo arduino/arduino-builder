@@ -30,6 +30,8 @@
 package phases
 
 import (
+	"path/filepath"
+
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
@@ -42,6 +44,7 @@ type CoreBuilder struct{}
 
 func (s *CoreBuilder) Run(ctx *types.Context) error {
 	coreBuildPath := ctx.CoreBuildPath
+	coreBuildCachePath := ctx.CoreBuildCachePath
 	buildProperties := ctx.BuildProperties
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel
@@ -52,7 +55,14 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	archiveFile, objectFiles, err := compileCore(coreBuildPath, buildProperties, verbose, warningsLevel, logger)
+	if coreBuildCachePath != "" {
+		err := utils.EnsureFolderExists(coreBuildCachePath)
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+	}
+
+	archiveFile, objectFiles, err := compileCore(coreBuildPath, coreBuildCachePath, buildProperties, verbose, warningsLevel, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -63,7 +73,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileCore(buildPath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
+func compileCore(buildPath string, buildCachePath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
 
@@ -89,15 +99,19 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 	// Recreate the archive if ANY of the core files (including platform.txt) has changed
 	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
 
-	targetArchivedCore := builder_utils.GetCachedCoreArchiveFileName(buildProperties[constants.BUILD_PROPERTIES_FQBN], realCoreFolder)
-	canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
+	var targetArchivedCore string
+	if buildCachePath != "" {
+		archivedCoreName := builder_utils.GetCachedCoreArchiveFileName(buildProperties[constants.BUILD_PROPERTIES_FQBN], realCoreFolder)
+		targetArchivedCore = filepath.Join(buildCachePath, archivedCoreName)
+		canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
 
-	if canUseArchivedCore {
-		// use archived core
-		if verbose {
-			logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core")
+		if canUseArchivedCore {
+			// use archived core
+			if verbose {
+				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core")
+			}
+			return targetArchivedCore, variantObjectFiles, nil
 		}
-		return targetArchivedCore, variantObjectFiles, nil
 	}
 
 	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
@@ -111,7 +125,10 @@ func compileCore(buildPath string, buildProperties properties.Map, verbose bool,
 	}
 
 	// archive core.a
-	builder_utils.CopyFile(archiveFile, targetArchivedCore)
+	if targetArchivedCore != "" {
+		logger.Println(constants.LOG_LEVEL_DEBUG, "Archiving built core (caching) in: "+targetArchivedCore)
+		builder_utils.CopyFile(archiveFile, targetArchivedCore)
+	}
 
 	return archiveFile, variantObjectFiles, nil
 }
