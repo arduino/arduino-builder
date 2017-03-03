@@ -55,6 +55,7 @@ func prepareBuilderTestContext(sketchPath, fqbn string) *types.Context {
 		Verbose:                 false,
 	}
 }
+
 func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
@@ -63,11 +64,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
 
 	// Run builder
 	command := builder.Builder{}
@@ -93,11 +89,6 @@ func TestBuilderBridge(t *testing.T) {
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
 
 	// Run builder
 	command := builder.Builder{}
@@ -126,11 +117,6 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
-
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
@@ -157,11 +143,6 @@ func TestBuilderBridgeTwice(t *testing.T) {
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
 
 	// Run builder
 	command := builder.Builder{}
@@ -191,16 +172,10 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
+	ctx.WarningsLevel = "all"
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	ctx.WarningsLevel = "all"
-
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "sam")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
 
 	// Run builder
 	command := builder.Builder{}
@@ -236,13 +211,9 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
 	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
 	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
+
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
-
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
 
 	// Run builder
 	command := builder.Builder{}
@@ -273,6 +244,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	require.Error(t, err)
@@ -288,6 +260,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -301,6 +274,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -314,6 +288,7 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -329,6 +304,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 
 	NoError(t, os.MkdirAll(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"), os.FileMode(0755)))
 
+	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
@@ -350,18 +326,10 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	NoError(t, err)
 	defer os.RemoveAll(ctx.BuildPath)
 
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
-
 	// Run build
 	command := builder.Builder{}
 	err = command.Run(ctx)
 	NoError(t, err)
-
-	// Cleanup cached core
-	os.Remove(coreFile)
 
 	// Run build twice, to verify the build still works when the
 	// build directory is present at the start
@@ -376,24 +344,26 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 
 	SetupBuildPath(t, ctx)
 	defer os.RemoveAll(ctx.BuildPath)
-
-	// Cleanup cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
-	coreFile := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	os.Remove(coreFile)
+	SetupBuildCachePath(t, ctx)
+	defer os.RemoveAll(ctx.BuildCachePath)
 
 	// Run build
 	bldr := builder.Builder{}
 	err := bldr.Run(ctx)
 	NoError(t, err)
-	coreStatBefore, err := os.Stat(coreFile)
+
+	// Pick timestamp of cached core
+	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFileName := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
+	cachedCoreFile := filepath.Join(ctx.CoreBuildCachePath, coreFileName)
+	coreStatBefore, err := os.Stat(cachedCoreFile)
 	require.NoError(t, err)
 
 	// Run build again, to verify that the builder skips rebuilding core.a
 	err = bldr.Run(ctx)
 	NoError(t, err)
 
-	coreStatAfterRebuild, err := os.Stat(coreFile)
+	coreStatAfterRebuild, err := os.Stat(cachedCoreFile)
 	require.NoError(t, err)
 	require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
 
@@ -407,7 +377,7 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 	err = bldr.Run(ctx)
 	NoError(t, err)
 
-	coreStatAfterTouch, err := os.Stat(coreFile)
+	coreStatAfterTouch, err := os.Stat(cachedCoreFile)
 	require.NoError(t, err)
 	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
 }
