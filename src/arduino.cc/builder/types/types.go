@@ -172,6 +172,7 @@ type Library struct {
 	Archs         []string
 	DotALinkage   bool
 	Precompiled   bool
+	LDflags       string
 	IsLegacy      bool
 	Version       string
 	Author        string

@@ -41,7 +41,8 @@ import (
 	"arduino.cc/properties"
 )
 
-var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS = map[string]bool{".a": true, ".so": true}
+var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC = map[string]bool{".a": true}
+var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC = map[string]bool{".so": true}
 
 type LibrariesBuilder struct{}
 
@@ -67,6 +68,34 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 
 	ctx.LibrariesObjectFiles = objectFiles
 
+	// Search for precompiled libraries
+	fixLDFLAGforPrecompiledLibraries(ctx, libraries)
+
+	return nil
+}
+
+func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Library) error {
+
+	for _, library := range libraries {
+		if library.Precompiled {
+			// add library src path to compiler.c.elf.extra_flags
+			// use library.Name as lib name and srcPath/{mcpu} as location
+			mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+			path := filepath.Join(library.SrcFolder, mcu)
+			// find all library names in the folder and prepend -l
+			filePaths := []string{}
+			libs_cmd := library.LDflags + " "
+			extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] }
+			utils.FindFilesInFolder(&filePaths, path, extensions, true)
+			for _, lib := range filePaths {
+				name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
+				// strip "lib" first occurrence
+				name = strings.Replace(name, "lib", "", 1)
+				libs_cmd += "-l" + name + " "
+			}
+			ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_EXTRAFLAGS] += "\"-L" + path + "\" " + libs_cmd
+		}
+	}
 	return nil
 }
 
@@ -99,7 +128,7 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 
 	if library.Precompiled {
 		// search for files with PRECOMPILED_LIBRARIES_VALID_EXTENSIONS
-		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS[ext] }
+		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
 
 		filePaths := []string{}
 		mcu := buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
