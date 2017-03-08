@@ -184,6 +184,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library.License = libProperties[constants.LIBRARY_LICENSE]
 
 	library.Name = filepath.Base(libraryFolder)
+	library.RealName = strings.TrimSpace(libProperties[constants.LIBRARY_NAME])
 	library.Version = strings.TrimSpace(libProperties[constants.LIBRARY_VERSION])
 	library.Author = strings.TrimSpace(libProperties[constants.LIBRARY_AUTHOR])
 	library.Maintainer = strings.TrimSpace(libProperties[constants.LIBRARY_MAINTAINER])
