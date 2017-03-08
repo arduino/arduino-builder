@@ -192,6 +192,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library.URL = strings.TrimSpace(libProperties[constants.LIBRARY_URL])
 	library.IsLegacy = false
 	library.DotALinkage = strings.TrimSpace(libProperties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
+	library.Precompiled = strings.TrimSpace(libProperties[constants.LIBRARY_PRECOMPILED]) == "true"
 	library.Properties = libProperties
 
 	return library, nil
