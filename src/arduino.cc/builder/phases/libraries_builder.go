@@ -31,6 +31,7 @@ package phases
 
 import (
 	"path/filepath"
+	"strings"
 
 	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
@@ -39,6 +40,8 @@ import (
 	"arduino.cc/builder/utils"
 	"arduino.cc/properties"
 )
+
+var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS = map[string]bool{".a": true, ".so": true}
 
 type LibrariesBuilder struct{}
 
@@ -93,6 +96,24 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 	}
 
 	objectFiles := []string{}
+
+	if library.Precompiled {
+		// search for files with PRECOMPILED_LIBRARIES_VALID_EXTENSIONS
+		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS[ext] }
+
+		filePaths := []string{}
+		mcu := buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+		err := utils.FindFilesInFolder(&filePaths, filepath.Join(library.SrcFolder, mcu), extensions, true)
+		if err != nil {
+			return nil, i18n.WrapError(err)
+		}
+		for _, path := range filePaths {
+			if strings.Contains(filepath.Base(path), library.RealName) {
+				objectFiles = append(objectFiles, path)
+			}
+		}
+	}
+
 	if library.Layout == types.LIBRARY_RECURSIVE {
 		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
