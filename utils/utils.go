@@ -508,9 +508,12 @@ func ExtractZip(filePath string, location string) (string, error) {
 	for _, f := range r.File {
 		fullname := filepath.Join(location, strings.Replace(f.Name, "", "", -1))
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(fullname, f.FileInfo().Mode().Perm())
+			os.MkdirAll(fullname, 0755)
 		} else {
-			os.MkdirAll(filepath.Dir(fullname), 0755)
+			_, err := os.Stat(filepath.Dir(fullname))
+			if err != nil {
+				os.MkdirAll(filepath.Dir(fullname), 0755)
+			}
 			perms := f.FileInfo().Mode().Perm()
 			out, err := os.OpenFile(fullname, os.O_CREATE|os.O_RDWR, perms)
 			if err != nil {

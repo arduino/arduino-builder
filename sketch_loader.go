@@ -69,7 +69,7 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 		dir, _ := ioutil.TempDir("", "arduino_sketch_zip_temp")
 		sketchLocation, err = utils.ExtractZip(sketchLocation, dir)
 		if err != nil {
-			return nil
+			panic(err)
 		}
 		mainSketchFileName := filepath.Base(sketchLocation) + ".ino"
 		sketchLocation = filepath.Join(sketchLocation, mainSketchFileName)
