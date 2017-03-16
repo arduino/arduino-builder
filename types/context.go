@@ -79,6 +79,9 @@ type Context struct {
 	Verbose           bool
 	DebugPreprocessor bool
 
+	// inoz handling
+	SketchZipped bool
+
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
 

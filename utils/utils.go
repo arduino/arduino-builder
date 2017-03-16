@@ -30,8 +30,10 @@
 package utils
 
 import (
+	"archive/zip"
 	"crypto/md5"
 	"encoding/hex"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -487,4 +489,72 @@ func ParseCppString(line string) (string, string, bool) {
 
 		i += width
 	}
+}
+
+func ExtractZip(filePath string, location string) (string, error) {
+	r, err := zip.OpenReader(filePath)
+	if err != nil {
+		return location, err
+	}
+
+	var dirList []string
+
+	for _, f := range r.File {
+		dirList = append(dirList, f.Name)
+	}
+
+	basedir := findBaseDir(dirList)
+
+	for _, f := range r.File {
+		fullname := filepath.Join(location, strings.Replace(f.Name, "", "", -1))
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(fullname, f.FileInfo().Mode().Perm())
+		} else {
+			os.MkdirAll(filepath.Dir(fullname), 0755)
+			perms := f.FileInfo().Mode().Perm()
+			out, err := os.OpenFile(fullname, os.O_CREATE|os.O_RDWR, perms)
+			if err != nil {
+				return location, err
+			}
+			rc, err := f.Open()
+			if err != nil {
+				return location, err
+			}
+			_, err = io.CopyN(out, rc, f.FileInfo().Size())
+			if err != nil {
+				return location, err
+			}
+			rc.Close()
+			out.Close()
+
+			mtime := f.FileInfo().ModTime()
+			err = os.Chtimes(fullname, mtime, mtime)
+			if err != nil {
+				return location, err
+			}
+		}
+	}
+	return filepath.Join(location, basedir), nil
+}
+
+func findBaseDir(dirList []string) string {
+	baseDir := ""
+	// https://github.com/backdrop-ops/contrib/issues/55#issuecomment-73814500
+	dontdiff := []string{"pax_global_header"}
+	for index := range dirList {
+		if SliceContains(dontdiff, dirList[index]) {
+			continue
+		}
+		candidateBaseDir := dirList[index]
+		for i := index; i < len(dirList); i++ {
+			if !strings.Contains(dirList[i], candidateBaseDir) {
+				return baseDir
+			}
+		}
+		// avoid setting the candidate if it is the last file
+		if dirList[len(dirList)-1] != candidateBaseDir {
+			baseDir = candidateBaseDir
+		}
+	}
+	return baseDir
 }

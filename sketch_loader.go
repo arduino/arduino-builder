@@ -30,7 +30,9 @@
 package builder
 
 import (
+	"bufio"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -63,6 +65,17 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 		sketchLocation = filepath.Join(sketchLocation, mainSketchStat.Name()+".ino")
 	}
 
+	if mimeType(sketchLocation) == "application/zip" {
+		dir, _ := ioutil.TempDir("", "arduino_sketch_zip_temp")
+		sketchLocation, err = utils.ExtractZip(sketchLocation, dir)
+		if err != nil {
+			return nil
+		}
+		mainSketchFileName := filepath.Base(sketchLocation) + ".ino"
+		sketchLocation = filepath.Join(sketchLocation, mainSketchFileName)
+		ctx.SketchZipped = true
+	}
+
 	ctx.SketchLocation = sketchLocation
 
 	allSketchFilePaths, err := collectAllSketchFiles(filepath.Dir(sketchLocation))
@@ -85,6 +98,22 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 	ctx.Sketch = sketch
 
 	return nil
+}
+
+func mimeType(fileName string) string {
+	fs, err := os.Open(fileName)
+
+	if err != nil {
+		return ""
+	}
+
+	defer fs.Close()
+
+	reader := bufio.NewReader(fs)
+
+	buf := make([]byte, 512)
+	reader.Read(buf)
+	return http.DetectContentType(buf)
 }
 
 func collectAllSketchFiles(from string) ([]string, error) {
