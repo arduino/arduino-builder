@@ -85,7 +85,7 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 	logger := ctx.GetLogger()
 
-	if !utils.SliceContains(allSketchFilePaths, sketchLocation) {
+	if !utils.SliceContains(allSketchFilePaths, sketchLocation) && !ctx.SketchZipped {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_CANT_FIND_SKETCH_IN_PATH, sketchLocation, filepath.Dir(sketchLocation))
 	}
 

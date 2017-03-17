@@ -500,18 +500,14 @@ func ExtractZip(filePath string, location string) (string, error) {
 	var dirList []string
 
 	for _, f := range r.File {
-		dirList = append(dirList, f.Name)
-	}
-
-	basedir := findBaseDir(dirList)
-
-	for _, f := range r.File {
 		fullname := filepath.Join(location, strings.Replace(f.Name, "", "", -1))
 		if f.FileInfo().IsDir() {
+			dirList = append(dirList, fullname)
 			os.MkdirAll(fullname, 0755)
 		} else {
 			_, err := os.Stat(filepath.Dir(fullname))
 			if err != nil {
+				dirList = append(dirList, filepath.Dir(fullname))
 				os.MkdirAll(filepath.Dir(fullname), 0755)
 			}
 			perms := f.FileInfo().Mode().Perm()
@@ -537,26 +533,23 @@ func ExtractZip(filePath string, location string) (string, error) {
 			}
 		}
 	}
+	basedir := filepath.Base(findBaseDir(dirList))
 	return filepath.Join(location, basedir), nil
 }
 
 func findBaseDir(dirList []string) string {
 	baseDir := ""
+	minLen := 256
 	// https://github.com/backdrop-ops/contrib/issues/55#issuecomment-73814500
 	dontdiff := []string{"pax_global_header"}
-	for index := range dirList {
-		if SliceContains(dontdiff, dirList[index]) {
+	for _, dir := range dirList {
+		if SliceContains(dontdiff, dir) {
 			continue
 		}
-		candidateBaseDir := dirList[index]
-		for i := index; i < len(dirList); i++ {
-			if !strings.Contains(dirList[i], candidateBaseDir) {
-				return baseDir
-			}
-		}
-		// avoid setting the candidate if it is the last file
-		if dirList[len(dirList)-1] != candidateBaseDir {
-			baseDir = candidateBaseDir
+		//get the shortest string
+		if len(dir) < minLen {
+			baseDir = dir
+			minLen = len(dir)
 		}
 	}
 	return baseDir
