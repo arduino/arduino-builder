@@ -41,8 +41,10 @@ type ContainerAddPrototypes struct{}
 
 func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	sourceFile := filepath.Join(ctx.SketchBuildPath, filepath.Base(ctx.Sketch.MainFile.Name)+".cpp")
+	depFile := sourceFile + ".d"
+	objFile := sourceFile + ".o"
 	commands := []types.Command{
-		&GCCPreprocRunner{SourceFilePath: sourceFile, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: ctx.IncludeFolders},
+		&GCCPreprocRunner{SourceFilePath: sourceFile, ObjFilePath: objFile, DepFilePath: depFile, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: ctx.IncludeFolders},
 		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},

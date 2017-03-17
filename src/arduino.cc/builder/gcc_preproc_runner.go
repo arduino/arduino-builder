@@ -43,12 +43,14 @@ import (
 
 type GCCPreprocRunner struct {
 	SourceFilePath string
+	ObjFilePath    string
+	DepFilePath    string
 	TargetFileName string
 	Includes       []string
 }
 
 func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFileName, s.Includes)
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.ObjFilePath, s.DepFilePath, s.TargetFileName, s.Includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -72,12 +74,14 @@ func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
 
 type GCCPreprocRunnerForDiscoveringIncludes struct {
 	SourceFilePath string
+	ObjFilePath    string
+	DepFilePath    string
 	TargetFilePath string
 	Includes       []string
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
-	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFilePath, s.Includes)
+	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.ObjFilePath, s.DepFilePath, s.TargetFilePath, s.Includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -100,7 +104,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, string, error) {
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, objFilePath string, depFilePath string, targetFilePath string, includes []string) (properties.Map, string, error) {
 	if targetFilePath != utils.NULLFile() {
 		preprocPath := ctx.PreprocPath
 		err := utils.EnsureFolderExists(preprocPath)
@@ -113,6 +117,12 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string
 	properties := ctx.BuildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
+	properties[constants.BUILD_PROPERTIES_DEP_FILE] = depFilePath
+	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objFilePath
+	err := utils.EnsureFolderExists(filepath.Dir(depFilePath))
+	if err != nil {
+		return nil, "", i18n.WrapError(err)
+	}
 
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)

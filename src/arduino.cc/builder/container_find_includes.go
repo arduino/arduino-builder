@@ -289,12 +289,14 @@ func writeCache(cache *includeCache, path string) error {
 
 func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
+	depPath := sourceFile.DepfilePath(ctx)
+	objPath := sourceFile.ObjectPath(ctx)
 	targetFilePath := utils.NULLFile()
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
-	// changed after the object file was generated, but if it
-	// changed between generating the cache and the object file,
+	// changed after the dependency file was generated, but if it
+	// changed between generating the cache and the dependency file,
 	// this could show the file as unchanged when it really is
 	// changed. Changing files during a build isn't really
 	// supported, but any problems from it should at least be
@@ -303,7 +305,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx))
+	unchanged, err := builder_utils.BuildResultIsUpToDate(sourcePath, depPath, objPath, depPath, ctx.DebugLevel, ctx.GetLogger())
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -324,7 +326,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			}
 		} else {
 			commands := []types.Command{
-				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath, Includes: includes},
+				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, ObjFilePath: objPath, DepFilePath: depPath, TargetFilePath: targetFilePath, Includes: includes},
 				&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
 			}
 			for _, command := range commands {
@@ -345,7 +347,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: includes})
+			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, ObjFilePath: objPath, DepFilePath: depPath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: includes})
 			return i18n.WrapError(err)
 		}
 
