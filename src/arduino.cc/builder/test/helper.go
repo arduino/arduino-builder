@@ -31,17 +31,18 @@
 package test
 
 import (
-	"arduino.cc/builder/constants"
-	"arduino.cc/builder/types"
-	"arduino.cc/builder/utils"
 	"bytes"
 	"fmt"
-	"github.com/go-errors/errors"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 	"text/template"
+
+	"arduino.cc/builder/constants"
+	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
+	"github.com/go-errors/errors"
+	"github.com/stretchr/testify/assert"
 )
 
 func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
@@ -78,10 +79,17 @@ func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 }
 
 func SetupBuildPath(t *testing.T, ctx *types.Context) string {
-	buildPath, err := ioutil.TempDir(constants.EMPTY_STRING, "test")
+	buildPath, err := ioutil.TempDir(constants.EMPTY_STRING, "test_build_path")
 	NoError(t, err)
 	ctx.BuildPath = buildPath
 	return buildPath
+}
+
+func SetupBuildCachePath(t *testing.T, ctx *types.Context) string {
+	buildCachePath, err := ioutil.TempDir(constants.EMPTY_STRING, "test_build_cache")
+	NoError(t, err)
+	ctx.BuildCachePath = buildCachePath
+	return buildCachePath
 }
 
 type ByLibraryName []*types.Library
