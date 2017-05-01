@@ -59,9 +59,18 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 
 	for _, importedLibrary := range ctx.ImportedLibraries {
 		if !importedLibrary.SupportsArchitectures(archs) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, importedLibrary.Archs, archs)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, sliceToCommaSeparatedString(importedLibrary.Archs), sliceToCommaSeparatedString(archs))
 		}
 	}
 
 	return nil
+}
+
+func sliceToCommaSeparatedString(slice []string) string {
+	str := "("
+	str = str + slice[0]
+	for i := 1; i < len(slice); i++ {
+		str = str + ", " + slice[i]
+	}
+	return str + ")"
 }

@@ -30,10 +30,11 @@
 package builder
 
 import (
+	"path/filepath"
+
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
-	"path/filepath"
 )
 
 type AddAdditionalEntriesToContext struct{}
@@ -62,6 +63,15 @@ func (s *AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 		ctx.SketchBuildPath = sketchBuildPath
 		ctx.LibrariesBuildPath = librariesBuildPath
 		ctx.CoreBuildPath = coreBuildPath
+	}
+
+	if ctx.BuildCachePath != "" {
+		coreBuildCachePath, err := filepath.Abs(filepath.Join(ctx.BuildCachePath, constants.FOLDER_CORE))
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+
+		ctx.CoreBuildCachePath = coreBuildCachePath
 	}
 
 	if ctx.WarningsLevel == "" {

@@ -37,8 +37,10 @@ type Context struct {
 	BuildProperties      properties.Map
 	BuildCore            string
 	BuildPath            string
+	BuildCachePath       string
 	SketchBuildPath      string
 	CoreBuildPath        string
+	CoreBuildCachePath   string
 	CoreArchiveFilePath  string
 	CoreObjectsFiles     []string
 	LibrariesBuildPath   string
