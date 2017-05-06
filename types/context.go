@@ -18,6 +18,7 @@ type Context struct {
 	SketchLocation          string
 	ArduinoAPIVersion       string
 	FQBN                    string
+	CodeCompleteAt          string
 
 	// Build options are serialized here
 	BuildOptionsJson         string
@@ -53,6 +54,7 @@ type Context struct {
 	Sketch          *Sketch
 	Source          string
 	SourceGccMinusE string
+	CodeCompletions string
 
 	WarningsLevel string
 

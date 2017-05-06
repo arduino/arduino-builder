@@ -33,8 +33,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"io/ioutil"
-
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
@@ -48,7 +46,12 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&GCCPreprocRunner{SourceFilePath: sourceFile, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: ctx.IncludeFolders},
 		&ArduinoPreprocessorRunner{},
-		&SketchSaver{},
+	}
+
+	if ctx.CodeCompleteAt != "" {
+		commands = append(commands, &OutputCodeCompletions{})
+	} else {
+		commands = append(commands, &SketchSaver{})
 	}
 
 	for _, command := range commands {
@@ -73,6 +76,11 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	toolProps := buildProperties.SubTree("tools").SubTree("arduino-preprocessor")
 	properties.Merge(toolProps)
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = targetFilePath
+	if ctx.CodeCompleteAt != "" {
+		properties["codecomplete"] = "-output-code-completions=" + ctx.CodeCompleteAt
+	} else {
+		properties["codecomplete"] = ""
+	}
 
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
 	if pattern == constants.EMPTY_STRING {
@@ -90,20 +98,23 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 		fmt.Println(commandLine)
 	}
 
-	sourceBytes, err := command.Output()
+	buf, err := command.Output()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-
-	ctx.Source = string(sourceBytes)
-	if ctx.Source == "" {
-		// If the output is empty the original sketch may pass through
-		buf, err := ioutil.ReadFile(targetFilePath)
-		if err != nil {
-			return i18n.WrapError(err)
-		}
-		ctx.Source = string(buf)
+	output := string(buf)
+	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
+	if ctx.CodeCompleteAt != "" {
+		ctx.CodeCompletions = output
+	} else {
+		ctx.Source = output
 	}
-	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", ctx.Source)
+	return nil
+}
+
+type OutputCodeCompletions struct{}
+
+func (s *OutputCodeCompletions) Run(ctx *types.Context) error {
+	fmt.Println(ctx.CodeCompletions)
 	return nil
 }
