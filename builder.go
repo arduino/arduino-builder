@@ -128,6 +128,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&PrintUsedLibrariesIfVerbose{},
 
+		&ExportProjectCMake{SketchError: mainErr != nil},
+
 		&phases.Sizer{SketchError: mainErr != nil},
 	}
 	otherErr := runCommands(ctx, commands, false)
