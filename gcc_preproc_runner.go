@@ -58,8 +58,6 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 		return i18n.WrapError(err)
 	}
 
-	ctx.FileToRead = targetFilePath
-
 	return nil
 }
 

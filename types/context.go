@@ -88,9 +88,6 @@ type Context struct {
 	logger     i18n.Logger
 	DebugLevel int
 
-	// ReadFileAndStoreInContext command
-	FileToRead string
-
 	// Reuse old tools since the backing storage didn't change
 	CanUseCachedTools bool
 }

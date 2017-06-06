@@ -56,7 +56,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 	commands := []types.Command{
-		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
+		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&CTagsRunner{},
