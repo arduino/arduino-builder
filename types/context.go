@@ -61,7 +61,6 @@ type Context struct {
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludeJustFound           string
 	IncludeFolders             []string
 	OutputGccMinusM            string
 

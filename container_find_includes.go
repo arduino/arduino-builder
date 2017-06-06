@@ -325,7 +325,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		} else {
 			commands := []types.Command{
 				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath, Includes: includes},
-				&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
 			}
 			for _, command := range commands {
 				err := runCommand(ctx, command)
@@ -333,7 +332,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 					return i18n.WrapError(err)
 				}
 			}
-			include = ctx.IncludeJustFound
+			include = IncludesFinderWithRegExp(ctx, ctx.SourceGccMinusE)
 		}
 
 		if include == "" {
