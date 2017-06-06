@@ -213,7 +213,7 @@ func (cache *includeCache) Next() includeCacheEntry {
 // not, or no entry is available, the cache is invalidated. Does not
 // advance the cache.
 func (cache *includeCache) ExpectFile(sourcefile string) {
-	if cache.valid && cache.next < len(cache.entries) && cache.Next().Sourcefile != sourcefile {
+	if cache.valid && (cache.next >= len(cache.entries) || cache.Next().Sourcefile != sourcefile) {
 		cache.valid = false
 		cache.entries = cache.entries[:cache.next]
 	}
