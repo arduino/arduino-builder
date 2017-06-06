@@ -43,27 +43,17 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
-	ctx.Source = output
+	include := builder.IncludesFinderWithRegExp(ctx, output)
 
-	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(ctx)
-	NoError(t, err)
-
-	require.Equal(t, "SPI.h", ctx.IncludeJustFound)
+	require.Equal(t, "SPI.h", include)
 }
 
 func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
 	ctx := &types.Context{}
 
-	output := ""
+	include := builder.IncludesFinderWithRegExp(ctx, "")
 
-	ctx.Source = output
-
-	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(ctx)
-	NoError(t, err)
-
-	require.Equal(t, "", ctx.IncludeJustFound)
+	require.Equal(t, "", include)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
@@ -73,13 +63,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 		" #               include <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	ctx.Source = output
+	include := builder.IncludesFinderWithRegExp(ctx, output)
 
-	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(ctx)
-	NoError(t, err)
-
-	require.Equal(t, "Wire.h", ctx.IncludeJustFound)
+	require.Equal(t, "Wire.h", include)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
@@ -89,13 +75,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 		" #\t\t\tinclude <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	ctx.Source = output
+	include := builder.IncludesFinderWithRegExp(ctx, output)
 
-	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(ctx)
-	NoError(t, err)
-
-	require.Equal(t, "Wire.h", ctx.IncludeJustFound)
+	require.Equal(t, "Wire.h", include)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
@@ -104,13 +86,9 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
 		"compilation terminated.\n"
 
-	ctx.Source = output
+	include := builder.IncludesFinderWithRegExp(ctx, output)
 
-	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(ctx)
-	NoError(t, err)
-
-	require.Equal(t, "SPI.h", ctx.IncludeJustFound)
+	require.Equal(t, "SPI.h", include)
 }
 
 func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
@@ -119,11 +97,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
 	output := "In file included from /tmp/arduino_modified_sketch_815412/binouts.ino:52:0:\n" +
 		"/tmp/arduino_build_static/sketch/regtable.h:31:22: fatal error: register.h: No such file or directory\n"
 
-	ctx.Source = output
+	include := builder.IncludesFinderWithRegExp(ctx, output)
 
-	parser := builder.IncludesFinderWithRegExp{Source: &ctx.Source}
-	err := parser.Run(ctx)
-	NoError(t, err)
-
-	require.Equal(t, "register.h", ctx.IncludeJustFound)
+	require.Equal(t, "register.h", include)
 }
