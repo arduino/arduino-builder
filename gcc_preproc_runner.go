@@ -41,14 +41,8 @@ import (
 	"github.com/arduino/go-properties-map"
 )
 
-type GCCPreprocRunner struct {
-	SourceFilePath string
-	TargetFileName string
-	Includes       []string
-}
-
-func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFileName, s.Includes)
+func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) error {
+	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -70,16 +64,10 @@ func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
 	return nil
 }
 
-type GCCPreprocRunnerForDiscoveringIncludes struct {
-	SourceFilePath string
-	TargetFilePath string
-	Includes       []string
-}
-
-func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
-	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, s.SourceFilePath, s.TargetFilePath, s.Includes)
+func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (string, error) {
+	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
-		return i18n.WrapError(err)
+		return "", i18n.WrapError(err)
 	}
 
 	verbose := ctx.Verbose
@@ -92,12 +80,10 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
 
 	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
 	if err != nil {
-		return i18n.WrapError(err)
+		return "", i18n.WrapError(err)
 	}
 
-	ctx.SourceGccMinusE = string(stderr)
-
-	return nil
+	return string(stderr), nil
 }
 
 func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, string, error) {

@@ -323,16 +323,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
 			}
 		} else {
-			commands := []types.Command{
-				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath, Includes: includes},
+			stderr, err := GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+			if err != nil {
+				return i18n.WrapError(err)
 			}
-			for _, command := range commands {
-				err := runCommand(ctx, command)
-				if err != nil {
-					return i18n.WrapError(err)
-				}
-			}
-			include = IncludesFinderWithRegExp(ctx, ctx.SourceGccMinusE)
+			include = IncludesFinderWithRegExp(ctx, stderr)
 		}
 
 		if include == "" {
@@ -344,7 +339,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: includes})
+			err := GCCPreprocRunner(ctx, sourcePath, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, includes)
 			return i18n.WrapError(err)
 		}
 
