@@ -84,9 +84,6 @@ type Context struct {
 	// Logging
 	logger     i18n.Logger
 	DebugLevel int
-
-	// ReadFileAndStoreInContext command
-	FileToRead string
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
