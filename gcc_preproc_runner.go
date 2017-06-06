@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -42,7 +41,7 @@ import (
 )
 
 func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) error {
-	properties, targetFilePath, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
+	properties, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -65,7 +64,7 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 }
 
 func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (string, error) {
-	properties, _, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
+	properties, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}
@@ -86,16 +85,7 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 	return string(stderr), nil
 }
 
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, string, error) {
-	if targetFilePath != utils.NULLFile() {
-		preprocPath := ctx.PreprocPath
-		err := utils.EnsureFolderExists(preprocPath)
-		if err != nil {
-			return nil, "", i18n.WrapError(err)
-		}
-		targetFilePath = filepath.Join(preprocPath, targetFilePath)
-	}
-
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, error) {
 	properties := ctx.BuildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
@@ -104,7 +94,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
-	return properties, targetFilePath, nil
+	return properties, nil
 }
 
 func GeneratePreprocPatternFromCompile(compilePattern string) string {

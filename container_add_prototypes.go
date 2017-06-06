@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
 )
 
 type ContainerAddPrototypes struct{}
@@ -42,8 +43,15 @@ type ContainerAddPrototypes struct{}
 func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	sourceFile := filepath.Join(ctx.SketchBuildPath, filepath.Base(ctx.Sketch.MainFile.Name)+".cpp")
 
+	// Generate the full pathname for the preproc output file
+	err := utils.EnsureFolderExists(ctx.PreprocPath)
+	if err != nil {
+		return i18n.WrapError(err)
+	}
+	targetFilePath := filepath.Join(ctx.PreprocPath, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
+
 	// Run preprocessor
-	err := GCCPreprocRunner(ctx, sourceFile, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, ctx.IncludeFolders)
+	err = GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
