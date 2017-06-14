@@ -55,7 +55,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	//verbose := ctx.Verbose
 	logger := ctx.GetLogger()
 
-	if s.SketchError {
+	if s.SketchError || !canExportCmakeProject(ctx) {
 		return nil
 	}
 
@@ -176,6 +176,10 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	utils.WriteFile(cmakeFile, cmakelist)
 
 	return nil
+}
+
+func canExportCmakeProject(ctx *types.Context) bool {
+	return ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_EXPORT_CMAKE_FLAGS] != ""
 }
 
 func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
