@@ -206,6 +206,14 @@ func TestTryBuild039(t *testing.T) {
 }
 
 func TestTryBuild040(t *testing.T) {
+	tryBuild(t, "sketch_with_externC_multiline", "sketch_with_externC_multiline.ino")
+}
+
+func TestTryBuild041(t *testing.T) {
+	tryBuild(t, "sketch_with_multiline_template", "sketch_with_multiline_template.ino")
+}
+
+func TestTryBuild042(t *testing.T) {
 	tryBuild(t, "sketch_with_fake_function_pointer", "sketch_with_fake_function_pointer.ino")
 }
 
