@@ -109,7 +109,7 @@ func ReadDir(dirname string) ([]os.FileInfo, error) {
 		info, err := resolveSymlink(dirname, info)
 		if err != nil {
 			// unresolvable symlinks should be skipped silently
-			return nil, nil
+			continue
 		}
 		infos[idx] = info
 	}

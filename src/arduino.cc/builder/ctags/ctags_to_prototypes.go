@@ -48,45 +48,51 @@ func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
 		} else {
 			return firstFunctionPointerAsArgument
 		}
-	} else if firstFunctionLine == -1 {
+	} else if firstFunctionLine != -1 {
+		return firstFunctionLine
+	} else if firstFunctionPointerAsArgument != -1 {
 		return firstFunctionPointerAsArgument
 	} else {
-		return firstFunctionLine
+		return 0
 	}
 }
 
 func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
-	functionNames := p.collectFunctionNames()
+	functionTags := p.collectFunctions()
 	for _, tag := range p.tags {
-		if functionNameUsedAsFunctionPointerIn(tag, functionNames) {
+		if functionNameUsedAsFunctionPointerIn(tag, functionTags) {
 			return tag.Line
 		}
 	}
 	return -1
 }
 
-func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionNames []string) bool {
-	for _, functionName := range functionNames {
-		if strings.Index(tag.Code, "&"+functionName) != -1 {
+func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionTags []*types.CTag) bool {
+	for _, functionTag := range functionTags {
+		if tag.Line != functionTag.Line && strings.Index(tag.Code, "&"+functionTag.FunctionName) != -1 {
+			return true
+		}
+		if tag.Line != functionTag.Line && strings.Index(tag.Code, functionTag.FunctionName) != -1 &&
+			(functionTag.Signature == "(void)" || functionTag.Signature == "()") {
 			return true
 		}
 	}
 	return false
 }
 
-func (p *CTagsParser) collectFunctionNames() []string {
-	names := []string{}
+func (p *CTagsParser) collectFunctions() []*types.CTag {
+	functionTags := []*types.CTag{}
 	for _, tag := range p.tags {
-		if tag.Kind == KIND_FUNCTION {
-			names = append(names, tag.FunctionName)
+		if tag.Kind == KIND_FUNCTION && !tag.SkipMe {
+			functionTags = append(functionTags, tag)
 		}
 	}
-	return names
+	return functionTags
 }
 
 func (p *CTagsParser) firstFunctionAtLine() int {
 	for _, tag := range p.tags {
-		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION {
+		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION && tag.Filename == p.mainFile {
 			return tag.Line
 		}
 	}

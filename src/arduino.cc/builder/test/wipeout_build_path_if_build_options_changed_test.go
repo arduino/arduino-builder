@@ -30,14 +30,15 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
+	"testing"
+
 	"arduino.cc/builder"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/types"
 	"arduino.cc/builder/utils"
 	"github.com/stretchr/testify/require"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
@@ -78,37 +79,6 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	defer os.RemoveAll(buildPath)
 
 	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
-
-	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
-
-	commands := []types.Command{
-		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	_, err := os.Stat(buildPath)
-	NoError(t, err)
-
-	files, err := gohasissues.ReadDir(buildPath)
-	NoError(t, err)
-	require.Equal(t, 1, len(files))
-
-	_, err = os.Stat(filepath.Join(buildPath, "should_not_be_deleted.txt"))
-	NoError(t, err)
-}
-
-func TestWipeoutBuildPathIfBuildOptionsChangedBuildOptionsMatch(t *testing.T) {
-	ctx := &types.Context{}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
-
-	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
-	ctx.BuildOptionsJson = "{ \"old\":\"old\" }"
 
 	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
 

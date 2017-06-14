@@ -34,10 +34,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"arduino.cc/builder/builder_utils"
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/gohasissues"
 	"arduino.cc/builder/i18n"
 	"arduino.cc/builder/types"
+	"arduino.cc/builder/utils"
 	"arduino.cc/properties"
 )
 
@@ -62,7 +64,17 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		delete(prevOpts, "sketchLocation")
 	}
 
-	if opts.Equals(prevOpts) {
+	// check if any of the files contained in the core folders has changed
+	// since the json was generated - like platform.txt or similar
+	// if so, trigger a "safety" wipe
+	buildProperties := ctx.BuildProperties
+	targetCoreFolder := buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH]
+	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
+	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
+	jsonPath := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
+	coreHasChanged := builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, jsonPath)
+
+	if opts.Equals(prevOpts) && !coreHasChanged {
 		return nil
 	}
 

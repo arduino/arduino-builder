@@ -24,53 +24,48 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2017 Arduino LLC (http://www.arduino.cc/)
  */
 
 package builder
 
 import (
-	"arduino.cc/builder/constants"
+	"testing"
+
 	"arduino.cc/builder/types"
-	"os"
-	"strings"
+
+	"github.com/stretchr/testify/require"
 )
 
-type WarnAboutArchIncompatibleLibraries struct{}
+func TestFindBestLibraryWithHeader(t *testing.T) {
+	l1 := &types.Library{Name: "Calculus Lib"}
+	l2 := &types.Library{Name: "Calculus Lib-master"}
+	l3 := &types.Library{Name: "Calculus Lib Improved"}
+	l4 := &types.Library{Name: "Another Calculus Lib"}
+	l5 := &types.Library{Name: "Yet Another Calculus Lib Improved"}
+	l6 := &types.Library{Name: "AnotherLib"}
 
-func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
-	if ctx.DebugLevel < 0 {
-		return nil
-	}
+	// Test exact name matching
+	res := findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4, l3, l2, l1})
+	require.Equal(t, l1.Name, res.Name)
 
-	targetPlatform := ctx.TargetPlatform
-	buildProperties := ctx.BuildProperties
-	logger := ctx.GetLogger()
+	// Test exact name with "-master" postfix matching
+	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4, l3, l2})
+	require.Equal(t, l2.Name, res.Name)
 
-	archs := []string{}
-	archs = append(archs, targetPlatform.PlatformId)
+	// Test prefix matching
+	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4, l3})
+	require.Equal(t, l3.Name, res.Name)
 
-	if buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK] != constants.EMPTY_STRING {
-		overrides := strings.Split(buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK], ",")
-		for _, override := range overrides {
-			archs = append(archs, override)
-		}
-	}
+	// Test postfix matching
+	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4})
+	require.Equal(t, l4.Name, res.Name)
 
-	for _, importedLibrary := range ctx.ImportedLibraries {
-		if !importedLibrary.SupportsArchitectures(archs) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, sliceToCommaSeparatedString(importedLibrary.Archs), sliceToCommaSeparatedString(archs))
-		}
-	}
+	// Test "contains"" matching
+	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5})
+	require.Equal(t, l5.Name, res.Name)
 
-	return nil
-}
-
-func sliceToCommaSeparatedString(slice []string) string {
-	str := "("
-	str = str + slice[0]
-	for i := 1; i < len(slice); i++ {
-		str = str + ", " + slice[i]
-	}
-	return str + ")"
+	// Test none matching
+	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6})
+	require.Nil(t, res)
 }

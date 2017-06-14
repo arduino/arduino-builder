@@ -51,12 +51,15 @@ var KNOWN_TAG_KINDS = map[string]bool{
 }
 
 type CTagsParser struct {
-	tags []*types.CTag
+	tags     []*types.CTag
+	mainFile string
 }
 
-func (p *CTagsParser) Parse(ctagsOutput string) []*types.CTag {
+func (p *CTagsParser) Parse(ctagsOutput string, mainFile string) []*types.CTag {
 	rows := strings.Split(ctagsOutput, "\n")
 	rows = removeEmpty(rows)
+
+	p.mainFile = mainFile
 
 	for _, row := range rows {
 		p.tags = append(p.tags, parseTag(row))
@@ -199,7 +202,6 @@ func parseTag(row string) *types.CTag {
 
 	parts = parts[2:]
 
-	signature := ""
 	returntype := ""
 	for _, part := range parts {
 		if strings.Contains(part, ":") {
@@ -216,7 +218,7 @@ func parseTag(row string) *types.CTag {
 			case "typeref":
 				tag.Typeref = value
 			case "signature":
-				signature = value
+				tag.Signature = value
 			case "returntype":
 				returntype = value
 			case "class":
@@ -228,7 +230,7 @@ func parseTag(row string) *types.CTag {
 			}
 		}
 	}
-	tag.Prototype = returntype + " " + tag.FunctionName + signature + ";"
+	tag.Prototype = returntype + " " + tag.FunctionName + tag.Signature + ";"
 
 	if strings.Contains(row, "/^") && strings.Contains(row, "$/;") {
 		tag.Code = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]
