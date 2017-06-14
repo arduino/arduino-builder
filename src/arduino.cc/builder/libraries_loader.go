@@ -184,6 +184,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library.License = libProperties[constants.LIBRARY_LICENSE]
 
 	library.Name = filepath.Base(libraryFolder)
+	library.RealName = strings.TrimSpace(libProperties[constants.LIBRARY_NAME])
 	library.Version = strings.TrimSpace(libProperties[constants.LIBRARY_VERSION])
 	library.Author = strings.TrimSpace(libProperties[constants.LIBRARY_AUTHOR])
 	library.Maintainer = strings.TrimSpace(libProperties[constants.LIBRARY_MAINTAINER])
@@ -192,6 +193,8 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library.URL = strings.TrimSpace(libProperties[constants.LIBRARY_URL])
 	library.IsLegacy = false
 	library.DotALinkage = strings.TrimSpace(libProperties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
+	library.Precompiled = strings.TrimSpace(libProperties[constants.LIBRARY_PRECOMPILED]) == "true"
+	library.LDflags = strings.TrimSpace(libProperties[constants.LIBRARY_LDFLAGS])
 	library.Properties = libProperties
 
 	return library, nil
