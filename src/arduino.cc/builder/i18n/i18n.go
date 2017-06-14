@@ -58,6 +58,21 @@ func (s NoopLogger) Name() string {
 	return "noop"
 }
 
+type HumanTagsLogger struct{}
+
+func (s HumanTagsLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	format = "[" + level + "] " + format
+	fmt.Fprintln(w, Format(format, a...))
+}
+
+func (s HumanTagsLogger) Println(level string, format string, a ...interface{}) {
+	s.Fprintln(os.Stdout, level, format, a...)
+}
+
+func (s HumanTagsLogger) Name() string {
+	return "humantags"
+}
+
 type HumanLogger struct{}
 
 func (s HumanLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
