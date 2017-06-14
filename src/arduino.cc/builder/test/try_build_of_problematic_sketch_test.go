@@ -205,6 +205,10 @@ func TestTryBuild039(t *testing.T) {
 	tryBuildWithContext(t, ctx, "sketch12", "sketch12.ino")
 }
 
+func TestTryBuild040(t *testing.T) {
+	tryBuild(t, "sketch_with_fake_function_pointer", "sketch_with_fake_function_pointer.ino")
+}
+
 func makeDefaultContext(t *testing.T) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 

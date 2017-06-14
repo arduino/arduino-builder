@@ -252,6 +252,7 @@ type CTag struct {
 	Filename     string
 	Typeref      string
 	SkipMe       bool
+	Signature    string
 
 	Prototype          string
 	Function           string
