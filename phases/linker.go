@@ -61,11 +61,8 @@ func (s *Linker) Run(ctx *types.Context) error {
 	}
 
 	buildProperties := ctx.BuildProperties
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
-	err = link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
+	err = link(ctx, objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -73,7 +70,7 @@ func (s *Linker) Run(ctx *types.Context) error {
 	return nil
 }
 
-func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func link(ctx *types.Context, objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties properties.Map) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	objectFiles = utils.Map(objectFiles, wrapWithDoubleQuotes)
@@ -81,12 +78,12 @@ func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath stri
 
 	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
 	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath
 	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILES] = objectFileList
 
-	_, err := builder_utils.ExecRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, verbose, verbose, logger)
+	_, err := builder_utils.ExecRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, ctx.Verbose, ctx.Verbose, ctx.GetLogger())
 	return err
 }
 
