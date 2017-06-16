@@ -46,11 +46,6 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 		return i18n.WrapError(err)
 	}
 
-	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
-		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
-		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
-	}
-
 	_, _, err = builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
 	if err != nil {
 		return i18n.WrapError(err)
@@ -63,11 +58,6 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 	properties, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
 		return nil, i18n.WrapError(err)
-	}
-
-	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
-		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
-		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
 	_, stderr, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Capture)
@@ -86,6 +76,11 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
+
+	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
+		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
+		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
+	}
 
 	return properties, nil
 }
