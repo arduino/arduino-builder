@@ -53,7 +53,7 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 
 	verbose := ctx.Verbose
 	logger := ctx.GetLogger()
-	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, verbose, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -75,7 +75,7 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, verbose, logger)
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}
