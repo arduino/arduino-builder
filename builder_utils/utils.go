@@ -40,12 +40,13 @@ import (
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
 
-func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles, err := CompileFiles(objectFiles, sourcePath, false, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+func CompileFilesRecursive(ctx *types.Context, objectFiles []string, sourcePath string, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
+	objectFiles, err := CompileFiles(ctx, objectFiles, sourcePath, false, buildPath, buildProperties, includes)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
@@ -56,7 +57,7 @@ func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath st
 	}
 
 	for _, folder := range folders {
-		objectFiles, err = CompileFilesRecursive(objectFiles, filepath.Join(sourcePath, folder.Name()), filepath.Join(buildPath, folder.Name()), buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = CompileFilesRecursive(ctx, objectFiles, filepath.Join(sourcePath, folder.Name()), filepath.Join(buildPath, folder.Name()), buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -65,28 +66,28 @@ func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath st
 	return objectFiles, nil
 }
 
-func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles, err := compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN, verbose, warningsLevel, logger)
+func CompileFiles(ctx *types.Context, objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
+	objectFiles, err := compileFilesWithExtensionWithRecipe(ctx, objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN, verbose, warningsLevel, logger)
+	objectFiles, err = compileFilesWithExtensionWithRecipe(ctx, objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN, verbose, warningsLevel, logger)
+	objectFiles, err = compileFilesWithExtensionWithRecipe(ctx, objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 	return objectFiles, nil
 }
 
-func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithExtensionWithRecipe(ctx *types.Context, objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, extension string, recipe string) ([]string, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	return compileFilesWithRecipe(objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+	return compileFilesWithRecipe(ctx, objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe)
 }
 
 func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]string, error) {
@@ -145,9 +146,9 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithRecipe(ctx *types.Context, objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string) ([]string, error) {
 	for _, source := range sources {
-		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -157,9 +158,10 @@ func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []s
 	return objectFiles, nil
 }
 
-func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
+func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string) (string, error) {
+	logger := ctx.GetLogger()
 	properties := buildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source
 	relativeSource, err := filepath.Rel(sourcePath, source)
@@ -179,11 +181,11 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 	}
 
 	if !objIsUpToDate {
-		_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
+		_, err = ExecRecipe(properties, recipe, false, ctx.Verbose, ctx.Verbose, logger)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
-	} else if verbose {
+	} else if ctx.Verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
 	}
 
@@ -309,7 +311,8 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile string)
 	return true
 }
 
-func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {
+func ArchiveCompiledFiles(ctx *types.Context, buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map) (string, error) {
+	logger := ctx.GetLogger()
 	archiveFilePath := filepath.Join(buildPath, archiveFile)
 
 	rebuildArchive := false
@@ -332,7 +335,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 				return "", i18n.WrapError(err)
 			}
 		} else {
-			if verbose {
+			if ctx.Verbose {
 				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, archiveFilePath)
 			}
 			return archiveFilePath, nil
@@ -345,7 +348,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath
 		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile
 
-		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, verbose, verbose, logger)
+		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, ctx.Verbose, ctx.Verbose, logger)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
