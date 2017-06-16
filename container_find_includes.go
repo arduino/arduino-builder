@@ -119,6 +119,8 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+
+	"github.com/go-errors/errors"
 )
 
 type ContainerFindIncludes struct{}
@@ -318,22 +320,33 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if library, ok := sourceFile.Origin.(*types.Library); ok && library.UtilityFolder != "" {
 			includes = append(includes, library.UtilityFolder)
 		}
+		var preproc_err error
+		var preproc_stderr []byte
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
 				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
 			}
 		} else {
-			stderr, err := GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
 			// Unwrap error and see if it is an ExitError.
-			// Ignore ExitErrors (e.g. gcc returning
-			// non-zero status), but bail out on other
-			// errors
-			_, is_exit_error := i18n.UnwrapError(err).(*exec.ExitError)
-			if err != nil && !is_exit_error {
-				return i18n.WrapError(err)
+			_, is_exit_error := i18n.UnwrapError(preproc_err).(*exec.ExitError)
+			if preproc_err == nil {
+				// Preprocessor successful, done
+				include = ""
+			} else if !is_exit_error || preproc_stderr == nil {
+				// Ignore ExitErrors (e.g. gcc returning
+				// non-zero status), but bail out on
+				// other errors
+				return i18n.WrapError(preproc_err)
+			} else {
+				include = IncludesFinderWithRegExp(ctx, string(preproc_stderr))
+				if include == "" {
+					// No include found? Bail out.
+					os.Stderr.Write(preproc_stderr)
+					return i18n.WrapError(preproc_err)
+				}
 			}
-			include = IncludesFinderWithRegExp(ctx, string(stderr))
 		}
 
 		if include == "" {
@@ -345,8 +358,19 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := GCCPreprocRunner(ctx, sourcePath, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, includes)
-			return i18n.WrapError(err)
+			if preproc_err == nil || preproc_stderr == nil {
+				// Filename came from cache, so run preprocessor to obtain error to show
+				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+				if preproc_err == nil {
+					// If there is a missing #include in the cache, but running
+					// gcc does not reproduce that, there is something wrong.
+					// Returning an error here will cause the cache to be
+					// deleted, so hopefully the next compilation will succeed.
+					return errors.New("Internal error in cache")
+				}
+			}
+			os.Stderr.Write(preproc_stderr)
+			return i18n.WrapError(preproc_err)
 		}
 
 		// Add this library to the list of libraries, the
