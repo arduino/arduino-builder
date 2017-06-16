@@ -402,16 +402,16 @@ func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, remo
 	return command, nil
 }
 
-func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
+func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
 	command, err := PrepareCommandForRecipe(buildProperties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
 	if err != nil {
-		return "", i18n.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	buffer := &bytes.Buffer{}
 	command.Stderr = buffer
 	err = command.Run()
-	return string(buffer.Bytes()), err
+	return buffer.Bytes(), err
 }
 
 func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {

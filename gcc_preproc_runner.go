@@ -61,10 +61,10 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 	return nil
 }
 
-func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (string, error) {
+func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) ([]byte, error) {
 	properties, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
-		return "", i18n.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	verbose := ctx.Verbose
@@ -77,10 +77,10 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 
 	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, verbose, logger)
 	if err != nil {
-		return string(stderr), i18n.WrapError(err)
+		return stderr, i18n.WrapError(err)
 	}
 
-	return string(stderr), nil
+	return stderr, nil
 }
 
 func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, error) {
