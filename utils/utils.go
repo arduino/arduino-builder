@@ -30,6 +30,7 @@
 package utils
 
 import (
+	"fmt"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
@@ -255,6 +256,24 @@ func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
 	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger)
 }
 
+func printableArgument(arg string) string {
+	if strings.ContainsAny(arg, "\"\\ \t") {
+		arg = strings.Replace(arg, "\\", "\\\\", -1)
+		arg = strings.Replace(arg, "\"", "\\\"", -1)
+		return "\"" + arg + "\""
+	} else {
+		return arg
+	}
+}
+
+// Convert a command and argument slice back to a printable string.
+// This adds basic escaping which is sufficient for debug output, but
+// probably not for shell interpretation. This essentially reverses
+// ParseCommandLine.
+func PrintableCommand(parts []string) string {
+	return strings.Join(Map(parts, printableArgument), " ")
+}
+
 const (
 	Ignore = 0 // Redirect to null
 	Show = 1 // Show on stdout/stderr as normal
@@ -263,6 +282,10 @@ const (
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
+	if ctx.Verbose {
+		fmt.Println(PrintableCommand(command.Args))
+	}
+
 	if stdout == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stdout = buffer

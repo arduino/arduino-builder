@@ -30,7 +30,6 @@
 package builder_utils
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -381,10 +380,6 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map,
 	command, err := utils.PrepareCommand(commandLine, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
-	}
-
-	if ctx.Verbose {
-		fmt.Println(commandLine)
 	}
 
 	return command, nil
