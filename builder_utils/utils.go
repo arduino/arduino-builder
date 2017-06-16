@@ -431,10 +431,6 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map,
 	return command, nil
 }
 
-func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
-	buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
-}
-
 // CopyFile copies the contents of the file named src to the file named
 // by dst. The file will be created if it does not already exist. If the
 // destination file exists, all it's contents will be replaced by the contents

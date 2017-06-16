@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"os/exec"
 	"strings"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -37,16 +38,15 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"github.com/arduino/go-properties-map"
 )
 
 func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) error {
-	properties, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
+	cmd, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	_, _, err = builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
+	_, _, err = utils.ExecCommand(ctx, cmd /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -55,12 +55,12 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 }
 
 func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) ([]byte, error) {
-	properties, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
+	cmd, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	_, stderr, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Capture)
+	_, stderr, err := utils.ExecCommand(ctx, cmd /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Capture)
 	if err != nil {
 		return stderr, i18n.WrapError(err)
 	}
@@ -68,21 +68,29 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 	return stderr, nil
 }
 
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, error) {
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (*exec.Cmd, error) {
 	properties := ctx.BuildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
 	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
 
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
-	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	return properties, nil
+	cmd, err := builder_utils.PrepareCommandForRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true)
+	if err != nil {
+		return nil, i18n.WrapError(err)
+	}
+
+	// Remove -MMD argument if present. Leaving it will make gcc try
+	// to create a /dev/null.d dependency file, which won't work.
+	cmd.Args = utils.Filter(cmd.Args, func(a string) bool { return a != "-MMD" })
+
+	return cmd, nil
 }
 
 func GeneratePreprocPatternFromCompile(compilePattern string) string {
