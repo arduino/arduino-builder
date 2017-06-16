@@ -77,7 +77,7 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 
 	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, verbose, logger)
 	if err != nil {
-		return "", i18n.WrapError(err)
+		return string(stderr), i18n.WrapError(err)
 	}
 
 	return string(stderr), nil

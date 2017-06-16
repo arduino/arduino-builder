@@ -410,8 +410,8 @@ func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, remo
 
 	buffer := &bytes.Buffer{}
 	command.Stderr = buffer
-	command.Run()
-	return string(buffer.Bytes()), nil
+	err = command.Run()
+	return string(buffer.Bytes()), err
 }
 
 func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
