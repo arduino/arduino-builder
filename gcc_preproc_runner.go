@@ -51,9 +51,7 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath string, targetFilePath 
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	verbose := ctx.Verbose
-	logger := ctx.GetLogger()
-	_, err = builder_utils.ExecRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, verbose, logger)
+	_, _, err = builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -67,15 +65,12 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath s
 		return nil, i18n.WrapError(err)
 	}
 
-	verbose := ctx.Verbose
-	logger := ctx.GetLogger()
-
 	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, verbose, logger)
+	_, stderr, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Capture)
 	if err != nil {
 		return stderr, i18n.WrapError(err)
 	}

@@ -30,7 +30,6 @@
 package builder_utils
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -181,7 +180,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string,
 	}
 
 	if !objIsUpToDate {
-		_, err = ExecRecipe(properties, recipe, false, ctx.Verbose, ctx.Verbose, logger)
+		_, _, err = ExecRecipe(ctx, properties, recipe, false, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
@@ -348,7 +347,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath string, archiveFile stri
 		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath
 		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile
 
-		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, ctx.Verbose, ctx.Verbose, logger)
+		_, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
@@ -357,28 +356,17 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath string, archiveFile stri
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
-	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+// See util.ExecCommand for stdout/stderr arguments
+func ExecRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
+	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, nil, i18n.WrapError(err)
 	}
-
-	if echoOutput {
-		command.Stdout = os.Stdout
-	}
-
-	command.Stderr = os.Stderr
-
-	if echoOutput {
-		err := command.Run()
-		return nil, i18n.WrapError(err)
-	}
-
-	bytes, err := command.Output()
-	return bytes, i18n.WrapError(err)
+	return utils.ExecCommand(ctx, command, stdout, stderr)
 }
 
-func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
+func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
+	logger := ctx.GetLogger()
 	pattern := buildProperties[recipe]
 	if pattern == constants.EMPTY_STRING {
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
@@ -395,23 +383,11 @@ func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, remo
 		return nil, i18n.WrapError(err)
 	}
 
-	if echoCommandLine {
+	if ctx.Verbose {
 		fmt.Println(commandLine)
 	}
 
 	return command, nil
-}
-
-func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
-	command, err := PrepareCommandForRecipe(buildProperties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
-	if err != nil {
-		return nil, i18n.WrapError(err)
-	}
-
-	buffer := &bytes.Buffer{}
-	command.Stderr = buffer
-	err = command.Run()
-	return buffer.Bytes(), err
 }
 
 func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
