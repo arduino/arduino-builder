@@ -110,6 +110,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -324,7 +325,12 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			}
 		} else {
 			stderr, err := GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
-			if err != nil {
+			// Unwrap error and see if it is an ExitError.
+			// Ignore ExitErrors (e.g. gcc returning
+			// non-zero status), but bail out on other
+			// errors
+			_, is_exit_error := i18n.UnwrapError(err).(*exec.ExitError)
+			if err != nil && !is_exit_error {
 				return i18n.WrapError(err)
 			}
 			include = IncludesFinderWithRegExp(ctx, stderr)
