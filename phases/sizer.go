@@ -89,7 +89,7 @@ func checkSize(buildProperties properties.Map, verbose bool, warningsLevel strin
 		}
 	}
 
-	textSize, dataSize, _, err := execSizeReceipe(properties, logger)
+	textSize, dataSize, _, err := execSizeRecipe(properties, logger)
 	if err != nil {
 		logger.Println(constants.LOG_LEVEL_WARN, constants.MSG_SIZER_ERROR_NO_RULE)
 		return nil
@@ -127,7 +127,7 @@ func checkSize(buildProperties properties.Map, verbose bool, warningsLevel strin
 	return nil
 }
 
-func execSizeReceipe(properties properties.Map, logger i18n.Logger) (textSize int, dataSize int, eepromSize int, resErr error) {
+func execSizeRecipe(properties properties.Map, logger i18n.Logger) (textSize int, dataSize int, eepromSize int, resErr error) {
 	out, err := builder_utils.ExecRecipe(properties, constants.RECIPE_SIZE_PATTERN, false, false, false, logger)
 	if err != nil {
 		resErr = errors.New("Error while determining sketch size: " + err.Error())
