@@ -333,7 +333,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			if err != nil && !is_exit_error {
 				return i18n.WrapError(err)
 			}
-			include = IncludesFinderWithRegExp(ctx, stderr)
+			include = IncludesFinderWithRegExp(ctx, string(stderr))
 		}
 
 		if include == "" {
