@@ -30,6 +30,7 @@
 package phases
 
 import (
+	"os"
 	"path/filepath"
 
 	"arduino.cc/builder/builder_utils"
@@ -126,7 +127,9 @@ func compileCore(buildPath string, buildCachePath string, buildProperties proper
 
 	// archive core.a
 	if targetArchivedCore != "" {
-		logger.Println(constants.LOG_LEVEL_DEBUG, "Archiving built core (caching) in: "+targetArchivedCore)
+		if verbose {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
+		}
 		builder_utils.CopyFile(archiveFile, targetArchivedCore)
 	}
 
