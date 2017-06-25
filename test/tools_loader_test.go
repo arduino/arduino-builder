@@ -71,8 +71,8 @@ func TestLoadTools(t *testing.T) {
 
 	idx := 0
 	require.Equal(t, "arduino-preprocessor", tools[idx].Name)
-	require.Equal(t, "0.1.0", tools[idx].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/arduino-preprocessor/0.1.0"), tools[idx].Folder)
+	require.Equal(t, "0.1.1", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/arduino-preprocessor/0.1.1"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
@@ -151,8 +151,8 @@ func TestLoadLotsOfTools(t *testing.T) {
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "arduino-preprocessor", tools[idx].Name)
-	require.Equal(t, "0.1.0", tools[idx].Version)
-	require.Equal(t, Abs(t, "./downloaded_tools/arduino-preprocessor/0.1.0"), tools[idx].Folder)
+	require.Equal(t, "0.1.1", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/arduino-preprocessor/0.1.1"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
