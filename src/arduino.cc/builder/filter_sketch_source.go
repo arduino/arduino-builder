@@ -79,7 +79,7 @@ func parseLineMarker(line string) string {
 	// https://github.com/gcc-mirror/gcc/blob/edd716b6b1caa1a5cb320a8cd7f626f30198e098/gcc/c-family/c-ppoutput.c#L413-L415
 
 	split := strings.SplitN(line, " ", 3)
-	if len(split) < 2 || split[0] != "#" {
+	if len(split) < 3 || split[0] != "#" {
 		return ""
 	}
 

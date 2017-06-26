@@ -75,6 +75,7 @@ const FLAG_WARNINGS_MORE = "more"
 const FLAG_WARNINGS_ALL = "all"
 const FLAG_LOGGER = "logger"
 const FLAG_LOGGER_HUMAN = "human"
+const FLAG_LOGGER_HUMANTAGS = "humantags"
 const FLAG_LOGGER_MACHINE = "machine"
 const FLAG_VERSION = "version"
 const FLAG_VID_PID = "vid-pid"
@@ -155,7 +156,7 @@ func init() {
 	quietFlag = flag.Bool(FLAG_QUIET, false, "if 'true' doesn't print any warnings or progress or whatever")
 	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
 	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
-	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
+	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_HUMANTAGS+"', '"+FLAG_LOGGER_MACHINE+"'")
 	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
 }
@@ -321,6 +322,8 @@ func main() {
 		ctx.SetLogger(i18n.NoopLogger{})
 	} else if *loggerFlag == FLAG_LOGGER_MACHINE {
 		ctx.SetLogger(i18n.MachineLogger{})
+	} else if *loggerFlag == FLAG_LOGGER_HUMANTAGS {
+		ctx.SetLogger(i18n.HumanTagsLogger{})
 	} else {
 		ctx.SetLogger(i18n.HumanLogger{})
 	}
