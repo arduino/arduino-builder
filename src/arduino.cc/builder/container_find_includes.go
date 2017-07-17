@@ -376,7 +376,16 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		queue.Push(sourceFile)
+		/*
+		 * hack: This is for Energia EMT targets to skip main.cpp
+		 * When the cache file is build the first time, main.cpp is not there yet
+		 * in the <build folder>/sketch.
+		 * On a second run it is there and the cache mismatches that of what is on disk
+		 * resulting in a pointer outside the cache array.
+		 */
+		if sourceFile.RelativePath != "main.cpp" {
+			queue.Push(sourceFile)
+		}
 	}
 
 	return nil
