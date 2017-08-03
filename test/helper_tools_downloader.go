@@ -118,7 +118,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 			OsUrls: []OsUrl{
 				OsUrl{Os: "i686-pc-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.1/arduino-preprocessor-0.1.1-i686-pc-linux-gnu.tar.bz2"},
 				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.1/arduino-preprocessor-0.1.1-x86_64-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "i686-cygwin", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.1/arduino-preprocessor-0.1.1-i686-pc-cygwin.tar.bz2"},
+				OsUrl{Os: "i686-mingw32", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.1/arduino-preprocessor-0.1.1-i686-pc-cygwin.tar.bz2"},
 				OsUrl{Os: "x86_64-apple-darwin", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.1/arduino-preprocessor-0.1.1-x86_64-apple-darwin11.tar.bz2"},
 				OsUrl{Os: "arm-linux-gnueabihf", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.1/arduino-preprocessor-0.1.1-armhf-pc-linux-gnu.tar.bz2"},
 			},
