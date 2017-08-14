@@ -30,7 +30,7 @@
 package builder
 
 import (
-	"fmt"
+	"os"
 
 	"arduino.cc/builder/constants"
 	"arduino.cc/builder/ctags"
@@ -63,7 +63,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	verbose := ctx.Verbose
 	if verbose {
-		fmt.Println(commandLine)
+		logger.UnformattedFprintln(os.Stdout, commandLine)
 	}
 
 	sourceBytes, err := command.Output()
