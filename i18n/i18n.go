@@ -49,6 +49,7 @@ type Logger interface {
 	UnformattedWrite(w io.Writer, data []byte)
 	Println(level string, format string, a ...interface{})
 	Name() string
+	Flush() string
 }
 
 type NoopLogger struct{}
@@ -61,8 +62,42 @@ func (s NoopLogger) UnformattedWrite(w io.Writer, data []byte) {}
 
 func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
 
+func (s NoopLogger) Flush() string {
+	return ""
+}
+
 func (s NoopLogger) Name() string {
 	return "noop"
+}
+
+type AccumulatorLogger struct {
+	Buffer *[]string
+}
+
+func (s AccumulatorLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	*s.Buffer = append(*s.Buffer, Format(format, a...))
+}
+
+func (s AccumulatorLogger) UnformattedFprintln(w io.Writer, str string) {
+	*s.Buffer = append(*s.Buffer, str)
+}
+
+func (s AccumulatorLogger) UnformattedWrite(w io.Writer, data []byte) {
+	*s.Buffer = append(*s.Buffer, string(data))
+}
+
+func (s AccumulatorLogger) Println(level string, format string, a ...interface{}) {
+	s.Fprintln(nil, level, format, a...)
+}
+
+func (s AccumulatorLogger) Flush() string {
+	str := strings.Join(*s.Buffer, "\n")
+	*s.Buffer = (*s.Buffer)[0:0]
+	return str
+}
+
+func (s AccumulatorLogger) Name() string {
+	return "accumulator"
 }
 
 type HumanTagsLogger struct{}
@@ -82,6 +117,10 @@ func (s HumanTagsLogger) UnformattedFprintln(w io.Writer, str string) {
 
 func (s HumanTagsLogger) UnformattedWrite(w io.Writer, data []byte) {
 	write(w, data)
+}
+
+func (s HumanTagsLogger) Flush() string {
+	return ""
 }
 
 func (s HumanTagsLogger) Name() string {
@@ -106,6 +145,10 @@ func (s HumanLogger) UnformattedWrite(w io.Writer, data []byte) {
 	write(w, data)
 }
 
+func (s HumanLogger) Flush() string {
+	return ""
+}
+
 func (s HumanLogger) Name() string {
 	return "human"
 }
@@ -122,6 +165,10 @@ func (s MachineLogger) Println(level string, format string, a ...interface{}) {
 
 func (s MachineLogger) UnformattedFprintln(w io.Writer, str string) {
 	fprintln(w, str)
+}
+
+func (s MachineLogger) Flush() string {
+	return ""
 }
 
 func (s MachineLogger) Name() string {

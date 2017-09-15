@@ -90,6 +90,9 @@ type Context struct {
 
 	// ReadFileAndStoreInContext command
 	FileToRead string
+
+	// Reuse old tools since the backing storage didn't change
+	CanUseCachedTools bool
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {

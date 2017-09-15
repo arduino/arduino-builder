@@ -41,9 +41,13 @@ import (
 	"strings"
 	"syscall"
 
+	"runtime/pprof"
+	"runtime/trace"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/jsonrpc"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
@@ -80,8 +84,10 @@ const FLAG_LOGGER_HUMAN = "human"
 const FLAG_LOGGER_HUMANTAGS = "humantags"
 const FLAG_LOGGER_MACHINE = "machine"
 const FLAG_VERSION = "version"
+const FLAG_DAEMON = "daemon"
 const FLAG_VID_PID = "vid-pid"
 const FLAG_JOBS = "jobs"
+const FLAG_TRACE = "trace"
 
 type foldersFlag []string
 
@@ -139,8 +145,10 @@ var debugLevelFlag *int
 var warningsLevelFlag *string
 var loggerFlag *string
 var versionFlag *bool
+var daemonFlag *bool
 var vidPidFlag *string
 var jobsFlag *int
+var traceFlag *bool
 
 func init() {
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
@@ -164,12 +172,38 @@ func init() {
 	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_HUMANTAGS+"', '"+FLAG_LOGGER_MACHINE+"'")
 	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
+	daemonFlag = flag.Bool(FLAG_DAEMON, false, "daemonizes and serves its functions via rpc")
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
 	jobsFlag = flag.Int(FLAG_JOBS, 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
+	traceFlag = flag.Bool(FLAG_TRACE, false, "traces the whole process lifecycle")
 }
 
 func main() {
+
 	flag.Parse()
+
+	if *traceFlag {
+		f, err := os.Create("trace.out")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		f2, err := os.Create("profile.out")
+		if err != nil {
+			panic(err)
+		}
+		defer f2.Close()
+
+		pprof.StartCPUProfile(f2)
+		defer pprof.StopCPUProfile()
+
+		err = trace.Start(f)
+		if err != nil {
+			panic(err)
+		}
+		defer trace.Stop()
+	}
 
 	if *versionFlag {
 		fmt.Println("Arduino Builder " + VERSION)
@@ -187,6 +221,15 @@ func main() {
 	}
 
 	ctx := &types.Context{}
+
+	if *daemonFlag {
+		var loggerBuffer []string
+		logger := i18n.AccumulatorLogger{}
+		logger.Buffer = &loggerBuffer
+		//logger := i18n.HumanLogger{}
+		ctx.SetLogger(logger)
+		jsonrpc.RegisterAndServeJsonRPC(ctx)
+	}
 
 	if *buildOptionsFileFlag != "" {
 		buildOptions := make(properties.Map)
