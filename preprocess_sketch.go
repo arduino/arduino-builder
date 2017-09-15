@@ -115,6 +115,6 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 type OutputCodeCompletions struct{}
 
 func (s *OutputCodeCompletions) Run(ctx *types.Context) error {
-	fmt.Println(ctx.CodeCompletions)
+	ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, "%s", ctx.CodeCompletions)
 	return nil
 }
