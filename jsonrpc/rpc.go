@@ -71,6 +71,14 @@ func (h *BuildHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) 
 	h.ctx.BuildCachePath = p.BuildCachePath
 	h.ctx.BuildPath = p.BuildPath
 	h.ctx.WarningsLevel = p.WarningsLevel
+	h.ctx.PrototypesSection = ""
+
+	h.ctx.IncludeFolders = h.ctx.IncludeFolders[0:0]
+	h.ctx.LibrariesObjectFiles = h.ctx.LibrariesObjectFiles[0:0]
+	h.ctx.CoreObjectsFiles = h.ctx.CoreObjectsFiles[0:0]
+	h.ctx.SketchObjectFiles = h.ctx.SketchObjectFiles[0:0]
+
+	h.ctx.ImportedLibraries = h.ctx.ImportedLibraries[0:0]
 
 	err := builder.RunBuilder(h.ctx)
 	if err != nil {
