@@ -46,8 +46,8 @@ import (
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
+	"github.com/arduino/arduino-builder/grpc"
 	"github.com/arduino/arduino-builder/i18n"
-	"github.com/arduino/arduino-builder/jsonrpc"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
