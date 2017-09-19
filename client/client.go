@@ -79,9 +79,9 @@ func main() {
 		Verbose:               true,
 		WarningsLevel:         "all",
 		BuildCachePath:        "/tmp/arduino_cache_761418/",
-		CodeCompleteAt:        "/home/martino/eslov-sk/libraries/WiFi101/examples/ScanNetworks/ScanNetworks.ino:1:1",
+		CodeCompleteAt:        "/home/martino/eslov-sk/libraries/WiFi101/examples/ScanNetworks/ScanNetworks.ino:56:9",
 	}
 
-	build(client, &exampleParames)
-	//autocomplete(client, &exampleParames)
+	//build(client, &exampleParames)
+	autocomplete(client, &exampleParames)
 }

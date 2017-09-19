@@ -9,6 +9,7 @@ import (
 
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
 	"github.com/fsnotify/fsnotify"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -50,6 +51,24 @@ type builderServer struct {
 	watcher *fsnotify.Watcher
 }
 
+func (s *builderServer) watch() {
+	folders := [][]string{s.ctx.HardwareFolders, s.ctx.ToolsFolders, s.ctx.BuiltInLibrariesFolders, s.ctx.OtherLibrariesFolders}
+
+	for _, category := range folders {
+		for _, folder := range category {
+			if !utils.SliceContains(s.ctx.WatchedLocations, folder) {
+				var subfolders []string
+				utils.FindAllSubdirectories(folder, &subfolders)
+				subfolders = append(subfolders, folder)
+				for _, element := range subfolders {
+					s.watcher.Add(element)
+					s.ctx.WatchedLocations = utils.AppendIfNotPresent(s.ctx.WatchedLocations, element)
+				}
+			}
+		}
+	}
+}
+
 // GetFeature returns the feature at the given point.
 func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) (*pb.Response, error) {
 
@@ -74,6 +93,8 @@ func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) 
 	s.ctx.SketchObjectFiles = s.ctx.SketchObjectFiles[0:0]
 
 	s.ctx.ImportedLibraries = s.ctx.ImportedLibraries[0:0]
+
+	s.watch()
 
 	err := builder.RunPreprocess(s.ctx)
 	if err != nil {
@@ -113,6 +134,8 @@ func (s *builderServer) Build(args *pb.BuildParams, stream pb.Builder_BuildServe
 	oldlogger := s.ctx.GetLogger()
 	logger := StreamLogger{stream}
 	s.ctx.SetLogger(logger)
+
+	s.watch()
 
 	err := builder.RunBuilder(s.ctx)
 	s.ctx.SetLogger(oldlogger)
