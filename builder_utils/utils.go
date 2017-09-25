@@ -418,6 +418,8 @@ func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties 
 	return bytes, i18n.WrapError(err)
 }
 
+const COMMANDLINE_LIMIT = 32000
+
 func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
 	pattern := buildProperties[recipe]
 	if pattern == constants.EMPTY_STRING {
@@ -430,7 +432,13 @@ func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, remo
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	command, err := utils.PrepareCommand(commandLine, logger)
+	relativePath := ""
+
+	if len(commandLine) > COMMANDLINE_LIMIT {
+		relativePath = buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH]
+	}
+
+	command, err := utils.PrepareCommand(commandLine, logger, relativePath)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}

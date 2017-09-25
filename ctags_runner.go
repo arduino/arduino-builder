@@ -56,7 +56,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine, logger)
+	command, err := utils.PrepareCommand(commandLine, logger, "")
 	if err != nil {
 		return i18n.WrapError(err)
 	}

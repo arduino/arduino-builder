@@ -231,7 +231,7 @@ func TrimSpace(value string) string {
 
 type argFilterFunc func(int, string, []string) bool
 
-func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger) (*exec.Cmd, error) {
+func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
 	parts, err := ParseCommandLine(pattern, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -241,19 +241,36 @@ func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18
 	var args []string
 	for idx, part := range parts {
 		if filter(idx, part, parts) {
+			// if relativePath is specified, the overall commandline is too long for the platform
+			// try reducing the length by making the filenames relative
+			// and changing working directory to build.path
+			if relativePath != "" {
+				if _, err := os.Stat(part); !os.IsNotExist(err) {
+					tmp, err := filepath.Rel(relativePath, part)
+					if err == nil {
+						part = tmp
+					}
+				}
+			}
 			args = append(args, part)
 		}
 	}
 
-	return exec.Command(command, args...), nil
+	cmd := exec.Command(command, args...)
+
+	if relativePath != "" {
+		cmd.Dir = relativePath
+	}
+
+	return cmd, nil
 }
 
 func filterEmptyArg(_ int, arg string, _ []string) bool {
 	return arg != constants.EMPTY_STRING
 }
 
-func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
-	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger)
+func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
+	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger, relativePath)
 }
 
 func MapHas(aMap map[string]interface{}, key string) bool {
