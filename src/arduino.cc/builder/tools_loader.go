@@ -52,6 +52,16 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 		if err != nil {
 			return i18n.WrapError(err)
 		}
+		builtinHardwareFolder := ""
+		if len(ctx.BuiltInLibrariesFolders) > 0 {
+			builtinHardwareFolder, err = filepath.Abs(filepath.Join(ctx.BuiltInLibrariesFolders[0], ".."))
+		}
+
+		if builtinToolsVersionsFile != constants.EMPTY_STRING && !strings.Contains(builtinToolsVersionsFile, builtinHardwareFolder) {
+			ctx.GetLogger().Println(constants.LOG_LEVEL_WARN, constants.MSG_IGNORED_BUILTIN_TOOLS_TXT, builtinToolsVersionsFile)
+			builtinToolsVersionsFile = constants.EMPTY_STRING
+		}
+
 		if builtinToolsVersionsFile != constants.EMPTY_STRING {
 			err = loadToolsFrom(&tools, builtinToolsVersionsFile)
 			if err != nil {
