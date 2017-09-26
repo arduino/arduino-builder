@@ -102,7 +102,9 @@ func (properties Map) loadSingleLine(line string) error {
 	line = strings.TrimSpace(line)
 
 	if len(line) > 0 && line[0] != '#' {
-		lineParts := strings.SplitN(line, "=", 2)
+		// remove inline comments
+		lineParts := strings.SplitN(line, "#", 2)
+		lineParts = strings.SplitN(lineParts[0], "=", 2)
 		if len(lineParts) != 2 {
 			return errors.New("")
 		}
