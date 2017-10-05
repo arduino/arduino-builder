@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -50,7 +49,7 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 	tools := []*types.Tool{}
 
 	if ctx.CanUseCachedTools {
-		fmt.Println("no fs modification, can use cached ctx")
+		//fmt.Println("no fs modification, can use cached ctx")
 		return nil
 	}
 
