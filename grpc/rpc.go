@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"strings"
 
 	builder "github.com/arduino/arduino-builder"
@@ -193,10 +194,13 @@ func newServer(ctx *types.Context, watcher *fsnotify.Watcher) *builderServer {
 }
 
 func RegisterAndServeJsonRPC(ctx *types.Context) {
-
+	lis, err := net.Listen("tcp", "localhost:12345")
+	if err != nil {
+		//can't spawn two grpc servers on the same port
+		os.Exit(0)
+	}
 	watcher := startWatching(ctx)
 
-	lis, _ := net.Listen("tcp", "localhost:12345")
 	grpcServer := grpc.NewServer()
 	pb.RegisterBuilderServer(grpcServer, newServer(ctx, watcher))
 	grpcServer.Serve(lis)
