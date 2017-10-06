@@ -293,6 +293,9 @@ func SliceToMapStringBool(keys []string, value bool) map[string]bool {
 
 func AbsolutizePaths(files []string) ([]string, error) {
 	for idx, file := range files {
+		if file == "" {
+			continue
+		}
 		absFile, err := filepath.Abs(file)
 		if err != nil {
 			return nil, i18n.WrapError(err)
