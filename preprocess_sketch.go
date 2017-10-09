@@ -32,6 +32,8 @@ package builder
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -77,6 +79,16 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	properties.Merge(toolProps)
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = targetFilePath
 	if ctx.CodeCompleteAt != "" {
+		if runtime.GOOS == "windows" {
+			//use relative filepath to avoid ":" escaping
+			splt := strings.Split(ctx.CodeCompleteAt, ":")
+			if len(splt) == 3 {
+				//all right, do nothing
+			} else {
+				splt[1] = filepath.Base(splt[0] + ":" + splt[1])
+				ctx.CodeCompleteAt = strings.Join(splt[1:], ":")
+			}
+		}
 		properties["codecomplete"] = "-output-code-completions=" + ctx.CodeCompleteAt
 	} else {
 		properties["codecomplete"] = ""
