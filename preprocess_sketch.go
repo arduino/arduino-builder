@@ -127,6 +127,10 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 type OutputCodeCompletions struct{}
 
 func (s *OutputCodeCompletions) Run(ctx *types.Context) error {
-	ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, "%s", ctx.CodeCompletions)
+	if ctx.CodeCompletions == "" {
+		// we assume it is a json, let's make it compliant at least
+		ctx.CodeCompletions = "[]"
+	}
+	ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, ctx.CodeCompletions)
 	return nil
 }
