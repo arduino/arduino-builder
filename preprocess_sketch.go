@@ -105,6 +105,12 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
+	if runtime.GOOS == "windows" {
+		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)
+		command.Dir = filepath.VolumeName(command.Args[0]) + "/"
+		//command.Args[0], _ = filepath.Rel(command.Dir, command.Args[0])
+	}
+
 	verbose := ctx.Verbose
 	if verbose {
 		fmt.Println(commandLine)
