@@ -40,12 +40,15 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 func KeysOfMapOfStringInterface(input map[string]interface{}) []string {
@@ -533,6 +536,18 @@ func ParseCppString(line string) (string, string, bool) {
 
 		i += width
 	}
+}
+
+func isMn(r rune) bool {
+	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
+}
+
+// Normalizes an UTF8 byte slice
+// TODO: use it more often troughout all the project (maybe on logger interface?)
+func NormalizeUTF8(buf []byte) []byte {
+	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	result, _, _ := transform.Bytes(t, buf)
+	return result
 }
 
 // CopyFile copies the contents of the file named src to the file named
