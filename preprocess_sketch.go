@@ -30,7 +30,9 @@
 package builder
 
 import (
+	"errors"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -118,14 +120,16 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 
 	buf, err := command.Output()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.New(i18n.WrapError(err).Error() + string(err.(*exec.ExitError).Stderr))
 	}
-	output := string(buf)
+
+	result := utils.NormalizeUTF8(buf)
+
 	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
 	if ctx.CodeCompleteAt != "" {
-		ctx.CodeCompletions = output
+		ctx.CodeCompletions = string(result)
 	} else {
-		ctx.Source = output
+		ctx.Source = string(result)
 	}
 	return nil
 }
