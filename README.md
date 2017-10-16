@@ -57,18 +57,22 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 You need [Go 1.6.3](https://golang.org/dl/#go1.6.3).
 
-Repo root contains the script `setup_go_env_vars`. Use it as is or as a template for setting up Go environment variables.
-
 To install `codereview/patch` you have to install [Mercurial](https://www.mercurial-scm.org/) first.
 
-Once done, run the following commands:
+To set things up, run the following inside the cloned arduino-builder
+directory:
 
 ```
+export GOPATH=$(pwd)
 go get github.com/go-errors/errors
 go get github.com/stretchr/testify
 go get github.com/jstemmer/go-junit-report
 go build arduino.cc/arduino-builder
 ```
+
+After installing dependencies, you do not need to run the `go get`
+commands again, but you will have to set `GOPATH` again for every shell
+you want to build in.
 
 ### TDD
 
