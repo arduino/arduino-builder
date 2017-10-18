@@ -71,6 +71,12 @@ func (s *builderServer) watch() {
 	}
 }
 
+func (s *builderServer) DropCache(ctx context.Context, args *pb.VerboseParams) (*pb.Response, error) {
+	s.ctx.CanUseCachedTools = false
+	response := pb.Response{Line: "Tools cache dropped"}
+	return &response, nil
+}
+
 // GetFeature returns the feature at the given point.
 func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) (*pb.Response, error) {
 
@@ -97,7 +103,8 @@ func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) 
 
 	s.ctx.ImportedLibraries = s.ctx.ImportedLibraries[0:0]
 
-	s.watch()
+	//s.watch()
+
 	oldlogger := s.ctx.GetLogger()
 	logger := i18n.NoopLogger{}
 	s.ctx.SetLogger(logger)
@@ -140,7 +147,7 @@ func (s *builderServer) Build(args *pb.BuildParams, stream pb.Builder_BuildServe
 	logger := StreamLogger{stream}
 	s.ctx.SetLogger(logger)
 
-	s.watch()
+	//s.watch()
 
 	err := builder.RunBuilder(s.ctx)
 	s.ctx.SetLogger(oldlogger)
@@ -190,10 +197,16 @@ func startWatching(ctx *types.Context) *fsnotify.Watcher {
 	return watcher
 }
 
-func newServer(ctx *types.Context, watcher *fsnotify.Watcher) *builderServer {
+func newServerWithWatcher(ctx *types.Context, watcher *fsnotify.Watcher) *builderServer {
 	s := new(builderServer)
 	s.ctx = ctx
 	s.watcher = watcher
+	return s
+}
+
+func newServer(ctx *types.Context) *builderServer {
+	s := new(builderServer)
+	s.ctx = ctx
 	return s
 }
 
@@ -203,9 +216,9 @@ func RegisterAndServeJsonRPC(ctx *types.Context) {
 		//can't spawn two grpc servers on the same port
 		os.Exit(0)
 	}
-	watcher := startWatching(ctx)
+	//watcher := startWatching(ctx)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterBuilderServer(grpcServer, newServer(ctx, watcher))
+	pb.RegisterBuilderServer(grpcServer, newServer(ctx))
 	grpcServer.Serve(lis)
 }

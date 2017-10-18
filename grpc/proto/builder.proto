@@ -34,6 +34,8 @@ service Builder {
   rpc Build(BuildParams) returns (stream Response) {}
 
   rpc Autocomplete(BuildParams) returns (Response) {}
+
+  rpc DropCache(VerboseParams) returns (Response) {}
 }
 
 message BuildParams {
@@ -50,6 +52,10 @@ message BuildParams {
   string warningsLevel = 11;
   string codeCompleteAt = 12;
   bool verbose = 13;
+}
+
+message VerboseParams {
+  bool verbose = 1;
 }
 
 message Response {
