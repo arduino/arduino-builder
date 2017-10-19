@@ -85,6 +85,16 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		if _, err := os.Stat(filepath.Join(libFolder, "examples")); err == nil {
 			os.RemoveAll(filepath.Join(libFolder, "examples"))
 		}
+		// Remove stray folders contining incompatible libraries
+		staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
+		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+		var files []string
+		utils.FindFilesInFolder(&files, filepath.Join(libFolder, "src"), staticLibsExtensions, true)
+		for _, file := range files {
+			if !strings.Contains(filepath.Dir(file), mcu) {
+				os.RemoveAll(filepath.Dir(file))
+			}
+		}
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
@@ -171,7 +181,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Compile and link project
 	cmakelist += "add_executable (" + projectName + " ${SOURCES} ${SOURCES_LIBS})\n"
-	cmakelist += "target_link_libraries( " + projectName + " " + strings.Join(libs, " ") + ")\n"
+	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed " + strings.Join(libs, " ") + ")\n"
 
 	utils.WriteFile(cmakeFile, cmakelist)
 
@@ -198,7 +208,7 @@ func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, link
 			*linkDirectories = appendIfUnique(*linkDirectories, strings.TrimPrefix(arg, "-L"))
 			continue
 		}
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "-I") {
+		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "-I") && !strings.HasPrefix(arg, "-o") {
 			// HACK : from linkerflags remove MMD (no cache is produced)
 			if !strings.HasPrefix(arg, "-MMD") {
 				*linkerflags = appendIfUnique(*linkerflags, arg)
