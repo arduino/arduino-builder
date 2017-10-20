@@ -418,7 +418,7 @@ func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties 
 	return bytes, i18n.WrapError(err)
 }
 
-const COMMANDLINE_LIMIT = 32000
+const COMMANDLINE_LIMIT = 30000
 
 func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
 	pattern := buildProperties[recipe]
