@@ -194,7 +194,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Compile and link project
 	cmakelist += "add_executable (" + projectName + " ${SOURCES} ${SOURCES_LIBS})\n"
-	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed " + strings.Join(libs, " ") + ")\n"
+	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed -Wl,--start-group " + strings.Join(libs, " ") + " -Wl,--end-group)\n"
 
 	utils.WriteFile(cmakeFile, cmakelist)
 
