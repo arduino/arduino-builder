@@ -31,9 +31,10 @@
 package builder
 
 import (
+	"regexp"
+
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"regexp"
 )
 
 type SketchSourceMerger struct{}
@@ -43,12 +44,12 @@ func (s *SketchSourceMerger) Run(ctx *types.Context) error {
 
 	lineOffset := 0
 	includeSection := ""
+	includeSection += "#line 1 " + utils.QuoteCppString(sketch.MainFile.Name) + "\n"
+	lineOffset++
 	if !sketchIncludesArduinoH(&sketch.MainFile) {
 		includeSection += "#include <Arduino.h>\n"
 		lineOffset++
 	}
-	includeSection += "#line 1 " + utils.QuoteCppString(sketch.MainFile.Name) + "\n"
-	lineOffset++
 	ctx.IncludeSection = includeSection
 
 	source := includeSection
