@@ -106,6 +106,19 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	// Use old ctags method to generate export file
+	commands := []types.Command{
+		&ContainerMergeCopySketchFiles{},
+		&ContainerAddPrototypes{},
+		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+		&SketchSaver{},
+	}
+
+	for _, command := range commands {
+		command.Run(ctx)
+	}
+
 	err = utils.CopyDir(ctx.SketchBuildPath, filepath.Join(cmakeFolder, "sketch"), extensions)
 	if err != nil {
 		fmt.Println(err)
