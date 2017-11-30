@@ -306,7 +306,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx))
+	unchanged, err := builder_utils.ObjFileIsUpToDate(ctx, sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx))
 	if err != nil {
 		return i18n.WrapError(err)
 	}
