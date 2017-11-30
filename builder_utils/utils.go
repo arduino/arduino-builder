@@ -173,7 +173,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string,
 		return "", i18n.WrapError(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
+	objIsUpToDate, err := ObjFileIsUpToDate(ctx, properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}
@@ -190,7 +190,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string,
 	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
 }
 
-func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, error) {
+func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile string) (bool, error) {
 	sourceFile = filepath.Clean(sourceFile)
 	objectFile = filepath.Clean(objectFile)
 	dependencyFile = filepath.Clean(dependencyFile)
