@@ -108,7 +108,7 @@ func compileCore(buildPath string, buildCachePath string, buildProperties proper
 		if canUseArchivedCore {
 			// use archived core
 			if verbose {
-				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core")
+				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core: {0}", targetArchivedCore)
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
