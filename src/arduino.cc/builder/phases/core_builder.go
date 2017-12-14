@@ -30,7 +30,6 @@
 package phases
 
 import (
-	"os"
 	"path/filepath"
 
 	"arduino.cc/builder/builder_utils"
@@ -109,7 +108,7 @@ func compileCore(buildPath string, buildCachePath string, buildProperties proper
 		if canUseArchivedCore {
 			// use archived core
 			if verbose {
-				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core")
+				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core: {0}", targetArchivedCore)
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
@@ -128,7 +127,7 @@ func compileCore(buildPath string, buildCachePath string, buildProperties proper
 	// archive core.a
 	if targetArchivedCore != "" {
 		if verbose {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
+			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
 		}
 		builder_utils.CopyFile(archiveFile, targetArchivedCore)
 	}
