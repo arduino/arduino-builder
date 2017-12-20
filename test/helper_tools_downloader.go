@@ -379,7 +379,7 @@ func coreAlreadyDownloadedAndUnpacked(targetPath string, core Core) (bool, error
 	if os.IsNotExist(err) {
 		return false, nil
 	}
-	platform, err := properties.Load(filepath.Join(corePath, "platform.txt"), i18n.HumanLogger{})
+	platform, err := properties.Load(filepath.Join(corePath, "platform.txt"))
 	if err != nil {
 		return false, i18n.WrapError(err)
 	}
@@ -435,7 +435,7 @@ func libraryAlreadyDownloadedAndUnpacked(targetPath string, library Library) boo
 		return false
 	}
 
-	libProps, err := properties.Load(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1), "library.properties"), i18n.HumanLogger{})
+	libProps, err := properties.Load(filepath.Join(targetPath, strings.Replace(library.Name, " ", "_", -1), "library.properties"))
 	if err != nil {
 		return false
 	}
