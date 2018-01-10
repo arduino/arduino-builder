@@ -48,7 +48,6 @@ type PreprocessSketch struct{}
 func (s *PreprocessSketch) Run(ctx *types.Context) error {
 	sourceFile := filepath.Join(ctx.SketchBuildPath, filepath.Base(ctx.Sketch.MainFile.Name)+".cpp")
 	commands := []types.Command{
-		&GCCPreprocRunner{SourceFilePath: sourceFile, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: ctx.IncludeFolders},
 		&ArduinoPreprocessorRunner{},
 	}
 
@@ -57,6 +56,8 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 	} else {
 		commands = append(commands, &SketchSaver{})
 	}
+
+	GCCPreprocRunner(ctx, sourceFile, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, ctx.IncludeFolders)
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -73,7 +74,7 @@ type ArduinoPreprocessorRunner struct{}
 
 func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
-	targetFilePath := ctx.FileToRead
+	targetFilePath := constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E
 	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
