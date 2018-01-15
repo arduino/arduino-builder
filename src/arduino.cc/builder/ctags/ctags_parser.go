@@ -30,8 +30,6 @@
 package ctags
 
 import (
-	"bufio"
-	"os"
 	"strconv"
 	"strings"
 
@@ -53,12 +51,15 @@ var KNOWN_TAG_KINDS = map[string]bool{
 }
 
 type CTagsParser struct {
-	tags []*types.CTag
+	tags     []*types.CTag
+	mainFile string
 }
 
-func (p *CTagsParser) Parse(ctagsOutput string) []*types.CTag {
+func (p *CTagsParser) Parse(ctagsOutput string, mainFile string) []*types.CTag {
 	rows := strings.Split(ctagsOutput, "\n")
 	rows = removeEmpty(rows)
+
+	p.mainFile = mainFile
 
 	for _, row := range rows {
 		p.tags = append(p.tags, parseTag(row))
@@ -69,7 +70,7 @@ func (p *CTagsParser) Parse(ctagsOutput string) []*types.CTag {
 	p.addPrototypes()
 	p.removeDefinedProtypes()
 	p.skipDuplicates()
-	p.skipTagsWhere(prototypeAndCodeDontMatch)
+	p.skipTagsWhere(p.prototypeAndCodeDontMatch)
 
 	return p.tags
 }
@@ -83,14 +84,20 @@ func (p *CTagsParser) addPrototypes() {
 }
 
 func addPrototype(tag *types.CTag) {
-	if strings.Index(tag.Prototype, TEMPLATE) == 0 || strings.Index(tag.Code, TEMPLATE) == 0 {
-		code := tag.Code
-		if strings.Contains(code, "{") {
-			code = code[:strings.Index(code, "{")]
+	if strings.Index(tag.Prototype, TEMPLATE) == 0 {
+		if strings.Index(tag.Code, TEMPLATE) == 0 {
+			code := tag.Code
+			if strings.Contains(code, "{") {
+				code = code[:strings.Index(code, "{")]
+			} else {
+				code = code[:strings.LastIndex(code, ")")+1]
+			}
+			tag.Prototype = code + ";"
 		} else {
-			code = code[:strings.LastIndex(code, ")")+1]
+			//tag.Code is 99% multiline, recreate it
+			code := findTemplateMultiline(tag)
+			tag.Prototype = code + ";"
 		}
-		tag.Prototype = code + ";"
 		return
 	}
 
@@ -98,9 +105,9 @@ func addPrototype(tag *types.CTag) {
 	if strings.Index(tag.Code, STATIC+" ") != -1 {
 		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + STATIC
 	}
-	if strings.Index(tag.Code, EXTERN+" ") != -1 {
-		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + EXTERN
-	}
+
+	// Extern "C" modifier is now added in FixCLinkageTagsDeclarations
+
 	tag.PrototypeModifiers = strings.TrimSpace(tag.PrototypeModifiers)
 }
 
@@ -146,47 +153,6 @@ func (p *CTagsParser) skipTagsWhere(skipFunc skipFuncType) {
 			tag.SkipMe = skip
 		}
 	}
-}
-
-func prototypeAndCodeDontMatch(tag *types.CTag) bool {
-	if tag.SkipMe {
-		return true
-	}
-
-	code := removeSpacesAndTabs(tag.Code)
-
-	// original code is multi-line, which tags doesn't have - could we find this code in the
-	// original source file, for purposes of checking here?
-	if strings.Index(code, ")") == -1 {
-		file, err := os.Open(tag.Filename)
-		if err == nil {
-			defer file.Close()
-
-			scanner := bufio.NewScanner(file)
-			line := 1
-
-			// skip lines until we get to the start of this tag
-			for scanner.Scan() && line < tag.Line {
-				line++
-			}
-
-			// read up to 10 lines in search of a closing paren
-			newcode := scanner.Text()
-			for scanner.Scan() && line < (tag.Line+10) && strings.Index(newcode, ")") == -1 {
-				newcode += scanner.Text()
-			}
-
-			// don't bother replacing the code text if we haven't found a closing paren
-			if strings.Index(newcode, ")") != -1 {
-				code = removeSpacesAndTabs(newcode)
-			}
-		}
-	}
-
-	prototype := removeSpacesAndTabs(tag.Prototype)
-	prototype = removeTralingSemicolon(prototype)
-
-	return strings.Index(code, prototype) == -1
 }
 
 func removeTralingSemicolon(s string) string {
@@ -236,7 +202,6 @@ func parseTag(row string) *types.CTag {
 
 	parts = parts[2:]
 
-	signature := ""
 	returntype := ""
 	for _, part := range parts {
 		if strings.Contains(part, ":") {
@@ -253,7 +218,7 @@ func parseTag(row string) *types.CTag {
 			case "typeref":
 				tag.Typeref = value
 			case "signature":
-				signature = value
+				tag.Signature = value
 			case "returntype":
 				returntype = value
 			case "class":
@@ -265,7 +230,7 @@ func parseTag(row string) *types.CTag {
 			}
 		}
 	}
-	tag.Prototype = returntype + " " + tag.FunctionName + signature + ";"
+	tag.Prototype = returntype + " " + tag.FunctionName + tag.Signature + ";"
 
 	if strings.Contains(row, "/^") && strings.Contains(row, "$/;") {
 		tag.Code = row[strings.Index(row, "/^")+2 : strings.Index(row, "$/;")]
