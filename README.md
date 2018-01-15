@@ -55,31 +55,26 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 ### Building from source
 
-You need [Go 1.6.3](https://golang.org/dl/#go1.6.3).
+You need [a recent version of Go (>=1.8.0)](https://golang.org/).
 
-To install `codereview/patch` you have to install [Mercurial](https://www.mercurial-scm.org/) first.
-
-To set things up, run the following inside the cloned arduino-builder
-directory:
+To build, run the following commands:
 
 ```
-export GOPATH=$(pwd)
 go get github.com/go-errors/errors
 go get github.com/stretchr/testify
 go get github.com/jstemmer/go-junit-report
-go build arduino.cc/arduino-builder
+go get github.com/arduino/go-properties-map
+go get github.com/arduino/go-timeutils
+go get github.com/arduino/arduino-builder
+go build github.com/arduino/arduino-builder/arduino-builder
 ```
-
-After installing dependencies, you do not need to run the `go get`
-commands again, but you will have to set `GOPATH` again for every shell
-you want to build in.
 
 ### TDD
 
 In order to run the tests, type:
 
 ```
-go test arduino.cc/...
+go test github.com/arduino/arduino-builder/arduino-builder/...
 ```
 
 This runs all tests, showing any failures and a summary at the end.
@@ -93,13 +88,13 @@ To run a single test, use the -run option, which accepts a regular
 expression (see also go help testflag).
 
 ```
-go test arduino.cc/... -run 'TestBuilderEmptySketch'
-go test arduino.cc/... -run 'TestPrototypesAdder.*'
+go test github.com/arduino/arduino-builder/arduino-builder/... -run 'TestBuilderEmptySketch'
+go test github.com/arduino/arduino-builder/arduino-builder/... -run 'TestPrototypesAdder.*'
 ```
 
 In jenkins, use
 ```
-go test -v arduino.cc/... | bin/go-junit-report > report.xml
+go test -v github.com/arduino/arduino-builder/arduino-builder/... | bin/go-junit-report > report.xml
 ```
 
 The first time you run the tests, some needed files (toolchains and
@@ -114,6 +109,6 @@ increasing the timeout might be needed as well.
 
 `arduino-builder` is licensed under General Public License version 2, as published by the Free Software Foundation. See [LICENSE.txt](LICENSE.txt).
 
-Copyright (C) 2015 Arduino LLC and contributors
+Copyright (C) 2017 Arduino AG and contributors
 
 See https://www.arduino.cc/ and https://github.com/arduino/arduino-builder/graphs/contributors
