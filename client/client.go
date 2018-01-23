@@ -26,7 +26,7 @@ import (
 	"io"
 	"log"
 
-	pb "arduino.cc/builder/grpc/proto"
+	pb "github.com/arduino/arduino-builder/grpc/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
