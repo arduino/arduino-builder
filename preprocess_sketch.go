@@ -51,13 +51,18 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 		&ArduinoPreprocessorRunner{},
 	}
 
+	err := utils.EnsureFolderExists(ctx.PreprocPath)
+	if err != nil {
+		return i18n.WrapError(err)
+	}
+
 	if ctx.CodeCompleteAt != "" {
 		commands = append(commands, &OutputCodeCompletions{})
 	} else {
 		commands = append(commands, &SketchSaver{})
 	}
 
-	GCCPreprocRunner(ctx, sourceFile, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, ctx.IncludeFolders)
+	GCCPreprocRunner(ctx, sourceFile, filepath.Join(ctx.PreprocPath, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), ctx.IncludeFolders)
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -74,7 +79,7 @@ type ArduinoPreprocessorRunner struct{}
 
 func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
-	targetFilePath := constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E
+	targetFilePath := filepath.Join(ctx.PreprocPath, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
 	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
