@@ -7,6 +7,12 @@ import (
 	"github.com/arduino/go-properties-map"
 )
 
+type ProgressStruct struct {
+	PrintEnabled bool
+	Steps        float64
+	Progress     float64
+}
+
 // Context structure
 type Context struct {
 	// Build options
@@ -80,6 +86,9 @@ type Context struct {
 	// Verbosity settings
 	Verbose           bool
 	DebugPreprocessor bool
+
+	// Dry run, only create progress map
+	Progress ProgressStruct
 
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
