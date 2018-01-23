@@ -303,9 +303,6 @@ const (
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
-	if ctx.Verbose {
-		fmt.Println(PrintableCommand(command.Args))
-	}
 
 	if stdout == Capture {
 		buffer := &bytes.Buffer{}
