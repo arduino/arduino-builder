@@ -1,6 +1,7 @@
 package types
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-builder/i18n"
@@ -103,6 +104,14 @@ type Context struct {
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
 	opts := make(properties.Map)
+	var additionalFilesRelative []string
+	if ctx.Sketch != nil {
+		for _, sketch := range ctx.Sketch.AdditionalFiles {
+			absPath := filepath.Dir(ctx.SketchLocation)
+			relPath := strings.TrimPrefix(sketch.Name, absPath)
+			additionalFilesRelative = append(additionalFilesRelative, relPath)
+		}
+	}
 	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders, ",")
 	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders, ",")
 	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders, ",")
@@ -111,6 +120,7 @@ func (ctx *Context) ExtractBuildOptions() properties.Map {
 	opts["fqbn"] = ctx.FQBN
 	opts["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	opts["customBuildProperties"] = strings.Join(ctx.CustomBuildProperties, ",")
+	opts["additionalFiles"] = strings.Join(additionalFilesRelative, ",")
 	return opts
 }
 
