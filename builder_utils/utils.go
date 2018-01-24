@@ -392,6 +392,32 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile string)
 	return true
 }
 
+func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile string) bool {
+
+	targetFileStat, err := os.Stat(targetFile)
+	if err == nil {
+		files, err := findAllFilesInFolder(corePath, true)
+		if err != nil {
+			return true
+		}
+		for _, file := range files {
+			// report changes only for .txt files
+			if filepath.Ext(file) != ".txt" {
+				continue
+			}
+			fileStat, err := os.Stat(file)
+			if err != nil || fileStat.ModTime().After(targetFileStat.ModTime()) {
+				return true
+			}
+		}
+		if targetCorePath != constants.EMPTY_STRING && !strings.EqualFold(corePath, targetCorePath) {
+			return TXTBuildRulesHaveChanged(targetCorePath, constants.EMPTY_STRING, targetFile)
+		}
+		return false
+	}
+	return true
+}
+
 func ArchiveCompiledFiles(ctx *types.Context, buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map) (string, error) {
 	logger := ctx.GetLogger()
 	archiveFilePath := filepath.Join(buildPath, archiveFile)
