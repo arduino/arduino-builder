@@ -31,7 +31,7 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
 	"path/filepath"

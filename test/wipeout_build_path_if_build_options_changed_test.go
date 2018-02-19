@@ -34,7 +34,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/builder"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
