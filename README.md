@@ -74,7 +74,7 @@ go build github.com/arduino/arduino-builder/arduino-builder
 In order to run the tests, type:
 
 ```
-go test github.com/arduino/arduino-builder/arduino-builder/...
+go test github.com/arduino/arduino-builder/...
 ```
 
 This runs all tests, showing any failures and a summary at the end.
