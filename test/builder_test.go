@@ -36,7 +36,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/builder"
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"

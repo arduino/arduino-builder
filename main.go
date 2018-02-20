@@ -40,7 +40,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/builder"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
