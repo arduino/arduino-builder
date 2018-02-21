@@ -136,12 +136,11 @@ type Package struct {
 }
 
 type Platform struct {
-	PlatformId   string
-	Folder       string
-	DefaultBoard *Board
-	Boards       map[string]*Board
-	Properties   properties.Map
-	Programmers  map[string]properties.Map
+	PlatformId  string
+	Folder      string
+	Boards      map[string]*Board
+	Properties  properties.Map
+	Programmers map[string]properties.Map
 }
 
 type Board struct {

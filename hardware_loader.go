@@ -184,8 +184,6 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 		return i18n.WrapError(err)
 	}
 
-	assignDefaultBoardToPlatform(targetPlatform)
-
 	platformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	if err != nil {
 		return i18n.WrapError(err)
@@ -207,16 +205,6 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 	targetPlatform.Programmers = properties.MergeMapsOfProperties(make(map[string]properties.Map), targetPlatform.Programmers, programmersProperties.FirstLevelOf())
 
 	return nil
-}
-
-func assignDefaultBoardToPlatform(targetPlatform *types.Platform) {
-	if targetPlatform.DefaultBoard == nil {
-		for _, board := range targetPlatform.Boards {
-			if targetPlatform.DefaultBoard == nil {
-				targetPlatform.DefaultBoard = board
-			}
-		}
-	}
 }
 
 func loadBoards(boards map[string]*types.Board, packageId string, platformId string, folder string, logger i18n.Logger) error {
