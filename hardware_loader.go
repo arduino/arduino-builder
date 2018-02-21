@@ -85,7 +85,7 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 			}
 
 			targetPackage := getOrCreatePackage(packages, packageId)
-			err = loadPackage(targetPackage, subfolderPath, logger)
+			err = loadPackage(targetPackage, subfolderPath)
 			if err != nil {
 				return i18n.WrapError(err)
 			}
@@ -111,7 +111,7 @@ func getOrCreatePackage(packages *types.Packages, packageId string) *types.Packa
 	return &targetPackage
 }
 
-func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger) error {
+func loadPackage(targetPackage *types.Package, folder string) error {
 	packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	if err != nil {
 		return i18n.WrapError(err)
@@ -143,7 +143,7 @@ func loadPackage(targetPackage *types.Package, folder string, logger i18n.Logger
 		}
 
 		platform := getOrCreatePlatform(platforms, platformId)
-		err = loadPlatform(platform, targetPackage.PackageId, subfolderPath, logger)
+		err = loadPlatform(platform, targetPackage.PackageId, subfolderPath)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
@@ -167,7 +167,7 @@ func getOrCreatePlatform(platforms map[string]*types.Platform, platformId string
 	return &targetPlatform
 }
 
-func loadPlatform(targetPlatform *types.Platform, packageId string, folder string, logger i18n.Logger) error {
+func loadPlatform(targetPlatform *types.Platform, packageId string, folder string) error {
 	_, err := os.Stat(filepath.Join(folder, constants.FILE_BOARDS_TXT))
 	if err != nil && !os.IsNotExist(err) {
 		return i18n.WrapError(err)
@@ -179,7 +179,7 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 
 	targetPlatform.Folder = folder
 
-	err = loadBoards(targetPlatform.Boards, packageId, targetPlatform.PlatformId, folder, logger)
+	err = loadBoards(targetPlatform.Boards, packageId, targetPlatform.PlatformId, folder)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -207,7 +207,7 @@ func loadPlatform(targetPlatform *types.Platform, packageId string, folder strin
 	return nil
 }
 
-func loadBoards(boards map[string]*types.Board, packageId string, platformId string, folder string, logger i18n.Logger) error {
+func loadBoards(boards map[string]*types.Board, packageId string, platformId string, folder string) error {
 	boardsProperties, err := properties.Load(filepath.Join(folder, constants.FILE_BOARDS_TXT))
 	if err != nil {
 		return i18n.WrapError(err)
