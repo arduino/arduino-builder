@@ -32,6 +32,7 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type RewriteHardwareKeys struct{}
@@ -47,13 +48,15 @@ func (s *RewriteHardwareKeys) Run(ctx *types.Context) error {
 
 	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {
-			if platform.Properties[constants.REWRITING] != constants.REWRITING_DISABLED {
-				for _, rewrite := range platformKeysRewrite.Rewrites {
-					if platform.Properties[rewrite.Key] != constants.EMPTY_STRING && platform.Properties[rewrite.Key] == rewrite.OldValue {
-						platform.Properties[rewrite.Key] = rewrite.NewValue
-						appliedRewrites := rewritesAppliedToPlatform(platform, hardwareRewriteResults)
-						appliedRewrites = append(appliedRewrites, rewrite)
-						hardwareRewriteResults[platform] = appliedRewrites
+			for _, platformRelease := range platform.Releases {
+				if platformRelease.Properties[constants.REWRITING] != constants.REWRITING_DISABLED {
+					for _, rewrite := range platformKeysRewrite.Rewrites {
+						if platformRelease.Properties[rewrite.Key] != "" && platformRelease.Properties[rewrite.Key] == rewrite.OldValue {
+							platformRelease.Properties[rewrite.Key] = rewrite.NewValue
+							appliedRewrites := rewritesAppliedToPlatform(platformRelease, hardwareRewriteResults)
+							appliedRewrites = append(appliedRewrites, rewrite)
+							hardwareRewriteResults[platformRelease] = appliedRewrites
+						}
 					}
 				}
 			}
@@ -63,7 +66,7 @@ func (s *RewriteHardwareKeys) Run(ctx *types.Context) error {
 	return nil
 }
 
-func rewritesAppliedToPlatform(platform *types.Platform, hardwareRewriteResults map[*types.Platform][]types.PlatforKeyRewrite) []types.PlatforKeyRewrite {
+func rewritesAppliedToPlatform(platform *cores.PlatformRelease, hardwareRewriteResults map[*cores.PlatformRelease][]types.PlatforKeyRewrite) []types.PlatforKeyRewrite {
 	if hardwareRewriteResults[platform] == nil {
 		hardwareRewriteResults[platform] = []types.PlatforKeyRewrite{}
 	}

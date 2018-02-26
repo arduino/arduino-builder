@@ -30,10 +30,11 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/types"
 	"os"
 	"strings"
+
+	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/arduino-builder/types"
 )
 
 type WarnAboutArchIncompatibleLibraries struct{}
@@ -48,7 +49,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 
 	archs := []string{}
-	archs = append(archs, targetPlatform.PlatformId)
+	archs = append(archs, targetPlatform.Platform.Architecture)
 
 	if buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK] != constants.EMPTY_STRING {
 		overrides := strings.Split(buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK], ",")

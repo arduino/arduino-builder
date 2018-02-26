@@ -36,11 +36,12 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 	headerToLibraries := ctx.HeaderToLibraries
-	platforms := []*types.Platform{ctx.ActualPlatform, ctx.TargetPlatform}
+	platforms := []*cores.PlatformRelease{ctx.ActualPlatform, ctx.TargetPlatform}
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 	importedLibraries := ctx.ImportedLibraries
 
@@ -138,14 +139,14 @@ func findLibraryIn(libraries []*types.Library, library *types.Library) *types.Li
 	return nil
 }
 
-func libraryCompatibleWithPlatform(library *types.Library, platform *types.Platform) (bool, bool) {
+func libraryCompatibleWithPlatform(library *types.Library, platform *cores.PlatformRelease) (bool, bool) {
 	if len(library.Archs) == 0 {
 		return true, true
 	}
 	if utils.SliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
 		return true, true
 	}
-	return utils.SliceContains(library.Archs, platform.PlatformId), false
+	return utils.SliceContains(library.Archs, platform.Platform.Architecture), false
 }
 
 func libraryCompatibleWithAllPlatforms(library *types.Library) bool {
@@ -155,7 +156,7 @@ func libraryCompatibleWithAllPlatforms(library *types.Library) bool {
 	return false
 }
 
-func librariesCompatibleWithPlatform(libraries []*types.Library, platform *types.Platform, reorder bool) []*types.Library {
+func librariesCompatibleWithPlatform(libraries []*types.Library, platform *cores.PlatformRelease, reorder bool) []*types.Library {
 	var compatibleLibraries []*types.Library
 	for _, library := range libraries {
 		compatible, generic := libraryCompatibleWithPlatform(library, platform)
@@ -172,7 +173,7 @@ func librariesCompatibleWithPlatform(libraries []*types.Library, platform *types
 	return compatibleLibraries
 }
 
-func librariesWithinPlatform(libraries []*types.Library, platform *types.Platform) []*types.Library {
+func librariesWithinPlatform(libraries []*types.Library, platform *cores.PlatformRelease) []*types.Library {
 	librariesWithinSpecifiedPlatform := []*types.Library{}
 	for _, library := range libraries {
 		cleanPlatformFolder := filepath.Clean(platform.Folder)

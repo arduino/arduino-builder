@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type AddAdditionalEntriesToContext struct{}
@@ -80,8 +81,8 @@ func (s *AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 
 	ctx.CollectedSourceFiles = &types.UniqueSourceFileQueue{}
 
-	ctx.LibrariesResolutionResults = make(map[string]types.LibraryResolutionResult)
-	ctx.HardwareRewriteResults = make(map[*types.Platform][]types.PlatforKeyRewrite)
+	ctx.LibrariesResolutionResults = map[string]types.LibraryResolutionResult{}
+	ctx.HardwareRewriteResults = map[*cores.PlatformRelease][]types.PlatforKeyRewrite{}
 
 	return nil
 }

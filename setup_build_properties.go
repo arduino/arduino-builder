@@ -40,6 +40,7 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 	"github.com/arduino/go-timeutils"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type SetupBuildProperties struct{}
@@ -62,7 +63,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	if ctx.Sketch != nil {
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_NAME] = filepath.Base(ctx.Sketch.MainFile.Name)
 	}
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.PlatformId)
+	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.Platform.Architecture)
 
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = ctx.BuildCore
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
@@ -78,10 +79,10 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	if variant == constants.EMPTY_STRING {
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] = constants.EMPTY_STRING
 	} else {
-		var variantPlatform *types.Platform
+		var variantPlatform *cores.PlatformRelease
 		variantParts := strings.Split(variant, ":")
 		if len(variantParts) > 1 {
-			variantPlatform = packages.Packages[variantParts[0]].Platforms[targetPlatform.PlatformId]
+			variantPlatform = packages.Packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture].Releases[""]
 			variant = variantParts[1]
 		} else {
 			variantPlatform = targetPlatform

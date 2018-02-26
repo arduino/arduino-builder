@@ -35,7 +35,6 @@ import (
 	"strconv"
 
 	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/go-properties-map"
 )
 
 type SourceFile struct {
@@ -122,30 +121,6 @@ type Sketch struct {
 	MainFile         SketchFile
 	OtherSketchFiles []SketchFile
 	AdditionalFiles  []SketchFile
-}
-
-type Packages struct {
-	Properties properties.Map
-	Packages   map[string]*Package
-}
-
-type Package struct {
-	PackageId  string
-	Properties properties.Map
-	Platforms  map[string]*Platform
-}
-
-type Platform struct {
-	PlatformId  string
-	Folder      string
-	Boards      map[string]*Board
-	Properties  properties.Map
-	Programmers map[string]properties.Map
-}
-
-type Board struct {
-	BoardId    string
-	Properties properties.Map
 }
 
 type Tool struct {

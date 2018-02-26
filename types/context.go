@@ -5,6 +5,7 @@ import (
 
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 // Context structure
@@ -23,16 +24,16 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
-	Hardware       *Packages
+	Hardware       *cores.Packages
 	Tools          []*Tool
-	TargetBoard    *Board
-	TargetPackage  *Package
-	TargetPlatform *Platform
-	ActualPlatform *Platform
+	TargetBoard    *cores.Board
+	TargetPackage  *cores.Package
+	TargetPlatform *cores.PlatformRelease
+	ActualPlatform *cores.PlatformRelease
 	USBVidPid      string
 
 	PlatformKeyRewrites    PlatforKeysRewrite
-	HardwareRewriteResults map[*Platform][]PlatforKeyRewrite
+	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite
 
 	BuildProperties      properties.Map
 	BuildCore            string

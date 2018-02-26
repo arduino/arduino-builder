@@ -30,12 +30,13 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
-	"path/filepath"
-	"testing"
 )
 
 func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {

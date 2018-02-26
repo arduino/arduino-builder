@@ -38,6 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type HardwareLoader struct{}
@@ -45,9 +46,10 @@ type HardwareLoader struct{}
 func (s *HardwareLoader) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 
-	packages := &types.Packages{}
-	packages.Packages = make(map[string]*types.Package)
-	packages.Properties = make(map[string]string)
+	packages := &cores.Packages{
+		Packages:   map[string]*cores.Package{},
+		Properties: properties.Map{},
+	}
 
 	folders := ctx.HardwareFolders
 	folders, err := utils.AbsolutizePaths(folders)
@@ -98,25 +100,26 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 	return nil
 }
 
-func getOrCreatePackage(packages *types.Packages, packageId string) *types.Package {
+func getOrCreatePackage(packages *cores.Packages, packageId string) *cores.Package {
 	if _, ok := packages.Packages[packageId]; ok {
 		return packages.Packages[packageId]
 	}
 
-	targetPackage := types.Package{}
-	targetPackage.PackageId = packageId
-	targetPackage.Platforms = make(map[string]*types.Platform)
-	targetPackage.Properties = make(map[string]string)
+	targetPackage := cores.Package{}
+	targetPackage.Name = packageId
+	targetPackage.Platforms = map[string]*cores.Platform{}
+	targetPackage.Packages = packages
+	// targetPackage.Properties = properties.Map{}
 
 	return &targetPackage
 }
 
-func loadPackage(targetPackage *types.Package, folder string) error {
-	packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
-	if err != nil {
-		return i18n.WrapError(err)
-	}
-	targetPackage.Properties.Merge(packagePlatformTxt)
+func loadPackage(targetPackage *cores.Package, folder string) error {
+	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
+	// if err != nil {
+	// 	return i18n.WrapError(err)
+	// }
+	// targetPackage.Properties.Merge(packagePlatformTxt)
 
 	subfolders, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 	if err != nil {
@@ -143,7 +146,7 @@ func loadPackage(targetPackage *types.Package, folder string) error {
 		}
 
 		platform := getOrCreatePlatform(platforms, platformId)
-		err = loadPlatform(platform, subfolderPath)
+		err = loadPlatform(platform.Releases[""], subfolderPath)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
@@ -153,21 +156,27 @@ func loadPackage(targetPackage *types.Package, folder string) error {
 	return nil
 }
 
-func getOrCreatePlatform(platforms map[string]*types.Platform, platformId string) *types.Platform {
+func getOrCreatePlatform(platforms map[string]*cores.Platform, platformId string) *cores.Platform {
 	if _, ok := platforms[platformId]; ok {
 		return platforms[platformId]
 	}
 
-	targetPlatform := types.Platform{}
-	targetPlatform.PlatformId = platformId
-	targetPlatform.Boards = make(map[string]*types.Board)
-	targetPlatform.Properties = make(map[string]string)
-	targetPlatform.Programmers = make(map[string]properties.Map)
+	targetPlatform := &cores.Platform{
+		Architecture: platformId,
+		Releases:     map[string]*cores.PlatformRelease{},
+	}
+	release := &cores.PlatformRelease{
+		Boards:      map[string]*cores.Board{},
+		Properties:  properties.Map{},
+		Programmers: map[string]properties.Map{},
+		Platform:    targetPlatform,
+	}
+	targetPlatform.Releases[""] = release
 
-	return &targetPlatform
+	return targetPlatform
 }
 
-func loadPlatform(targetPlatform *types.Platform, folder string) error {
+func loadPlatform(targetPlatform *cores.PlatformRelease, folder string) error {
 	_, err := os.Stat(filepath.Join(folder, constants.FILE_BOARDS_TXT))
 	if err != nil && !os.IsNotExist(err) {
 		return i18n.WrapError(err)
@@ -202,12 +211,15 @@ func loadPlatform(targetPlatform *types.Platform, folder string) error {
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	targetPlatform.Programmers = properties.MergeMapsOfProperties(make(map[string]properties.Map), targetPlatform.Programmers, programmersProperties.FirstLevelOf())
+	targetPlatform.Programmers = properties.MergeMapsOfProperties(
+		map[string]properties.Map{},
+		targetPlatform.Programmers,
+		programmersProperties.FirstLevelOf())
 
 	return nil
 }
 
-func loadBoards(boards map[string]*types.Board, folder string) error {
+func loadBoards(boards map[string]*cores.Board, folder string) error {
 	boardsProperties, err := properties.Load(filepath.Join(folder, constants.FILE_BOARDS_TXT))
 	if err != nil {
 		return i18n.WrapError(err)
@@ -233,14 +245,14 @@ func loadBoards(boards map[string]*types.Board, folder string) error {
 	return nil
 }
 
-func getOrCreateBoard(boards map[string]*types.Board, boardId string) *types.Board {
+func getOrCreateBoard(boards map[string]*cores.Board, boardId string) *cores.Board {
 	if _, ok := boards[boardId]; ok {
 		return boards[boardId]
 	}
 
-	board := types.Board{}
+	board := cores.Board{}
 	board.BoardId = boardId
-	board.Properties = make(properties.Map)
+	board.Properties = properties.Map{}
 
 	return &board
 }

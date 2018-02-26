@@ -30,27 +30,37 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
+	properties "github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestRewriteHardwareKeys(t *testing.T) {
 	ctx := &types.Context{}
 
-	packages := &types.Packages{}
-	packages.Packages = make(map[string]*types.Package)
-	aPackage := &types.Package{PackageId: "dummy"}
+	packages := &cores.Packages{}
+	packages.Packages = map[string]*cores.Package{}
+	aPackage := &cores.Package{Name: "dummy"}
 	packages.Packages["dummy"] = aPackage
-	aPackage.Platforms = make(map[string]*types.Platform)
+	aPackage.Platforms = map[string]*cores.Platform{}
 
-	platform := &types.Platform{PlatformId: "dummy"}
-	aPackage.Platforms["dummy"] = platform
-	platform.Properties = make(map[string]string)
-	platform.Properties[constants.PLATFORM_NAME] = "A test platform"
-	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
+	platform := &cores.PlatformRelease{
+		Properties: properties.Map{
+			constants.PLATFORM_NAME:                  "A test platform",
+			constants.BUILD_PROPERTIES_COMPILER_PATH: "{runtime.ide.path}/hardware/tools/avr/bin/",
+		},
+	}
+	aPackage.Platforms["dummy"] = &cores.Platform{
+		Architecture: "dummy",
+		Releases: map[string]*cores.PlatformRelease{
+			"": platform,
+		},
+	}
 
 	ctx.Hardware = packages
 
@@ -74,18 +84,25 @@ func TestRewriteHardwareKeys(t *testing.T) {
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	ctx := &types.Context{}
 
-	packages := &types.Packages{}
-	packages.Packages = make(map[string]*types.Package)
-	aPackage := &types.Package{PackageId: "dummy"}
+	packages := &cores.Packages{}
+	packages.Packages = make(map[string]*cores.Package)
+	aPackage := &cores.Package{Name: "dummy"}
 	packages.Packages["dummy"] = aPackage
-	aPackage.Platforms = make(map[string]*types.Platform)
+	aPackage.Platforms = make(map[string]*cores.Platform)
 
-	platform := &types.Platform{PlatformId: "dummy"}
-	aPackage.Platforms["dummy"] = platform
-	platform.Properties = make(map[string]string)
-	platform.Properties[constants.PLATFORM_NAME] = "A test platform"
-	platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH] = "{runtime.ide.path}/hardware/tools/avr/bin/"
-	platform.Properties[constants.REWRITING] = constants.REWRITING_DISABLED
+	platform := &cores.PlatformRelease{
+		Properties: properties.Map{
+			constants.PLATFORM_NAME:                  "A test platform",
+			constants.BUILD_PROPERTIES_COMPILER_PATH: "{runtime.ide.path}/hardware/tools/avr/bin/",
+			constants.REWRITING:                      constants.REWRITING_DISABLED,
+		},
+	}
+	aPackage.Platforms["dummy"] = &cores.Platform{
+		Architecture: "dummy",
+		Releases: map[string]*cores.PlatformRelease{
+			"": platform,
+		},
+	}
 
 	ctx.Hardware = packages
 

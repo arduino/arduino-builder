@@ -30,10 +30,11 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/types"
 	"os"
 	"strings"
+
+	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/arduino-builder/types"
 )
 
 type AddBuildBoardPropertyIfMissing struct{}
@@ -44,10 +45,19 @@ func (s *AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 
 	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {
-			for _, board := range platform.Boards {
-				if board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD] == constants.EMPTY_STRING {
-					board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD] = strings.ToUpper(platform.PlatformId + "_" + board.BoardId)
-					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_MISSING_BUILD_BOARD, aPackage.PackageId, platform.PlatformId, board.BoardId, board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+			for _, platformRelease := range platform.Releases {
+				for _, board := range platformRelease.Boards {
+					if board.Properties["build.board"] == "" {
+						board.Properties["build.board"] = strings.ToUpper(platform.Architecture + "_" + board.BoardId)
+						logger.Fprintln(
+							os.Stdout,
+							constants.LOG_LEVEL_WARN,
+							constants.MSG_MISSING_BUILD_BOARD,
+							aPackage.Name,
+							platform.Architecture,
+							board.BoardId,
+							board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+					}
 				}
 			}
 		}

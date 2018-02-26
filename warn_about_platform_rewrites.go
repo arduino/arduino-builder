@@ -30,9 +30,11 @@
 package builder
 
 import (
+	"os"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
-	"os"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type WarnAboutPlatformRewrites struct{}
@@ -47,7 +49,7 @@ func (s *WarnAboutPlatformRewrites) Run(ctx *types.Context) error {
 	targetPlatform := ctx.TargetPlatform
 	actualPlatform := ctx.ActualPlatform
 
-	platforms := []*types.Platform{targetPlatform}
+	platforms := []*cores.PlatformRelease{targetPlatform}
 	if actualPlatform != targetPlatform {
 		platforms = append(platforms, actualPlatform)
 	}

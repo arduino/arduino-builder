@@ -30,12 +30,13 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
-	"path/filepath"
-	"testing"
 )
 
 func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
@@ -58,9 +59,11 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
+	require.Equal(t, "my_avr_platform", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.NotNil(t, targetPlatform)
+	require.NotNil(t, targetPlatform.Platform)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardId)
 	require.Equal(t, constants.EMPTY_STRING, targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
@@ -87,9 +90,9 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
+	require.Equal(t, "my_avr_platform", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardId)
 	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])

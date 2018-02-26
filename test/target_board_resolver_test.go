@@ -30,12 +30,13 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
-	"path/filepath"
-	"testing"
 )
 
 func TestTargetBoardResolverUno(t *testing.T) {
@@ -55,9 +56,9 @@ func TestTargetBoardResolverUno(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "arduino", targetPackage.PackageId)
+	require.Equal(t, "arduino", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "uno", targetBoard.BoardId)
 	require.Equal(t, "atmega328p", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
@@ -80,9 +81,9 @@ func TestTargetBoardResolverDue(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "arduino", targetPackage.PackageId)
+	require.Equal(t, "arduino", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "sam", targetPlatform.PlatformId)
+	require.Equal(t, "sam", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "arduino_due_x", targetBoard.BoardId)
 	require.Equal(t, "cortex-m3", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
@@ -105,9 +106,9 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "arduino", targetPackage.PackageId)
+	require.Equal(t, "arduino", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mega", targetBoard.BoardId)
 	require.Equal(t, "atmega1280", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
@@ -131,9 +132,9 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "arduino", targetPackage.PackageId)
+	require.Equal(t, "arduino", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mega", targetBoard.BoardId)
 	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
@@ -157,9 +158,9 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "my_avr_platform", targetPackage.PackageId)
+	require.Equal(t, "my_avr_platform", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "custom_yun", targetBoard.BoardId)
 	require.Equal(t, "atmega32u4", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
@@ -183,9 +184,9 @@ func TestTargetBoardResolverCustomCore(t *testing.T) {
 	}
 
 	targetPackage := ctx.TargetPackage
-	require.Equal(t, "watterott", targetPackage.PackageId)
+	require.Equal(t, "watterott", targetPackage.Name)
 	targetPlatform := ctx.TargetPlatform
-	require.Equal(t, "avr", targetPlatform.PlatformId)
+	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "attiny841", targetBoard.BoardId)
 	require.Equal(t, "tiny841", ctx.BuildCore)

@@ -30,11 +30,13 @@
 package builder
 
 import (
+	"strings"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"strings"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type TargetBoardResolver struct{}
@@ -64,13 +66,13 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
 	}
 
-	targetBoard := targetPlatform.Boards[targetBoardName]
+	targetBoard := targetPlatform.Releases[""].Boards[targetBoardName]
 	if targetBoard == nil {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
 	}
 
 	ctx.TargetPackage = targetPackage
-	ctx.TargetPlatform = targetPlatform
+	ctx.TargetPlatform = targetPlatform.Releases[""]
 	ctx.TargetBoard = targetBoard
 
 	if len(fqbnParts) > 3 {
@@ -82,7 +84,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		core = DEFAULT_BUILD_CORE
 	}
 
-	var corePlatform *types.Platform
+	var corePlatform *cores.PlatformRelease
 	coreParts := strings.Split(core, ":")
 	if len(coreParts) > 1 {
 		core = coreParts[1]
@@ -90,18 +92,18 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 			return i18n.ErrorfWithLogger(logger, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
 
 		}
-		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatform.PlatformId]
+		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatform.Architecture].Releases[""]
 	}
 
-	var actualPlatform *types.Platform
+	var actualPlatform *cores.PlatformRelease
 	if corePlatform != nil {
 		actualPlatform = corePlatform
 	} else {
-		actualPlatform = targetPlatform
+		actualPlatform = targetPlatform.Releases[""]
 	}
 
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.Folder)
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.Releases[""].Folder)
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CORE, core, actualPlatform.Folder)
 	}
 
@@ -111,7 +113,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	return nil
 }
 
-func addAdditionalPropertiesToTargetBoard(board *types.Board, options string) {
+func addAdditionalPropertiesToTargetBoard(board *cores.Board, options string) {
 	optionsParts := strings.Split(options, ",")
 	optionsParts = utils.Map(optionsParts, utils.TrimSpace)
 
