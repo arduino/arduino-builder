@@ -178,7 +178,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	require.NotNil(t, packages.Packages["RFduino"])
 	require.Equal(t, 0, len(packages.Packages["RFduino"].Platforms))
 
-	samdPlatform := packages.Packages["arduino"].Platforms["samd"].Releases[""]
+	samdPlatform := packages.Packages["arduino"].Platforms["samd"].Releases["1.6.5"]
 	require.Equal(t, 3, len(samdPlatform.Boards))
 
 	require.Equal(t, "arduino_zero_edbg", samdPlatform.Boards["arduino_zero_edbg"].BoardId)
@@ -195,7 +195,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	require.Equal(t, "Atmel EDBG", samdPlatform.Programmers["edbg"][constants.PROGRAMMER_NAME])
 	require.Equal(t, "openocd", samdPlatform.Programmers["edbg"]["program.tool"])
 
-	avrRedBearPlatform := packages.Packages["RedBearLab"].Platforms["avr"].Releases[""]
+	avrRedBearPlatform := packages.Packages["RedBearLab"].Platforms["avr"].Releases["1.0.0"]
 	require.Equal(t, 3, len(avrRedBearPlatform.Boards))
 
 	require.Equal(t, "blend", avrRedBearPlatform.Boards["blend"].BoardId)
@@ -232,7 +232,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms))
 	require.Equal(t, 20, len(packages.Packages["arduino"].Platforms["avr"].Releases[""].Boards))
 	require.Equal(t, 2, len(packages.Packages["arduino"].Platforms["sam"].Releases[""].Boards))
-	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms["samd"].Releases[""].Boards))
+	require.Equal(t, 3, len(packages.Packages["arduino"].Platforms["samd"].Releases["1.6.5"].Boards))
 
 	require.Equal(t, 1, len(packages.Packages["my_avr_platform"].Platforms))
 	require.Equal(t, 2, len(packages.Packages["my_avr_platform"].Platforms["avr"].Releases[""].Boards))

@@ -61,18 +61,22 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
 	}
 
-	targetPlatform := targetPackage.Platforms[targetPlatformName]
+	targetPlatforms := targetPackage.Platforms[targetPlatformName]
+	if targetPlatforms == nil {
+		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
+	}
+	targetPlatform := targetPlatforms.GetInstalled()
 	if targetPlatform == nil {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
 	}
 
-	targetBoard := targetPlatform.Releases[""].Boards[targetBoardName]
+	targetBoard := targetPlatform.Boards[targetBoardName]
 	if targetBoard == nil {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
 	}
 
+	ctx.TargetPlatform = targetPlatform
 	ctx.TargetPackage = targetPackage
-	ctx.TargetPlatform = targetPlatform.Releases[""]
 	ctx.TargetBoard = targetBoard
 
 	if len(fqbnParts) > 3 {
@@ -92,18 +96,18 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 			return i18n.ErrorfWithLogger(logger, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
 
 		}
-		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatform.Architecture].Releases[""]
+		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatforms.Architecture].GetInstalled()
 	}
 
 	var actualPlatform *cores.PlatformRelease
 	if corePlatform != nil {
 		actualPlatform = corePlatform
 	} else {
-		actualPlatform = targetPlatform.Releases[""]
+		actualPlatform = targetPlatform
 	}
 
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.Releases[""].Folder)
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.Folder)
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CORE, core, actualPlatform.Folder)
 	}
 

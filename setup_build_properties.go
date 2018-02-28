@@ -82,7 +82,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		var variantPlatform *cores.PlatformRelease
 		variantParts := strings.Split(variant, ":")
 		if len(variantParts) > 1 {
-			variantPlatform = packages.Packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture].Releases[""]
+			variantPlatform = packages.Packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture].GetInstalled()
 			variant = variantParts[1]
 		} else {
 			variantPlatform = targetPlatform
