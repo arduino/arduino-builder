@@ -93,7 +93,7 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Lib
 				name = strings.Replace(name, "lib", "", 1)
 				libs_cmd += "-l" + name + " "
 			}
-			ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_EXTRAFLAGS] += "\"-L" + path + "\" " + libs_cmd
+			ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_LDFLAGS] += "\"-L" + path + "\" " + libs_cmd
 		}
 	}
 	return nil
