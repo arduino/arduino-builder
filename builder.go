@@ -89,7 +89,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&WarnAboutArchIncompatibleLibraries{},
 
 		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Generating function prototypes..."),
-		&ContainerAddPrototypes{},
+		&PreprocessSketch{},
 
 		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling sketch..."),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
@@ -158,7 +158,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		&ContainerAddPrototypes{},
+		&PreprocessSketch{},
 
 		&PrintPreprocessedSource{},
 	}
