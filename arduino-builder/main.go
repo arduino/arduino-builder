@@ -59,6 +59,7 @@ const FLAG_HARDWARE = "hardware"
 const FLAG_TOOLS = "tools"
 const FLAG_BUILT_IN_LIBRARIES = "built-in-libraries"
 const FLAG_LIBRARIES = "libraries"
+const FLAG_PACKAGE_JSON = "package-index"
 const FLAG_PREFS = "prefs"
 const FLAG_FQBN = "fqbn"
 const FLAG_IDE_VERSION = "ide-version"
@@ -123,6 +124,7 @@ var hardwareFoldersFlag foldersFlag
 var toolsFoldersFlag foldersFlag
 var librariesBuiltInFoldersFlag foldersFlag
 var librariesFoldersFlag foldersFlag
+var jsonFoldersFlag foldersFlag
 var customBuildPropertiesFlag propertiesFlag
 var fqbnFlag *string
 var coreAPIVersionFlag *string
@@ -146,6 +148,7 @@ func init() {
 	flag.Var(&toolsFoldersFlag, FLAG_TOOLS, "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
 	flag.Var(&librariesBuiltInFoldersFlag, FLAG_BUILT_IN_LIBRARIES, "Specify a built-in 'libraries' folder. These are low priority libraries. Can be added multiple times for specifying multiple built-in 'libraries' folders")
 	flag.Var(&librariesFoldersFlag, FLAG_LIBRARIES, "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
+	flag.Var(&jsonFoldersFlag, FLAG_PACKAGE_JSON, "Specify a folder containing package_index json files. Can be added multiple times for specifying multiple folders")
 	flag.Var(&customBuildPropertiesFlag, FLAG_PREFS, "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
 	fqbnFlag = flag.String(FLAG_FQBN, "", "fully qualified board name")
 	coreAPIVersionFlag = flag.String(FLAG_CORE_API_VERSION, "10600", "version of core APIs (used to populate ARDUINO #define)")
@@ -215,6 +218,13 @@ func main() {
 		printCompleteError(err)
 	} else if len(librariesFolders) > 0 {
 		ctx.OtherLibrariesFolders = librariesFolders
+	}
+
+	// FLAG_PACKAGE_JSON
+	if jsonFolders, err := toSliceOfUnquoted(jsonFoldersFlag); err != nil {
+		printCompleteError(err)
+	} else if len(jsonFolders) > 0 {
+		ctx.JsonFolders = jsonFolders
 	}
 
 	// FLAG_BUILT_IN_LIBRARIES

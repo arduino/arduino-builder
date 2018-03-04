@@ -30,6 +30,10 @@
 package builder
 
 import (
+	"strings"
+
+	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/arduino-builder/json_package_index"
 	"github.com/arduino/arduino-builder/types"
 )
 
@@ -45,6 +49,43 @@ func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(ctx *types.Con
 	newBuildProperties.Merge(buildProperties)
 
 	ctx.BuildProperties = newBuildProperties
+
+	return nil
+}
+
+type OverridePropertiesWithJsonInfo struct{}
+
+func (s *OverridePropertiesWithJsonInfo) Run(ctx *types.Context) error {
+
+	if ctx.JsonFolders != nil {
+
+		allowedJsons := strings.Split(ctx.BuildProperties[constants.ADDITIONALE_BOARD_MANAGER_JSON], ",")
+		jsonProperties, err := json_package_index.PackageIndexFoldersToPropertiesMap(ctx.Hardware, ctx.JsonFolders, allowedJsons)
+
+		if err != nil {
+			// doesn't matter, log the broken package in verbose mode
+		}
+
+		newBuildProperties := jsonProperties[ctx.TargetPackage.PackageId+":"+ctx.TargetPlatform.PlatformId+":"+ctx.TargetPlatform.Properties["version"]]
+
+		buildProperties := ctx.BuildProperties.Clone()
+
+		buildProperties.Merge(newBuildProperties)
+
+		// HACK!!! To overcome AVR core 1.6.12 lto problems, replace avr-gcc-4.8.1-arduino5 with
+		// 4.9.2-atmel3.5.3-arduino2 if it exists
+		if ctx.TargetBoard.Properties["build.core"] == "arduino:arduino" && buildProperties[constants.HACK_PROPERTIES_AVR_GCC_NEW] != "" {
+			buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD] =
+				"{" + constants.HACK_PROPERTIES_AVR_GCC_NEW + "}"
+			// if base runtime property is fully specified it needs to be replaced
+			if !strings.HasPrefix(buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD_2], "{") {
+				buildProperties[constants.HACK_PROPERTIES_AVR_GCC_OLD_2] =
+					"{" + constants.HACK_PROPERTIES_AVR_GCC_NEW + "}"
+			}
+		}
+
+		ctx.BuildProperties = buildProperties
+	}
 
 	return nil
 }
