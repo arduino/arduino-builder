@@ -32,22 +32,17 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 )
 
 type HardwareLoader struct{}
 
 func (s *HardwareLoader) Run(ctx *types.Context) error {
-	packages := &cores.Packages{
-		Packages:   map[string]*cores.Package{},
-		Properties: properties.Map{},
-	}
-
-	folders := ctx.HardwareFolders
-	if err := packages.LoadHardwareFromFolders(folders); err != nil {
+	pm := packagemanager.PackageManager()
+	pm.Clear()
+	if err := pm.LoadHardwareFromDirectories(ctx.HardwareFolders); err != nil {
 		return i18n.WrapError(err)
 	}
-	ctx.Hardware = packages
+	ctx.Hardware = pm.GetPackages()
 	return nil
 }
