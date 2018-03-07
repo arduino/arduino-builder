@@ -34,7 +34,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
 )
@@ -61,7 +60,7 @@ func TestTargetBoardResolverUno(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "uno", targetBoard.BoardId)
-	require.Equal(t, "atmega328p", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
+	require.Equal(t, "atmega328p", targetBoard.Properties["build.mcu"])
 }
 
 func TestTargetBoardResolverDue(t *testing.T) {
@@ -86,7 +85,7 @@ func TestTargetBoardResolverDue(t *testing.T) {
 	require.Equal(t, "sam", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "arduino_due_x", targetBoard.BoardId)
-	require.Equal(t, "cortex-m3", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
+	require.Equal(t, "cortex-m3", targetBoard.Properties["build.mcu"])
 }
 
 func TestTargetBoardResolverMega1280(t *testing.T) {
@@ -111,8 +110,8 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mega", targetBoard.BoardId)
-	require.Equal(t, "atmega1280", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
-	require.Equal(t, "AVR_MEGA", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+	require.Equal(t, "atmega1280", targetBoard.Properties["build.mcu"])
+	require.Equal(t, "AVR_MEGA", targetBoard.Properties["build.board"])
 }
 
 func TestTargetBoardResolverMega2560(t *testing.T) {
@@ -137,8 +136,8 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mega", targetBoard.BoardId)
-	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
-	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+	require.Equal(t, "atmega2560", targetBoard.Properties["build.mcu"])
+	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties["build.board"])
 }
 
 func TestTargetBoardResolverCustomYun(t *testing.T) {
@@ -163,8 +162,8 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "custom_yun", targetBoard.BoardId)
-	require.Equal(t, "atmega32u4", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
-	require.Equal(t, "AVR_YUN", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+	require.Equal(t, "atmega32u4", targetBoard.Properties["build.mcu"])
+	require.Equal(t, "AVR_YUN", targetBoard.Properties["build.board"])
 }
 
 func TestTargetBoardResolverCustomCore(t *testing.T) {
@@ -190,5 +189,5 @@ func TestTargetBoardResolverCustomCore(t *testing.T) {
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "attiny841", targetBoard.BoardId)
 	require.Equal(t, "tiny841", ctx.BuildCore)
-	require.Equal(t, "tiny14", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_VARIANT])
+	require.Equal(t, "tiny14", targetBoard.Properties["build.variant"])
 }

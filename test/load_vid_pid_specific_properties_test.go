@@ -30,12 +30,13 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {

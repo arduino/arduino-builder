@@ -30,12 +30,12 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/stretchr/testify/require"
 	"path/filepath"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLoadPlatformKeysRewrite(t *testing.T) {
@@ -55,7 +55,7 @@ func TestLoadPlatformKeysRewrite(t *testing.T) {
 	platformKeysRewrite := ctx.PlatformKeyRewrites
 
 	require.Equal(t, 13, len(platformKeysRewrite.Rewrites))
-	require.Equal(t, constants.BUILD_PROPERTIES_COMPILER_PATH, platformKeysRewrite.Rewrites[0].Key)
+	require.Equal(t, "compiler.path", platformKeysRewrite.Rewrites[0].Key)
 	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platformKeysRewrite.Rewrites[0].OldValue)
 	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platformKeysRewrite.Rewrites[0].NewValue)
 
@@ -63,7 +63,7 @@ func TestLoadPlatformKeysRewrite(t *testing.T) {
 	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/avrdude", platformKeysRewrite.Rewrites[1].OldValue)
 	require.Equal(t, "{path}/bin/avrdude", platformKeysRewrite.Rewrites[1].NewValue)
 
-	require.Equal(t, constants.BUILD_PROPERTIES_COMPILER_PATH, platformKeysRewrite.Rewrites[3].Key)
+	require.Equal(t, "compiler.path", platformKeysRewrite.Rewrites[3].Key)
 	require.Equal(t, "{runtime.ide.path}/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/", platformKeysRewrite.Rewrites[3].OldValue)
 	require.Equal(t, "{runtime.tools.arm-none-eabi-gcc.path}/bin/", platformKeysRewrite.Rewrites[3].NewValue)
 

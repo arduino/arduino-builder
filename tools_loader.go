@@ -57,12 +57,12 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 			builtinHardwareFolder, err = filepath.Abs(filepath.Join(ctx.BuiltInLibrariesFolders[0], ".."))
 		}
 
-		if builtinToolsVersionsFile != constants.EMPTY_STRING && !strings.Contains(builtinToolsVersionsFile, builtinHardwareFolder) {
+		if builtinToolsVersionsFile != "" && !strings.Contains(builtinToolsVersionsFile, builtinHardwareFolder) {
 			ctx.GetLogger().Println(constants.LOG_LEVEL_WARN, constants.MSG_IGNORED_BUILTIN_TOOLS_TXT, builtinToolsVersionsFile)
-			builtinToolsVersionsFile = constants.EMPTY_STRING
+			builtinToolsVersionsFile = ""
 		}
 
-		if builtinToolsVersionsFile != constants.EMPTY_STRING {
+		if builtinToolsVersionsFile != "" {
 			err = loadToolsFrom(&tools, builtinToolsVersionsFile)
 			if err != nil {
 				return i18n.WrapError(err)
@@ -143,7 +143,7 @@ func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) er
 
 	for _, row := range rows {
 		row = strings.TrimSpace(row)
-		if row != constants.EMPTY_STRING {
+		if row != "" {
 			rowParts := strings.Split(row, "=")
 			toolName := strings.Split(rowParts[0], ".")[1]
 			toolVersion := rowParts[1]
@@ -157,13 +157,13 @@ func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) er
 }
 
 func findBuiltinToolsVersionsFile(folder string) (string, error) {
-	builtinToolsVersionsFilePath := constants.EMPTY_STRING
+	builtinToolsVersionsFilePath := ""
 	findBuiltInToolsVersionsTxt := func(currentPath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
 
-		if builtinToolsVersionsFilePath != constants.EMPTY_STRING {
+		if builtinToolsVersionsFilePath != "" {
 			return nil
 		}
 		if filepath.Base(currentPath) == constants.FILE_BUILTIN_TOOLS_VERSIONS_TXT {

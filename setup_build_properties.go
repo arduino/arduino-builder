@@ -35,7 +35,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
@@ -58,26 +57,26 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Merge(targetBoard.Properties)
 
 	if ctx.BuildPath != "" {
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH] = ctx.BuildPath
+		buildProperties["build.path"] = ctx.BuildPath
 	}
 	if ctx.Sketch != nil {
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_NAME] = filepath.Base(ctx.Sketch.MainFile.Name)
+		buildProperties["build.project_name"] = filepath.Base(ctx.Sketch.MainFile.Name)
 	}
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.Platform.Architecture)
+	buildProperties["build.arch"] = strings.ToUpper(targetPlatform.Platform.Architecture)
 
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = ctx.BuildCore
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
-	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
-	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder
-	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(targetPlatform.Folder, "..")
-	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ctx.ArduinoAPIVersion
-	buildProperties[constants.BUILD_PROPERTIES_FQBN] = ctx.FQBN
-	buildProperties[constants.IDE_VERSION] = ctx.ArduinoAPIVersion
-	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS] = utils.PrettyOSName()
+	buildProperties["build.core"] = ctx.BuildCore
+	buildProperties["build.core.path"] = filepath.Join(actualPlatform.Folder, "cores", buildProperties["build.core"])
+	buildProperties["build.system.path"] = filepath.Join(actualPlatform.Folder, "system")
+	buildProperties["runtime.platform.path"] = targetPlatform.Folder
+	buildProperties["runtime.hardware.path"] = filepath.Join(targetPlatform.Folder, "..")
+	buildProperties["runtime.ide.version"] = ctx.ArduinoAPIVersion
+	buildProperties["build.fqbn"] = ctx.FQBN
+	buildProperties["ide_version"] = ctx.ArduinoAPIVersion
+	buildProperties["runtime.os"] = utils.PrettyOSName()
 
-	variant := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT]
-	if variant == constants.EMPTY_STRING {
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] = constants.EMPTY_STRING
+	variant := buildProperties["build.variant"]
+	if variant == "" {
+		buildProperties["build.variant.path"] = ""
 	} else {
 		var variantPlatform *cores.PlatformRelease
 		variantParts := strings.Split(variant, ":")
@@ -87,17 +86,17 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		} else {
 			variantPlatform = targetPlatform
 		}
-		buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] = filepath.Join(variantPlatform.Folder, constants.FOLDER_VARIANTS, variant)
+		buildProperties["build.variant.path"] = filepath.Join(variantPlatform.Folder, "variants", variant)
 	}
 
 	tools := ctx.Tools
 	for _, tool := range tools {
-		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
-		buildProperties[constants.BUILD_PROPERTIES_RUNTIME_TOOLS_PREFIX+tool.Name+"-"+tool.Version+constants.BUILD_PROPERTIES_RUNTIME_TOOLS_SUFFIX] = tool.Folder
+		buildProperties["runtime.tools."+tool.Name+".path"] = tool.Folder
+		buildProperties["runtime.tools."+tool.Name+"-"+tool.Version+".path"] = tool.Folder
 	}
 
-	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_SOFTWARE) {
-		buildProperties[constants.BUILD_PROPERTIES_SOFTWARE] = DEFAULT_SOFTWARE
+	if !utils.MapStringStringHas(buildProperties, "software") {
+		buildProperties["software"] = DEFAULT_SOFTWARE
 	}
 
 	if ctx.SketchLocation != "" {
@@ -106,14 +105,14 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 			return err
 		}
 		sourcePath = filepath.Dir(sourcePath)
-		buildProperties[constants.BUILD_PROPERTIES_SOURCE_PATH] = sourcePath
+		buildProperties["build.source.path"] = sourcePath
 	}
 
 	now := time.Now()
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_UTC] = strconv.FormatInt(now.Unix(), 10)
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_LOCAL] = strconv.FormatInt(timeutils.LocalUnix(now), 10)
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_ZONE] = strconv.Itoa(timeutils.TimezoneOffsetNoDST(now))
-	buildProperties[constants.BUILD_PROPERTIES_EXTRA_TIME_DST] = strconv.Itoa(timeutils.DaylightSavingsOffset(now))
+	buildProperties["extra.time.utc"] = strconv.FormatInt(now.Unix(), 10)
+	buildProperties["extra.time.local"] = strconv.FormatInt(timeutils.LocalUnix(now), 10)
+	buildProperties["extra.time.zone"] = strconv.Itoa(timeutils.TimezoneOffsetNoDST(now))
+	buildProperties["extra.time.dst"] = strconv.Itoa(timeutils.DaylightSavingsOffset(now))
 
 	ctx.BuildProperties = buildProperties
 

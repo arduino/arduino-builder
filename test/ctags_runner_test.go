@@ -36,7 +36,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
 )
@@ -70,7 +69,7 @@ func TestCTagsRunner(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
 
@@ -120,7 +119,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
 
@@ -168,7 +167,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
 
@@ -215,7 +214,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
 
@@ -261,7 +260,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: constants.FILE_CTAGS_TARGET},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
 

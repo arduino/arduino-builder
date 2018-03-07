@@ -33,7 +33,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/cores"
@@ -51,8 +50,8 @@ func TestRewriteHardwareKeys(t *testing.T) {
 
 	platform := &cores.PlatformRelease{
 		Properties: properties.Map{
-			constants.PLATFORM_NAME:                  "A test platform",
-			constants.BUILD_PROPERTIES_COMPILER_PATH: "{runtime.ide.path}/hardware/tools/avr/bin/",
+			"name":          "A test platform",
+			"compiler.path": "{runtime.ide.path}/hardware/tools/avr/bin/",
 		},
 	}
 	aPackage.Platforms["dummy"] = &cores.Platform{
@@ -64,7 +63,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 
 	ctx.Hardware = packages
 
-	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
+	rewrite := types.PlatforKeyRewrite{Key: "compiler.path", OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
 	ctx.PlatformKeyRewrites = platformKeysRewrite
 
@@ -78,7 +77,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH])
+	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platform.Properties["compiler.path"])
 }
 
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
@@ -92,9 +91,9 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 
 	platform := &cores.PlatformRelease{
 		Properties: properties.Map{
-			constants.PLATFORM_NAME:                  "A test platform",
-			constants.BUILD_PROPERTIES_COMPILER_PATH: "{runtime.ide.path}/hardware/tools/avr/bin/",
-			constants.REWRITING:                      constants.REWRITING_DISABLED,
+			"name":          "A test platform",
+			"compiler.path": "{runtime.ide.path}/hardware/tools/avr/bin/",
+			"rewriting":     "disabled",
 		},
 	}
 	aPackage.Platforms["dummy"] = &cores.Platform{
@@ -106,7 +105,7 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 
 	ctx.Hardware = packages
 
-	rewrite := types.PlatforKeyRewrite{Key: constants.BUILD_PROPERTIES_COMPILER_PATH, OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
+	rewrite := types.PlatforKeyRewrite{Key: "compiler.path", OldValue: "{runtime.ide.path}/hardware/tools/avr/bin/", NewValue: "{runtime.tools.avr-gcc.path}/bin/"}
 	platformKeysRewrite := types.PlatforKeysRewrite{Rewrites: []types.PlatforKeyRewrite{rewrite}}
 
 	ctx.PlatformKeyRewrites = platformKeysRewrite
@@ -121,5 +120,5 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platform.Properties[constants.BUILD_PROPERTIES_COMPILER_PATH])
+	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platform.Properties["compiler.path"])
 }
