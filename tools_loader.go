@@ -30,14 +30,16 @@
 package builder
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"os"
-	"path/filepath"
-	"strings"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 type ToolsLoader struct{}
@@ -45,7 +47,7 @@ type ToolsLoader struct{}
 func (s *ToolsLoader) Run(ctx *types.Context) error {
 	folders := ctx.ToolsFolders
 
-	tools := []*types.Tool{}
+	tools := []*cores.ToolRelease{}
 
 	for _, folder := range folders {
 		builtinToolsVersionsFile, err := findBuiltinToolsVersionsFile(folder)
@@ -121,16 +123,16 @@ func collectAllToolsFolders(from string) ([]string, error) {
 	return folders, i18n.WrapError(err)
 }
 
-func toolsSliceContains(tools *[]*types.Tool, name, version string) bool {
+func toolsSliceContains(tools *[]*cores.ToolRelease, name, version string) bool {
 	for _, tool := range *tools {
-		if name == tool.Name && version == tool.Version {
+		if name == tool.Tool.Name && version == tool.Version {
 			return true
 		}
 	}
 	return false
 }
 
-func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) error {
+func loadToolsFrom(tools *[]*cores.ToolRelease, builtinToolsVersionsFilePath string) error {
 	rows, err := utils.ReadFileToRows(builtinToolsVersionsFilePath)
 	if err != nil {
 		return i18n.WrapError(err)
@@ -148,7 +150,11 @@ func loadToolsFrom(tools *[]*types.Tool, builtinToolsVersionsFilePath string) er
 			toolName := strings.Split(rowParts[0], ".")[1]
 			toolVersion := rowParts[1]
 			if !toolsSliceContains(tools, toolName, toolVersion) {
-				*tools = append(*tools, &types.Tool{Name: toolName, Version: toolVersion, Folder: folder})
+				*tools = append(*tools,
+					&cores.ToolRelease{
+						Tool:    &cores.Tool{Name: toolName},
+						Version: toolVersion,
+						Folder:  folder})
 			}
 		}
 	}
@@ -175,7 +181,7 @@ func findBuiltinToolsVersionsFile(folder string) (string, error) {
 	return builtinToolsVersionsFilePath, i18n.WrapError(err)
 }
 
-func loadToolsFromFolderStructure(tools *[]*types.Tool, folder string) error {
+func loadToolsFromFolderStructure(tools *[]*cores.ToolRelease, folder string) error {
 	toolsNames, err := utils.ReadDirFiltered(folder, utils.FilterDirs)
 	if err != nil {
 		return i18n.WrapError(err)
@@ -191,7 +197,11 @@ func loadToolsFromFolderStructure(tools *[]*types.Tool, folder string) error {
 				return i18n.WrapError(err)
 			}
 			if !toolsSliceContains(tools, toolName.Name(), toolVersion.Name()) {
-				*tools = append(*tools, &types.Tool{Name: toolName.Name(), Version: toolVersion.Name(), Folder: toolFolder})
+				*tools = append(*tools,
+					&cores.ToolRelease{
+						Tool:    &cores.Tool{Name: toolName.Name()},
+						Version: toolVersion.Name(),
+						Folder:  toolFolder})
 			}
 		}
 	}

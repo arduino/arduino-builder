@@ -25,7 +25,7 @@ type Context struct {
 	BuildOptionsJsonPrevious string
 
 	Hardware       *cores.Packages
-	Tools          []*Tool
+	Tools          []*cores.ToolRelease
 	TargetBoard    *cores.Board
 	TargetPackage  *cores.Package
 	TargetPlatform *cores.PlatformRelease

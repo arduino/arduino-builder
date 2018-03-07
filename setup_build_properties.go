@@ -91,8 +91,8 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	tools := ctx.Tools
 	for _, tool := range tools {
-		buildProperties["runtime.tools."+tool.Name+".path"] = tool.Folder
-		buildProperties["runtime.tools."+tool.Name+"-"+tool.Version+".path"] = tool.Folder
+		buildProperties["runtime.tools."+tool.Tool.Name+".path"] = tool.Folder
+		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version+".path"] = tool.Folder
 	}
 
 	if !utils.MapStringStringHas(buildProperties, "software") {

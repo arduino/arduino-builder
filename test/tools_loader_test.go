@@ -30,14 +30,16 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/stretchr/testify/require"
 )
 
-type ByToolIDAndVersion []*types.Tool
+type ByToolIDAndVersion []*cores.ToolRelease
 
 func (s ByToolIDAndVersion) Len() int {
 	return len(s)
@@ -46,10 +48,10 @@ func (s ByToolIDAndVersion) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s ByToolIDAndVersion) Less(i, j int) bool {
-	if s[i].Name == s[j].Name {
+	if s[i].Tool.Name == s[j].Tool.Name {
 		return s[i].Version < s[j].Version
 	}
-	return s[i].Name < s[j].Name
+	return s[i].Tool.Name < s[j].Tool.Name
 }
 
 func TestLoadTools(t *testing.T) {
@@ -69,27 +71,27 @@ func TestLoadTools(t *testing.T) {
 	sort.Sort(ByToolIDAndVersion(tools))
 
 	idx := 0
-	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
+	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Tool.Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "avr-gcc", tools[idx].Name)
+	require.Equal(t, "avr-gcc", tools[idx].Tool.Name)
 	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "avrdude", tools[idx].Name)
+	require.Equal(t, "avrdude", tools[idx].Tool.Name)
 	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "bossac", tools[idx].Name)
+	require.Equal(t, "bossac", tools[idx].Tool.Name)
 	require.Equal(t, "1.5-arduino", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "bossac", tools[idx].Name)
+	require.Equal(t, "bossac", tools[idx].Tool.Name)
 	require.Equal(t, "1.6.1-arduino", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "ctags", tools[idx].Name)
+	require.Equal(t, "ctags", tools[idx].Tool.Name)
 	require.Equal(t, "5.8-arduino11", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino11"), tools[idx].Folder)
 }
@@ -111,15 +113,15 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	sort.Sort(ByToolIDAndVersion(tools))
 
 	idx := 0
-	require.Equal(t, "CMSIS", tools[idx].Name)
+	require.Equal(t, "CMSIS", tools[idx].Tool.Name)
 	require.Equal(t, "4.0.0-atmel", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
+	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Tool.Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "openocd", tools[idx].Name)
+	require.Equal(t, "openocd", tools[idx].Tool.Name)
 	require.Equal(t, "0.9.0-arduino", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[idx].Folder)
 }
@@ -141,35 +143,35 @@ func TestLoadLotsOfTools(t *testing.T) {
 	sort.Sort(ByToolIDAndVersion(tools))
 
 	idx := 0
-	require.Equal(t, "CMSIS", tools[idx].Name)
+	require.Equal(t, "CMSIS", tools[idx].Tool.Name)
 	require.Equal(t, "4.0.0-atmel", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
+	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Tool.Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "avr-gcc", tools[idx].Name)
+	require.Equal(t, "avr-gcc", tools[idx].Tool.Name)
 	require.Equal(t, "4.8.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "avrdude", tools[idx].Name)
+	require.Equal(t, "avrdude", tools[idx].Tool.Name)
 	require.Equal(t, "6.0.1-arduino5", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "bossac", tools[idx].Name)
+	require.Equal(t, "bossac", tools[idx].Tool.Name)
 	require.Equal(t, "1.5-arduino", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "bossac", tools[idx].Name)
+	require.Equal(t, "bossac", tools[idx].Tool.Name)
 	require.Equal(t, "1.6.1-arduino", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "ctags", tools[idx].Name)
+	require.Equal(t, "ctags", tools[idx].Tool.Name)
 	require.Equal(t, "5.8-arduino11", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino11"), tools[idx].Folder)
 	idx++
-	require.Equal(t, "openocd", tools[idx].Name)
+	require.Equal(t, "openocd", tools[idx].Tool.Name)
 	require.Equal(t, "0.9.0-arduino", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[idx].Folder)
 }

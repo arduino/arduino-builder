@@ -123,12 +123,6 @@ type Sketch struct {
 	AdditionalFiles  []SketchFile
 }
 
-type Tool struct {
-	Name    string
-	Version string
-	Folder  string
-}
-
 type LibraryLayout uint16
 
 const (
