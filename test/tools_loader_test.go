@@ -65,7 +65,7 @@ func TestLoadTools(t *testing.T) {
 	err := loader.Run(ctx)
 	NoError(t, err)
 
-	tools := ctx.Tools
+	tools := ctx.RequiredTools
 	require.Equal(t, 6, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -107,7 +107,7 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	err := loader.Run(ctx)
 	NoError(t, err)
 
-	tools := ctx.Tools
+	tools := ctx.RequiredTools
 	require.Equal(t, 3, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -137,7 +137,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 	err := loader.Run(ctx)
 	NoError(t, err)
 
-	tools := ctx.Tools
+	tools := ctx.RequiredTools
 	require.Equal(t, 8, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))

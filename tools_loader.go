@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,46 +46,64 @@ import (
 type ToolsLoader struct{}
 
 func (s *ToolsLoader) Run(ctx *types.Context) error {
-	folders := ctx.ToolsFolders
+	folders := []string{}
+	builtinFolders := []string{}
 
-	tools := []*cores.ToolRelease{}
-
-	for _, folder := range folders {
-		builtinToolsVersionsFile, err := findBuiltinToolsVersionsFile(folder)
+	if ctx.BuiltInToolsFolders != nil || len(ctx.BuiltInLibrariesFolders) == 0 {
+		folders = ctx.ToolsFolders
+		builtinFolders = ctx.BuiltInToolsFolders
+	} else {
+		// Auto-detect built-in tools folders (for arduino-builder backward compatibility)
+		// this is a deprecated feature and will be removed in the future
+		builtinHardwareFolder, err := filepath.Abs(filepath.Join(ctx.BuiltInLibrariesFolders[0], ".."))
 		if err != nil {
-			return i18n.WrapError(err)
-		}
-		builtinHardwareFolder := ""
-		if len(ctx.BuiltInLibrariesFolders) > 0 {
-			builtinHardwareFolder, err = filepath.Abs(filepath.Join(ctx.BuiltInLibrariesFolders[0], ".."))
+			fmt.Println("Error detecting ")
 		}
 
-		if builtinToolsVersionsFile != "" && !strings.Contains(builtinToolsVersionsFile, builtinHardwareFolder) {
-			ctx.GetLogger().Println(constants.LOG_LEVEL_WARN, constants.MSG_IGNORED_BUILTIN_TOOLS_TXT, builtinToolsVersionsFile)
-			builtinToolsVersionsFile = ""
-		}
-
-		if builtinToolsVersionsFile != "" {
-			err = loadToolsFrom(&tools, builtinToolsVersionsFile)
-			if err != nil {
-				return i18n.WrapError(err)
-			}
-		} else {
-			subfolders, err := collectAllToolsFolders(folder)
-			if err != nil {
-				return i18n.WrapError(err)
-			}
-
-			for _, subfolder := range subfolders {
-				err = loadToolsFromFolderStructure(&tools, subfolder)
-				if err != nil {
-					return i18n.WrapError(err)
-				}
+		builtinFolders = []string{}
+		for _, folder := range ctx.ToolsFolders {
+			if !strings.Contains(folder, builtinHardwareFolder) {
+				folders = append(folders, folder)
+			} else {
+				builtinFolders = append(builtinFolders, folder)
 			}
 		}
 	}
 
-	ctx.Tools = tools
+	tools := []*cores.ToolRelease{}
+
+	for _, folder := range builtinFolders {
+		builtinToolsVersionsFile, err := findBuiltinToolsVersionsFile(folder)
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+
+		if builtinToolsVersionsFile == "" {
+			folders = append(folders, folder)
+			continue
+		}
+
+		err = loadToolsFrom(&tools, builtinToolsVersionsFile)
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+	}
+
+	for _, folder := range folders {
+		subfolders, err := collectAllToolsFolders(folder)
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+
+		for _, subfolder := range subfolders {
+			err = loadToolsFromFolderStructure(&tools, subfolder)
+			if err != nil {
+				return i18n.WrapError(err)
+			}
+		}
+	}
+
+	ctx.RequiredTools = tools
 
 	return nil
 }
@@ -172,7 +191,7 @@ func findBuiltinToolsVersionsFile(folder string) (string, error) {
 		if builtinToolsVersionsFilePath != "" {
 			return nil
 		}
-		if filepath.Base(currentPath) == constants.FILE_BUILTIN_TOOLS_VERSIONS_TXT {
+		if filepath.Base(currentPath) == "builtin_tools_versions.txt" {
 			builtinToolsVersionsFilePath = currentPath
 		}
 		return nil

@@ -89,7 +89,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		buildProperties["build.variant.path"] = filepath.Join(variantPlatform.Folder, "variants", variant)
 	}
 
-	tools := ctx.Tools
+	tools := ctx.RequiredTools
 	for _, tool := range tools {
 		buildProperties["runtime.tools."+tool.Tool.Name+".path"] = tool.Folder
 		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version+".path"] = tool.Folder

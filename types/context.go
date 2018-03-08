@@ -13,6 +13,7 @@ type Context struct {
 	// Build options
 	HardwareFolders         []string
 	ToolsFolders            []string
+	BuiltInToolsFolders     []string
 	LibrariesFolders        []string
 	BuiltInLibrariesFolders []string
 	OtherLibrariesFolders   []string
@@ -25,7 +26,7 @@ type Context struct {
 	BuildOptionsJsonPrevious string
 
 	Hardware       *cores.Packages
-	Tools          []*cores.ToolRelease
+	RequiredTools  []*cores.ToolRelease
 	TargetBoard    *cores.Board
 	TargetPackage  *cores.Package
 	TargetPlatform *cores.PlatformRelease
