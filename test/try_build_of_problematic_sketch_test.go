@@ -31,11 +31,12 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
 )
 
 func TestTryBuild001(t *testing.T) {
@@ -222,7 +223,7 @@ func makeDefaultContext(t *testing.T) *types.Context {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		FQBN:              "arduino:avr:leonardo",

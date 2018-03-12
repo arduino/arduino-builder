@@ -31,14 +31,15 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPrototypesAdderBridgeExample(t *testing.T) {
@@ -49,7 +50,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -91,7 +92,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch2", "SketchWithIfDef.ino"),
@@ -131,7 +132,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch3", "Baladuino.ino"),
@@ -171,7 +172,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch4", "CharWithEscapedDoubleQuote.ino"),
@@ -211,7 +212,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch5", "IncludeBetweenMultilineComment.ino"),
@@ -251,7 +252,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch6", "/LineContinuations.ino"),
@@ -291,7 +292,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch7", "StringWithComment.ino"),
@@ -331,7 +332,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch8", "SketchWithStruct.ino"),
@@ -379,7 +380,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -425,7 +426,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch_no_functions_two_files", "main.ino"),
@@ -465,7 +466,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch_no_functions", "main.ino"),
@@ -511,7 +512,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -554,7 +555,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -608,7 +609,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -651,7 +652,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		SketchLocation:          sketchLocation,
@@ -693,13 +694,13 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppString(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
-		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		LibrariesFolders:  []string{"libraries", "downloaded_libraries"},
-		ToolsFolders:      []string{"downloaded_tools"},
-		SketchLocation:    sketchLocation,
-		FQBN:              "arduino:avr:leonardo",
-		ArduinoAPIVersion: "10600",
-		Verbose:           true,
+		HardwareFolders:     []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		LibrariesFolders:    []string{"libraries", "downloaded_libraries"},
+		BuiltInToolsFolders: []string{"downloaded_tools"},
+		SketchLocation:      sketchLocation,
+		FQBN:                "arduino:avr:leonardo",
+		ArduinoAPIVersion:   "10600",
+		Verbose:             true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -742,7 +743,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -788,7 +789,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -834,7 +835,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -874,7 +875,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("eol_processing", "sketch.ino"),

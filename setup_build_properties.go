@@ -89,8 +89,11 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		buildProperties["build.variant.path"] = filepath.Join(variantPlatform.Folder, "variants", variant)
 	}
 
-	tools := ctx.RequiredTools
-	for _, tool := range tools {
+	for _, tool := range ctx.AllTools {
+		buildProperties["runtime.tools."+tool.Tool.Name+".path"] = tool.Folder
+		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version+".path"] = tool.Folder
+	}
+	for _, tool := range ctx.RequiredTools {
 		buildProperties["runtime.tools."+tool.Tool.Name+".path"] = tool.Folder
 		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version+".path"] = tool.Folder
 	}

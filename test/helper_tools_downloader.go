@@ -42,6 +42,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
@@ -83,6 +85,10 @@ type Core struct {
 }
 
 func DownloadCoresAndToolsAndLibraries(t *testing.T) {
+	pm := packagemanager.PackageManager()
+	pm.Clear()
+	pm.DisableDebugOutput()
+
 	cores := []Core{
 		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.10"},
 		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.7"},

@@ -48,7 +48,7 @@ func prepareBuilderTestContext(sketchPath, fqbn string) *types.Context {
 		SketchLocation:          sketchPath,
 		FQBN:                    fqbn,
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		ArduinoAPIVersion:       "10600",

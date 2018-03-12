@@ -30,14 +30,15 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"sort"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIncludesToIncludeFolders(t *testing.T) {
@@ -45,7 +46,7 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
@@ -81,7 +82,7 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch2", "SketchWithIfDef.ino"),
@@ -116,7 +117,7 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch9", "sketch.ino"),
@@ -154,7 +155,7 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch10", "sketch.ino"),
@@ -192,7 +193,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		SketchLocation:          filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
 		FQBN:                    "my_avr_platform:avr:custom_yun",
@@ -229,7 +230,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
@@ -267,7 +268,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		ToolsFolders:            []string{"downloaded_tools", "downloaded_board_manager_stuff"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch_usbhost", "sketch_usbhost.ino"),
@@ -305,7 +306,7 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"),

@@ -47,7 +47,7 @@ func TestCTagsRunner(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -97,7 +97,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -145,7 +145,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -192,7 +192,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
@@ -238,7 +238,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInToolsFolders:     []string{"downloaded_tools"},
 		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
 		OtherLibrariesFolders:   []string{"libraries"},
 		SketchLocation:          sketchLocation,
