@@ -38,11 +38,11 @@ import (
 type HardwareLoader struct{}
 
 func (s *HardwareLoader) Run(ctx *types.Context) error {
-	pm := packagemanager.PackageManager()
-	pm.Clear()
+	pm := packagemanager.NewPackageManager()
 	if err := pm.LoadHardwareFromDirectories(ctx.HardwareFolders); err != nil {
 		return i18n.WrapError(err)
 	}
+	ctx.PackageManager = pm
 	ctx.Hardware = pm.GetPackages()
 	return nil
 }

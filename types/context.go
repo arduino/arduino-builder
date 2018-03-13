@@ -3,6 +3,8 @@ package types
 import (
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/cores"
@@ -25,6 +27,7 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
+	PackageManager *packagemanager.PackageManager
 	Hardware       *cores.Packages
 	AllTools       []*cores.ToolRelease
 	RequiredTools  []*cores.ToolRelease

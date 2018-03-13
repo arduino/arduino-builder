@@ -64,9 +64,8 @@ func TestLoadTools(t *testing.T) {
 		BuiltInToolsFolders: []string{"downloaded_tools", "tools_builtin"},
 	}
 
-	loader := builder.ToolsLoader{}
-	err := loader.Run(ctx)
-	NoError(t, err)
+	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
+	NoError(t, (&builder.ToolsLoader{}).Run(ctx))
 
 	tools := ctx.AllTools
 	require.Equal(t, 8, len(tools))
