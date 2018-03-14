@@ -34,6 +34,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -200,6 +201,7 @@ func compileFilesWithRecipe(ctx *types.Context, objectFiles []string, sourcePath
 			for objectFile := range objectFilesChan {
 				objectFiles = append(objectFiles, objectFile)
 			}
+			sort.Strings(objectFiles)
 			return objectFiles, nil
 		}
 	}
