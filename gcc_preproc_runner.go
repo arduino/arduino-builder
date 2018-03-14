@@ -90,7 +90,7 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
 		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
 	}
 
-	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, false, logger)
+	stderr, err := builder_utils.ExecRecipeCollectStdErr(properties, constants.RECIPE_PREPROC_MACROS, true, verbose, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}

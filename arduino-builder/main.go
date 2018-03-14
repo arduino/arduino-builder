@@ -375,14 +375,6 @@ func toSliceOfUnquoted(value []string) ([]string, error) {
 	return values, nil
 }
 
-func printError(err error, printStackTrace bool) {
-	if printStackTrace {
-		printCompleteError(err)
-	} else {
-		printErrorMessageAndFlagUsage(err)
-	}
-}
-
 func printCompleteError(err error) {
 	err = i18n.WrapError(err)
 	fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())

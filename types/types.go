@@ -185,11 +185,6 @@ type PlatforKeyRewrite struct {
 	NewValue string
 }
 
-type KeyValuePair struct {
-	Key   string
-	Value string
-}
-
 type Prototype struct {
 	FunctionName string
 	File         string
@@ -226,7 +221,6 @@ type CTag struct {
 	Signature    string
 
 	Prototype          string
-	Function           string
 	PrototypeModifiers string
 }
 

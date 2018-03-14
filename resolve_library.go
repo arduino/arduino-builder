@@ -130,15 +130,6 @@ func filterOutLibraryFrom(libraries []*types.Library, libraryToRemove *types.Lib
 	return filteredOutLibraries
 }
 
-func findLibraryIn(libraries []*types.Library, library *types.Library) *types.Library {
-	for _, lib := range libraries {
-		if lib == library {
-			return lib
-		}
-	}
-	return nil
-}
-
 func libraryCompatibleWithPlatform(library *types.Library, platform *cores.PlatformRelease) (bool, bool) {
 	if len(library.Archs) == 0 {
 		return true, true
@@ -171,20 +162,6 @@ func librariesCompatibleWithPlatform(libraries []*types.Library, platform *cores
 	}
 
 	return compatibleLibraries
-}
-
-func librariesWithinPlatform(libraries []*types.Library, platform *cores.PlatformRelease) []*types.Library {
-	librariesWithinSpecifiedPlatform := []*types.Library{}
-	for _, library := range libraries {
-		cleanPlatformFolder := filepath.Clean(platform.Folder)
-		cleanLibraryFolder := filepath.Clean(library.SrcFolder)
-		if strings.Contains(cleanLibraryFolder, cleanPlatformFolder) {
-			librariesWithinSpecifiedPlatform = append(librariesWithinSpecifiedPlatform, library)
-		}
-	}
-
-	return librariesWithinSpecifiedPlatform
-
 }
 
 func findBestLibraryWithHeader(header string, libraries []*types.Library) *types.Library {

@@ -355,7 +355,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 }
 
 func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
-	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
@@ -375,7 +375,7 @@ func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties 
 	return bytes, i18n.WrapError(err)
 }
 
-func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
+func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, logger i18n.Logger) (*exec.Cmd, error) {
 	pattern := buildProperties[recipe]
 	if pattern == constants.EMPTY_STRING {
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
@@ -399,8 +399,8 @@ func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, remo
 	return command, nil
 }
 
-func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
-	command, err := PrepareCommandForRecipe(buildProperties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, logger i18n.Logger) (string, error) {
+	command, err := PrepareCommandForRecipe(buildProperties, recipe, removeUnsetProperties, echoCommandLine, logger)
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}

@@ -40,7 +40,7 @@ import (
 
 type AddAdditionalEntriesToContext struct{}
 
-func (s *AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
+func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 	if ctx.BuildPath != "" {
 		buildPath := ctx.BuildPath
 		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))

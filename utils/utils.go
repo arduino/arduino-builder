@@ -46,14 +46,6 @@ import (
 	"github.com/arduino/arduino-builder/types"
 )
 
-func KeysOfMapOfStringInterface(input map[string]interface{}) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
-
 func KeysOfMapOfString(input map[string]string) []string {
 	var keys []string
 	for key, _ := range input {
@@ -254,22 +246,9 @@ func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
 	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger)
 }
 
-func MapHas(aMap map[string]interface{}, key string) bool {
-	_, ok := aMap[key]
-	return ok
-}
-
 func MapStringStringHas(aMap map[string]string, key string) bool {
 	_, ok := aMap[key]
 	return ok
-}
-
-func SliceToMapStringBool(keys []string, value bool) map[string]bool {
-	aMap := make(map[string]bool)
-	for _, key := range keys {
-		aMap[key] = value
-	}
-	return aMap
 }
 
 func AbsolutizePaths(files []string) ([]string, error) {
@@ -293,32 +272,6 @@ func ReadFileToRows(file string) ([]string, error) {
 	txt = strings.Replace(txt, "\r\n", "\n", -1)
 
 	return strings.Split(txt, "\n"), nil
-}
-
-func TheOnlySubfolderOf(folder string) (string, error) {
-	subfolders, err := ReadDirFiltered(folder, FilterDirs)
-	if err != nil {
-		return constants.EMPTY_STRING, i18n.WrapError(err)
-	}
-
-	if len(subfolders) != 1 {
-		return constants.EMPTY_STRING, nil
-	}
-
-	return subfolders[0].Name(), nil
-}
-
-func FilterOutFoldersByNames(folders []os.FileInfo, names ...string) []os.FileInfo {
-	filterNames := SliceToMapStringBool(names, true)
-
-	var filtered []os.FileInfo
-	for _, folder := range folders {
-		if !filterNames[folder.Name()] {
-			filtered = append(filtered, folder)
-		}
-	}
-
-	return filtered
 }
 
 type CheckExtensionFunc func(ext string) bool
@@ -428,10 +381,6 @@ func (l *loggerAction) Run(ctx *types.Context) error {
 
 func LogIfVerbose(level string, format string, args ...interface{}) types.Command {
 	return &loggerAction{true, level, format, args}
-}
-
-func LogThis(level string, format string, args ...interface{}) types.Command {
-	return &loggerAction{false, level, format, args}
 }
 
 // Returns the given string as a quoted string for use with the C

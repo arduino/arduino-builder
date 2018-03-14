@@ -30,9 +30,10 @@
 package builder
 
 import (
+	"time"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
-	"time"
 )
 
 type PrintUsedLibrariesIfVerbose struct{}

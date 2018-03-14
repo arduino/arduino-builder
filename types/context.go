@@ -69,7 +69,6 @@ type Context struct {
 	LibrariesResolutionResults map[string]LibraryResolutionResult
 	IncludeJustFound           string
 	IncludeFolders             []string
-	OutputGccMinusM            string
 
 	// C++ Parsing
 	CTagsOutput                 string
