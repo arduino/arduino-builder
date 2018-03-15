@@ -35,7 +35,6 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
@@ -80,12 +79,16 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	ctx.TargetBoard = targetBoard
 
 	if len(fqbnParts) > 3 {
-		addAdditionalPropertiesToTargetBoard(targetBoard, fqbnParts[3])
+		if props, err := targetBoard.GeneratePropertiesForConfiguration(fqbnParts[3]); err != nil {
+			i18n.ErrorfWithLogger(logger, "Error in FQBN: %s", err)
+		} else {
+			targetBoard.Properties = props
+		}
 	}
 
-	core := targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_CORE]
-	if core == constants.EMPTY_STRING {
-		core = DEFAULT_BUILD_CORE
+	core := targetBoard.Properties["build.core"]
+	if core == "" {
+		core = "arduino"
 	}
 
 	var corePlatform *cores.PlatformRelease
@@ -115,29 +118,4 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	ctx.ActualPlatform = actualPlatform
 
 	return nil
-}
-
-func addAdditionalPropertiesToTargetBoard(board *cores.Board, options string) {
-	optionsParts := strings.Split(options, ",")
-	optionsParts = utils.Map(optionsParts, utils.TrimSpace)
-
-	for _, optionPart := range optionsParts {
-		parts := strings.Split(optionPart, "=")
-		parts = utils.Map(parts, utils.TrimSpace)
-
-		key := parts[0]
-		value := parts[1]
-		if key != constants.EMPTY_STRING && value != constants.EMPTY_STRING {
-			menu := board.Properties.SubTree(constants.BOARD_PROPERTIES_MENU)
-			if len(menu) == 0 {
-				return
-			}
-			propertiesOfKey := menu.SubTree(key)
-			if len(propertiesOfKey) == 0 {
-				return
-			}
-			propertiesOfKeyValue := propertiesOfKey.SubTree(value)
-			board.Properties.Merge(propertiesOfKeyValue)
-		}
-	}
 }

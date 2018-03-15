@@ -64,7 +64,6 @@ var LIBRARY_CATEGORIES = map[string]bool{
 const DEFAULT_DEBUG_LEVEL = 5
 const DEFAULT_WARNINGS_LEVEL = "none"
 const DEFAULT_SOFTWARE = "ARDUINO"
-const DEFAULT_BUILD_CORE = "arduino"
 
 type Builder struct{}
 

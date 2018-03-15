@@ -30,7 +30,6 @@
 
 package constants
 
-const BOARD_PROPERTIES_MENU = "menu"
 const BUILD_OPTIONS_FILE = "build.options.json"
 const BUILD_PROPERTIES_ARCHIVE_FILE = "archive_file"
 const BUILD_PROPERTIES_ARCHIVE_FILE_PATH = "archive_file_path"
@@ -38,7 +37,6 @@ const BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK = "architecture.override_check"
 const BUILD_PROPERTIES_BOOTLOADER_FILE = "bootloader.file"
 const BUILD_PROPERTIES_BOOTLOADER_NOBLINK = "bootloader.noblink"
 const BUILD_PROPERTIES_BUILD_BOARD = "build.board"
-const BUILD_PROPERTIES_BUILD_CORE = "build.core"
 const BUILD_PROPERTIES_BUILD_CORE_PATH = "build.core.path"
 const BUILD_PROPERTIES_BUILD_MCU = "build.mcu"
 const BUILD_PROPERTIES_BUILD_VARIANT_PATH = "build.variant.path"
