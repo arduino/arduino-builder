@@ -74,7 +74,7 @@ go build github.com/arduino/arduino-builder/arduino-builder
 In order to run the tests, type:
 
 ```
-go test github.com/arduino/arduino-builder/arduino-builder/...
+go test github.com/arduino/arduino-builder/...
 ```
 
 This runs all tests, showing any failures and a summary at the end.
@@ -88,13 +88,13 @@ To run a single test, use the -run option, which accepts a regular
 expression (see also go help testflag).
 
 ```
-go test github.com/arduino/arduino-builder/arduino-builder/... -run 'TestBuilderEmptySketch'
-go test github.com/arduino/arduino-builder/arduino-builder/... -run 'TestPrototypesAdder.*'
+go test github.com/arduino/arduino-builder/... -run 'TestBuilderEmptySketch'
+go test github.com/arduino/arduino-builder/... -run 'TestPrototypesAdder.*'
 ```
 
 In jenkins, use
 ```
-go test -v github.com/arduino/arduino-builder/arduino-builder/... | bin/go-junit-report > report.xml
+go test -v github.com/arduino/arduino-builder/... | bin/go-junit-report > report.xml
 ```
 
 The first time you run the tests, some needed files (toolchains and
