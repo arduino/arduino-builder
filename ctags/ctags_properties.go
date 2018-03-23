@@ -24,24 +24,24 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2015-2018 Arduino LLC (http://www.arduino.cc/)
  */
 
-package builder
+package ctags
 
-import (
-	"github.com/arduino/arduino-builder/ctags"
-	"github.com/arduino/arduino-builder/types"
-)
+import properties "github.com/arduino/go-properties-map"
 
-type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}
+// CtagsProperties are the platform properties needed to run ctags
+var CtagsProperties = properties.Map{
+	// Ctags
+	"tools.ctags.path":     "{runtime.tools.ctags.path}",
+	"tools.ctags.cmd.path": "{path}/ctags",
+	"tools.ctags.pattern":  `"{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"`,
 
-func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(ctx *types.Context) error {
-	buildProperties := ctx.BuildProperties
+	// additional entries
+	"tools.avrdude.path": "{runtime.tools.avrdude.path}",
 
-	newBuildProperties := ctags.CtagsProperties.Clone()
-	newBuildProperties.Merge(buildProperties)
-	ctx.BuildProperties = newBuildProperties
-
-	return nil
+	"preproc.macros.flags": "-w -x c++ -E -CC",
+	//"preproc.macros.compatibility_flags": `{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}`,
+	//"recipe.preproc.macros":              `"{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"`,
 }
