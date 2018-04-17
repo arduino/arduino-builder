@@ -35,7 +35,7 @@ import (
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/stretchr/testify/require"
 )
 
