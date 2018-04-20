@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -64,12 +65,20 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.PlatformId)
 
+	// get base folder and use it to populate BUILD_PROPERTIES_RUNTIME_IDE_PATH (arduino and arduino-builder live in the same dir)
+	ex, err := os.Executable()
+	exPath := ""
+	if err == nil {
+		exPath = filepath.Dir(ex)
+	}
+
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE] = ctx.BuildCore
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_CORES, buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE])
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_SYSTEM_PATH] = filepath.Join(actualPlatform.Folder, constants.FOLDER_SYSTEM)
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH] = targetPlatform.Folder
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_HARDWARE_PATH] = filepath.Join(targetPlatform.Folder, "..")
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_VERSION] = ctx.ArduinoAPIVersion
+	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_IDE_PATH] = exPath
 	buildProperties[constants.BUILD_PROPERTIES_FQBN] = ctx.FQBN
 	buildProperties[constants.IDE_VERSION] = ctx.ArduinoAPIVersion
 	buildProperties[constants.BUILD_PROPERTIES_RUNTIME_OS] = utils.PrettyOSName()
