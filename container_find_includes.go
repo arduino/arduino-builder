@@ -118,6 +118,7 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type ContainerFindIncludes struct{}
@@ -314,7 +315,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		cache.ExpectFile(sourcePath)
 
 		includes := ctx.IncludeFolders
-		if library, ok := sourceFile.Origin.(*types.Library); ok && library.UtilityFolder != "" {
+		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityFolder != "" {
 			includes = append(includes, library.UtilityFolder)
 		}
 		if unchanged && cache.valid {

@@ -41,6 +41,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -92,7 +93,7 @@ func SetupBuildCachePath(t *testing.T, ctx *types.Context) string {
 	return buildCachePath
 }
 
-type ByLibraryName []*types.Library
+type ByLibraryName []*libraries.Library
 
 func (s ByLibraryName) Len() int {
 	return len(s)

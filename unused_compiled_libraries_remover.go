@@ -30,12 +30,14 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/i18n"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type UnusedCompiledLibrariesRemover struct{}
@@ -68,7 +70,7 @@ func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
 	return nil
 }
 
-func toLibraryNames(libraries []*types.Library) []string {
+func toLibraryNames(libraries []*libraries.Library) []string {
 	libraryNames := []string{}
 	for _, library := range libraries {
 		libraryNames = append(libraryNames, library.Name)

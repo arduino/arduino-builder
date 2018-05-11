@@ -60,7 +60,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 
 	for _, importedLibrary := range ctx.ImportedLibraries {
 		if !importedLibrary.SupportsArchitectures(archs) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, sliceToCommaSeparatedString(importedLibrary.Archs), sliceToCommaSeparatedString(archs))
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, sliceToCommaSeparatedString(importedLibrary.Architectures), sliceToCommaSeparatedString(archs))
 		}
 	}
 

@@ -39,6 +39,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type LibrariesLoader struct{}
@@ -72,7 +73,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	ctx.LibrariesFolders = sortedLibrariesFolders
 
-	var libraries []*types.Library
+	var libs []*libraries.Library
 	for _, libraryFolder := range sortedLibrariesFolders {
 		subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
 		if err != nil {
@@ -83,14 +84,14 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			if err != nil {
 				return i18n.WrapError(err)
 			}
-			libraries = append(libraries, library)
+			libs = append(libs, library)
 		}
 	}
 
-	ctx.Libraries = libraries
+	ctx.Libraries = libs
 
-	headerToLibraries := make(map[string][]*types.Library)
-	for _, library := range libraries {
+	headerToLibraries := make(map[string][]*libraries.Library)
+	for _, library := range libs {
 		headers, err := utils.ReadDirFiltered(library.SrcFolder, utils.FilterFilesWithExtensions(".h", ".hpp", ".hh"))
 		if err != nil {
 			return i18n.WrapError(err)
@@ -106,14 +107,14 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	return nil
 }
 
-func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*types.Library, error) {
+func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*libraries.Library, error) {
 	if _, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES)); os.IsNotExist(err) {
 		return makeLegacyLibrary(libraryFolder)
 	}
 	return makeNewLibrary(libraryFolder, debugLevel, logger)
 }
 
-func addUtilityFolder(library *types.Library) {
+func addUtilityFolder(library *libraries.Library) {
 	utilitySourcePath := filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)
 	stat, err := os.Stat(utilitySourcePath)
 	if err == nil && stat.IsDir() {
@@ -121,7 +122,7 @@ func addUtilityFolder(library *types.Library) {
 	}
 }
 
-func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*types.Library, error) {
+func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*libraries.Library, error) {
 	libProperties, err := properties.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES))
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -137,13 +138,13 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		}
 	}
 
-	library := &types.Library{}
+	library := &libraries.Library{}
 	library.Folder = libraryFolder
 	if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)); err == nil && stat.IsDir() {
-		library.Layout = types.LIBRARY_RECURSIVE
+		library.Layout = libraries.LIBRARY_RECURSIVE
 		library.SrcFolder = filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)
 	} else {
-		library.Layout = types.LIBRARY_FLAT
+		library.Layout = libraries.LIBRARY_FLAT
 		library.SrcFolder = libraryFolder
 		addUtilityFolder(library)
 	}
@@ -166,9 +167,9 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	if libProperties[constants.LIBRARY_ARCHITECTURES] == constants.EMPTY_STRING {
 		libProperties[constants.LIBRARY_ARCHITECTURES] = constants.LIBRARY_ALL_ARCHS
 	}
-	library.Archs = []string{}
+	library.Architectures = []string{}
 	for _, arch := range strings.Split(libProperties[constants.LIBRARY_ARCHITECTURES], ",") {
-		library.Archs = append(library.Archs, strings.TrimSpace(arch))
+		library.Architectures = append(library.Architectures, strings.TrimSpace(arch))
 	}
 
 	libProperties[constants.LIBRARY_CATEGORY] = strings.TrimSpace(libProperties[constants.LIBRARY_CATEGORY])
@@ -190,7 +191,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library.Maintainer = strings.TrimSpace(libProperties[constants.LIBRARY_MAINTAINER])
 	library.Sentence = strings.TrimSpace(libProperties[constants.LIBRARY_SENTENCE])
 	library.Paragraph = strings.TrimSpace(libProperties[constants.LIBRARY_PARAGRAPH])
-	library.URL = strings.TrimSpace(libProperties[constants.LIBRARY_URL])
+	library.Website = strings.TrimSpace(libProperties[constants.LIBRARY_URL])
 	library.IsLegacy = false
 	library.DotALinkage = strings.TrimSpace(libProperties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
 	library.Precompiled = strings.TrimSpace(libProperties[constants.LIBRARY_PRECOMPILED]) == "true"
@@ -200,14 +201,14 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	return library, nil
 }
 
-func makeLegacyLibrary(libraryFolder string) (*types.Library, error) {
-	library := &types.Library{
-		Folder:    libraryFolder,
-		SrcFolder: libraryFolder,
-		Layout:    types.LIBRARY_FLAT,
-		Name:      filepath.Base(libraryFolder),
-		Archs:     []string{constants.LIBRARY_ALL_ARCHS},
-		IsLegacy:  true,
+func makeLegacyLibrary(libraryFolder string) (*libraries.Library, error) {
+	library := &libraries.Library{
+		Folder:        libraryFolder,
+		SrcFolder:     libraryFolder,
+		Layout:        libraries.LIBRARY_FLAT,
+		Name:          filepath.Base(libraryFolder),
+		Architectures: []string{constants.LIBRARY_ALL_ARCHS},
+		IsLegacy:      true,
 	}
 	addUtilityFolder(library)
 	return library, nil

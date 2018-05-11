@@ -7,6 +7,7 @@ import (
 	"github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 // Context structure
@@ -62,9 +63,9 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	Libraries                  []*Library
-	HeaderToLibraries          map[string][]*Library
-	ImportedLibraries          []*Library
+	Libraries                  []*libraries.Library
+	HeaderToLibraries          map[string][]*libraries.Library
+	ImportedLibraries          []*libraries.Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
 	IncludeJustFound           string
 	IncludeFolders             []string

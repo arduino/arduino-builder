@@ -30,11 +30,13 @@
 package builder
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"os"
-	"path/filepath"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type FailIfImportedLibraryIsWrong struct{}
@@ -56,7 +58,7 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.Folder)
 				}
 			}
-			if library.Layout == types.LIBRARY_RECURSIVE {
+			if library.Layout == libraries.LIBRARY_RECURSIVE {
 				if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)); err == nil && stat.IsDir() {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
 				}

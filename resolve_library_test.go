@@ -32,40 +32,40 @@ package builder
 import (
 	"testing"
 
-	"github.com/arduino/arduino-builder/types"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestFindBestLibraryWithHeader(t *testing.T) {
-	l1 := &types.Library{Name: "Calculus Lib"}
-	l2 := &types.Library{Name: "Calculus Lib-master"}
-	l3 := &types.Library{Name: "Calculus Lib Improved"}
-	l4 := &types.Library{Name: "Another Calculus Lib"}
-	l5 := &types.Library{Name: "Yet Another Calculus Lib Improved"}
-	l6 := &types.Library{Name: "AnotherLib"}
+	l1 := &libraries.Library{Name: "Calculus Lib"}
+	l2 := &libraries.Library{Name: "Calculus Lib-master"}
+	l3 := &libraries.Library{Name: "Calculus Lib Improved"}
+	l4 := &libraries.Library{Name: "Another Calculus Lib"}
+	l5 := &libraries.Library{Name: "Yet Another Calculus Lib Improved"}
+	l6 := &libraries.Library{Name: "AnotherLib"}
 
 	// Test exact name matching
-	res := findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4, l3, l2, l1})
+	res := findBestLibraryWithHeader("calculus_lib.h", []*libraries.Library{l6, l5, l4, l3, l2, l1})
 	require.Equal(t, l1.Name, res.Name)
 
 	// Test exact name with "-master" postfix matching
-	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4, l3, l2})
+	res = findBestLibraryWithHeader("calculus_lib.h", []*libraries.Library{l6, l5, l4, l3, l2})
 	require.Equal(t, l2.Name, res.Name)
 
 	// Test prefix matching
-	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4, l3})
+	res = findBestLibraryWithHeader("calculus_lib.h", []*libraries.Library{l6, l5, l4, l3})
 	require.Equal(t, l3.Name, res.Name)
 
 	// Test postfix matching
-	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5, l4})
+	res = findBestLibraryWithHeader("calculus_lib.h", []*libraries.Library{l6, l5, l4})
 	require.Equal(t, l4.Name, res.Name)
 
 	// Test "contains"" matching
-	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6, l5})
+	res = findBestLibraryWithHeader("calculus_lib.h", []*libraries.Library{l6, l5})
 	require.Equal(t, l5.Name, res.Name)
 
 	// Test none matching
-	res = findBestLibraryWithHeader("calculus_lib.h", []*types.Library{l6})
+	res = findBestLibraryWithHeader("calculus_lib.h", []*libraries.Library{l6})
 	require.Nil(t, res)
 }

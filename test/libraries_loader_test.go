@@ -68,68 +68,68 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
 	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
 
-	libraries := ctx.Libraries
-	require.Equal(t, 24, len(libraries))
+	libs := ctx.Libraries
+	require.Equal(t, 24, len(libs))
 
-	sort.Sort(ByLibraryName(libraries))
+	sort.Sort(ByLibraryName(libs))
 
 	idx := 0
 
-	require.Equal(t, "ANewLibrary-master", libraries[idx].Name)
+	require.Equal(t, "ANewLibrary-master", libs[idx].Name)
 
 	idx++
-	require.Equal(t, "Adafruit_PN532", libraries[idx].Name)
-	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libraries[idx].Folder)
-	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libraries[idx].SrcFolder)
-	require.Equal(t, 1, len(libraries[idx].Archs))
-	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libraries[idx].Archs[0])
-	require.False(t, libraries[idx].IsLegacy)
+	require.Equal(t, "Adafruit_PN532", libs[idx].Name)
+	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libs[idx].Folder)
+	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libs[idx].SrcFolder)
+	require.Equal(t, 1, len(libs[idx].Architectures))
+	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libs[idx].Architectures[0])
+	require.False(t, libs[idx].IsLegacy)
 
 	idx++
-	require.Equal(t, "Audio", libraries[idx].Name)
+	require.Equal(t, "Audio", libs[idx].Name)
 
 	idx++
-	require.Equal(t, "Balanduino", libraries[idx].Name)
-	require.True(t, libraries[idx].IsLegacy)
+	require.Equal(t, "Balanduino", libs[idx].Name)
+	require.True(t, libs[idx].IsLegacy)
 
 	idx++
-	bridgeLib := libraries[idx]
+	bridgeLib := libs[idx]
 	require.Equal(t, "Bridge", bridgeLib.Name)
 	require.Equal(t, Abs(t, "downloaded_libraries/Bridge"), bridgeLib.Folder)
 	require.Equal(t, Abs(t, "downloaded_libraries/Bridge/src"), bridgeLib.SrcFolder)
-	require.Equal(t, 1, len(bridgeLib.Archs))
-	require.Equal(t, constants.LIBRARY_ALL_ARCHS, bridgeLib.Archs[0])
+	require.Equal(t, 1, len(bridgeLib.Architectures))
+	require.Equal(t, constants.LIBRARY_ALL_ARCHS, bridgeLib.Architectures[0])
 	require.Equal(t, "Arduino", bridgeLib.Author)
 	require.Equal(t, "Arduino <info@arduino.cc>", bridgeLib.Maintainer)
 
 	idx++
-	require.Equal(t, "CapacitiveSensor", libraries[idx].Name)
+	require.Equal(t, "CapacitiveSensor", libs[idx].Name)
 	idx++
-	require.Equal(t, "EEPROM", libraries[idx].Name)
+	require.Equal(t, "EEPROM", libs[idx].Name)
 	idx++
-	require.Equal(t, "Ethernet", libraries[idx].Name)
+	require.Equal(t, "Ethernet", libs[idx].Name)
 	idx++
-	require.Equal(t, "FakeAudio", libraries[idx].Name)
+	require.Equal(t, "FakeAudio", libs[idx].Name)
 	idx++
-	require.Equal(t, "FastLED", libraries[idx].Name)
+	require.Equal(t, "FastLED", libs[idx].Name)
 	idx++
-	require.Equal(t, "HID", libraries[idx].Name)
+	require.Equal(t, "HID", libs[idx].Name)
 	idx++
-	require.Equal(t, "IRremote", libraries[idx].Name)
+	require.Equal(t, "IRremote", libs[idx].Name)
 	idx++
-	require.Equal(t, "Robot_IR_Remote", libraries[idx].Name)
+	require.Equal(t, "Robot_IR_Remote", libs[idx].Name)
 	idx++
-	require.Equal(t, "SPI", libraries[idx].Name)
+	require.Equal(t, "SPI", libs[idx].Name)
 	idx++
-	require.Equal(t, "SPI", libraries[idx].Name)
+	require.Equal(t, "SPI", libs[idx].Name)
 	idx++
-	require.Equal(t, "ShouldNotRecurseWithOldLibs", libraries[idx].Name)
+	require.Equal(t, "ShouldNotRecurseWithOldLibs", libs[idx].Name)
 	idx++
-	require.Equal(t, "SoftwareSerial", libraries[idx].Name)
+	require.Equal(t, "SoftwareSerial", libs[idx].Name)
 	idx++
-	require.Equal(t, "USBHost", libraries[idx].Name)
+	require.Equal(t, "USBHost", libs[idx].Name)
 	idx++
-	require.Equal(t, "Wire", libraries[idx].Name)
+	require.Equal(t, "Wire", libs[idx].Name)
 
 	headerToLibraries := ctx.HeaderToLibraries
 	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
@@ -142,11 +142,11 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	require.Equal(t, 2, len(headerToLibraries["IRremote.h"]))
 
-	libraries = headerToLibraries["IRremote.h"]
-	sort.Sort(ByLibraryName(libraries))
+	libs = headerToLibraries["IRremote.h"]
+	sort.Sort(ByLibraryName(libs))
 
-	require.Equal(t, "IRremote", libraries[0].Name)
-	require.Equal(t, "Robot_IR_Remote", libraries[1].Name)
+	require.Equal(t, "IRremote", libs[0].Name)
+	require.Equal(t, "Robot_IR_Remote", libs[1].Name)
 }
 
 func TestLoadLibrariesSAM(t *testing.T) {

@@ -39,6 +39,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC = map[string]bool{".a": true}
@@ -74,7 +75,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Library) error {
+func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*libraries.Library) error {
 
 	for _, library := range libraries {
 		if library.Precompiled {
@@ -99,7 +100,7 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Lib
 	return nil
 }
 
-func compileLibraries(libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibraries(libraries []*libraries.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	objectFiles := []string{}
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
@@ -113,7 +114,7 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 
 }
 
-func compileLibrary(library *types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibrary(library *libraries.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
 	if verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
 	}
@@ -143,7 +144,7 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 		}
 	}
 
-	if library.Layout == types.LIBRARY_RECURSIVE {
+	if library.Layout == libraries.LIBRARY_RECURSIVE {
 		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)

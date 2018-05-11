@@ -30,13 +30,15 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUnusedCompiledLibrariesRemover(t *testing.T) {
@@ -50,7 +52,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
-	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
+	ctx.ImportedLibraries = []*libraries.Library{&libraries.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)
@@ -68,7 +70,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = filepath.Join(os.TempDir(), "test")
-	ctx.ImportedLibraries = []*types.Library{&types.Library{Name: "Bridge"}}
+	ctx.ImportedLibraries = []*libraries.Library{&libraries.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err := cmd.Run(ctx)
@@ -86,7 +88,7 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
-	ctx.ImportedLibraries = []*types.Library{}
+	ctx.ImportedLibraries = []*libraries.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)

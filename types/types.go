@@ -34,7 +34,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/arduino/arduino-builder/constants"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type SourceFile struct {
@@ -65,7 +65,7 @@ func buildRoot(ctx *Context, origin interface{}) string {
 	switch o := origin.(type) {
 	case *Sketch:
 		return ctx.SketchBuildPath
-	case *Library:
+	case *libraries.Library:
 		return filepath.Join(ctx.LibrariesBuildPath, o.Name)
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
@@ -79,7 +79,7 @@ func sourceRoot(ctx *Context, origin interface{}) string {
 	switch o := origin.(type) {
 	case *Sketch:
 		return ctx.SketchBuildPath
-	case *Library:
+	case *libraries.Library:
 		return o.SrcFolder
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
@@ -123,54 +123,6 @@ type Sketch struct {
 	AdditionalFiles  []SketchFile
 }
 
-type LibraryLayout uint16
-
-const (
-	LIBRARY_FLAT LibraryLayout = 1 << iota
-	LIBRARY_RECURSIVE
-)
-
-type Library struct {
-	Folder        string
-	SrcFolder     string
-	UtilityFolder string
-	Layout        LibraryLayout
-	Name          string
-	RealName      string
-	Archs         []string
-	DotALinkage   bool
-	Precompiled   bool
-	LDflags       string
-	IsLegacy      bool
-	Version       string
-	Author        string
-	Maintainer    string
-	Sentence      string
-	Paragraph     string
-	URL           string
-	Category      string
-	License       string
-	Properties    map[string]string
-}
-
-func (library *Library) String() string {
-	return library.Name + " : " + library.SrcFolder
-}
-
-func (library *Library) SupportsArchitectures(archs []string) bool {
-	if sliceContains(archs, constants.LIBRARY_ALL_ARCHS) || sliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
-		return true
-	}
-
-	for _, libraryArch := range library.Archs {
-		if sliceContains(archs, libraryArch) {
-			return true
-		}
-	}
-
-	return false
-}
-
 type PlatforKeysRewrite struct {
 	Rewrites []PlatforKeyRewrite
 }
@@ -203,8 +155,8 @@ type SourceFolder struct {
 }
 
 type LibraryResolutionResult struct {
-	Library          *Library
-	NotUsedLibraries []*Library
+	Library          *libraries.Library
+	NotUsedLibraries []*libraries.Library
 }
 
 type CTag struct {
@@ -224,9 +176,9 @@ type CTag struct {
 	PrototypeModifiers string
 }
 
-func LibraryToSourceFolder(library *Library) []SourceFolder {
+func LibraryToSourceFolder(library *libraries.Library) []SourceFolder {
 	sourceFolders := []SourceFolder{}
-	recurse := library.Layout == LIBRARY_RECURSIVE
+	recurse := library.Layout == libraries.LIBRARY_RECURSIVE
 	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
 	if library.UtilityFolder != "" {
 		sourceFolders = append(sourceFolders, SourceFolder{Folder: library.UtilityFolder, Recurse: false})
