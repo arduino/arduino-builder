@@ -32,12 +32,10 @@ package builder
 import (
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
@@ -79,7 +77,16 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			return i18n.WrapError(err)
 		}
 		for _, subFolder := range subFolders {
-			library, err := makeLibrary(filepath.Join(libraryFolder, subFolder.Name()), debugLevel, logger)
+			library, err := libraries.Load(filepath.Join(libraryFolder, subFolder.Name()))
+			if debugLevel > 0 {
+				if warnings, err := library.Lint(); err != nil {
+					return i18n.WrapError(err)
+				} else {
+					for _, warning := range warnings {
+						logger.Fprintln(os.Stdout, "warn", warning)
+					}
+				}
+			}
 			if err != nil {
 				return i18n.WrapError(err)
 			}
@@ -104,117 +111,6 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	ctx.HeaderToLibraries = headerToLibraries
 
 	return nil
-}
-
-func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*libraries.Library, error) {
-	if _, err := os.Stat(filepath.Join(libraryFolder, "library.properties")); os.IsNotExist(err) {
-		return makeLegacyLibrary(libraryFolder)
-	}
-	return makeNewLibrary(libraryFolder, debugLevel, logger)
-}
-
-func addUtilityFolder(library *libraries.Library) {
-	utilitySourcePath := filepath.Join(library.Folder, "utility")
-	stat, err := os.Stat(utilitySourcePath)
-	if err == nil && stat.IsDir() {
-		library.UtilityFolder = utilitySourcePath
-	}
-}
-
-func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*libraries.Library, error) {
-	libProperties, err := properties.Load(filepath.Join(libraryFolder, "library.properties"))
-	if err != nil {
-		return nil, i18n.WrapError(err)
-	}
-
-	if libProperties["maintainer"] == "" && libProperties["email"] != "" {
-		libProperties["maintainer"] = libProperties["email"]
-	}
-
-	for _, propName := range libraries.MandatoryProperties {
-		if libProperties[propName] == "" {
-			libProperties[propName] = "-"
-		}
-	}
-
-	library := &libraries.Library{}
-	library.Folder = libraryFolder
-	if stat, err := os.Stat(filepath.Join(libraryFolder, "src")); err == nil && stat.IsDir() {
-		library.Layout = libraries.RecursiveLayout
-		library.SrcFolder = filepath.Join(libraryFolder, "src")
-	} else {
-		library.Layout = libraries.FlatLayout
-		library.SrcFolder = libraryFolder
-		addUtilityFolder(library)
-	}
-
-	subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
-	if err != nil {
-		return nil, i18n.WrapError(err)
-	}
-
-	if debugLevel >= 0 {
-		for _, subFolder := range subFolders {
-			if utils.IsSCCSOrHiddenFile(subFolder) {
-				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
-					logger.Fprintln(os.Stdout, "warn",
-						"WARNING: Spurious {0} folder in '{1}' library",
-						filepath.Base(subFolder.Name()), libProperties["name"])
-				}
-			}
-		}
-	}
-
-	if libProperties["architectures"] == "" {
-		libProperties["architectures"] = "*"
-	}
-	library.Architectures = []string{}
-	for _, arch := range strings.Split(libProperties["architectures"], ",") {
-		library.Architectures = append(library.Architectures, strings.TrimSpace(arch))
-	}
-
-	libProperties["category"] = strings.TrimSpace(libProperties["category"])
-	if !libraries.ValidCategories[libProperties["category"]] {
-		logger.Fprintln(os.Stdout, "warn",
-			"WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'",
-			libProperties["category"], libProperties["name"], "Uncategorized")
-		libProperties["category"] = "Uncategorized"
-	}
-	library.Category = libProperties["category"]
-
-	if libProperties["license"] == "" {
-		libProperties["license"] = "Unspecified"
-	}
-	library.License = libProperties["license"]
-
-	library.Name = filepath.Base(libraryFolder)
-	library.RealName = strings.TrimSpace(libProperties["name"])
-	library.Version = strings.TrimSpace(libProperties["version"])
-	library.Author = strings.TrimSpace(libProperties["author"])
-	library.Maintainer = strings.TrimSpace(libProperties["maintainer"])
-	library.Sentence = strings.TrimSpace(libProperties["sentence"])
-	library.Paragraph = strings.TrimSpace(libProperties["paragraph"])
-	library.Website = strings.TrimSpace(libProperties["url"])
-	library.IsLegacy = false
-	library.DotALinkage = strings.TrimSpace(libProperties["dot_a_linkage"]) == "true"
-	library.Precompiled = strings.TrimSpace(libProperties["precompiled"]) == "true"
-	library.LDflags = strings.TrimSpace(libProperties["ldflags"])
-	library.Properties = libProperties
-
-	return library, nil
-}
-
-func makeLegacyLibrary(libraryFolder string) (*libraries.Library, error) {
-	library := &libraries.Library{
-		Folder:        libraryFolder,
-		SrcFolder:     libraryFolder,
-		Layout:        libraries.FlatLayout,
-		Name:          filepath.Base(libraryFolder),
-		Architectures: []string{"*"},
-		IsLegacy:      true,
-	}
-	addUtilityFolder(library)
-	return library, nil
 }
 
 func appendPathToLibrariesFolders(librariesFolders []string, newLibrariesFolder string) []string {
