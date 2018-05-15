@@ -144,7 +144,7 @@ func compileLibrary(library *libraries.Library, buildPath string, buildPropertie
 		}
 	}
 
-	if library.Layout == libraries.LIBRARY_RECURSIVE {
+	if library.Layout == libraries.RecursiveLayout {
 		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)

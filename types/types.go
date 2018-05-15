@@ -178,7 +178,7 @@ type CTag struct {
 
 func LibraryToSourceFolder(library *libraries.Library) []SourceFolder {
 	sourceFolders := []SourceFolder{}
-	recurse := library.Layout == libraries.LIBRARY_RECURSIVE
+	recurse := library.Layout == libraries.RecursiveLayout
 	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
 	if library.UtilityFolder != "" {
 		sourceFolders = append(sourceFolders, SourceFolder{Folder: library.UtilityFolder, Recurse: false})

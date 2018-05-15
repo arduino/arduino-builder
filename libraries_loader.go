@@ -131,7 +131,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		libProperties["maintainer"] = libProperties["email"]
 	}
 
-	for _, propName := range LIBRARY_NOT_SO_MANDATORY_PROPERTIES {
+	for _, propName := range libraries.MandatoryProperties {
 		if libProperties[propName] == "" {
 			libProperties[propName] = "-"
 		}
@@ -140,10 +140,10 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	library := &libraries.Library{}
 	library.Folder = libraryFolder
 	if stat, err := os.Stat(filepath.Join(libraryFolder, "src")); err == nil && stat.IsDir() {
-		library.Layout = libraries.LIBRARY_RECURSIVE
+		library.Layout = libraries.RecursiveLayout
 		library.SrcFolder = filepath.Join(libraryFolder, "src")
 	} else {
-		library.Layout = libraries.LIBRARY_FLAT
+		library.Layout = libraries.FlatLayout
 		library.SrcFolder = libraryFolder
 		addUtilityFolder(library)
 	}
@@ -174,7 +174,7 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 	}
 
 	libProperties["category"] = strings.TrimSpace(libProperties["category"])
-	if !LIBRARY_CATEGORIES[libProperties["category"]] {
+	if !libraries.ValidCategories[libProperties["category"]] {
 		logger.Fprintln(os.Stdout, "warn",
 			"WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'",
 			libProperties["category"], libProperties["name"], "Uncategorized")
@@ -208,7 +208,7 @@ func makeLegacyLibrary(libraryFolder string) (*libraries.Library, error) {
 	library := &libraries.Library{
 		Folder:        libraryFolder,
 		SrcFolder:     libraryFolder,
-		Layout:        libraries.LIBRARY_FLAT,
+		Layout:        libraries.FlatLayout,
 		Name:          filepath.Base(libraryFolder),
 		Architectures: []string{"*"},
 		IsLegacy:      true,

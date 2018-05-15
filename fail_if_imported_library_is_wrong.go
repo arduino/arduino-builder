@@ -53,12 +53,12 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 			if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_ARCH)); err == nil && stat.IsDir() {
 				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
 			}
-			for _, propName := range LIBRARY_MANDATORY_PROPERTIES {
+			for _, propName := range libraries.MandatoryProperties {
 				if _, ok := library.Properties[propName]; !ok {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.Folder)
 				}
 			}
-			if library.Layout == libraries.LIBRARY_RECURSIVE {
+			if library.Layout == libraries.RecursiveLayout {
 				if stat, err := os.Stat(filepath.Join(library.Folder, "utility")); err == nil && stat.IsDir() {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
 				}
