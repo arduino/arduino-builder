@@ -66,7 +66,7 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), ctx.PreprocPath)
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_LIBRARIES)), ctx.LibrariesBuildPath)
+	require.Equal(t, Abs(t, filepath.Join("folder", "libraries")), ctx.LibrariesBuildPath)
 	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
 
 	require.NotNil(t, ctx.WarningsLevel)

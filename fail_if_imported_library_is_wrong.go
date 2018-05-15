@@ -59,7 +59,7 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 				}
 			}
 			if library.Layout == libraries.LIBRARY_RECURSIVE {
-				if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)); err == nil && stat.IsDir() {
+				if stat, err := os.Stat(filepath.Join(library.Folder, "utility")); err == nil && stat.IsDir() {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
 				}
 			}

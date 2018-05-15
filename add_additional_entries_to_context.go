@@ -51,7 +51,7 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		librariesBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_LIBRARIES))
+		librariesBuildPath, err := filepath.Abs(filepath.Join(buildPath, "libraries"))
 		if err != nil {
 			return i18n.WrapError(err)
 		}

@@ -46,8 +46,8 @@ var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
 var ADDITIONAL_FILE_VALID_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".s": true}
 var ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS = map[string]bool{".c": true, ".cpp": true, ".s": true}
 
-var LIBRARY_MANDATORY_PROPERTIES = []string{constants.LIBRARY_NAME, constants.LIBRARY_VERSION, constants.LIBRARY_AUTHOR, constants.LIBRARY_MAINTAINER}
-var LIBRARY_NOT_SO_MANDATORY_PROPERTIES = []string{constants.LIBRARY_SENTENCE, constants.LIBRARY_PARAGRAPH, constants.LIBRARY_URL}
+var LIBRARY_MANDATORY_PROPERTIES = []string{"name", "version", "author", constants.LIBRARY_MAINTAINER}
+var LIBRARY_NOT_SO_MANDATORY_PROPERTIES = []string{"sentence", "paragraph", "url"}
 var LIBRARY_CATEGORIES = map[string]bool{
 	"Display":             true,
 	"Communication":       true,

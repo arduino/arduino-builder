@@ -166,7 +166,7 @@ func compileLibrary(library *libraries.Library, buildPath string, buildPropertie
 		}
 
 		if library.UtilityFolder != "" {
-			utilityBuildPath := filepath.Join(libraryBuildPath, constants.LIBRARY_FOLDER_UTILITY)
+			utilityBuildPath := filepath.Join(libraryBuildPath, "utility")
 			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 			if err != nil {
 				return nil, i18n.WrapError(err)

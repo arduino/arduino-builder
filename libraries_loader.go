@@ -34,7 +34,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
@@ -59,10 +58,10 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	actualPlatform := ctx.ActualPlatform
 	if actualPlatform != platform {
-		sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(actualPlatform.Folder, constants.FOLDER_LIBRARIES))
+		sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(actualPlatform.Folder, "libraries"))
 	}
 
-	sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(platform.Folder, constants.FOLDER_LIBRARIES))
+	sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(platform.Folder, "libraries"))
 
 	librariesFolders := ctx.OtherLibrariesFolders
 	librariesFolders, err = utils.AbsolutizePaths(librariesFolders)
@@ -108,14 +107,14 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 }
 
 func makeLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*libraries.Library, error) {
-	if _, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES)); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(libraryFolder, "library.properties")); os.IsNotExist(err) {
 		return makeLegacyLibrary(libraryFolder)
 	}
 	return makeNewLibrary(libraryFolder, debugLevel, logger)
 }
 
 func addUtilityFolder(library *libraries.Library) {
-	utilitySourcePath := filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)
+	utilitySourcePath := filepath.Join(library.Folder, "utility")
 	stat, err := os.Stat(utilitySourcePath)
 	if err == nil && stat.IsDir() {
 		library.UtilityFolder = utilitySourcePath
@@ -123,26 +122,26 @@ func addUtilityFolder(library *libraries.Library) {
 }
 
 func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*libraries.Library, error) {
-	libProperties, err := properties.Load(filepath.Join(libraryFolder, constants.LIBRARY_PROPERTIES))
+	libProperties, err := properties.Load(filepath.Join(libraryFolder, "library.properties"))
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	if libProperties[constants.LIBRARY_MAINTAINER] == constants.EMPTY_STRING && libProperties[constants.LIBRARY_EMAIL] != constants.EMPTY_STRING {
-		libProperties[constants.LIBRARY_MAINTAINER] = libProperties[constants.LIBRARY_EMAIL]
+	if libProperties["maintainer"] == "" && libProperties["email"] != "" {
+		libProperties["maintainer"] = libProperties["email"]
 	}
 
 	for _, propName := range LIBRARY_NOT_SO_MANDATORY_PROPERTIES {
-		if libProperties[propName] == constants.EMPTY_STRING {
+		if libProperties[propName] == "" {
 			libProperties[propName] = "-"
 		}
 	}
 
 	library := &libraries.Library{}
 	library.Folder = libraryFolder
-	if stat, err := os.Stat(filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)); err == nil && stat.IsDir() {
+	if stat, err := os.Stat(filepath.Join(libraryFolder, "src")); err == nil && stat.IsDir() {
 		library.Layout = libraries.LIBRARY_RECURSIVE
-		library.SrcFolder = filepath.Join(libraryFolder, constants.LIBRARY_FOLDER_SRC)
+		library.SrcFolder = filepath.Join(libraryFolder, "src")
 	} else {
 		library.Layout = libraries.LIBRARY_FLAT
 		library.SrcFolder = libraryFolder
@@ -158,44 +157,48 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		for _, subFolder := range subFolders {
 			if utils.IsSCCSOrHiddenFile(subFolder) {
 				if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
-					logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_SPURIOUS_FILE_IN_LIB, filepath.Base(subFolder.Name()), libProperties[constants.LIBRARY_NAME])
+					logger.Fprintln(os.Stdout, "warn",
+						"WARNING: Spurious {0} folder in '{1}' library",
+						filepath.Base(subFolder.Name()), libProperties["name"])
 				}
 			}
 		}
 	}
 
-	if libProperties[constants.LIBRARY_ARCHITECTURES] == constants.EMPTY_STRING {
-		libProperties[constants.LIBRARY_ARCHITECTURES] = constants.LIBRARY_ALL_ARCHS
+	if libProperties["architectures"] == "" {
+		libProperties["architectures"] = "*"
 	}
 	library.Architectures = []string{}
-	for _, arch := range strings.Split(libProperties[constants.LIBRARY_ARCHITECTURES], ",") {
+	for _, arch := range strings.Split(libProperties["architectures"], ",") {
 		library.Architectures = append(library.Architectures, strings.TrimSpace(arch))
 	}
 
-	libProperties[constants.LIBRARY_CATEGORY] = strings.TrimSpace(libProperties[constants.LIBRARY_CATEGORY])
-	if !LIBRARY_CATEGORIES[libProperties[constants.LIBRARY_CATEGORY]] {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_LIB_INVALID_CATEGORY, libProperties[constants.LIBRARY_CATEGORY], libProperties[constants.LIBRARY_NAME], constants.LIB_CATEGORY_UNCATEGORIZED)
-		libProperties[constants.LIBRARY_CATEGORY] = constants.LIB_CATEGORY_UNCATEGORIZED
+	libProperties["category"] = strings.TrimSpace(libProperties["category"])
+	if !LIBRARY_CATEGORIES[libProperties["category"]] {
+		logger.Fprintln(os.Stdout, "warn",
+			"WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'",
+			libProperties["category"], libProperties["name"], "Uncategorized")
+		libProperties["category"] = "Uncategorized"
 	}
-	library.Category = libProperties[constants.LIBRARY_CATEGORY]
+	library.Category = libProperties["category"]
 
-	if libProperties[constants.LIBRARY_LICENSE] == constants.EMPTY_STRING {
-		libProperties[constants.LIBRARY_LICENSE] = constants.LIB_LICENSE_UNSPECIFIED
+	if libProperties["license"] == "" {
+		libProperties["license"] = "Unspecified"
 	}
-	library.License = libProperties[constants.LIBRARY_LICENSE]
+	library.License = libProperties["license"]
 
 	library.Name = filepath.Base(libraryFolder)
-	library.RealName = strings.TrimSpace(libProperties[constants.LIBRARY_NAME])
-	library.Version = strings.TrimSpace(libProperties[constants.LIBRARY_VERSION])
-	library.Author = strings.TrimSpace(libProperties[constants.LIBRARY_AUTHOR])
-	library.Maintainer = strings.TrimSpace(libProperties[constants.LIBRARY_MAINTAINER])
-	library.Sentence = strings.TrimSpace(libProperties[constants.LIBRARY_SENTENCE])
-	library.Paragraph = strings.TrimSpace(libProperties[constants.LIBRARY_PARAGRAPH])
-	library.Website = strings.TrimSpace(libProperties[constants.LIBRARY_URL])
+	library.RealName = strings.TrimSpace(libProperties["name"])
+	library.Version = strings.TrimSpace(libProperties["version"])
+	library.Author = strings.TrimSpace(libProperties["author"])
+	library.Maintainer = strings.TrimSpace(libProperties["maintainer"])
+	library.Sentence = strings.TrimSpace(libProperties["sentence"])
+	library.Paragraph = strings.TrimSpace(libProperties["paragraph"])
+	library.Website = strings.TrimSpace(libProperties["url"])
 	library.IsLegacy = false
-	library.DotALinkage = strings.TrimSpace(libProperties[constants.LIBRARY_DOT_A_LINKAGE]) == "true"
-	library.Precompiled = strings.TrimSpace(libProperties[constants.LIBRARY_PRECOMPILED]) == "true"
-	library.LDflags = strings.TrimSpace(libProperties[constants.LIBRARY_LDFLAGS])
+	library.DotALinkage = strings.TrimSpace(libProperties["dot_a_linkage"]) == "true"
+	library.Precompiled = strings.TrimSpace(libProperties["precompiled"]) == "true"
+	library.LDflags = strings.TrimSpace(libProperties["ldflags"])
 	library.Properties = libProperties
 
 	return library, nil
@@ -207,7 +210,7 @@ func makeLegacyLibrary(libraryFolder string) (*libraries.Library, error) {
 		SrcFolder:     libraryFolder,
 		Layout:        libraries.LIBRARY_FLAT,
 		Name:          filepath.Base(libraryFolder),
-		Architectures: []string{constants.LIBRARY_ALL_ARCHS},
+		Architectures: []string{"*"},
 		IsLegacy:      true,
 	}
 	addUtilityFolder(library)

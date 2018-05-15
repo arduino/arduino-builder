@@ -105,7 +105,7 @@ func TestBuilderBridge(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.hex"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge", "Mailbox.cpp.o"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
 	NoError(t, err)
 }
 
@@ -132,7 +132,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, "sketch_with_config.ino.hex"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge", "Mailbox.cpp.o"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
 	NoError(t, err)
 }
 
@@ -164,7 +164,7 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.hex"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge", "Mailbox.cpp.o"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
 	NoError(t, err)
 }
 
@@ -196,7 +196,7 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.bin"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge", "Mailbox.cpp.o"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
 	NoError(t, err)
 
 	cmd := exec.Command(filepath.Join("downloaded_tools", "arm-none-eabi-gcc", "4.8.3-2014q1", "bin", "arm-none-eabi-objdump"), "-f", filepath.Join(buildPath, constants.FOLDER_CORE, "core.a"))
@@ -230,7 +230,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	NoError(t, err)
 	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.hex"))
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge", "Mailbox.cpp.o"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
 	NoError(t, err)
 }
 
@@ -302,17 +302,17 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 	buildPath := SetupBuildPath(t, ctx)
 	defer os.RemoveAll(buildPath)
 
-	NoError(t, os.MkdirAll(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"), os.FileMode(0755)))
+	NoError(t, os.MkdirAll(filepath.Join(buildPath, "libraries", "SPI"), os.FileMode(0755)))
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "SPI"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "SPI"))
 	require.Error(t, err)
 	require.True(t, os.IsNotExist(err))
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_LIBRARIES, "Bridge"))
+	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge"))
 	NoError(t, err)
 }
 
