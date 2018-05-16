@@ -34,6 +34,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/paths"
+
 	"github.com/arduino/arduino-builder/types"
 )
 
@@ -65,7 +67,7 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 	}
 
 	pm := ctx.PackageManager
-	pm.LoadToolsFromBundleDirectories(builtinFolders)
+	pm.LoadToolsFromBundleDirectories(paths.NewPathList(builtinFolders...))
 
 	ctx.AllTools = pm.GetAllInstalledToolsReleases()
 

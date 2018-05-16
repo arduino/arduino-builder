@@ -33,13 +33,14 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
 type HardwareLoader struct{}
 
 func (s *HardwareLoader) Run(ctx *types.Context) error {
 	pm := packagemanager.NewPackageManager()
-	if err := pm.LoadHardwareFromDirectories(ctx.HardwareFolders); err != nil {
+	if err := pm.LoadHardwareFromDirectories(paths.NewPathList(ctx.HardwareFolders...)); err != nil {
 		return i18n.WrapError(err)
 	}
 	ctx.PackageManager = pm

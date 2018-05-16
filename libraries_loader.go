@@ -37,6 +37,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
 type LibrariesLoader struct{}
@@ -77,7 +78,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			return i18n.WrapError(err)
 		}
 		for _, subFolder := range subFolders {
-			library, err := libraries.Load(filepath.Join(libraryFolder, subFolder.Name()))
+			library, err := libraries.Load(paths.New(libraryFolder).Join(subFolder.Name()))
 			if debugLevel > 0 {
 				if warnings, err := library.Lint(); err != nil {
 					return i18n.WrapError(err)
