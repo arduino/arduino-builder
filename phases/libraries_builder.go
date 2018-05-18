@@ -82,7 +82,7 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*libraries
 			// add library src path to compiler.c.elf.extra_flags
 			// use library.Name as lib name and srcPath/{mcpu} as location
 			mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
-			path := filepath.Join(library.SrcFolder, mcu)
+			path := library.SrcFolder.Join(mcu).String()
 			// find all library names in the folder and prepend -l
 			filePaths := []string{}
 			libs_cmd := library.LDflags + " "
@@ -133,7 +133,7 @@ func compileLibrary(library *libraries.Library, buildPath string, buildPropertie
 
 		filePaths := []string{}
 		mcu := buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
-		err := utils.FindFilesInFolder(&filePaths, filepath.Join(library.SrcFolder, mcu), extensions, true)
+		err := utils.FindFilesInFolder(&filePaths, library.SrcFolder.Join(mcu).String(), extensions, true)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -145,7 +145,7 @@ func compileLibrary(library *libraries.Library, buildPath string, buildPropertie
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder.String(), libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -157,17 +157,17 @@ func compileLibrary(library *libraries.Library, buildPath string, buildPropertie
 			objectFiles = []string{archiveFile}
 		}
 	} else {
-		if library.UtilityFolder != "" {
-			includes = append(includes, utils.WrapWithHyphenI(library.UtilityFolder))
+		if library.UtilityFolder != nil {
+			includes = append(includes, utils.WrapWithHyphenI(library.UtilityFolder.String()))
 		}
-		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder.String(), false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 
-		if library.UtilityFolder != "" {
+		if library.UtilityFolder != nil {
 			utilityBuildPath := filepath.Join(libraryBuildPath, "utility")
-			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder.String(), false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}

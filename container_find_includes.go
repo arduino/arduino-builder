@@ -315,8 +315,8 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		cache.ExpectFile(sourcePath)
 
 		includes := ctx.IncludeFolders
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityFolder != "" {
-			includes = append(includes, library.UtilityFolder)
+		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityFolder != nil {
+			includes = append(includes, library.UtilityFolder.String())
 		}
 		if unchanged && cache.valid {
 			include = cache.Next().Include
@@ -354,10 +354,10 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		appendIncludeFolder(ctx, cache, sourcePath, include, library.SrcFolder)
-		sourceFolders := types.LibraryToSourceFolder(library)
+		appendIncludeFolder(ctx, cache, sourcePath, include, library.SrcFolder.String())
+		sourceFolders := library.SourceDirs()
 		for _, sourceFolder := range sourceFolders {
-			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceFolder.Folder, sourceFolder.Recurse)
+			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceFolder.Folder.String(), sourceFolder.Recurse)
 		}
 		first = false
 	}

@@ -99,7 +99,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	headerToLibraries := make(map[string][]*libraries.Library)
 	for _, library := range libs {
-		headers, err := utils.ReadDirFiltered(library.SrcFolder, utils.FilterFilesWithExtensions(".h", ".hpp", ".hh"))
+		headers, err := utils.ReadDirFiltered(library.SrcFolder.String(), utils.FilterFilesWithExtensions(".h", ".hpp", ".hh"))
 		if err != nil {
 			return i18n.WrapError(err)
 		}

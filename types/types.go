@@ -80,7 +80,7 @@ func sourceRoot(ctx *Context, origin interface{}) string {
 	case *Sketch:
 		return ctx.SketchBuildPath
 	case *libraries.Library:
-		return o.SrcFolder
+		return o.SrcFolder.String()
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
@@ -149,11 +149,6 @@ func (proto *Prototype) String() string {
 	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
 }
 
-type SourceFolder struct {
-	Folder  string
-	Recurse bool
-}
-
 type LibraryResolutionResult struct {
 	Library          *libraries.Library
 	NotUsedLibraries []*libraries.Library
@@ -174,16 +169,6 @@ type CTag struct {
 
 	Prototype          string
 	PrototypeModifiers string
-}
-
-func LibraryToSourceFolder(library *libraries.Library) []SourceFolder {
-	sourceFolders := []SourceFolder{}
-	recurse := library.Layout == libraries.RecursiveLayout
-	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
-	if library.UtilityFolder != "" {
-		sourceFolders = append(sourceFolders, SourceFolder{Folder: library.UtilityFolder, Recurse: false})
-	}
-	return sourceFolders
 }
 
 type Command interface {
