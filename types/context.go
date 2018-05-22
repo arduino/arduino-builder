@@ -100,6 +100,9 @@ type Context struct {
 
 	// Reuse old tools since the backing storage didn't change
 	CanUseCachedTools bool
+
+	// Experimental: use arduino-preprocessor to create prototypes
+	UseArduinoPreprocessor bool
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {

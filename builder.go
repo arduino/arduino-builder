@@ -142,6 +142,18 @@ func (s *Builder) Run(ctx *types.Context) error {
 	return otherErr
 }
 
+type PreprocessSketch struct{}
+
+func (s *PreprocessSketch) Run(ctx *types.Context) error {
+	var commands []types.Command
+	if ctx.UseArduinoPreprocessor {
+		commands = append(commands, &PreprocessSketchArduino{})
+	} else {
+		commands = append(commands, &ContainerAddPrototypes{})
+	}
+	return runCommands(ctx, commands, true)
+}
+
 type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {

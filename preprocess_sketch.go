@@ -43,9 +43,9 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 )
 
-type PreprocessSketch struct{}
+type PreprocessSketchArduino struct{}
 
-func (s *PreprocessSketch) Run(ctx *types.Context) error {
+func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 	sourceFile := filepath.Join(ctx.SketchBuildPath, filepath.Base(ctx.Sketch.MainFile.Name)+".cpp")
 	commands := []types.Command{
 		&ArduinoPreprocessorRunner{},

@@ -88,6 +88,7 @@ const FLAG_DAEMON = "daemon"
 const FLAG_VID_PID = "vid-pid"
 const FLAG_JOBS = "jobs"
 const FLAG_TRACE = "trace"
+const FLAG_EXPERIMENTAL = "experimental"
 
 type foldersFlag []string
 
@@ -149,6 +150,7 @@ var daemonFlag *bool
 var vidPidFlag *string
 var jobsFlag *int
 var traceFlag *bool
+var experimentalFeatures *bool
 
 func init() {
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
@@ -176,6 +178,7 @@ func init() {
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
 	jobsFlag = flag.Int(FLAG_JOBS, 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
 	traceFlag = flag.Bool(FLAG_TRACE, false, "traces the whole process lifecycle")
+	experimentalFeatures = flag.Bool(FLAG_EXPERIMENTAL, false, "enables experimental features")
 }
 
 func main() {
@@ -221,6 +224,11 @@ func main() {
 	}
 
 	ctx := &types.Context{}
+
+	// place here all experimental features that should live under this flag
+	if *experimentalFeatures {
+		ctx.UseArduinoPreprocessor = true
+	}
 
 	if *daemonFlag {
 		var loggerBuffer []string
