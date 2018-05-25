@@ -34,6 +34,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 )
@@ -43,7 +45,8 @@ type FilterSketchSource struct {
 }
 
 func (s *FilterSketchSource) Run(ctx *types.Context) error {
-	fileNames := []string{ctx.Sketch.MainFile.Name}
+	fileNames := paths.NewPathList()
+	fileNames.Add(ctx.Sketch.MainFile.Name)
 	for _, file := range ctx.Sketch.OtherSketchFiles {
 		fileNames = append(fileNames, file.Name)
 	}
@@ -54,9 +57,8 @@ func (s *FilterSketchSource) Run(ctx *types.Context) error {
 	scanner := bufio.NewScanner(strings.NewReader(*s.Source))
 	for scanner.Scan() {
 		line := scanner.Text()
-		filename := parseLineMarker(line)
-		if filename != "" {
-			inSketch = utils.SliceContains(fileNames, filename)
+		if filename := parseLineMarker(line); filename != nil {
+			inSketch = fileNames.Contains(filename)
 		}
 
 		if inSketch {
@@ -70,7 +72,7 @@ func (s *FilterSketchSource) Run(ctx *types.Context) error {
 
 // Parses the given line as a gcc line marker and returns the contained
 // filename.
-func parseLineMarker(line string) string {
+func parseLineMarker(line string) *paths.Path {
 	// A line marker contains the line number and filename and looks like:
 	// # 123 /path/to/file.cpp
 	// It can be followed by zero or more flag number that indicate the
@@ -80,12 +82,12 @@ func parseLineMarker(line string) string {
 
 	split := strings.SplitN(line, " ", 3)
 	if len(split) < 3 || split[0] != "#" {
-		return ""
+		return nil
 	}
 
 	_, err := strconv.Atoi(split[1])
 	if err != nil {
-		return ""
+		return nil
 	}
 
 	// If we get here, we found a # followed by a line number, so
@@ -94,7 +96,7 @@ func parseLineMarker(line string) string {
 	str, rest, ok := utils.ParseCppString(split[2])
 
 	if ok && (rest == "" || rest[0] == ' ') {
-		return str
+		return paths.New(str)
 	}
-	return ""
+	return nil
 }

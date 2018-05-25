@@ -30,56 +30,58 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateBuildPathIfMissing(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "test",
+		SketchLocation: paths.New("test"),
 	}
 
 	command := builder.GenerateBuildPathIfMissing{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath)
+	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath.String())
 	_, err = os.Stat(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 	require.True(t, os.IsNotExist(err))
 }
 
 func TestGenerateBuildPathIfEmpty(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "test",
+		SketchLocation: paths.New("test"),
 	}
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
 	err := createBuildPathIfMissing.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath)
+	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath.String())
 	_, err = os.Stat(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 	require.True(t, os.IsNotExist(err))
 }
 
 func TestDontGenerateBuildPathIfPresent(t *testing.T) {
 	ctx := &types.Context{}
-	ctx.BuildPath = "test"
+	ctx.BuildPath = paths.New("test")
 
 	createBuildPathIfMissing := builder.GenerateBuildPathIfMissing{}
 	err := createBuildPathIfMissing.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test", ctx.BuildPath)
+	require.Equal(t, ctx.BuildPath.String(), "test")
 }
 
 func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "test",
+		SketchLocation: paths.New("test"),
 	}
 
 	commands := []types.Command{
@@ -94,7 +96,7 @@ func TestGenerateBuildPathAndEnsureItExists(t *testing.T) {
 
 	defer os.RemoveAll(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 
-	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath)
+	require.Equal(t, filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"), ctx.BuildPath.String())
 	_, err := os.Stat(filepath.Join(os.TempDir(), "arduino-sketch-098F6BCD4621D373CADE4E832627B4F6"))
 	NoError(t, err)
 }

@@ -30,13 +30,13 @@
 package test
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -44,15 +44,15 @@ func TestSetupBuildProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		BuiltInToolsFolders: []string{"downloaded_tools", "./tools_builtin"},
-		SketchLocation:      filepath.Join("sketch1", "sketch.ino"),
+		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:      paths.New("sketch1", "sketch.ino"),
 		FQBN:                "arduino:avr:uno",
 		ArduinoAPIVersion:   "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -78,23 +78,27 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
 
-	require.Equal(t, Abs(t, "downloaded_hardware/arduino/avr"), buildProperties["runtime.platform.path"])
-	require.Equal(t, Abs(t, "downloaded_hardware/arduino"), buildProperties["runtime.hardware.path"])
+	requireEquivalentPaths(t, buildProperties["runtime.platform.path"], "downloaded_hardware/arduino/avr")
+	requireEquivalentPaths(t, buildProperties["runtime.hardware.path"], "downloaded_hardware/arduino")
 	require.Equal(t, "10600", buildProperties["runtime.ide.version"])
 	require.NotEmpty(t, buildProperties["runtime.os"])
 
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc.path"])
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"])
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), buildProperties["runtime.tools.bossac-1.6.1-arduino.path"])
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), buildProperties["runtime.tools.bossac-1.5-arduino.path"])
-	bossacPath := buildProperties["runtime.tools.bossac.path"]
-	require.True(t, bossacPath == Abs(t, "./downloaded_tools/bossac/1.6.1-arduino") || bossacPath == Abs(t, "./downloaded_tools/bossac/1.5-arduino"))
-	avrdudePath := buildProperties["runtime.tools.avrdude.path"]
-	require.True(t, avrdudePath == Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5") || avrdudePath == Abs(t, "./tools_builtin/avr"))
-	avrgccPath := buildProperties["runtime.tools.avr-gcc.path"]
-	require.True(t, avrgccPath == Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5") || avrgccPath == Abs(t, "./tools_builtin/avr"))
+	requireEquivalentPaths(t, buildProperties["runtime.tools.arm-none-eabi-gcc.path"], "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"], "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
 
-	require.Equal(t, Abs(t, "sketch1"), buildProperties["build.source.path"])
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avrdude-6.0.1-arduino5.path"], "tools_builtin/avr", "downloaded_tools/avrdude/6.0.1-arduino5")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avrdude.path"], "tools_builtin/avr", "downloaded_tools/avrdude/6.0.1-arduino5")
+
+	bossacPath := buildProperties["runtime.tools.bossac.path"]
+	bossac161Path := buildProperties["runtime.tools.bossac-1.6.1-arduino.path"]
+	bossac15Path := buildProperties["runtime.tools.bossac-1.5-arduino.path"]
+	requireEquivalentPaths(t, bossac161Path, "downloaded_tools/bossac/1.6.1-arduino")
+	requireEquivalentPaths(t, bossac15Path, "downloaded_tools/bossac/1.5-arduino")
+	requireEquivalentPaths(t, bossacPath, bossac161Path, bossac15Path)
+
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avr-gcc.path"], "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
+
+	requireEquivalentPaths(t, buildProperties["build.source.path"], "sketch1")
 
 	require.True(t, utils.MapStringStringHas(buildProperties, "extra.time.utc"))
 	require.True(t, utils.MapStringStringHas(buildProperties, "extra.time.local"))
@@ -106,9 +110,9 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders: []string{"downloaded_tools", "./tools_builtin"},
-		SketchLocation:      filepath.Join("sketch1", "sketch.ino"),
+		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:      paths.New("sketch1", "sketch.ino"),
 		FQBN:                "arduino:avr:uno",
 		ArduinoAPIVersion:   "10600",
 
@@ -116,7 +120,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -147,15 +151,15 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		BuiltInToolsFolders: []string{"downloaded_tools", "./tools_builtin"},
-		SketchLocation:      filepath.Join("sketch1", "sketch.ino"),
+		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:      paths.New("sketch1", "sketch.ino"),
 		FQBN:                "my_avr_platform:avr:custom_yun",
 		ArduinoAPIVersion:   "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -177,23 +181,23 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 
 	require.Equal(t, "custom_yun", buildProperties["_id"])
 	require.Equal(t, "caterina/Caterina-custom_yun.hex", buildProperties["bootloader.file"])
-	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr")), buildProperties["runtime.platform.path"])
-	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform")), buildProperties["runtime.hardware.path"])
+	requireEquivalentPaths(t, buildProperties["runtime.platform.path"], filepath.Join("user_hardware", "my_avr_platform", "avr"))
+	requireEquivalentPaths(t, buildProperties["runtime.hardware.path"], filepath.Join("user_hardware", "my_avr_platform"))
 }
 
 func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		BuiltInToolsFolders: []string{"downloaded_tools", "./tools_builtin"},
-		SketchLocation:      filepath.Join("sketch1", "sketch.ino"),
+		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:      paths.New("sketch1", "sketch.ino"),
 		FQBN:                "my_avr_platform:avr:custom_yun",
 		ArduinoAPIVersion:   "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -214,26 +218,25 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties["recipe.c.o.pattern"])
 	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties["tools.avrdude.config.path"])
 
-	require.Equal(t, Abs(t, "user_hardware/my_avr_platform/avr"), buildProperties["runtime.platform.path"])
-	require.Equal(t, Abs(t, "user_hardware/my_avr_platform"), buildProperties["runtime.hardware.path"])
+	requireEquivalentPaths(t, buildProperties["runtime.platform.path"], "user_hardware/my_avr_platform/avr")
+	requireEquivalentPaths(t, buildProperties["runtime.hardware.path"], "user_hardware/my_avr_platform")
 	require.Equal(t, "10600", buildProperties["runtime.ide.version"])
 	require.NotEmpty(t, buildProperties["runtime.os"])
 
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc.path"])
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), buildProperties["runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"])
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), buildProperties["runtime.tools.bossac-1.6.1-arduino.path"])
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), buildProperties["runtime.tools.bossac-1.5-arduino.path"])
-	require.True(t, buildProperties["runtime.tools.bossac.path"] == Abs(t, "./downloaded_tools/bossac/1.6.1-arduino") || buildProperties["runtime.tools.bossac.path"] == Abs(t, "./downloaded_tools/bossac/1.5-arduino"))
-	avrdudePath := buildProperties["runtime.tools.avrdude.path"]
-	require.True(t, avrdudePath == Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5") || avrdudePath == Abs(t, "./tools_builtin/avr"))
-	avrdudePath601 := buildProperties["runtime.tools.avrdude-6.0.1-arduino5.path"]
-	require.True(t, avrdudePath601 == Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5") || avrdudePath601 == Abs(t, "./tools_builtin/avr"))
-	avrgccPath := buildProperties["runtime.tools.avr-gcc.path"]
-	require.True(t, avrgccPath == Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5") || avrgccPath == Abs(t, "./tools_builtin/avr"))
-	avrgccPath481 := buildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"]
-	require.True(t, avrgccPath481 == Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5") || avrgccPath481 == Abs(t, "./tools_builtin/avr"))
+	requireEquivalentPaths(t, buildProperties["runtime.tools.arm-none-eabi-gcc.path"], "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"], "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.bossac-1.6.1-arduino.path"], "downloaded_tools/bossac/1.6.1-arduino")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.bossac-1.5-arduino.path"], "downloaded_tools/bossac/1.5-arduino")
 
-	require.Equal(t, Abs(t, "sketch1"), buildProperties["build.source.path"])
+	requireEquivalentPaths(t, buildProperties["runtime.tools.bossac.path"], "downloaded_tools/bossac/1.6.1-arduino", "downloaded_tools/bossac/1.5-arduino")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avrdude.path"], "downloaded_tools/avrdude/6.0.1-arduino5", "tools_builtin/avr")
+
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avrdude-6.0.1-arduino5.path"], "downloaded_tools/avrdude/6.0.1-arduino5", "tools_builtin/avr")
+
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avr-gcc.path"], "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
+	requireEquivalentPaths(t, buildProperties["runtime.tools.avr-gcc-4.8.1-arduino5.path"], "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
+
+	requireEquivalentPaths(t, buildProperties["build.source.path"], "sketch1")
 
 	require.True(t, utils.MapStringStringHas(buildProperties, "extra.time.utc"))
 	require.True(t, utils.MapStringStringHas(buildProperties, "extra.time.local"))

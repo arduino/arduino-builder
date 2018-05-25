@@ -31,13 +31,13 @@ package test
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,18 +45,18 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -81,18 +81,18 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch2", "SketchWithIfDef.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("sketch2", "SketchWithIfDef.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -116,18 +116,18 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch9", "sketch.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("sketch9", "sketch.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -154,18 +154,18 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch10", "sketch.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("sketch10", "sketch.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -192,17 +192,17 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		SketchLocation:          filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		SketchLocation:          paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
 		FQBN:                    "my_avr_platform:avr:custom_yun",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -222,25 +222,25 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
-	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI")), importedLibraries[0].SrcFolder.String())
+	requireEquivalentPaths(t, importedLibraries[0].SrcFolder.String(), filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI"))
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
 		FQBN:                    "my_avr_platform:avr:custom_yun",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -260,25 +260,25 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
-	require.Equal(t, Abs(t, filepath.Join("libraries", "SPI")), importedLibraries[0].SrcFolder.String())
+	requireEquivalentPaths(t, importedLibraries[0].SrcFolder.String(), filepath.Join("libraries", "SPI"))
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_usbhost", "sketch_usbhost.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("sketch_usbhost", "sketch_usbhost.ino"),
 		FQBN:                    "arduino:samd:arduino_zero_native",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -298,25 +298,25 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "USBHost", importedLibraries[0].Name)
-	require.Equal(t, Abs(t, filepath.Join("libraries", "USBHost", "src")), importedLibraries[0].SrcFolder.String())
+	requireEquivalentPaths(t, importedLibraries[0].SrcFolder.String(), filepath.Join("libraries", "USBHost", "src"))
 }
 
 func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"),
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"),
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 

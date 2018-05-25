@@ -30,12 +30,12 @@
 package test
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,15 +59,15 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	ctx := &types.Context{}
-	ctx.BuildPath = "folder"
+	ctx.BuildPath = paths.New("folder")
 
 	command := builder.AddAdditionalEntriesToContext{}
 	NoError(t, command.Run(ctx))
 
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_PREPROC)), ctx.PreprocPath)
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
-	require.Equal(t, Abs(t, filepath.Join("folder", "libraries")), ctx.LibrariesBuildPath)
-	require.Equal(t, Abs(t, filepath.Join("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
+	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_PREPROC)), ctx.PreprocPath)
+	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
+	require.Equal(t, Abs(t, paths.New("folder", "libraries")), ctx.LibrariesBuildPath)
+	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
 
 	require.NotNil(t, ctx.WarningsLevel)
 

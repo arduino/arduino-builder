@@ -30,23 +30,22 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestStoreBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders:         []string{"hardware"},
-		ToolsFolders:            []string{"tools"},
-		BuiltInLibrariesFolders: []string{"built-in libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
-		SketchLocation:          "sketchLocation",
+		HardwareFolders:         paths.NewPathList("hardware"),
+		ToolsFolders:            paths.NewPathList("tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("built-in libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
+		SketchLocation:          paths.New("sketchLocation"),
 		FQBN:                    "fqbn",
 		ArduinoAPIVersion:       "ideVersion",
 		CustomBuildProperties:   []string{"custom=prop"},
@@ -55,7 +54,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.CreateBuildOptionsMap{},
@@ -67,10 +66,11 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		NoError(t, err)
 	}
 
-	_, err := os.Stat(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE))
+	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).Exist()
 	NoError(t, err)
+	require.True(t, exist)
 
-	bytes, err := ioutil.ReadFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE))
+	bytes, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ReadFile()
 	NoError(t, err)
 
 	require.Equal(t, "{\n"+

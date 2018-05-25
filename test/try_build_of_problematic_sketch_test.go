@@ -31,12 +31,12 @@
 package test
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 )
 
 func TestTryBuild001(t *testing.T) {
@@ -119,7 +119,7 @@ func TestTryBuild019(t *testing.T) {
 
 func TestTryBuild020(t *testing.T) {
 	ctx := makeDefaultContext(t)
-	ctx.OtherLibrariesFolders = []string{"dependent_libraries", "libraries"}
+	ctx.OtherLibrariesFolders = paths.NewPathList("dependent_libraries", "libraries")
 	tryPreprocessWithContext(t, ctx, "sketch_with_dependend_libraries", "sketch.ino")
 }
 
@@ -222,17 +222,17 @@ func makeDefaultContext(t *testing.T) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		FQBN:              "arduino:avr:leonardo",
 		ArduinoAPIVersion: "10607",
 		Verbose:           true,
 		DebugPreprocessor: true,
 	}
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	return ctx
 }
@@ -243,11 +243,11 @@ func tryBuild(t *testing.T, sketchPath ...string) {
 }
 
 func tryBuildWithContext(t *testing.T, ctx *types.Context, sketchPath ...string) {
-	sketchLocation := filepath.Join(sketchPath...)
+	sketchLocation := paths.New(sketchPath...)
 	ctx.SketchLocation = sketchLocation
 
 	err := builder.RunBuilder(ctx)
-	NoError(t, err, "Build error for "+sketchLocation)
+	NoError(t, err, "Build error for "+sketchLocation.String())
 }
 
 func tryPreprocess(t *testing.T, sketchPath ...string) {
@@ -256,9 +256,9 @@ func tryPreprocess(t *testing.T, sketchPath ...string) {
 }
 
 func tryPreprocessWithContext(t *testing.T, ctx *types.Context, sketchPath ...string) {
-	sketchLocation := filepath.Join(sketchPath...)
+	sketchLocation := paths.New(sketchPath...)
 	ctx.SketchLocation = sketchLocation
 
 	err := builder.RunPreprocess(ctx)
-	NoError(t, err, "Build error for "+sketchLocation)
+	NoError(t, err, "Build error for "+sketchLocation.String())
 }

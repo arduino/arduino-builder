@@ -48,7 +48,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	properties := buildProperties.Clone()
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = ctagsTargetFilePath
+	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, ctagsTargetFilePath)
 
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
 	if pattern == constants.EMPTY_STRING {

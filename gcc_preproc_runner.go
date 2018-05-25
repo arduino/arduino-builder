@@ -30,7 +30,6 @@
 package builder
 
 import (
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -38,13 +37,14 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 )
 
 type GCCPreprocRunner struct {
-	SourceFilePath string
-	TargetFileName string
-	Includes       []string
+	SourceFilePath *paths.Path
+	TargetFileName *paths.Path
+	Includes       paths.PathList
 }
 
 func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
@@ -71,9 +71,9 @@ func (s *GCCPreprocRunner) Run(ctx *types.Context) error {
 }
 
 type GCCPreprocRunnerForDiscoveringIncludes struct {
-	SourceFilePath string
-	TargetFilePath string
-	Includes       []string
+	SourceFilePath *paths.Path
+	TargetFilePath *paths.Path
+	Includes       paths.PathList
 }
 
 func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
@@ -100,22 +100,20 @@ func (s *GCCPreprocRunnerForDiscoveringIncludes) Run(ctx *types.Context) error {
 	return nil
 }
 
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath string, targetFilePath string, includes []string) (properties.Map, string, error) {
-	if targetFilePath != utils.NULLFile() {
+func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) (properties.Map, *paths.Path, error) {
+	if !targetFilePath.EqualsTo(paths.NullPath()) {
 		preprocPath := ctx.PreprocPath
-		err := utils.EnsureFolderExists(preprocPath)
-		if err != nil {
-			return nil, "", i18n.WrapError(err)
+		if err := preprocPath.MkdirAll(); err != nil {
+			return nil, nil, i18n.WrapError(err)
 		}
-		targetFilePath = filepath.Join(preprocPath, targetFilePath)
+		targetFilePath = preprocPath.JoinPath(targetFilePath)
 	}
 
 	properties := ctx.BuildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = sourceFilePath
-	properties[constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH] = targetFilePath
+	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, sourceFilePath)
+	properties.SetPath(constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH, targetFilePath)
 
-	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
+	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(utils.Map(includes.AsStrings(), utils.WrapWithHyphenI), constants.SPACE)
 	builder_utils.RemoveHyphenMDDFlagFromGCCCommandLine(properties)
 
 	return properties, targetFilePath, nil

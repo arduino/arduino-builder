@@ -35,6 +35,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
@@ -42,7 +44,7 @@ import (
 
 func TestMergeSketch(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+		SketchLocation: paths.New("sketch1", "sketch.ino"),
 	}
 
 	commands := []types.Command{

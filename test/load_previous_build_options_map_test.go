@@ -30,23 +30,21 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/stretchr/testify/require"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
-	err := utils.WriteFile(filepath.Join(buildPath, constants.BUILD_OPTIONS_FILE), "test")
+	err := buildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte("test"))
 	NoError(t, err)
 
 	command := builder.LoadPreviousBuildOptionsMap{}
@@ -60,7 +58,7 @@ func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
 	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	command := builder.LoadPreviousBuildOptionsMap{}
 	err := command.Run(ctx)

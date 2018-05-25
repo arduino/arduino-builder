@@ -30,7 +30,7 @@
 package builder
 
 import (
-	"path/filepath"
+	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -40,9 +40,9 @@ import (
 type ContainerAddPrototypes struct{}
 
 func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
-	sourceFile := filepath.Join(ctx.SketchBuildPath, filepath.Base(ctx.Sketch.MainFile.Name)+".cpp")
+	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Name.Base() + ".cpp")
 	commands := []types.Command{
-		&GCCPreprocRunner{SourceFilePath: sourceFile, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: ctx.IncludeFolders},
+		&GCCPreprocRunner{SourceFilePath: sourceFile, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: ctx.IncludeFolders},
 		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},

@@ -30,26 +30,26 @@
 package test
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCTagsRunner(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := Abs(t, filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
+	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
@@ -57,7 +57,7 @@ func TestCTagsRunner(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -78,14 +78,14 @@ func TestCTagsRunner(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
-	expectedOutput := "server	" + sketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
-		"setup	" + sketchLocation + "	/^void setup() {$/;\"	kind:function	line:33	signature:()	returntype:void\n" +
-		"loop	" + sketchLocation + "	/^void loop() {$/;\"	kind:function	line:46	signature:()	returntype:void\n" +
-		"process	" + sketchLocation + "	/^void process(BridgeClient client) {$/;\"	kind:function	line:62	signature:(BridgeClient client)	returntype:void\n" +
-		"digitalCommand	" + sketchLocation + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:82	signature:(BridgeClient client)	returntype:void\n" +
-		"analogCommand	" + sketchLocation + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:109	signature:(BridgeClient client)	returntype:void\n" +
-		"modeCommand	" + sketchLocation + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:149	signature:(BridgeClient client)	returntype:void\n"
+	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
+	expectedOutput := "server	" + quotedSketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
+		"setup	" + quotedSketchLocation + "	/^void setup() {$/;\"	kind:function	line:33	signature:()	returntype:void\n" +
+		"loop	" + quotedSketchLocation + "	/^void loop() {$/;\"	kind:function	line:46	signature:()	returntype:void\n" +
+		"process	" + quotedSketchLocation + "	/^void process(BridgeClient client) {$/;\"	kind:function	line:62	signature:(BridgeClient client)	returntype:void\n" +
+		"digitalCommand	" + quotedSketchLocation + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:82	signature:(BridgeClient client)	returntype:void\n" +
+		"analogCommand	" + quotedSketchLocation + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:109	signature:(BridgeClient client)	returntype:void\n" +
+		"modeCommand	" + quotedSketchLocation + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:149	signature:(BridgeClient client)	returntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
@@ -93,13 +93,13 @@ func TestCTagsRunner(t *testing.T) {
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := Abs(t, filepath.Join("sketch_with_class", "sketch.ino"))
+	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
@@ -107,7 +107,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -128,12 +128,12 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
-	expectedOutput := "set_values\t" + sketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
-		"area\t" + sketchLocation + "\t/^    int area() {return width*height;}$/;\"\tkind:function\tline:5\tclass:Rectangle\tsignature:()\treturntype:int\n" +
-		"set_values\t" + sketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
-		"setup\t" + sketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
-		"loop\t" + sketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
+	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
+	expectedOutput := "set_values\t" + quotedSketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
+		"area\t" + quotedSketchLocation + "\t/^    int area() {return width*height;}$/;\"\tkind:function\tline:5\tclass:Rectangle\tsignature:()\treturntype:int\n" +
+		"set_values\t" + quotedSketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
+		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
+		"loop\t" + quotedSketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
@@ -141,13 +141,13 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := Abs(t, filepath.Join("sketch_with_typename", "sketch.ino"))
+	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
@@ -155,7 +155,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -176,11 +176,11 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
-	expectedOutput := "Foo\t" + sketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
-		"setup\t" + sketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
-		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
-		"func\t" + sketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
+	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
+	expectedOutput := "Foo\t" + quotedSketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
+		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
+		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
+		"func\t" + quotedSketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
@@ -188,13 +188,13 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := Abs(t, filepath.Join("sketch_with_namespace", "sketch.ino"))
+	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
@@ -202,7 +202,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -223,10 +223,10 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
-	expectedOutput := "value\t" + sketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
-		"setup\t" + sketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
-		"loop\t" + sketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
+	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
+	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
+		"setup\t" + quotedSketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
+		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
@@ -234,13 +234,13 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := Abs(t, filepath.Join("sketch_with_templates_and_shift", "template_and_shift.cpp"))
+	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "template_and_shift.cpp"))
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
 		FQBN:                    "arduino:avr:leonardo",
 		ArduinoAPIVersion:       "10600",
@@ -248,7 +248,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 
@@ -269,11 +269,11 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		NoError(t, err)
 	}
 
-	sketchLocation = strings.Replace(sketchLocation, "\\", "\\\\", -1)
-	expectedOutput := "printGyro\t" + sketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
-		"bVar\t" + sketchLocation + "\t/^c< 8 > bVar;$/;\"\tkind:variable\tline:15\n" +
-		"aVar\t" + sketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
-		"func\t" + sketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
+	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
+	expectedOutput := "printGyro\t" + quotedSketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
+		"bVar\t" + quotedSketchLocation + "\t/^c< 8 > bVar;$/;\"\tkind:variable\tline:15\n" +
+		"aVar\t" + quotedSketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
+		"func\t" + quotedSketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
 
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
@@ -13,13 +14,13 @@ import (
 // Context structure
 type Context struct {
 	// Build options
-	HardwareFolders         []string
-	ToolsFolders            []string
-	BuiltInToolsFolders     []string
-	LibrariesFolders        []string
-	BuiltInLibrariesFolders []string
-	OtherLibrariesFolders   []string
-	SketchLocation          string
+	HardwareFolders         paths.PathList
+	ToolsFolders            paths.PathList
+	BuiltInToolsFolders     paths.PathList
+	LibrariesFolders        paths.PathList
+	BuiltInLibrariesFolders paths.PathList
+	OtherLibrariesFolders   paths.PathList
+	SketchLocation          *paths.Path
 	ArduinoAPIVersion       string
 	FQBN                    string
 
@@ -42,17 +43,17 @@ type Context struct {
 
 	BuildProperties      properties.Map
 	BuildCore            string
-	BuildPath            string
-	BuildCachePath       string
-	SketchBuildPath      string
-	CoreBuildPath        string
-	CoreBuildCachePath   string
-	CoreArchiveFilePath  string
-	CoreObjectsFiles     []string
-	LibrariesBuildPath   string
-	LibrariesObjectFiles []string
-	PreprocPath          string
-	SketchObjectFiles    []string
+	BuildPath            *paths.Path
+	BuildCachePath       *paths.Path
+	SketchBuildPath      *paths.Path
+	CoreBuildPath        *paths.Path
+	CoreBuildCachePath   *paths.Path
+	CoreArchiveFilePath  *paths.Path
+	CoreObjectsFiles     paths.PathList
+	LibrariesBuildPath   *paths.Path
+	LibrariesObjectFiles paths.PathList
+	PreprocPath          *paths.Path
+	SketchObjectFiles    paths.PathList
 
 	CollectedSourceFiles *UniqueSourceFileQueue
 
@@ -68,11 +69,11 @@ type Context struct {
 	ImportedLibraries          []*libraries.Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
 	IncludeJustFound           string
-	IncludeFolders             []string
+	IncludeFolders             paths.PathList
 
 	// C++ Parsing
 	CTagsOutput                 string
-	CTagsTargetFile             string
+	CTagsTargetFile             *paths.Path
 	CTagsOfPreprocessedSource   []*CTag
 	IncludeSection              string
 	LineOffset                  int
@@ -92,16 +93,16 @@ type Context struct {
 	DebugLevel int
 
 	// ReadFileAndStoreInContext command
-	FileToRead string
+	FileToRead *paths.Path
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
 	opts := make(properties.Map)
-	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders, ",")
-	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders, ",")
-	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders, ",")
-	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesFolders, ",")
-	opts["sketchLocation"] = ctx.SketchLocation
+	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders.AsStrings(), ",")
+	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders.AsStrings(), ",")
+	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders.AsStrings(), ",")
+	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesFolders.AsStrings(), ",")
+	opts["sketchLocation"] = ctx.SketchLocation.String()
 	opts["fqbn"] = ctx.FQBN
 	opts["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	opts["customBuildProperties"] = strings.Join(ctx.CustomBuildProperties, ",")
@@ -109,11 +110,11 @@ func (ctx *Context) ExtractBuildOptions() properties.Map {
 }
 
 func (ctx *Context) InjectBuildOptions(opts properties.Map) {
-	ctx.HardwareFolders = strings.Split(opts["hardwareFolders"], ",")
-	ctx.ToolsFolders = strings.Split(opts["toolsFolders"], ",")
-	ctx.BuiltInLibrariesFolders = strings.Split(opts["builtInLibrariesFolders"], ",")
-	ctx.OtherLibrariesFolders = strings.Split(opts["otherLibrariesFolders"], ",")
-	ctx.SketchLocation = opts["sketchLocation"]
+	ctx.HardwareFolders = paths.NewPathList(strings.Split(opts["hardwareFolders"], ",")...)
+	ctx.ToolsFolders = paths.NewPathList(strings.Split(opts["toolsFolders"], ",")...)
+	ctx.BuiltInLibrariesFolders = paths.NewPathList(strings.Split(opts["builtInLibrariesFolders"], ",")...)
+	ctx.OtherLibrariesFolders = paths.NewPathList(strings.Split(opts["otherLibrariesFolders"], ",")...)
+	ctx.SketchLocation = paths.New(opts["sketchLocation"])
 	ctx.FQBN = opts["fqbn"]
 	ctx.ArduinoAPIVersion = opts["runtime.ide.version"]
 	ctx.CustomBuildProperties = strings.Split(opts["customBuildProperties"], ",")

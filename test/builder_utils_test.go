@@ -30,13 +30,13 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder/builder_utils"
-	"github.com/arduino/arduino-builder/utils"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
-	"os"
 	"testing"
 	"time"
+
+	"github.com/arduino/arduino-builder/builder_utils"
+	paths "github.com/arduino/go-paths-helper"
+	"github.com/stretchr/testify/require"
 )
 
 func sleep(t *testing.T) {
@@ -45,43 +45,44 @@ func sleep(t *testing.T) {
 	time.Sleep(dur)
 }
 
-func tempFile(t *testing.T, prefix string) string {
+func tempFile(t *testing.T, prefix string) *paths.Path {
 	file, err := ioutil.TempFile("", prefix)
+	file.Close()
 	NoError(t, err)
-	return file.Name()
+	return paths.New(file.Name())
 }
 
 func TestObjFileIsUpToDateObjMissing(t *testing.T) {
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, "", "")
+	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, nil, nil)
 	NoError(t, err)
 	require.False(t, upToDate)
 }
 
 func TestObjFileIsUpToDateDepMissing(t *testing.T) {
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
 	objFile := tempFile(t, "obj")
-	defer os.RemoveAll(objFile)
+	defer objFile.RemoveAll()
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, "")
+	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, nil)
 	NoError(t, err)
 	require.False(t, upToDate)
 }
 
 func TestObjFileIsUpToDateObjOlder(t *testing.T) {
 	objFile := tempFile(t, "obj")
-	defer os.RemoveAll(objFile)
+	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
-	defer os.RemoveAll(depFile)
+	defer depFile.RemoveAll()
 
 	sleep(t)
 
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
@@ -90,14 +91,14 @@ func TestObjFileIsUpToDateObjOlder(t *testing.T) {
 
 func TestObjFileIsUpToDateObjNewer(t *testing.T) {
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
 	sleep(t)
 
 	objFile := tempFile(t, "obj")
-	defer os.RemoveAll(objFile)
+	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
-	defer os.RemoveAll(depFile)
+	defer depFile.RemoveAll()
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
@@ -106,21 +107,22 @@ func TestObjFileIsUpToDateObjNewer(t *testing.T) {
 
 func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
 	sleep(t)
 
 	objFile := tempFile(t, "obj")
-	defer os.RemoveAll(objFile)
+	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
-	defer os.RemoveAll(depFile)
+	defer depFile.RemoveAll()
 
 	sleep(t)
 
 	headerFile := tempFile(t, "header")
-	defer os.RemoveAll(headerFile)
+	defer headerFile.RemoveAll()
 
-	utils.WriteFile(depFile, objFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile)
+	data := objFile.String() + ": \\\n\t" + sourceFile.String() + " \\\n\t" + headerFile.String()
+	depFile.WriteFile([]byte(data))
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
@@ -129,19 +131,20 @@ func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
 
 func TestObjFileIsUpToDateDepIsOlder(t *testing.T) {
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
 	headerFile := tempFile(t, "header")
-	defer os.RemoveAll(headerFile)
+	defer headerFile.RemoveAll()
 
 	sleep(t)
 
 	objFile := tempFile(t, "obj")
-	defer os.RemoveAll(objFile)
+	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
-	defer os.RemoveAll(depFile)
+	defer depFile.RemoveAll()
 
-	utils.WriteFile(depFile, objFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile)
+	res := objFile.String() + ": \\\n\t" + sourceFile.String() + " \\\n\t" + headerFile.String()
+	depFile.WriteFile([]byte(res))
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
@@ -150,21 +153,22 @@ func TestObjFileIsUpToDateDepIsOlder(t *testing.T) {
 
 func TestObjFileIsUpToDateDepIsWrong(t *testing.T) {
 	sourceFile := tempFile(t, "source")
-	defer os.RemoveAll(sourceFile)
+	defer sourceFile.RemoveAll()
 
 	sleep(t)
 
 	objFile := tempFile(t, "obj")
-	defer os.RemoveAll(objFile)
+	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
-	defer os.RemoveAll(depFile)
+	defer depFile.RemoveAll()
 
 	sleep(t)
 
 	headerFile := tempFile(t, "header")
-	defer os.RemoveAll(headerFile)
+	defer headerFile.RemoveAll()
 
-	utils.WriteFile(depFile, sourceFile+": \\\n\t"+sourceFile+" \\\n\t"+headerFile)
+	res := sourceFile.String() + ": \\\n\t" + sourceFile.String() + " \\\n\t" + headerFile.String()
+	depFile.WriteFile([]byte(res))
 
 	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)

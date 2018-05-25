@@ -33,6 +33,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
@@ -43,7 +45,7 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		HardwareFolders: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		FQBN:            "my_avr_platform:avr:mymega",
 	}
 
@@ -74,7 +76,7 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders: []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"},
+		HardwareFolders: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		FQBN:            "my_avr_platform:avr:mymega:cpu=atmega2560",
 	}
 

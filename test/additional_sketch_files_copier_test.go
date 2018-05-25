@@ -30,16 +30,17 @@
 package test
 
 import (
+	"os"
+	"sort"
+	"testing"
+	"time"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"os"
-	"path/filepath"
-	"sort"
-	"testing"
-	"time"
 )
 
 type ByFileInfoName []os.FileInfo
@@ -56,11 +57,11 @@ func (s ByFileInfoName) Less(i, j int) bool {
 
 func TestCopyOtherFiles(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+		SketchLocation: paths.New("sketch1", "sketch.ino"),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -73,10 +74,11 @@ func TestCopyOtherFiles(t *testing.T) {
 		NoError(t, err)
 	}
 
-	_, err1 := os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "header.h"))
+	exist, err1 := buildPath.Join(constants.FOLDER_SKETCH, "header.h").Exist()
 	NoError(t, err1)
+	require.True(t, exist)
 
-	files, err1 := gohasissues.ReadDir(filepath.Join(buildPath, constants.FOLDER_SKETCH))
+	files, err1 := gohasissues.ReadDir(buildPath.Join(constants.FOLDER_SKETCH).String())
 	NoError(t, err1)
 	require.Equal(t, 3, len(files))
 
@@ -85,7 +87,7 @@ func TestCopyOtherFiles(t *testing.T) {
 	require.Equal(t, "s_file.S", files[1].Name())
 	require.Equal(t, "src", files[2].Name())
 
-	files, err1 = gohasissues.ReadDir(filepath.Join(buildPath, constants.FOLDER_SKETCH, "src"))
+	files, err1 = gohasissues.ReadDir(buildPath.Join(constants.FOLDER_SKETCH, "src").String())
 	NoError(t, err1)
 	require.Equal(t, 1, len(files))
 	require.Equal(t, "helper.h", files[0].Name())
@@ -93,11 +95,11 @@ func TestCopyOtherFiles(t *testing.T) {
 
 func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+		SketchLocation: paths.New("sketch1", "sketch.ino"),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -110,13 +112,13 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 		NoError(t, err)
 	}
 
-	headerStatBefore, err := os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "header.h"))
+	headerStatBefore, err := buildPath.Join(constants.FOLDER_SKETCH, "header.h").Stat()
 	NoError(t, err)
 
 	time.Sleep(2 * time.Second)
 
 	ctx = &types.Context{
-		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+		SketchLocation: paths.New("sketch1", "sketch.ino"),
 		BuildPath:      buildPath,
 	}
 
@@ -125,7 +127,7 @@ func TestCopyOtherFilesOnlyIfChanged(t *testing.T) {
 		NoError(t, err)
 	}
 
-	headerStatAfter, err := os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "header.h"))
+	headerStatAfter, err := buildPath.Join(constants.FOLDER_SKETCH, "header.h").Stat()
 	NoError(t, err)
 
 	require.Equal(t, headerStatBefore.ModTime().Unix(), headerStatAfter.ModTime().Unix())

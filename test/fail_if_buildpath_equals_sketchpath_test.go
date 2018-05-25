@@ -30,16 +30,18 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestFailIfBuildPathEqualsSketchPath(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "buildPath/sketch.ino",
-		BuildPath:      "buildPath",
+		SketchLocation: paths.New("buildPath/sketch.ino"),
+		BuildPath:      paths.New("buildPath"),
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
@@ -48,8 +50,8 @@ func TestFailIfBuildPathEqualsSketchPath(t *testing.T) {
 
 func TestFailIfBuildPathEqualsSketchPathSketchPathDiffers(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "sketchPath/sketch.ino",
-		BuildPath:      "buildPath",
+		SketchLocation: paths.New("sketchPath/sketch.ino"),
+		BuildPath:      paths.New("buildPath"),
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}

@@ -35,6 +35,7 @@ import (
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/stretchr/testify/require"
 )
@@ -57,11 +58,27 @@ func (s ByToolIDAndVersion) Less(i, j int) bool {
 	return s[i].Folder < s[j].Folder
 }
 
+func requireEquivalentPaths(t *testing.T, actual string, expected ...string) {
+	if len(expected) == 1 {
+		actualAbs, err := paths.New(actual).Abs()
+		require.NoError(t, err)
+		expectedAbs, err := paths.New(expected[0]).Abs()
+		require.NoError(t, err)
+		require.Equal(t, expectedAbs.String(), actualAbs.String())
+	} else {
+		actualAbs, err := paths.New(actual).Abs()
+		require.NoError(t, err)
+		expectedAbs := paths.NewPathList(expected...)
+		require.NoError(t, expectedAbs.ToAbs())
+		require.Contains(t, expectedAbs.AsStrings(), actualAbs.String())
+	}
+}
+
 func TestLoadTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		BuiltInToolsFolders: []string{"downloaded_tools", "tools_builtin"},
+		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
@@ -74,34 +91,34 @@ func TestLoadTools(t *testing.T) {
 
 	idx := 0
 	require.Equal(t, ":arm-none-eabi-gcc@4.8.3-2014q1", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
 	idx++
 	require.Equal(t, ":avr-gcc@4.8.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/avr-gcc/4.8.1-arduino5")
 	idx++
 	require.Equal(t, "arduino:avr-gcc@4.8.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "tools_builtin/avr")
 	idx++
 	require.Equal(t, ":avrdude@6.0.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/avrdude/6.0.1-arduino5")
 	idx++
 	require.Equal(t, "arduino:avrdude@6.0.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "tools_builtin/avr")
 	idx++
 	require.Equal(t, ":bossac@1.5-arduino", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/bossac/1.5-arduino")
 	idx++
 	require.Equal(t, ":bossac@1.6.1-arduino", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/bossac/1.6.1-arduino")
 	idx++
 	require.Equal(t, ":ctags@5.8-arduino11", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino11"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/ctags/5.8-arduino11")
 }
 
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 	ctx := &types.Context{
-		HardwareFolders: []string{"downloaded_board_manager_stuff"},
+		HardwareFolders: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
@@ -114,21 +131,21 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 
 	idx := 0
 	require.Equal(t, "arduino:CMSIS@4.0.0-atmel", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel")
 	idx++
 	require.Equal(t, "RFduino:arm-none-eabi-gcc@4.8.3-2014q1", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1")
 	idx++
 	require.Equal(t, "arduino:openocd@0.9.0-arduino", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino")
 }
 
 func TestLoadLotsOfTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     []string{"downloaded_board_manager_stuff"},
-		BuiltInToolsFolders: []string{"downloaded_tools", "tools_builtin"},
+		HardwareFolders:     paths.NewPathList("downloaded_board_manager_stuff"),
+		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
@@ -141,35 +158,35 @@ func TestLoadLotsOfTools(t *testing.T) {
 
 	idx := 0
 	require.Equal(t, "arduino:CMSIS@4.0.0-atmel", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel")
 	idx++
 	require.Equal(t, "RFduino:arm-none-eabi-gcc@4.8.3-2014q1", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1")
 	idx++
 	require.Equal(t, ":arm-none-eabi-gcc@4.8.3-2014q1", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
 	idx++
 	require.Equal(t, ":avr-gcc@4.8.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/avr-gcc/4.8.1-arduino5"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/avr-gcc/4.8.1-arduino5")
 	idx++
 	require.Equal(t, "arduino:avr-gcc@4.8.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "tools_builtin/avr")
 	idx++
 	require.Equal(t, ":avrdude@6.0.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/avrdude/6.0.1-arduino5"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/avrdude/6.0.1-arduino5")
 	idx++
 	require.Equal(t, "arduino:avrdude@6.0.1-arduino5", tools[idx].String())
-	require.Equal(t, Abs(t, "./tools_builtin/avr"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "tools_builtin/avr")
 	idx++
 	require.Equal(t, ":bossac@1.5-arduino", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.5-arduino"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/bossac/1.5-arduino")
 	idx++
 	require.Equal(t, ":bossac@1.6.1-arduino", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/bossac/1.6.1-arduino"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, tools[idx].Folder, "downloaded_tools/bossac/1.6.1-arduino")
 	idx++
 	require.Equal(t, ":ctags@5.8-arduino11", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_tools/ctags/5.8-arduino11"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/ctags/5.8-arduino11")
 	idx++
 	require.Equal(t, "arduino:openocd@0.9.0-arduino", tools[idx].String())
-	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino"), tools[idx].Folder)
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino")
 }

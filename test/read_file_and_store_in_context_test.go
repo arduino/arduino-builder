@@ -30,24 +30,26 @@
 package test
 
 import (
+	"io/ioutil"
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"os"
-	"testing"
 )
 
 func TestReadFileAndStoreInContext(t *testing.T) {
-	file, err := ioutil.TempFile("", "test")
+	filePath, err := ioutil.TempFile("", "test")
 	NoError(t, err)
-	defer os.RemoveAll(file.Name())
 
-	utils.WriteFile(file.Name(), "test test\nciao")
+	file := paths.New(filePath.Name())
+	defer file.RemoveAll()
+
+	file.WriteFile([]byte("test test\nciao"))
 
 	ctx := &types.Context{}
-	ctx.FileToRead = file.Name()
+	ctx.FileToRead = file
 
 	command := &builder.ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE}
 	err = command.Run(ctx)

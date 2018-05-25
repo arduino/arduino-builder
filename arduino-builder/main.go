@@ -40,11 +40,12 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 	"github.com/go-errors/errors"
 )
@@ -194,7 +195,7 @@ func main() {
 	if hardwareFolders, err := toSliceOfUnquoted(hardwareFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(hardwareFolders) > 0 {
-		ctx.HardwareFolders = hardwareFolders
+		ctx.HardwareFolders = paths.NewPathList(hardwareFolders...)
 	}
 	if len(ctx.HardwareFolders) == 0 {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_HARDWARE + "' is mandatory"))
@@ -204,7 +205,7 @@ func main() {
 	if toolsFolders, err := toSliceOfUnquoted(toolsFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(toolsFolders) > 0 {
-		ctx.ToolsFolders = toolsFolders
+		ctx.ToolsFolders = paths.NewPathList(toolsFolders...)
 	}
 	if len(ctx.ToolsFolders) == 0 {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_TOOLS + "' is mandatory"))
@@ -214,14 +215,14 @@ func main() {
 	if librariesFolders, err := toSliceOfUnquoted(librariesFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(librariesFolders) > 0 {
-		ctx.OtherLibrariesFolders = librariesFolders
+		ctx.OtherLibrariesFolders = paths.NewPathList(librariesFolders...)
 	}
 
 	// FLAG_BUILT_IN_LIBRARIES
 	if librariesBuiltInFolders, err := toSliceOfUnquoted(librariesBuiltInFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(librariesBuiltInFolders) > 0 {
-		ctx.BuiltInLibrariesFolders = librariesBuiltInFolders
+		ctx.BuiltInLibrariesFolders = paths.NewPathList(librariesBuiltInFolders...)
 	}
 
 	// FLAG_PREFS
@@ -242,38 +243,38 @@ func main() {
 	}
 
 	// FLAG_BUILD_PATH
-	buildPath, err := gohasissues.Unquote(*buildPathFlag)
+	buildPathUnquoted, err := gohasissues.Unquote(*buildPathFlag)
 	if err != nil {
 		printCompleteError(err)
 	}
-	if buildPath != "" {
-		_, err := os.Stat(buildPath)
-		if err != nil {
+	buildPath := paths.New(buildPathUnquoted)
+	if buildPath != nil {
+		// TODO: mmmmhhh... this one looks like a bug, why check existence?
+		if _, err := buildPath.Stat(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
-		err = utils.EnsureFolderExists(buildPath)
-		if err != nil {
+		if err := buildPath.MkdirAll(); err != nil {
 			printCompleteError(err)
 		}
 	}
 	ctx.BuildPath = buildPath
 
 	// FLAG_BUILD_CACHE
-	buildCachePath, err := gohasissues.Unquote(*buildCachePathFlag)
+	buildCachePathUnquoted, err := gohasissues.Unquote(*buildCachePathFlag)
 	if err != nil {
 		printCompleteError(err)
 	}
-	if buildCachePath != "" {
-		_, err := os.Stat(buildCachePath)
-		if err != nil {
+	buildCachePath := paths.New(buildCachePathUnquoted)
+	if buildCachePath != nil {
+		// TODO: mmmmhhh... this one looks like a bug, why check existence?
+		if _, err := buildCachePath.Stat(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
-		err = utils.EnsureFolderExists(buildCachePath)
-		if err != nil {
+		if err := buildCachePath.MkdirAll(); err != nil {
 			printCompleteError(err)
 		}
 	}
@@ -285,12 +286,11 @@ func main() {
 	}
 
 	if flag.NArg() > 0 {
-		sketchLocation := flag.Arg(0)
-		sketchLocation, err := gohasissues.Unquote(sketchLocation)
+		sketchLocationUnquoted, err := gohasissues.Unquote(flag.Arg(0))
 		if err != nil {
 			printCompleteError(err)
 		}
-		ctx.SketchLocation = sketchLocation
+		ctx.SketchLocation = paths.New(sketchLocationUnquoted)
 	}
 
 	if *verboseFlag && *quietFlag {

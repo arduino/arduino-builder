@@ -30,11 +30,12 @@
 package test
 
 import (
-	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -43,14 +44,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func prepareBuilderTestContext(sketchPath, fqbn string) *types.Context {
+func prepareBuilderTestContext(sketchPath *paths.Path, fqbn string) *types.Context {
 	return &types.Context{
 		SketchLocation:          sketchPath,
 		FQBN:                    fqbn,
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInToolsFolders:     []string{"downloaded_tools"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 false,
 	}
@@ -59,90 +60,107 @@ func prepareBuilderTestContext(sketchPath, fqbn string) *types.Context {
 func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(paths.New("sketch1", "sketch.ino"), "arduino:avr:uno")
 	ctx.DebugLevel = 10
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
+	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "sketch.ino.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch.ino.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "sketch.ino.elf"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("sketch.ino.elf").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "sketch.ino.hex"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("sketch.ino.hex").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestBuilderBridge(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
+	ctx := prepareBuilderTestContext(paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
+	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "Bridge.ino.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.elf"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.elf").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.hex"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.hex").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestBuilderSketchWithConfig(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_config", "sketch_with_config.ino"), "arduino:avr:leonardo")
+	ctx := prepareBuilderTestContext(paths.New("sketch_with_config", "sketch_with_config.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
+	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "sketch_with_config.ino.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch_with_config.ino.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "sketch_with_config.ino.elf"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("sketch_with_config.ino.elf").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "sketch_with_config.ino.hex"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("sketch_with_config.ino.hex").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestBuilderBridgeTwice(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
+	ctx := prepareBuilderTestContext(paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
@@ -154,52 +172,66 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	err = command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
+	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "Bridge.ino.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.elf"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.elf").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.hex"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.hex").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestBuilderBridgeSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
+	ctx := prepareBuilderTestContext(paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
 	ctx.WarningsLevel = "all"
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "syscalls_sam3.c.o"))
+	exist, err := buildPath.Join(constants.FOLDER_CORE, "syscalls_sam3.c.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "USB", "PluggableUSB.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_CORE, "USB", "PluggableUSB.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "avr", "dtostrf.c.d"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_CORE, "avr", "dtostrf.c.d").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "Bridge.ino.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.elf"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.elf").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.bin"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.bin").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 
-	cmd := exec.Command(filepath.Join("downloaded_tools", "arm-none-eabi-gcc", "4.8.3-2014q1", "bin", "arm-none-eabi-objdump"), "-f", filepath.Join(buildPath, constants.FOLDER_CORE, "core.a"))
+	cmd := exec.Command(filepath.Join("downloaded_tools", "arm-none-eabi-gcc", "4.8.3-2014q1", "bin", "arm-none-eabi-objdump"), "-f", buildPath.Join(constants.FOLDER_CORE, "core.a").String())
 	bytes, err := cmd.CombinedOutput()
 	NoError(t, err)
 	require.NotContains(t, string(bytes), "variant.cpp.o")
@@ -208,41 +240,47 @@ func TestBuilderBridgeSAM(t *testing.T) {
 func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
-	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
-	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
+	ctx := prepareBuilderTestContext(paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
+	ctx.HardwareFolders = append(ctx.HardwareFolders, paths.New("downloaded_board_manager_stuff"))
+	ctx.ToolsFolders = append(ctx.ToolsFolders, paths.New("downloaded_board_manager_stuff"))
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_CORE, "HardwareSerial.cpp.o"))
+	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, constants.FOLDER_SKETCH, "Bridge.ino.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.elf"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.elf").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "Bridge.ino.hex"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("Bridge.ino.hex").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge", "Mailbox.cpp.o"))
+	require.True(t, exist)
+	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch_no_functions", "main.ino"), "RedBearLab:avr:blend")
-	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
-	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
+	ctx := prepareBuilderTestContext(paths.New("sketch_no_functions", "main.ino"), "RedBearLab:avr:blend")
+	ctx.HardwareFolders = append(ctx.HardwareFolders, paths.New("downloaded_board_manager_stuff"))
+	ctx.ToolsFolders = append(ctx.ToolsFolders, paths.New("downloaded_board_manager_stuff"))
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
@@ -253,12 +291,12 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_backup_files", "sketch.ino"), "arduino:avr:uno")
-	ctx.HardwareFolders = append(ctx.HardwareFolders, "downloaded_board_manager_stuff")
-	ctx.ToolsFolders = append(ctx.ToolsFolders, "downloaded_board_manager_stuff")
+	ctx := prepareBuilderTestContext(paths.New("sketch_with_backup_files", "sketch.ino"), "arduino:avr:uno")
+	ctx.HardwareFolders = append(ctx.HardwareFolders, paths.New("downloaded_board_manager_stuff"))
+	ctx.ToolsFolders = append(ctx.ToolsFolders, paths.New("downloaded_board_manager_stuff"))
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
@@ -269,10 +307,10 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_old_lib", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(paths.New("sketch_with_old_lib", "sketch.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
@@ -283,10 +321,10 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	// Run builder
 	command := builder.Builder{}
@@ -297,34 +335,35 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
+	ctx := prepareBuilderTestContext(paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
-	NoError(t, os.MkdirAll(filepath.Join(buildPath, "libraries", "SPI"), os.FileMode(0755)))
+	NoError(t, buildPath.Join("libraries", "SPI").MkdirAll())
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "SPI"))
-	require.Error(t, err)
-	require.True(t, os.IsNotExist(err))
-	_, err = os.Stat(filepath.Join(buildPath, "libraries", "Bridge"))
+	exist, err := buildPath.Join("libraries", "SPI").Exist()
 	NoError(t, err)
+	require.False(t, exist)
+	exist, err = buildPath.Join("libraries", "Bridge").Exist()
+	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(paths.New("sketch1", "sketch.ino"), "arduino:avr:uno")
 
 	var err error
-	ctx.BuildPath, err = filepath.Abs(filepath.Join("sketch1", "build"))
+	ctx.BuildPath, err = paths.New("sketch1", "build").Abs()
 	NoError(t, err)
-	defer os.RemoveAll(ctx.BuildPath)
+	defer ctx.BuildPath.RemoveAll()
 
 	// Run build
 	command := builder.Builder{}
@@ -340,12 +379,12 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 func TestBuilderCacheCoreAFile(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(filepath.Join("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(paths.New("sketch1", "sketch.ino"), "arduino:avr:uno")
 
 	SetupBuildPath(t, ctx)
-	defer os.RemoveAll(ctx.BuildPath)
+	defer ctx.BuildPath.RemoveAll()
 	SetupBuildCachePath(t, ctx)
-	defer os.RemoveAll(ctx.BuildCachePath)
+	defer ctx.BuildCachePath.RemoveAll()
 
 	// Run build
 	bldr := builder.Builder{}
@@ -353,31 +392,31 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 	NoError(t, err)
 
 	// Pick timestamp of cached core
-	coreFolder := filepath.Join("downloaded_hardware", "arduino", "avr")
+	coreFolder := paths.New("downloaded_hardware", "arduino", "avr")
 	coreFileName := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN, coreFolder)
-	cachedCoreFile := filepath.Join(ctx.CoreBuildCachePath, coreFileName)
-	coreStatBefore, err := os.Stat(cachedCoreFile)
+	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName)
+	coreStatBefore, err := cachedCoreFile.Stat()
 	require.NoError(t, err)
 
 	// Run build again, to verify that the builder skips rebuilding core.a
 	err = bldr.Run(ctx)
 	NoError(t, err)
 
-	coreStatAfterRebuild, err := os.Stat(cachedCoreFile)
+	coreStatAfterRebuild, err := cachedCoreFile.Stat()
 	require.NoError(t, err)
 	require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
 
 	// Touch a file of the core and check if the builder invalidate the cache
 	time.Sleep(time.Second)
 	now := time.Now().Local()
-	err = os.Chtimes(filepath.Join(coreFolder, "cores", "arduino", "Arduino.h"), now, now)
+	err = coreFolder.Join("cores", "arduino", "Arduino.h").Chtimes(now, now)
 	require.NoError(t, err)
 
 	// Run build again, to verify that the builder rebuilds core.a
 	err = bldr.Run(ctx)
 	NoError(t, err)
 
-	coreStatAfterTouch, err := os.Stat(cachedCoreFile)
+	coreStatAfterTouch, err := cachedCoreFile.Stat()
 	require.NoError(t, err)
 	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
 }

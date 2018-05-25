@@ -30,22 +30,24 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCreateBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders:       []string{"hardware", "hardware2"},
-		ToolsFolders:          []string{"tools"},
-		OtherLibrariesFolders: []string{"libraries"},
-		SketchLocation:        "sketchLocation",
+		HardwareFolders:       paths.NewPathList("hardware", "hardware2"),
+		ToolsFolders:          paths.NewPathList("tools"),
+		OtherLibrariesFolders: paths.NewPathList("libraries"),
+		SketchLocation:        paths.New("sketchLocation"),
 		FQBN:                  "fqbn",
 		ArduinoAPIVersion:     "ideVersion",
 		Verbose:               true,
-		BuildPath:             "buildPath",
+		BuildPath:             paths.New("buildPath"),
 		DebugLevel:            5,
 	}
 

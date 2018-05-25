@@ -32,7 +32,6 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"io/ioutil"
 )
 
 type ReadFileAndStoreInContext struct {
@@ -40,7 +39,7 @@ type ReadFileAndStoreInContext struct {
 }
 
 func (s *ReadFileAndStoreInContext) Run(ctx *types.Context) error {
-	bytes, err := ioutil.ReadFile(ctx.FileToRead)
+	bytes, err := ctx.FileToRead.ReadFile()
 	if err != nil {
 		return i18n.WrapError(err)
 	}

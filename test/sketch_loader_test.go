@@ -35,12 +35,13 @@ import (
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoadSketchWithFolder(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "sketch1",
+		SketchLocation: paths.New("sketch1"),
 	}
 
 	loader := builder.SketchLoader{}
@@ -52,7 +53,7 @@ func TestLoadSketchWithFolder(t *testing.T) {
 
 func TestLoadSketchNonExistentPath(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "asdasd78128123981723981273asdasd",
+		SketchLocation: paths.New("asdasd78128123981723981273asdasd"),
 	}
 
 	loader := builder.SketchLoader{}
@@ -64,7 +65,7 @@ func TestLoadSketchNonExistentPath(t *testing.T) {
 
 func TestLoadSketch(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: filepath.Join("sketch1", "sketch.ino"),
+		SketchLocation: paths.New("sketch1", "sketch.ino"),
 	}
 
 	commands := []types.Command{
@@ -79,21 +80,21 @@ func TestLoadSketch(t *testing.T) {
 	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
-	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
+	require.Contains(t, sketch.MainFile.Name.String(), "sketch.ino")
 
 	require.Equal(t, 2, len(sketch.OtherSketchFiles))
-	require.Contains(t, sketch.OtherSketchFiles[0].Name, "old.pde")
-	require.Contains(t, sketch.OtherSketchFiles[1].Name, "other.ino")
+	require.Contains(t, sketch.OtherSketchFiles[0].Name.String(), "old.pde")
+	require.Contains(t, sketch.OtherSketchFiles[1].Name.String(), "other.ino")
 
 	require.Equal(t, 3, len(sketch.AdditionalFiles))
-	require.Contains(t, sketch.AdditionalFiles[0].Name, "header.h")
-	require.Contains(t, sketch.AdditionalFiles[1].Name, "s_file.S")
-	require.Contains(t, sketch.AdditionalFiles[2].Name, "helper.h")
+	require.Contains(t, sketch.AdditionalFiles[0].Name.String(), "header.h")
+	require.Contains(t, sketch.AdditionalFiles[1].Name.String(), "s_file.S")
+	require.Contains(t, sketch.AdditionalFiles[2].Name.String(), "helper.h")
 }
 
 func TestFailToLoadSketchFromFolder(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "./sketch1",
+		SketchLocation: paths.New("./sketch1"),
 	}
 
 	loader := builder.SketchLoader{}
@@ -104,7 +105,7 @@ func TestFailToLoadSketchFromFolder(t *testing.T) {
 
 func TestLoadSketchFromFolder(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: "sketch_with_subfolders",
+		SketchLocation: paths.New("sketch_with_subfolders"),
 	}
 
 	commands := []types.Command{
@@ -119,20 +120,20 @@ func TestLoadSketchFromFolder(t *testing.T) {
 	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
-	require.Contains(t, sketch.MainFile.Name, "sketch_with_subfolders.ino")
+	require.Contains(t, sketch.MainFile.Name.String(), "sketch_with_subfolders.ino")
 
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))
 
 	require.Equal(t, 4, len(sketch.AdditionalFiles))
-	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[0].Name), "sketch_with_subfolders/src/subfolder/other.cpp")
-	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[1].Name), "sketch_with_subfolders/src/subfolder/other.h")
-	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[2].Name), "sketch_with_subfolders/subfolder/dont_load_me.cpp")
-	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[3].Name), "sketch_with_subfolders/subfolder/other.h")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[0].Name.String()), "sketch_with_subfolders/src/subfolder/other.cpp")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[1].Name.String()), "sketch_with_subfolders/src/subfolder/other.h")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[2].Name.String()), "sketch_with_subfolders/subfolder/dont_load_me.cpp")
+	require.Contains(t, filepath.ToSlash(sketch.AdditionalFiles[3].Name.String()), "sketch_with_subfolders/subfolder/other.h")
 }
 
 func TestLoadSketchWithBackup(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: filepath.Join("sketch_with_backup_files", "sketch.ino"),
+		SketchLocation: paths.New("sketch_with_backup_files", "sketch.ino"),
 	}
 
 	commands := []types.Command{
@@ -147,7 +148,7 @@ func TestLoadSketchWithBackup(t *testing.T) {
 	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
-	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
+	require.Contains(t, sketch.MainFile.Name.String(), "sketch.ino")
 
 	require.Equal(t, 0, len(sketch.AdditionalFiles))
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))
@@ -155,7 +156,7 @@ func TestLoadSketchWithBackup(t *testing.T) {
 
 func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: filepath.Join("sketch_with_macosx_garbage", "sketch.ino"),
+		SketchLocation: paths.New("sketch_with_macosx_garbage", "sketch.ino"),
 	}
 
 	commands := []types.Command{
@@ -170,7 +171,7 @@ func TestLoadSketchWithMacOSXGarbage(t *testing.T) {
 	sketch := ctx.Sketch
 	require.NotNil(t, sketch)
 
-	require.Contains(t, sketch.MainFile.Name, "sketch.ino")
+	require.Contains(t, sketch.MainFile.Name.String(), "sketch.ino")
 
 	require.Equal(t, 0, len(sketch.AdditionalFiles))
 	require.Equal(t, 0, len(sketch.OtherSketchFiles))

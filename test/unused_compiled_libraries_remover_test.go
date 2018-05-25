@@ -30,25 +30,23 @@
 package test
 
 import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUnusedCompiledLibrariesRemover(t *testing.T) {
-	temp, err := ioutil.TempDir("", "test")
+	temp, err := paths.MkTempDir("", "test")
 	NoError(t, err)
-	defer os.RemoveAll(temp)
+	defer temp.RemoveAll()
 
-	NoError(t, os.MkdirAll(filepath.Join(temp, "SPI"), os.FileMode(0755)))
-	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
-	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
+	NoError(t, temp.Join("SPI").MkdirAll())
+	NoError(t, temp.Join("Bridge").MkdirAll())
+	NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
@@ -58,18 +56,20 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	err = cmd.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(temp, "SPI"))
-	require.Error(t, err)
-	require.True(t, os.IsNotExist(err))
-	_, err = os.Stat(filepath.Join(temp, "Bridge"))
+	exist, err := temp.Join("SPI").Exist()
+	require.NoError(t, err)
+	require.False(t, exist)
+	exist, err = temp.Join("Bridge").Exist()
 	NoError(t, err)
-	_, err = os.Stat(filepath.Join(temp, "dummy_file"))
+	require.True(t, exist)
+	exist, err = temp.Join("dummy_file").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }
 
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	ctx := &types.Context{}
-	ctx.LibrariesBuildPath = filepath.Join(os.TempDir(), "test")
+	ctx.LibrariesBuildPath = paths.TempDir().Join("test")
 	ctx.ImportedLibraries = []*libraries.Library{&libraries.Library{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
@@ -78,13 +78,13 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 }
 
 func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
-	temp, err := ioutil.TempDir("", "test")
+	temp, err := paths.MkTempDir("", "test")
 	NoError(t, err)
-	defer os.RemoveAll(temp)
+	defer temp.RemoveAll()
 
-	NoError(t, os.MkdirAll(filepath.Join(temp, "SPI"), os.FileMode(0755)))
-	NoError(t, os.MkdirAll(filepath.Join(temp, "Bridge"), os.FileMode(0755)))
-	NoError(t, ioutil.WriteFile(filepath.Join(temp, "dummy_file"), []byte{}, os.FileMode(0644)))
+	NoError(t, temp.Join("SPI").MkdirAll())
+	NoError(t, temp.Join("Bridge").MkdirAll())
+	NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
@@ -94,12 +94,13 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	err = cmd.Run(ctx)
 	NoError(t, err)
 
-	_, err = os.Stat(filepath.Join(temp, "SPI"))
-	require.Error(t, err)
-	require.True(t, os.IsNotExist(err))
-	_, err = os.Stat(filepath.Join(temp, "Bridge"))
-	require.Error(t, err)
-	require.True(t, os.IsNotExist(err))
-	_, err = os.Stat(filepath.Join(temp, "dummy_file"))
+	exist, err := temp.Join("SPI").Exist()
+	require.NoError(t, err)
+	require.False(t, exist)
+	exist, err = temp.Join("Bridge").Exist()
+	require.NoError(t, err)
+	require.False(t, exist)
+	exist, err = temp.Join("dummy_file").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }

@@ -30,14 +30,11 @@
 package test
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,12 +42,12 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
 	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
 
-	utils.TouchFile(filepath.Join(buildPath, "should_be_deleted.txt"))
+	buildPath.Join("should_be_deleted.txt").Truncate()
 
 	commands := []types.Command{
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
@@ -61,26 +58,28 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 		NoError(t, err)
 	}
 
-	_, err := os.Stat(buildPath)
+	exist, err := buildPath.Exist()
 	NoError(t, err)
+	require.True(t, exist)
 
-	files, err := gohasissues.ReadDir(buildPath)
+	files, err := gohasissues.ReadDir(buildPath.String())
 	NoError(t, err)
 	require.Equal(t, 0, len(files))
 
-	_, err = os.Stat(filepath.Join(buildPath, "should_be_deleted.txt"))
-	require.Error(t, err)
+	exist, err = buildPath.Join("should_be_deleted.txt").Exist()
+	require.NoError(t, err)
+	require.False(t, exist)
 }
 
 func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.T) {
 	ctx := &types.Context{}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
 
-	utils.TouchFile(filepath.Join(buildPath, "should_not_be_deleted.txt"))
+	require.NoError(t, buildPath.Join("should_not_be_deleted.txt").Truncate())
 
 	commands := []types.Command{
 		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
@@ -91,13 +90,15 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 		NoError(t, err)
 	}
 
-	_, err := os.Stat(buildPath)
+	exist, err := buildPath.Exist()
 	NoError(t, err)
+	require.True(t, exist)
 
-	files, err := gohasissues.ReadDir(buildPath)
+	files, err := gohasissues.ReadDir(buildPath.String())
 	NoError(t, err)
 	require.Equal(t, 1, len(files))
 
-	_, err = os.Stat(filepath.Join(buildPath, "should_not_be_deleted.txt"))
+	exist, err = buildPath.Join("should_not_be_deleted.txt").Exist()
 	NoError(t, err)
+	require.True(t, exist)
 }

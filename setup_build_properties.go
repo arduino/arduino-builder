@@ -56,11 +56,11 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(targetBoard.Properties)
 
-	if ctx.BuildPath != "" {
-		buildProperties["build.path"] = ctx.BuildPath
+	if ctx.BuildPath != nil {
+		buildProperties.SetPath("build.path", ctx.BuildPath)
 	}
 	if ctx.Sketch != nil {
-		buildProperties["build.project_name"] = filepath.Base(ctx.Sketch.MainFile.Name)
+		buildProperties["build.project_name"] = ctx.Sketch.MainFile.Name.Base()
 	}
 	buildProperties["build.arch"] = strings.ToUpper(targetPlatform.Platform.Architecture)
 
@@ -102,13 +102,13 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		buildProperties["software"] = DEFAULT_SOFTWARE
 	}
 
-	if ctx.SketchLocation != "" {
-		sourcePath, err := filepath.Abs(ctx.SketchLocation)
+	if ctx.SketchLocation != nil {
+		sourcePath, err := ctx.SketchLocation.Abs()
 		if err != nil {
 			return err
 		}
-		sourcePath = filepath.Dir(sourcePath)
-		buildProperties["build.source.path"] = sourcePath
+		sourcePath = sourcePath.Parent()
+		buildProperties.SetPath("build.source.path", sourcePath)
 	}
 
 	now := time.Now()

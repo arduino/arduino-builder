@@ -30,12 +30,12 @@
 package test
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,15 +43,15 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
-		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		HardwareFolders:   paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		ToolsFolders:      paths.NewPathList("downloaded_tools", "./tools_builtin"),
+		SketchLocation:    paths.New("sketch1", "sketch.ino"),
 		FQBN:              "arduino:avr:micro",
 		ArduinoAPIVersion: "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -73,15 +73,15 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:   []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		ToolsFolders:      []string{"downloaded_tools", "./tools_builtin"},
-		SketchLocation:    filepath.Join("sketch1", "sketch.ino"),
+		HardwareFolders:   paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		ToolsFolders:      paths.NewPathList("downloaded_tools", "./tools_builtin"),
+		SketchLocation:    paths.New("sketch1", "sketch.ino"),
 		FQBN:              "arduino:avr:micro",
 		ArduinoAPIVersion: "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
-	defer os.RemoveAll(buildPath)
+	defer buildPath.RemoveAll()
 
 	ctx.USBVidPid = "0x2341_0x0237"
 

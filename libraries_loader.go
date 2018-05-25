@@ -31,25 +31,23 @@ package builder
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
 type LibrariesLoader struct{}
 
 func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	builtInLibrariesFolders := ctx.BuiltInLibrariesFolders
-	builtInLibrariesFolders, err := utils.AbsolutizePaths(builtInLibrariesFolders)
-	if err != nil {
+	if err := builtInLibrariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	sortedLibrariesFolders := []string{}
-	sortedLibrariesFolders = utils.AppendIfNotPresent(sortedLibrariesFolders, builtInLibrariesFolders...)
+	sortedLibrariesFolders := paths.NewPathList()
+	sortedLibrariesFolders.AddAllMissing(builtInLibrariesFolders)
 
 	platform := ctx.TargetPlatform
 	debugLevel := ctx.DebugLevel
@@ -57,28 +55,33 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	actualPlatform := ctx.ActualPlatform
 	if actualPlatform != platform {
-		sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(actualPlatform.Folder, "libraries"))
+		actualPlatformLibDir := paths.New(actualPlatform.Folder).Join("libraries")
+		if isDir, _ := actualPlatformLibDir.IsDir(); isDir {
+			sortedLibrariesFolders.Add(actualPlatformLibDir)
+		}
 	}
 
-	sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(platform.Folder, "libraries"))
+	platformLibDir := paths.New(platform.Folder).Join("libraries")
+	if isDir, _ := platformLibDir.IsDir(); isDir {
+		sortedLibrariesFolders.Add(platformLibDir)
+	}
 
 	librariesFolders := ctx.OtherLibrariesFolders
-	librariesFolders, err = utils.AbsolutizePaths(librariesFolders)
-	if err != nil {
+	if err := librariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	sortedLibrariesFolders = utils.AppendIfNotPresent(sortedLibrariesFolders, librariesFolders...)
+	sortedLibrariesFolders.AddAllMissing(librariesFolders)
 
 	ctx.LibrariesFolders = sortedLibrariesFolders
 
 	var libs []*libraries.Library
 	for _, libraryFolder := range sortedLibrariesFolders {
-		subFolders, err := utils.ReadDirFiltered(libraryFolder, utils.FilterDirs)
+		subFolders, err := utils.ReadDirFiltered(libraryFolder.String(), utils.FilterDirs)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 		for _, subFolder := range subFolders {
-			library, err := libraries.Load(paths.New(libraryFolder).Join(subFolder.Name()))
+			library, err := libraries.Load(libraryFolder.Join(subFolder.Name()))
 			if debugLevel > 0 {
 				if warnings, err := library.Lint(); err != nil {
 					return i18n.WrapError(err)
@@ -112,12 +115,4 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	ctx.HeaderToLibraries = headerToLibraries
 
 	return nil
-}
-
-func appendPathToLibrariesFolders(librariesFolders []string, newLibrariesFolder string) []string {
-	if stat, err := os.Stat(newLibrariesFolder); os.IsNotExist(err) || !stat.IsDir() {
-		return librariesFolders
-	}
-
-	return utils.AppendIfNotPresent(librariesFolders, newLibrariesFolder)
 }

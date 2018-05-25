@@ -32,7 +32,6 @@ package builder_utils
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,72 +40,78 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 )
 
-func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles, err := CompileFiles(objectFiles, sourcePath, false, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+func CompileFilesRecursive(sourcePath *paths.Path, buildPath *paths.Path, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) (paths.PathList, error) {
+	objectFiles, err := CompileFiles(sourcePath, false, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
+	folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
 	for _, folder := range folders {
-		objectFiles, err = CompileFilesRecursive(objectFiles, filepath.Join(sourcePath, folder.Name()), filepath.Join(buildPath, folder.Name()), buildProperties, includes, verbose, warningsLevel, logger)
+		subFolderObjectFiles, err := CompileFilesRecursive(sourcePath.Join(folder.Name()), buildPath.Join(folder.Name()), buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
+		objectFiles.AddAll(subFolderObjectFiles)
 	}
 
 	return objectFiles, nil
 }
 
-func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles, err := compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN, verbose, warningsLevel, logger)
+func CompileFiles(sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) (paths.PathList, error) {
+	sObjectFiles, err := compileFilesWithExtensionWithRecipe(sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN, verbose, warningsLevel, logger)
+	cObjectFiles, err := compileFilesWithExtensionWithRecipe(sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN, verbose, warningsLevel, logger)
+	cppObjectFiles, err := compileFilesWithExtensionWithRecipe(sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN, verbose, warningsLevel, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
+	objectFiles := paths.NewPathList()
+	objectFiles.AddAll(sObjectFiles)
+	objectFiles.AddAll(cObjectFiles)
+	objectFiles.AddAll(cppObjectFiles)
 	return objectFiles, nil
 }
 
-func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithExtensionWithRecipe(sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties properties.Map, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (paths.PathList, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	return compileFilesWithRecipe(objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+	return compileFilesWithRecipe(sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 }
 
-func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]string, error) {
-	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFilesWithExtensions(extension))
+func findFilesInFolder(sourcePath *paths.Path, extension string, recurse bool) (paths.PathList, error) {
+	files, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterFilesWithExtensions(extension))
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	var sources []string
+	var sources paths.PathList
 	for _, file := range files {
-		sources = append(sources, filepath.Join(sourcePath, file.Name()))
+		sources = append(sources, sourcePath.Join(file.Name()))
 	}
 
 	if recurse {
-		folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
+		folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 
 		for _, folder := range folders {
-			otherSources, err := findFilesInFolder(filepath.Join(sourcePath, folder.Name()), extension, recurse)
+			otherSources, err := findFilesInFolder(sourcePath.Join(folder.Name()), extension, recurse)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}
@@ -145,62 +150,65 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithRecipe(sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (paths.PathList, error) {
+	objectFiles := paths.NewPathList()
 	for _, source := range sources {
-		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+		objFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 
-		objectFiles = append(objectFiles, objectFile)
+		objectFiles.Add(objFile)
 	}
 	return objectFiles, nil
 }
 
-func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
+func compileFileWithRecipe(sourcePath *paths.Path, source *paths.Path, buildPath *paths.Path, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (*paths.Path, error) {
 	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source
-	relativeSource, err := filepath.Rel(sourcePath, source)
+	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source.String()
+	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
-		return "", i18n.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
-	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = filepath.Join(buildPath, relativeSource+".o")
+	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = buildPath.JoinPath(relativeSource).String() + ".o"
 
-	err = utils.EnsureFolderExists(filepath.Dir(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]))
+	err = paths.New(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]).Parent().MkdirAll()
 	if err != nil {
-		return "", i18n.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
+	objIsUpToDate, err := ObjFileIsUpToDate(properties.GetPath(constants.BUILD_PROPERTIES_SOURCE_FILE), properties.GetPath(constants.BUILD_PROPERTIES_OBJECT_FILE), buildPath.Join(relativeSource.String()+".d"))
 	if err != nil {
-		return "", i18n.WrapError(err)
+		return nil, i18n.WrapError(err)
 	}
 
 	if !objIsUpToDate {
 		_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
 		if err != nil {
-			return "", i18n.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 	} else if verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
 	}
 
-	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
+	return paths.New(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]), nil
 }
 
-func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, error) {
-	sourceFile = filepath.Clean(sourceFile)
-	objectFile = filepath.Clean(objectFile)
-	dependencyFile = filepath.Clean(dependencyFile)
+func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
+	if objectFile == nil || dependencyFile == nil {
+		return false, nil
+	}
 
-	sourceFileStat, err := os.Stat(sourceFile)
+	sourceFile = sourceFile.Clean()
+	sourceFileStat, err := sourceFile.Stat()
 	if err != nil {
 		return false, i18n.WrapError(err)
 	}
 
-	objectFileStat, err := os.Stat(objectFile)
+	objectFile = objectFile.Clean()
+	objectFileStat, err := objectFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -209,7 +217,8 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 		}
 	}
 
-	dependencyFileStat, err := os.Stat(dependencyFile)
+	dependencyFile = dependencyFile.Clean()
+	dependencyFileStat, err := dependencyFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -225,7 +234,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 		return false, nil
 	}
 
-	rows, err := utils.ReadFileToRows(dependencyFile)
+	rows, err := dependencyFile.ReadFileAsLines()
 	if err != nil {
 		return false, i18n.WrapError(err)
 	}
@@ -244,7 +253,7 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 		return false, nil
 	}
 	objFileInDepFile := firstRow[:len(firstRow)-1]
-	if objFileInDepFile != objectFile {
+	if objFileInDepFile != objectFile.String() {
 		return false, nil
 	}
 
@@ -287,11 +296,11 @@ func nonEmptyString(s string) bool {
 	return s != constants.EMPTY_STRING
 }
 
-func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile string) bool {
+func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
 
-	targetFileStat, err := os.Stat(targetFile)
+	targetFileStat, err := targetFile.Stat()
 	if err == nil {
-		files, err := findAllFilesInFolder(corePath, true)
+		files, err := findAllFilesInFolder(corePath.String(), true)
 		if err != nil {
 			return true
 		}
@@ -301,24 +310,24 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile string)
 				return true
 			}
 		}
-		if targetCorePath != constants.EMPTY_STRING && !strings.EqualFold(corePath, targetCorePath) {
-			return CoreOrReferencedCoreHasChanged(targetCorePath, constants.EMPTY_STRING, targetFile)
+		if targetCorePath != nil && !strings.EqualFold(corePath.String(), targetCorePath.String()) {
+			return CoreOrReferencedCoreHasChanged(targetCorePath, nil, targetFile)
 		}
 		return false
 	}
 	return true
 }
 
-func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {
-	archiveFilePath := filepath.Join(buildPath, archiveFile)
+func ArchiveCompiledFiles(buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties properties.Map, verbose bool, logger i18n.Logger) (*paths.Path, error) {
+	archiveFilePath := buildPath.JoinPath(archiveFile)
 
 	rebuildArchive := false
 
-	if archiveFileStat, err := os.Stat(archiveFilePath); err == nil {
+	if archiveFileStat, err := archiveFilePath.Stat(); err == nil {
 
-		for _, objectFile := range objectFiles {
-			objectFileStat, _ := os.Stat(objectFile)
-			if objectFileStat.ModTime().After(archiveFileStat.ModTime()) {
+		for _, objectFile := range objectFilesToArchive {
+			objectFileStat, err := objectFile.Stat()
+			if err != nil || objectFileStat.ModTime().After(archiveFileStat.ModTime()) {
 				// need to rebuild the archive
 				rebuildArchive = true
 				break
@@ -327,9 +336,9 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 
 		// something changed, rebuild the core archive
 		if rebuildArchive {
-			err = os.Remove(archiveFilePath)
+			err = archiveFilePath.Remove()
 			if err != nil {
-				return "", i18n.WrapError(err)
+				return nil, i18n.WrapError(err)
 			}
 		} else {
 			if verbose {
@@ -339,15 +348,15 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 		}
 	}
 
-	for _, objectFile := range objectFiles {
+	for _, objectFile := range objectFilesToArchive {
 		properties := buildProperties.Clone()
-		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = filepath.Base(archiveFilePath)
-		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath
-		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile
+		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = archiveFilePath.Base()
+		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath.String()
+		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile.String()
 
 		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, verbose, verbose, logger)
 		if err != nil {
-			return "", i18n.WrapError(err)
+			return nil, i18n.WrapError(err)
 		}
 	}
 
@@ -377,7 +386,7 @@ func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties 
 
 func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, logger i18n.Logger) (*exec.Cmd, error) {
 	pattern := buildProperties[recipe]
-	if pattern == constants.EMPTY_STRING {
+	if pattern == "" {
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
 	}
 
@@ -415,58 +424,14 @@ func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
 	buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
 }
 
-// CopyFile copies the contents of the file named src to the file named
-// by dst. The file will be created if it does not already exist. If the
-// destination file exists, all it's contents will be replaced by the contents
-// of the source file. The file mode will be copied from the source and
-// the copied data is synced/flushed to stable storage.
-func CopyFile(src, dst string) (err error) {
-	in, err := os.Open(src)
-	if err != nil {
-		return
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer func() {
-		if e := out.Close(); e != nil {
-			err = e
-		}
-	}()
-
-	_, err = io.Copy(out, in)
-	if err != nil {
-		return
-	}
-
-	err = out.Sync()
-	if err != nil {
-		return
-	}
-
-	si, err := os.Stat(src)
-	if err != nil {
-		return
-	}
-	err = os.Chmod(dst, si.Mode())
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 // GetCachedCoreArchiveFileName returns the filename to be used to store
 // the global cached core.a.
-func GetCachedCoreArchiveFileName(fqbn, coreFolder string) string {
+func GetCachedCoreArchiveFileName(fqbn string, coreFolder *paths.Path) string {
 	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
 	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
-	if absCoreFolder, err := filepath.Abs(coreFolder); err == nil {
+	if absCoreFolder, err := coreFolder.Abs(); err == nil {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected
-	hash := utils.MD5Sum([]byte(coreFolder))
+	hash := utils.MD5Sum([]byte(coreFolder.String()))
 	return "core_" + fqbnToUnderscore + "_" + hash + ".a"
 }

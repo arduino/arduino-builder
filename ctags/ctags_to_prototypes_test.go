@@ -35,6 +35,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,7 +44,7 @@ func producePrototypes(t *testing.T, filename string, mainFile string) ([]*types
 	require.NoError(t, err)
 
 	parser := &CTagsParser{}
-	parser.Parse(string(bytes), mainFile)
+	parser.Parse(string(bytes), paths.New(mainFile))
 	return parser.GeneratePrototypes()
 }
 

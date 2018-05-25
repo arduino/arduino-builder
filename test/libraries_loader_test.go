@@ -37,6 +37,7 @@ import (
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -44,9 +45,9 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		FQBN: "arduino:avr:leonardo",
 	}
 
@@ -64,9 +65,9 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 3, len(librariesFolders))
-	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
-	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
-	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
 
 	libs := ctx.Libraries
 	require.Equal(t, 24, len(libs))
@@ -79,8 +80,8 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	idx++
 	require.Equal(t, "Adafruit_PN532", libs[idx].Name)
-	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libs[idx].Folder.String())
-	require.Equal(t, Abs(t, "downloaded_libraries/Adafruit_PN532"), libs[idx].SrcFolder.String())
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].Folder))
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].SrcFolder))
 	require.Equal(t, 1, len(libs[idx].Architectures))
 	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libs[idx].Architectures[0])
 	require.False(t, libs[idx].IsLegacy)
@@ -95,8 +96,8 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	bridgeLib := libs[idx]
 	require.Equal(t, "Bridge", bridgeLib.Name)
-	require.Equal(t, Abs(t, "downloaded_libraries/Bridge"), bridgeLib.Folder.String())
-	require.Equal(t, Abs(t, "downloaded_libraries/Bridge/src"), bridgeLib.SrcFolder.String())
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge")).EquivalentTo(bridgeLib.Folder))
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge/src")).EquivalentTo(bridgeLib.SrcFolder))
 	require.Equal(t, 1, len(bridgeLib.Architectures))
 	require.Equal(t, constants.LIBRARY_ALL_ARCHS, bridgeLib.Architectures[0])
 	require.Equal(t, "Arduino", bridgeLib.Author)
@@ -153,9 +154,9 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries"},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		FQBN: "arduino:sam:arduino_due_x_dbg",
 	}
 
@@ -173,9 +174,9 @@ func TestLoadLibrariesSAM(t *testing.T) {
 
 	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 3, len(librariesFolders))
-	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
-	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "sam", "libraries")), librariesFolders[1])
-	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "sam", "libraries")).EquivalentTo(librariesFolders[1]))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
 
 	libraries := ctx.Libraries
 	require.Equal(t, 22, len(libraries))
@@ -236,9 +237,9 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
 		FQBN: "arduino:avr:leonardo",
 	}
 
@@ -256,18 +257,18 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 
 	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 3, len(librariesFolders))
-	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
-	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
-	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[2])
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
 }
 
 func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"},
-		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
-		OtherLibrariesFolders:   []string{"libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")},
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"),
+		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesFolders:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
 		FQBN: "my_avr_platform:avr:custom_yun",
 	}
 
@@ -285,8 +286,8 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 
 	librariesFolders := ctx.LibrariesFolders
 	require.Equal(t, 4, len(librariesFolders))
-	require.Equal(t, Abs(t, filepath.Join("downloaded_libraries")), librariesFolders[0])
-	require.Equal(t, Abs(t, filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")), librariesFolders[1])
-	require.Equal(t, Abs(t, filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries")), librariesFolders[2])
-	require.Equal(t, Abs(t, filepath.Join("libraries")), librariesFolders[3])
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
+	require.True(t, Abs(t, paths.New("user_hardware", "my_avr_platform", "avr", "libraries")).EquivalentTo(librariesFolders[2]))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[3]))
 }

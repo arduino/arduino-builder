@@ -37,12 +37,13 @@ import (
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoadHardware(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"},
+		HardwareFolders: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
 	}
 
 	commands := []types.Command{
@@ -86,7 +87,7 @@ func TestLoadHardware(t *testing.T) {
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"},
+		HardwareFolders: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
 	}
 
 	commands := []types.Command{
@@ -156,7 +157,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: []string{"downloaded_board_manager_stuff"},
+		HardwareFolders: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
 
 	commands := []types.Command{
@@ -204,7 +205,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 
 func TestLoadLotsOfHardware(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: []string{"downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"},
+		HardwareFolders: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
 	}
 
 	commands := []types.Command{

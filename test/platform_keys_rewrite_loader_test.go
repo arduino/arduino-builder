@@ -35,12 +35,13 @@ import (
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoadPlatformKeysRewrite(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: []string{"downloaded_hardware", filepath.Join("..", "hardware"), "hardware"},
+		HardwareFolders: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
 	}
 
 	commands := []types.Command{

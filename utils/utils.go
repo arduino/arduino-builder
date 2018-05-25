@@ -32,7 +32,6 @@ package utils
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -44,6 +43,7 @@ import (
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/go-paths-helper"
 )
 
 func KeysOfMapOfString(input map[string]string) []string {
@@ -263,17 +263,6 @@ func AbsolutizePaths(files []string) ([]string, error) {
 	return files, nil
 }
 
-func ReadFileToRows(file string) ([]string, error) {
-	bytes, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, i18n.WrapError(err)
-	}
-	txt := string(bytes)
-	txt = strings.Replace(txt, "\r\n", "\n", -1)
-
-	return strings.Split(txt, "\n"), nil
-}
-
 type CheckExtensionFunc func(ext string) bool
 
 func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
@@ -318,16 +307,6 @@ func FindFilesInFolder(files *[]string, folder string, extensions CheckExtension
 	return gohasissues.Walk(folder, walkFunc)
 }
 
-func GetParentFolder(basefolder string, n int) string {
-	tempFolder := basefolder
-	i := 0
-	for i < n {
-		tempFolder = filepath.Dir(tempFolder)
-		i++
-	}
-	return tempFolder
-}
-
 func AppendIfNotPresent(target []string, elements ...string) []string {
 	for _, element := range elements {
 		if !SliceContains(target, element) {
@@ -335,29 +314,6 @@ func AppendIfNotPresent(target []string, elements ...string) []string {
 		}
 	}
 	return target
-}
-
-func EnsureFolderExists(folder string) error {
-	return os.MkdirAll(folder, os.FileMode(0755))
-}
-
-func WriteFileBytes(targetFilePath string, data []byte) error {
-	return ioutil.WriteFile(targetFilePath, data, os.FileMode(0644))
-}
-
-func WriteFile(targetFilePath string, data string) error {
-	return WriteFileBytes(targetFilePath, []byte(data))
-}
-
-func TouchFile(targetFilePath string) error {
-	return WriteFileBytes(targetFilePath, []byte{})
-}
-
-func NULLFile() string {
-	if runtime.GOOS == "windows" {
-		return "nul"
-	}
-	return "/dev/null"
 }
 
 func MD5Sum(data []byte) string {
@@ -390,6 +346,10 @@ func QuoteCppString(str string) string {
 	str = strings.Replace(str, "\\", "\\\\", -1)
 	str = strings.Replace(str, "\"", "\\\"", -1)
 	return "\"" + str + "\""
+}
+
+func QuoteCppPath(path *paths.Path) string {
+	return QuoteCppString(path.String())
 }
 
 // Parse a C-preprocessor string as emitted by the preprocessor. This

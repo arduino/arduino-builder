@@ -33,7 +33,6 @@ package test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"testing"
 	"text/template"
@@ -41,6 +40,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"
@@ -48,7 +48,7 @@ import (
 
 func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
 	funcsMap := template.FuncMap{
-		"QuoteCppString": utils.QuoteCppString,
+		"QuoteCppString": utils.QuoteCppPath,
 	}
 
 	tpl, err := template.New(filepath.Base(filename)).Funcs(funcsMap).ParseFiles(filename)
@@ -63,10 +63,10 @@ func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) strin
 	return buf.String()
 }
 
-func Abs(t *testing.T, rel string) string {
-	toolPath, err := filepath.Abs(rel)
+func Abs(t *testing.T, rel *paths.Path) *paths.Path {
+	absPath, err := rel.Abs()
 	NoError(t, err)
-	return toolPath
+	return absPath
 }
 
 func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
@@ -79,15 +79,15 @@ func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 	}
 }
 
-func SetupBuildPath(t *testing.T, ctx *types.Context) string {
-	buildPath, err := ioutil.TempDir(constants.EMPTY_STRING, "test_build_path")
+func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
+	buildPath, err := paths.MkTempDir("", "test_build_path")
 	NoError(t, err)
 	ctx.BuildPath = buildPath
 	return buildPath
 }
 
-func SetupBuildCachePath(t *testing.T, ctx *types.Context) string {
-	buildCachePath, err := ioutil.TempDir(constants.EMPTY_STRING, "test_build_cache")
+func SetupBuildCachePath(t *testing.T, ctx *types.Context) *paths.Path {
+	buildCachePath, err := paths.MkTempDir(constants.EMPTY_STRING, "test_build_cache")
 	NoError(t, err)
 	ctx.BuildCachePath = buildCachePath
 	return buildCachePath

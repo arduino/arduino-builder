@@ -38,6 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
@@ -50,15 +51,13 @@ type LibrariesBuilder struct{}
 func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := ctx.IncludeFolders
-	includes = utils.Map(includes, utils.WrapWithHyphenI)
+	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
 	libraries := ctx.ImportedLibraries
 	verbose := ctx.Verbose
 	warningsLevel := ctx.WarningsLevel
 	logger := ctx.GetLogger()
 
-	err := utils.EnsureFolderExists(librariesBuildPath)
-	if err != nil {
+	if err := librariesBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
@@ -100,8 +99,8 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*libraries
 	return nil
 }
 
-func compileLibraries(libraries []*libraries.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles := []string{}
+func compileLibraries(libraries []*libraries.Library, buildPath *paths.Path, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) (paths.PathList, error) {
+	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
@@ -111,21 +110,19 @@ func compileLibraries(libraries []*libraries.Library, buildPath string, buildPro
 	}
 
 	return objectFiles, nil
-
 }
 
-func compileLibrary(library *libraries.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibrary(library *libraries.Library, buildPath *paths.Path, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) (paths.PathList, error) {
 	if verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
 	}
-	libraryBuildPath := filepath.Join(buildPath, library.Name)
+	libraryBuildPath := buildPath.Join(library.Name)
 
-	err := utils.EnsureFolderExists(libraryBuildPath)
-	if err != nil {
+	if err := libraryBuildPath.MkdirAll(); err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	objectFiles := []string{}
+	objectFiles := paths.NewPathList()
 
 	if library.Precompiled {
 		// search for files with PRECOMPILED_LIBRARIES_VALID_EXTENSIONS
@@ -139,38 +136,42 @@ func compileLibrary(library *libraries.Library, buildPath string, buildPropertie
 		}
 		for _, path := range filePaths {
 			if strings.Contains(filepath.Base(path), library.RealName) {
-				objectFiles = append(objectFiles, path)
+				objectFiles.Add(paths.New(path))
 			}
 		}
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder.String(), libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		libObjectFiles, err := builder_utils.CompileFilesRecursive(library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 		if library.DotALinkage {
-			archiveFile, err := builder_utils.ArchiveCompiledFiles(libraryBuildPath, library.Name+".a", objectFiles, buildProperties, verbose, logger)
+			archiveFile, err := builder_utils.ArchiveCompiledFiles(libraryBuildPath, paths.New(library.Name+".a"), libObjectFiles, buildProperties, verbose, logger)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}
-			objectFiles = []string{archiveFile}
+			objectFiles.Add(archiveFile)
+		} else {
+			objectFiles.AddAll(libObjectFiles)
 		}
 	} else {
 		if library.UtilityFolder != nil {
 			includes = append(includes, utils.WrapWithHyphenI(library.UtilityFolder.String()))
 		}
-		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder.String(), false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		libObjectFiles, err := builder_utils.CompileFiles(library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
+		objectFiles.AddAll(libObjectFiles)
 
 		if library.UtilityFolder != nil {
-			utilityBuildPath := filepath.Join(libraryBuildPath, "utility")
-			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder.String(), false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+			utilityBuildPath := libraryBuildPath.Join("utility")
+			utilityObjectFiles, err := builder_utils.CompileFiles(library.UtilityFolder, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}
+			objectFiles.AddAll(utilityObjectFiles)
 		}
 	}
 
