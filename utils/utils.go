@@ -30,6 +30,8 @@
 package utils
 
 import (
+	"fmt"
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"io/ioutil"
@@ -252,6 +254,68 @@ func filterEmptyArg(_ int, arg string, _ []string) bool {
 
 func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
 	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger)
+}
+
+func printableArgument(arg string) string {
+	if strings.ContainsAny(arg, "\"\\ \t") {
+		arg = strings.Replace(arg, "\\", "\\\\", -1)
+		arg = strings.Replace(arg, "\"", "\\\"", -1)
+		return "\"" + arg + "\""
+	} else {
+		return arg
+	}
+}
+
+// Convert a command and argument slice back to a printable string.
+// This adds basic escaping which is sufficient for debug output, but
+// probably not for shell interpretation. This essentially reverses
+// ParseCommandLine.
+func PrintableCommand(parts []string) string {
+	return strings.Join(Map(parts, printableArgument), " ")
+}
+
+const (
+	Ignore = 0 // Redirect to null
+	Show = 1 // Show on stdout/stderr as normal
+	ShowIfVerbose = 2 // Show if verbose is set, Ignore otherwise
+	Capture = 3 // Capture into buffer
+)
+
+func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
+	if ctx.Verbose {
+		fmt.Println(PrintableCommand(command.Args))
+	}
+
+	if stdout == Capture {
+		buffer := &bytes.Buffer{}
+		command.Stdout = buffer
+	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
+		command.Stdout = os.Stdout
+	}
+
+	if stderr == Capture {
+		buffer := &bytes.Buffer{}
+		command.Stderr = buffer
+	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
+		command.Stderr = os.Stderr
+	}
+
+	err := command.Start()
+	if err != nil {
+		return nil, nil, i18n.WrapError(err)
+	}
+
+	err = command.Wait()
+
+	var outbytes, errbytes []byte
+	if buf, ok := command.Stdout.(*bytes.Buffer); ok {
+		outbytes =  buf.Bytes()
+	}
+	if buf, ok := command.Stderr.(*bytes.Buffer); ok {
+		errbytes =  buf.Bytes()
+	}
+
+	return outbytes, errbytes, i18n.WrapError(err)
 }
 
 func MapHas(aMap map[string]interface{}, key string) bool {

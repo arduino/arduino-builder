@@ -30,8 +30,6 @@
 package builder_utils
 
 import (
-	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -40,12 +38,13 @@ import (
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
 
-func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles, err := CompileFiles(objectFiles, sourcePath, false, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+func CompileFilesRecursive(ctx *types.Context, objectFiles []string, sourcePath string, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
+	objectFiles, err := CompileFiles(ctx, objectFiles, sourcePath, false, buildPath, buildProperties, includes)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
@@ -56,7 +55,7 @@ func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath st
 	}
 
 	for _, folder := range folders {
-		objectFiles, err = CompileFilesRecursive(objectFiles, filepath.Join(sourcePath, folder.Name()), filepath.Join(buildPath, folder.Name()), buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = CompileFilesRecursive(ctx, objectFiles, filepath.Join(sourcePath, folder.Name()), filepath.Join(buildPath, folder.Name()), buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -65,28 +64,28 @@ func CompileFilesRecursive(objectFiles []string, sourcePath string, buildPath st
 	return objectFiles, nil
 }
 
-func CompileFiles(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	objectFiles, err := compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN, verbose, warningsLevel, logger)
+func CompileFiles(ctx *types.Context, objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
+	objectFiles, err := compileFilesWithExtensionWithRecipe(ctx, objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN, verbose, warningsLevel, logger)
+	objectFiles, err = compileFilesWithExtensionWithRecipe(ctx, objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	objectFiles, err = compileFilesWithExtensionWithRecipe(objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN, verbose, warningsLevel, logger)
+	objectFiles, err = compileFilesWithExtensionWithRecipe(ctx, objectFiles, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 	return objectFiles, nil
 }
 
-func compileFilesWithExtensionWithRecipe(objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, extension string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithExtensionWithRecipe(ctx *types.Context, objectFiles []string, sourcePath string, recurse bool, buildPath string, buildProperties properties.Map, includes []string, extension string, recipe string) ([]string, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	return compileFilesWithRecipe(objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+	return compileFilesWithRecipe(ctx, objectFiles, sourcePath, sources, buildPath, buildProperties, includes, recipe)
 }
 
 func findFilesInFolder(sourcePath string, extension string, recurse bool) ([]string, error) {
@@ -145,9 +144,9 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileFilesWithRecipe(ctx *types.Context, objectFiles []string, sourcePath string, sources []string, buildPath string, buildProperties properties.Map, includes []string, recipe string) ([]string, error) {
 	for _, source := range sources {
-		objectFile, err := compileFileWithRecipe(sourcePath, source, buildPath, buildProperties, includes, recipe, verbose, warningsLevel, logger)
+		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -157,9 +156,10 @@ func compileFilesWithRecipe(objectFiles []string, sourcePath string, sources []s
 	return objectFiles, nil
 }
 
-func compileFileWithRecipe(sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string, verbose bool, warningsLevel string, logger i18n.Logger) (string, error) {
+func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string) (string, error) {
+	logger := ctx.GetLogger()
 	properties := buildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
 	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
 	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source
 	relativeSource, err := filepath.Rel(sourcePath, source)
@@ -173,27 +173,33 @@ func compileFileWithRecipe(sourcePath string, source string, buildPath string, b
 		return "", i18n.WrapError(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
+	objIsUpToDate, err := ObjFileIsUpToDate(ctx, properties[constants.BUILD_PROPERTIES_SOURCE_FILE], properties[constants.BUILD_PROPERTIES_OBJECT_FILE], filepath.Join(buildPath, relativeSource+".d"))
 	if err != nil {
 		return "", i18n.WrapError(err)
 	}
 
 	if !objIsUpToDate {
-		_, err = ExecRecipe(properties, recipe, false, verbose, verbose, logger)
+		_, _, err = ExecRecipe(ctx, properties, recipe, false, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
-	} else if verbose {
+	} else if ctx.Verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
 	}
 
 	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
 }
 
-func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, error) {
+func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile string) (bool, error) {
 	sourceFile = filepath.Clean(sourceFile)
 	objectFile = filepath.Clean(objectFile)
 	dependencyFile = filepath.Clean(dependencyFile)
+	logger := ctx.GetLogger()
+	debugLevel := ctx.DebugLevel
+
+	if debugLevel >= 20 {
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Checking previous results for {0} (result = {1}, dep = {2})", sourceFile, objectFile, dependencyFile)
+	}
 
 	sourceFileStat, err := os.Stat(sourceFile)
 	if err != nil {
@@ -203,6 +209,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 	objectFileStat, err := os.Stat(objectFile)
 	if err != nil {
 		if os.IsNotExist(err) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", objectFile)
+			}
 			return false, nil
 		} else {
 			return false, i18n.WrapError(err)
@@ -212,6 +221,9 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 	dependencyFileStat, err := os.Stat(dependencyFile)
 	if err != nil {
 		if os.IsNotExist(err) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", dependencyFile)
+			}
 			return false, nil
 		} else {
 			return false, i18n.WrapError(err)
@@ -219,9 +231,15 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 	}
 
 	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, objectFile)
+		}
 		return false, nil
 	}
 	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, dependencyFile)
+		}
 		return false, nil
 	}
 
@@ -241,10 +259,16 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 
 	firstRow := rows[0]
 	if !strings.HasSuffix(firstRow, ":") {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "No colon in first line of depfile")
+		}
 		return false, nil
 	}
 	objFileInDepFile := firstRow[:len(firstRow)-1]
 	if objFileInDepFile != objectFile {
+		if debugLevel >= 20 {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Depfile is about different file: {0}", objFileInDepFile)
+		}
 		return false, nil
 	}
 
@@ -254,12 +278,22 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile string) (bool, err
 		if err != nil && !os.IsNotExist(err) {
 			// There is probably a parsing error of the dep file
 			// Ignore the error and trigger a full rebuild anyway
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Failed to read: {0}", row)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, i18n.WrapError(err).Error())
+			}
 			return false, nil
 		}
 		if os.IsNotExist(err) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", row)
+			}
 			return false, nil
 		}
 		if depStat.ModTime().After(objectFileStat.ModTime()) {
+			if debugLevel >= 20 {
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", row, objectFile)
+			}
 			return false, nil
 		}
 	}
@@ -309,7 +343,8 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile string)
 	return true
 }
 
-func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map, verbose bool, logger i18n.Logger) (string, error) {
+func ArchiveCompiledFiles(ctx *types.Context, buildPath string, archiveFile string, objectFiles []string, buildProperties properties.Map) (string, error) {
+	logger := ctx.GetLogger()
 	archiveFilePath := filepath.Join(buildPath, archiveFile)
 
 	rebuildArchive := false
@@ -332,7 +367,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 				return "", i18n.WrapError(err)
 			}
 		} else {
-			if verbose {
+			if ctx.Verbose {
 				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, archiveFilePath)
 			}
 			return archiveFilePath, nil
@@ -345,7 +380,7 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath
 		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile
 
-		_, err := ExecRecipe(properties, constants.RECIPE_AR_PATTERN, false, verbose, verbose, logger)
+		_, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false, /* stdout */ utils.ShowIfVerbose, /* stderr */ utils.Show)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
@@ -354,28 +389,17 @@ func ArchiveCompiledFiles(buildPath string, archiveFile string, objectFiles []st
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(properties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) ([]byte, error) {
-	command, err := PrepareCommandForRecipe(properties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
+// See util.ExecCommand for stdout/stderr arguments
+func ExecRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
+	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, nil, i18n.WrapError(err)
 	}
-
-	if echoOutput {
-		command.Stdout = os.Stdout
-	}
-
-	command.Stderr = os.Stderr
-
-	if echoOutput {
-		err := command.Run()
-		return nil, i18n.WrapError(err)
-	}
-
-	bytes, err := command.Output()
-	return bytes, i18n.WrapError(err)
+	return utils.ExecCommand(ctx, command, stdout, stderr)
 }
 
-func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (*exec.Cmd, error) {
+func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
+	logger := ctx.GetLogger()
 	pattern := buildProperties[recipe]
 	if pattern == constants.EMPTY_STRING {
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
@@ -392,27 +416,7 @@ func PrepareCommandForRecipe(buildProperties properties.Map, recipe string, remo
 		return nil, i18n.WrapError(err)
 	}
 
-	if echoCommandLine {
-		fmt.Println(commandLine)
-	}
-
 	return command, nil
-}
-
-func ExecRecipeCollectStdErr(buildProperties properties.Map, recipe string, removeUnsetProperties bool, echoCommandLine bool, echoOutput bool, logger i18n.Logger) (string, error) {
-	command, err := PrepareCommandForRecipe(buildProperties, recipe, removeUnsetProperties, echoCommandLine, echoOutput, logger)
-	if err != nil {
-		return "", i18n.WrapError(err)
-	}
-
-	buffer := &bytes.Buffer{}
-	command.Stderr = buffer
-	command.Run()
-	return string(buffer.Bytes()), nil
-}
-
-func RemoveHyphenMDDFlagFromGCCCommandLine(buildProperties properties.Map) {
-	buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS] = strings.Replace(buildProperties[constants.BUILD_PROPERTIES_COMPILER_CPP_FLAGS], "-MMD", "", -1)
 }
 
 // CopyFile copies the contents of the file named src to the file named

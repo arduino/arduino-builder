@@ -61,7 +61,6 @@ type Context struct {
 	HeaderToLibraries          map[string][]*Library
 	ImportedLibraries          []*Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludeJustFound           string
 	IncludeFolders             []string
 	OutputGccMinusM            string
 
@@ -85,9 +84,6 @@ type Context struct {
 	// Logging
 	logger     i18n.Logger
 	DebugLevel int
-
-	// ReadFileAndStoreInContext command
-	FileToRead string
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
