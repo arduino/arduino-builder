@@ -36,11 +36,12 @@ import (
 )
 
 type ReadFileAndStoreInContext struct {
+	FileToRead string
 	Target *string
 }
 
 func (s *ReadFileAndStoreInContext) Run(ctx *types.Context) error {
-	bytes, err := ioutil.ReadFile(ctx.FileToRead)
+	bytes, err := ioutil.ReadFile(s.FileToRead)
 	if err != nil {
 		return i18n.WrapError(err)
 	}

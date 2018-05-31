@@ -52,16 +52,13 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	includes := ctx.IncludeFolders
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 	libraries := ctx.ImportedLibraries
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
 	err := utils.EnsureFolderExists(librariesBuildPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	objectFiles, err := compileLibraries(libraries, librariesBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	objectFiles, err := compileLibraries(ctx, libraries, librariesBuildPath, buildProperties, includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -93,16 +90,16 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Lib
 				name = strings.Replace(name, "lib", "", 1)
 				libs_cmd += "-l" + name + " "
 			}
-			ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_EXTRAFLAGS] += "\"-L" + path + "\" " + libs_cmd
+			ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS] += "\"-L" + path + "\" " + libs_cmd + " "
 		}
 	}
 	return nil
 }
 
-func compileLibraries(libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
+func compileLibraries(ctx *types.Context, libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
 	objectFiles := []string{}
 	for _, library := range libraries {
-		libraryObjectFiles, err := compileLibrary(library, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -113,8 +110,9 @@ func compileLibraries(libraries []*types.Library, buildPath string, buildPropert
 
 }
 
-func compileLibrary(library *types.Library, buildPath string, buildProperties properties.Map, includes []string, verbose bool, warningsLevel string, logger i18n.Logger) ([]string, error) {
-	if verbose {
+func compileLibrary(ctx *types.Context, library *types.Library, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
+	logger := ctx.GetLogger()
+	if ctx.Verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
 	}
 	libraryBuildPath := filepath.Join(buildPath, library.Name)
@@ -144,12 +142,12 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 	}
 
 	if library.Layout == types.LIBRARY_RECURSIVE {
-		objectFiles, err = builder_utils.CompileFilesRecursive(objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFilesRecursive(ctx, objectFiles, library.SrcFolder, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 		if library.DotALinkage {
-			archiveFile, err := builder_utils.ArchiveCompiledFiles(libraryBuildPath, library.Name+".a", objectFiles, buildProperties, verbose, logger)
+			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, library.Name+".a", objectFiles, buildProperties)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}
@@ -159,14 +157,14 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 		if library.UtilityFolder != "" {
 			includes = append(includes, utils.WrapWithHyphenI(library.UtilityFolder))
 		}
-		objectFiles, err = builder_utils.CompileFiles(objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		objectFiles, err = builder_utils.CompileFiles(ctx, objectFiles, library.SrcFolder, false, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 
 		if library.UtilityFolder != "" {
 			utilityBuildPath := filepath.Join(libraryBuildPath, constants.LIBRARY_FOLDER_UTILITY)
-			objectFiles, err = builder_utils.CompileFiles(objectFiles, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+			objectFiles, err = builder_utils.CompileFiles(ctx, objectFiles, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}

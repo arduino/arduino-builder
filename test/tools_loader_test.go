@@ -30,11 +30,12 @@
 package test
 
 import (
+	"sort"
+	"testing"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/stretchr/testify/require"
-	"sort"
-	"testing"
 )
 
 type ByToolIDAndVersion []*types.Tool
@@ -64,11 +65,15 @@ func TestLoadTools(t *testing.T) {
 	NoError(t, err)
 
 	tools := ctx.Tools
-	require.Equal(t, 6, len(tools))
+	require.Equal(t, 7, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
 	idx := 0
+	require.Equal(t, "arduino-preprocessor", tools[idx].Name)
+	require.Equal(t, "0.1.5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/arduino-preprocessor/0.1.5"), tools[idx].Folder)
+	idx++
 	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1"), tools[idx].Folder)
@@ -136,7 +141,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 	NoError(t, err)
 
 	tools := ctx.Tools
-	require.Equal(t, 8, len(tools))
+	require.Equal(t, 9, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
@@ -144,6 +149,10 @@ func TestLoadLotsOfTools(t *testing.T) {
 	require.Equal(t, "CMSIS", tools[idx].Name)
 	require.Equal(t, "4.0.0-atmel", tools[idx].Version)
 	require.Equal(t, Abs(t, "./downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel"), tools[idx].Folder)
+	idx++
+	require.Equal(t, "arduino-preprocessor", tools[idx].Name)
+	require.Equal(t, "0.1.5", tools[idx].Version)
+	require.Equal(t, Abs(t, "./downloaded_tools/arduino-preprocessor/0.1.5"), tools[idx].Folder)
 	idx++
 	require.Equal(t, "arm-none-eabi-gcc", tools[idx].Name)
 	require.Equal(t, "4.8.3-2014q1", tools[idx].Version)
