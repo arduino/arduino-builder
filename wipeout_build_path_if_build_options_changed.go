@@ -72,7 +72,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
 		realCoreFolder := coreFolder.Parent().Parent()
 		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
-		coreHasChanged := builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, jsonPath)
+		coreHasChanged := builder_utils.TXTBuildRulesHaveChanged(realCoreFolder, targetCoreFolder, jsonPath)
 
 		if !coreHasChanged {
 			return nil
@@ -85,6 +85,12 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	files, err := gohasissues.ReadDir(buildPath.String())
 	if err != nil {
 		return i18n.WrapError(err)
+	}
+	// if build path is inside the sketch folder, also wipe ctx.AdditionalFiles
+	if ctx.SketchLocation != nil {
+		if inside, _ := ctx.BuildPath.IsInsideDir(ctx.SketchLocation.Parent()); inside {
+			ctx.Sketch.AdditionalFiles = ctx.Sketch.AdditionalFiles[:0]
+		}
 	}
 	for _, file := range files {
 		buildPath.Join(file.Name()).RemoveAll()

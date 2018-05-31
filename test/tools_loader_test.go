@@ -85,11 +85,14 @@ func TestLoadTools(t *testing.T) {
 	NoError(t, (&builder.ToolsLoader{}).Run(ctx))
 
 	tools := ctx.AllTools
-	require.Equal(t, 8, len(tools))
+	require.Equal(t, 9, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
 	idx := 0
+	require.Equal(t, ":arduino-preprocessor@0.1.5", tools[idx].String())
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/arduino-preprocessor/0.1.5")
+	idx++
 	require.Equal(t, ":arm-none-eabi-gcc@4.8.3-2014q1", tools[idx].String())
 	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
 	idx++
@@ -152,13 +155,16 @@ func TestLoadLotsOfTools(t *testing.T) {
 	NoError(t, (&builder.ToolsLoader{}).Run(ctx))
 
 	tools := ctx.AllTools
-	require.Equal(t, 11, len(tools))
+	require.Equal(t, 12, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
 
 	idx := 0
 	require.Equal(t, "arduino:CMSIS@4.0.0-atmel", tools[idx].String())
 	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/arduino/tools/CMSIS/4.0.0-atmel")
+	idx++
+	require.Equal(t, ":arduino-preprocessor@0.1.5", tools[idx].String())
+	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_tools/arduino-preprocessor/0.1.5")
 	idx++
 	require.Equal(t, "RFduino:arm-none-eabi-gcc@4.8.3-2014q1", tools[idx].String())
 	requireEquivalentPaths(t, tools[idx].Folder, "downloaded_board_manager_stuff/RFduino/tools/arm-none-eabi-gcc/4.8.3-2014q1")

@@ -61,11 +61,8 @@ func (s *Linker) Run(ctx *types.Context) error {
 	}
 
 	buildProperties := ctx.BuildProperties
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
-	err = link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
+	err = link(ctx, objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -73,7 +70,7 @@ func (s *Linker) Run(ctx *types.Context) error {
 	return nil
 }
 
-func link(objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties properties.Map) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	quotedObjectFiles := utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes)
@@ -81,12 +78,12 @@ func link(objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFi
 
 	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
 	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath.String()
 	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath.String()
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILES] = objectFileList
 
-	_, err := builder_utils.ExecRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, verbose, verbose, logger)
+	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 	return err
 }
 

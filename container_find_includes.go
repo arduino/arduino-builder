@@ -108,6 +108,8 @@ package builder
 
 import (
 	"encoding/json"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -117,6 +119,8 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+
+	"github.com/go-errors/errors"
 )
 
 type ContainerFindIncludes struct{}
@@ -212,7 +216,7 @@ func (cache *includeCache) Next() includeCacheEntry {
 // not, or no entry is available, the cache is invalidated. Does not
 // advance the cache.
 func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
-	if cache.valid && cache.next < len(cache.entries) && cache.Next().Sourcefile.String() != sourcefile.String() {
+	if cache.valid && (cache.next >= len(cache.entries) || !cache.Next().Sourcefile.EqualsTo(sourcefile)) {
 		cache.valid = false
 		cache.entries = cache.entries[:cache.next]
 	}
@@ -289,6 +293,8 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
 	targetFilePath := paths.NullPath()
+	depPath := sourceFile.DepfilePath(ctx)
+	objPath := sourceFile.ObjectPath(ctx)
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -302,7 +308,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx))
+	unchanged, err := builder_utils.ObjFileIsUpToDate(ctx, sourcePath, objPath, depPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -316,23 +322,33 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityFolder != nil {
 			includes = append(includes, library.UtilityFolder)
 		}
+		var preproc_err error
+		var preproc_stderr []byte
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
 				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
 			}
 		} else {
-			commands := []types.Command{
-				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath, Includes: includes},
-				&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
-			}
-			for _, command := range commands {
-				err := runCommand(ctx, command)
-				if err != nil {
-					return i18n.WrapError(err)
+			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+			// Unwrap error and see if it is an ExitError.
+			_, is_exit_error := i18n.UnwrapError(preproc_err).(*exec.ExitError)
+			if preproc_err == nil {
+				// Preprocessor successful, done
+				include = ""
+			} else if !is_exit_error || preproc_stderr == nil {
+				// Ignore ExitErrors (e.g. gcc returning
+				// non-zero status), but bail out on
+				// other errors
+				return i18n.WrapError(preproc_err)
+			} else {
+				include = IncludesFinderWithRegExp(ctx, string(preproc_stderr))
+				if include == "" {
+					// No include found? Bail out.
+					os.Stderr.Write(preproc_stderr)
+					return i18n.WrapError(preproc_err)
 				}
 			}
-			include = ctx.IncludeJustFound
 		}
 
 		if include == "" {
@@ -344,8 +360,21 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
-			return i18n.WrapError(err)
+			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
+			// return i18n.WrapError(err)
+			if preproc_err == nil || preproc_stderr == nil {
+				// Filename came from cache, so run preprocessor to obtain error to show
+				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+				if preproc_err == nil {
+					// If there is a missing #include in the cache, but running
+					// gcc does not reproduce that, there is something wrong.
+					// Returning an error here will cause the cache to be
+					// deleted, so hopefully the next compilation will succeed.
+					return errors.New("Internal error in cache")
+				}
+			}
+			os.Stderr.Write(preproc_stderr)
+			return i18n.WrapError(preproc_err)
 		}
 
 		// Add this library to the list of libraries, the

@@ -11,6 +11,12 @@ import (
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
+type ProgressStruct struct {
+	PrintEnabled bool
+	Steps        float64
+	Progress     float64
+}
+
 // Context structure
 type Context struct {
 	// Build options
@@ -21,8 +27,10 @@ type Context struct {
 	BuiltInLibrariesFolders paths.PathList
 	OtherLibrariesFolders   paths.PathList
 	SketchLocation          *paths.Path
+	WatchedLocations        paths.PathList
 	ArduinoAPIVersion       string
 	FQBN                    string
+	CodeCompleteAt          string
 
 	// Build options are serialized here
 	BuildOptionsJson         string
@@ -60,6 +68,7 @@ type Context struct {
 	Sketch          *Sketch
 	Source          string
 	SourceGccMinusE string
+	CodeCompletions string
 
 	WarningsLevel string
 
@@ -68,8 +77,8 @@ type Context struct {
 	HeaderToLibraries          map[string][]*libraries.Library
 	ImportedLibraries          []*libraries.Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludeJustFound           string
 	IncludeFolders             paths.PathList
+	//OutputGccMinusM            string
 
 	// C++ Parsing
 	CTagsOutput                 string
@@ -85,6 +94,9 @@ type Context struct {
 	Verbose           bool
 	DebugPreprocessor bool
 
+	// Dry run, only create progress map
+	Progress ProgressStruct
+
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
 
@@ -92,8 +104,11 @@ type Context struct {
 	logger     i18n.Logger
 	DebugLevel int
 
-	// ReadFileAndStoreInContext command
-	FileToRead *paths.Path
+	// Reuse old tools since the backing storage didn't change
+	CanUseCachedTools bool
+
+	// Experimental: use arduino-preprocessor to create prototypes
+	UseArduinoPreprocessor bool
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
@@ -103,9 +118,21 @@ func (ctx *Context) ExtractBuildOptions() properties.Map {
 	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders.AsStrings(), ",")
 	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesFolders.AsStrings(), ",")
 	opts["sketchLocation"] = ctx.SketchLocation.String()
+	var additionalFilesRelative []string
+	if ctx.Sketch != nil {
+		for _, sketch := range ctx.Sketch.AdditionalFiles {
+			absPath := ctx.SketchLocation.Parent()
+			relPath, err := sketch.Name.RelTo(absPath)
+			if err != nil {
+				continue // ignore
+			}
+			additionalFilesRelative = append(additionalFilesRelative, relPath.String())
+		}
+	}
 	opts["fqbn"] = ctx.FQBN
 	opts["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	opts["customBuildProperties"] = strings.Join(ctx.CustomBuildProperties, ",")
+	opts["additionalFiles"] = strings.Join(additionalFilesRelative, ",")
 	return opts
 }
 

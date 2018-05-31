@@ -49,9 +49,8 @@ func TestReadFileAndStoreInContext(t *testing.T) {
 	file.WriteFile([]byte("test test\nciao"))
 
 	ctx := &types.Context{}
-	ctx.FileToRead = file
 
-	command := &builder.ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE}
+	command := &builder.ReadFileAndStoreInContext{FileToRead: file, Target: &ctx.SourceGccMinusE}
 	err = command.Run(ctx)
 	NoError(t, err)
 

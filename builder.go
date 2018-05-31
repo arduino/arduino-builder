@@ -35,6 +35,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/phases"
@@ -73,7 +74,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&WarnAboutArchIncompatibleLibraries{},
 
 		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Generating function prototypes..."),
-		&ContainerAddPrototypes{},
+		&PreprocessSketch{},
 
 		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling sketch..."),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
@@ -112,6 +113,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&PrintUsedLibrariesIfVerbose{},
 
+		&ExportProjectCMake{SketchError: mainErr != nil},
+
 		&phases.Sizer{SketchError: mainErr != nil},
 	}
 	otherErr := runCommands(ctx, commands, false)
@@ -121,6 +124,18 @@ func (s *Builder) Run(ctx *types.Context) error {
 	}
 
 	return otherErr
+}
+
+type PreprocessSketch struct{}
+
+func (s *PreprocessSketch) Run(ctx *types.Context) error {
+	var commands []types.Command
+	if ctx.UseArduinoPreprocessor {
+		commands = append(commands, &PreprocessSketchArduino{})
+	} else {
+		commands = append(commands, &ContainerAddPrototypes{})
+	}
+	return runCommands(ctx, commands, true)
 }
 
 type Preprocess struct{}
@@ -142,7 +157,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		&ContainerAddPrototypes{},
+		&PreprocessSketch{},
 
 		&PrintPreprocessedSource{},
 	}
@@ -165,34 +180,20 @@ func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 }
 
 func runCommands(ctx *types.Context, commands []types.Command, progressEnabled bool) error {
-	commandsLength := len(commands)
-	progressForEachCommand := float32(100) / float32(commandsLength)
 
-	progress := float32(0)
+	ctx.Progress.PrintEnabled = progressEnabled
+	ctx.Progress.Progress = 0
+
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		printProgressIfProgressEnabledAndMachineLogger(progressEnabled, ctx, progress)
+		ctx.Progress.Steps = 100.0 / float64(len(commands))
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		progress += progressForEachCommand
 	}
-
-	printProgressIfProgressEnabledAndMachineLogger(progressEnabled, ctx, 100)
-
 	return nil
-}
-
-func printProgressIfProgressEnabledAndMachineLogger(progressEnabled bool, ctx *types.Context, progress float32) {
-	if !progressEnabled {
-		return
-	}
-
-	log := ctx.GetLogger()
-	if log.Name() == "machine" {
-		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(float64(progress), 'f', 2, 32))
-	}
 }
 
 func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {

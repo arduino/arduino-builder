@@ -74,6 +74,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	NoError(t, err)
 
 	require.Equal(t, "{\n"+
+		"  \"additionalFiles\": \"\",\n"+
 		"  \"builtInLibrariesFolders\": \"built-in libraries\",\n"+
 		"  \"customBuildProperties\": \"custom=prop\",\n"+
 		"  \"fqbn\": \"fqbn\",\n"+

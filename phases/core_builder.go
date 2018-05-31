@@ -45,9 +45,6 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	coreBuildPath := ctx.CoreBuildPath
 	coreBuildCachePath := ctx.CoreBuildCachePath
 	buildProperties := ctx.BuildProperties
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
 	if err := coreBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
@@ -59,7 +56,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 		}
 	}
 
-	archiveFile, objectFiles, err := compileCore(coreBuildPath, coreBuildCachePath, buildProperties, verbose, warningsLevel, logger)
+	archiveFile, objectFiles, err := compileCore(ctx, coreBuildPath, coreBuildCachePath, buildProperties)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -70,11 +67,12 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileCore(buildPath *paths.Path, buildCachePath *paths.Path, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) (*paths.Path, paths.PathList, error) {
-	coreFolder := paths.New(buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
-	variantFolder := paths.New(buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
+func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties properties.Map) (*paths.Path, paths.PathList, error) {
+	logger := ctx.GetLogger()
+	coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
+	variantFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH)
 
-	targetCoreFolder := paths.New(buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH])
+	targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
 
 	includes := []string{}
 	includes = append(includes, coreFolder.String())
@@ -87,7 +85,7 @@ func compileCore(buildPath *paths.Path, buildCachePath *paths.Path, buildPropert
 
 	variantObjectFiles := paths.NewPathList()
 	if variantFolder != nil {
-		variantObjectFiles, err = builder_utils.CompileFiles(variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+		variantObjectFiles, err = builder_utils.CompileFiles(ctx, variantFolder, true, buildPath, buildProperties, includes)
 		if err != nil {
 			return nil, nil, i18n.WrapError(err)
 		}
@@ -104,26 +102,26 @@ func compileCore(buildPath *paths.Path, buildCachePath *paths.Path, buildPropert
 
 		if canUseArchivedCore {
 			// use archived core
-			if verbose {
+			if ctx.Verbose {
 				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core: {0}", targetArchivedCore)
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
 	}
 
-	coreObjectFiles, err := builder_utils.CompileFiles(coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	coreObjectFiles, err := builder_utils.CompileFiles(ctx, coreFolder, true, buildPath, buildProperties, includes)
 	if err != nil {
 		return nil, nil, i18n.WrapError(err)
 	}
 
-	archiveFile, err := builder_utils.ArchiveCompiledFiles(buildPath, paths.New("core.a"), coreObjectFiles, buildProperties, verbose, logger)
+	archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, buildPath, paths.New("core.a"), coreObjectFiles, buildProperties)
 	if err != nil {
 		return nil, nil, i18n.WrapError(err)
 	}
 
 	// archive core.a
 	if targetArchivedCore != nil {
-		if verbose {
+		if ctx.Verbose {
 			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
 		}
 		if err := archiveFile.CopyTo(targetArchivedCore); err != nil {

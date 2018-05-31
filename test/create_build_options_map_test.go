@@ -56,6 +56,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	NoError(t, err)
 
 	require.Equal(t, "{\n"+
+		"  \"additionalFiles\": \"\",\n"+
 		"  \"builtInLibrariesFolders\": \"\",\n"+
 		"  \"customBuildProperties\": \"\",\n"+
 		"  \"fqbn\": \"fqbn\",\n"+

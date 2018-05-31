@@ -40,6 +40,11 @@ import (
 type ToolsLoader struct{}
 
 func (s *ToolsLoader) Run(ctx *types.Context) error {
+	if ctx.CanUseCachedTools {
+		//fmt.Println("no fs modification, can use cached ctx")
+		return nil
+	}
+
 	folders := paths.NewPathList()
 	builtinFolders := paths.NewPathList()
 
@@ -50,6 +55,7 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 		// Auto-detect built-in tools folders (for arduino-builder backward compatibility)
 		// this is a deprecated feature and will be removed in the future
 		builtinHardwareFolder, err := ctx.BuiltInLibrariesFolders[0].Join("..").Abs()
+
 		if err != nil {
 			fmt.Println("Error detecting ")
 		}
@@ -66,6 +72,7 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 	pm := ctx.PackageManager
 	pm.LoadToolsFromBundleDirectories(builtinFolders)
 
+	ctx.CanUseCachedTools = true
 	ctx.AllTools = pm.GetAllInstalledToolsReleases()
 
 	if ctx.TargetBoard != nil {
