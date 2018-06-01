@@ -30,8 +30,6 @@
 package builder
 
 import (
-	"os"
-
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/ctags"
 	"github.com/arduino/arduino-builder/i18n"
@@ -61,12 +59,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	verbose := ctx.Verbose
-	if verbose {
-		logger.UnformattedFprintln(os.Stdout, commandLine)
-	}
-
-	sourceBytes, err := command.Output()
+	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Ignore /* stderr */)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
