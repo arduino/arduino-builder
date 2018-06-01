@@ -502,10 +502,6 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map,
 		return nil, i18n.WrapError(err)
 	}
 
-	if ctx.Verbose {
-		logger.UnformattedFprintln(os.Stdout, commandLine)
-	}
-
 	return command, nil
 }
 
