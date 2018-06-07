@@ -46,8 +46,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	if err := builtInLibrariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	sortedLibrariesFolders := paths.NewPathList()
-	sortedLibrariesFolders.AddAllMissing(builtInLibrariesFolders)
+	sortedLibrariesFolders := builtInLibrariesFolders.Clone()
 
 	platform := ctx.TargetPlatform
 	debugLevel := ctx.DebugLevel
@@ -76,25 +75,21 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	var libs []*libraries.Library
 	for _, libraryFolder := range sortedLibrariesFolders {
-		subFolders, err := utils.ReadDirFiltered(libraryFolder.String(), utils.FilterDirs)
+		libsInFolder, err := libraries.LoadLibrariesFromDir(libraryFolder)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		for _, subFolder := range subFolders {
-			library, err := libraries.Load(libraryFolder.Join(subFolder.Name()))
-			if debugLevel > 0 {
-				if warnings, err := library.Lint(); err != nil {
-					return i18n.WrapError(err)
-				} else {
-					for _, warning := range warnings {
-						logger.Fprintln(os.Stdout, "warn", warning)
-					}
-				}
-			}
+		libs = append(libs, libsInFolder...)
+	}
+	if debugLevel > 0 {
+		for _, lib := range libs {
+			warnings, err := lib.Lint()
 			if err != nil {
 				return i18n.WrapError(err)
 			}
-			libs = append(libs, library)
+			for _, warning := range warnings {
+				logger.Fprintln(os.Stdout, "warn", warning)
+			}
 		}
 	}
 
