@@ -39,7 +39,6 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
 
@@ -63,7 +62,7 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	keys := utils.KeysOfMapOfString(txt)
+	keys := txt.Keys()
 	sort.Strings(keys)
 
 	for _, key := range keys {
