@@ -34,8 +34,6 @@ import (
 
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
@@ -48,21 +46,19 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	}
 	sortedLibrariesFolders := builtInLibrariesFolders.Clone()
 
+	actualPlatform := ctx.ActualPlatform
 	platform := ctx.TargetPlatform
 	debugLevel := ctx.DebugLevel
 	logger := ctx.GetLogger()
 
-	actualPlatform := ctx.ActualPlatform
 	if actualPlatform != platform {
-		actualPlatformLibDir := paths.New(actualPlatform.Folder).Join("libraries")
-		if isDir, _ := actualPlatformLibDir.IsDir(); isDir {
-			sortedLibrariesFolders.Add(actualPlatformLibDir)
+		if dir := actualPlatform.GetLibrariesDir(); dir != nil {
+			sortedLibrariesFolders.Add(dir)
 		}
 	}
 
-	platformLibDir := paths.New(platform.Folder).Join("libraries")
-	if isDir, _ := platformLibDir.IsDir(); isDir {
-		sortedLibrariesFolders.Add(platformLibDir)
+	if dir := platform.GetLibrariesDir(); dir != nil {
+		sortedLibrariesFolders.Add(dir)
 	}
 
 	librariesFolders := ctx.OtherLibrariesFolders
@@ -97,12 +93,13 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	headerToLibraries := make(map[string][]*libraries.Library)
 	for _, library := range libs {
-		headers, err := utils.ReadDirFiltered(library.SrcFolder.String(), utils.FilterFilesWithExtensions(".h", ".hpp", ".hh"))
+		headers, err := library.SrcFolder.ReadDir()
 		if err != nil {
 			return i18n.WrapError(err)
 		}
+		headers.FilterSuffix(".h", ".hpp", ".hh")
 		for _, header := range headers {
-			headerFileName := header.Name()
+			headerFileName := header.Base()
 			headerToLibraries[headerFileName] = append(headerToLibraries[headerFileName], library)
 		}
 	}
