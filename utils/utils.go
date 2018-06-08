@@ -52,22 +52,6 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-func KeysOfMapOfStringInterface(input map[string]interface{}) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
-
-func KeysOfMapOfString(input map[string]string) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
-
 func PrettyOSName() string {
 	switch osName := runtime.GOOS; osName {
 	case "darwin":
