@@ -50,7 +50,7 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"),
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -86,7 +86,7 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch2", "SketchWithIfDef.ino"),
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -121,7 +121,7 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch9", "sketch.ino"),
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -159,7 +159,7 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch10", "sketch.ino"),
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -196,7 +196,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		SketchLocation:          paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
-		FQBN:                    "my_avr_platform:avr:custom_yun",
+		FQBN:                    parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -234,7 +234,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"),
-		FQBN:                    "my_avr_platform:avr:custom_yun",
+		FQBN:                    parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -272,7 +272,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch_usbhost", "sketch_usbhost.ino"),
-		FQBN:                    "arduino:samd:arduino_zero_native",
+		FQBN:                    parseFQBN(t, "arduino:samd:arduino_zero_native"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -310,7 +310,7 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"),
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}

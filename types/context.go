@@ -29,7 +29,7 @@ type Context struct {
 	SketchLocation          *paths.Path
 	WatchedLocations        paths.PathList
 	ArduinoAPIVersion       string
-	FQBN                    string
+	FQBN                    *cores.FQBN
 	CodeCompleteAt          string
 
 	// Build options are serialized here
@@ -129,7 +129,7 @@ func (ctx *Context) ExtractBuildOptions() properties.Map {
 			additionalFilesRelative = append(additionalFilesRelative, relPath.String())
 		}
 	}
-	opts["fqbn"] = ctx.FQBN
+	opts["fqbn"] = ctx.FQBN.String()
 	opts["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	opts["customBuildProperties"] = strings.Join(ctx.CustomBuildProperties, ",")
 	opts["additionalFiles"] = strings.Join(additionalFilesRelative, ",")
@@ -142,7 +142,11 @@ func (ctx *Context) InjectBuildOptions(opts properties.Map) {
 	ctx.BuiltInLibrariesFolders = paths.NewPathList(strings.Split(opts["builtInLibrariesFolders"], ",")...)
 	ctx.OtherLibrariesFolders = paths.NewPathList(strings.Split(opts["otherLibrariesFolders"], ",")...)
 	ctx.SketchLocation = paths.New(opts["sketchLocation"])
-	ctx.FQBN = opts["fqbn"]
+	fqbn, err := cores.ParseFQBN(opts["fqbn"])
+	if err != nil {
+		i18n.ErrorfWithLogger(ctx.GetLogger(), "Error in FQBN: %s", err)
+	}
+	ctx.FQBN = fqbn
 	ctx.ArduinoAPIVersion = opts["runtime.ide.version"]
 	ctx.CustomBuildProperties = strings.Split(opts["customBuildProperties"], ",")
 }

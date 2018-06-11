@@ -46,7 +46,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("built-in libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketchLocation"),
-		FQBN:                    "fqbn",
+		FQBN:                    parseFQBN(t, "my:nice:fqbn"),
 		ArduinoAPIVersion:       "ideVersion",
 		CustomBuildProperties:   []string{"custom=prop"},
 		Verbose:                 true,
@@ -77,7 +77,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		"  \"additionalFiles\": \"\",\n"+
 		"  \"builtInLibrariesFolders\": \"built-in libraries\",\n"+
 		"  \"customBuildProperties\": \"custom=prop\",\n"+
-		"  \"fqbn\": \"fqbn\",\n"+
+		"  \"fqbn\": \"my:nice:fqbn\",\n"+
 		"  \"hardwareFolders\": \"hardware\",\n"+
 		"  \"otherLibrariesFolders\": \"libraries\",\n"+
 		"  \"runtime.ide.version\": \"ideVersion\",\n"+

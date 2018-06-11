@@ -50,7 +50,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
+		FQBN:                    parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:       "10600",
 	}
 
@@ -92,7 +92,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
+		FQBN:                    parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:       "10600",
 	}
 
@@ -134,7 +134,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    "arduino:avr:uno",
+		FQBN:                    parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:       "10600",
 	}
 
@@ -172,7 +172,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    "my_avr_platform:avr:mymega:cpu=atmega2560",
+		FQBN:                    parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
 		ArduinoAPIVersion:       "10600",
 	}
 

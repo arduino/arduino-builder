@@ -129,7 +129,7 @@ func TestTryBuild021(t *testing.T) {
 
 func TestTryBuild022(t *testing.T) {
 	ctx := makeDefaultContext(t)
-	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	ctx.FQBN = parseFQBN(t, "arduino:samd:arduino_zero_native")
 	tryBuildWithContext(t, ctx, "sketch_usbhost", "sketch_usbhost.ino")
 }
 
@@ -188,7 +188,7 @@ func TestTryBuild035(t *testing.T) {
 
 func TestTryBuild036(t *testing.T) {
 	ctx := makeDefaultContext(t)
-	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	ctx.FQBN = parseFQBN(t, "arduino:samd:arduino_zero_native")
 	tryBuildWithContext(t, ctx, "sketch11", "sketch_fastleds.ino")
 }
 
@@ -202,7 +202,7 @@ func TestTryBuild038(t *testing.T) {
 
 func TestTryBuild039(t *testing.T) {
 	ctx := makeDefaultContext(t)
-	ctx.FQBN = "arduino:samd:arduino_zero_native"
+	ctx.FQBN = parseFQBN(t, "arduino:samd:arduino_zero_native")
 	tryBuildWithContext(t, ctx, "sketch12", "sketch12.ino")
 }
 
@@ -226,7 +226,7 @@ func makeDefaultContext(t *testing.T) *types.Context {
 		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		FQBN:              "arduino:avr:leonardo",
+		FQBN:              parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion: "10607",
 		Verbose:           true,
 		DebugPreprocessor: true,

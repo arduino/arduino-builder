@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/i18n"
@@ -89,7 +90,11 @@ func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) 
 	s.ctx.SketchLocation = paths.New(args.SketchLocation)
 	s.ctx.CustomBuildProperties = strings.Split(args.CustomBuildProperties, ",")
 	s.ctx.ArduinoAPIVersion = args.ArduinoAPIVersion
-	s.ctx.FQBN = args.FQBN
+	if fqbn, err := cores.ParseFQBN(args.FQBN); err != nil {
+		return nil, fmt.Errorf("parsing fqbn: %s", err)
+	} else {
+		s.ctx.FQBN = fqbn
+	}
 	s.ctx.Verbose = false //p.Verbose
 	s.ctx.BuildCachePath = paths.New(args.BuildCachePath)
 	s.ctx.BuildPath = paths.New(args.BuildPath)
@@ -129,7 +134,11 @@ func (s *builderServer) Build(args *pb.BuildParams, stream pb.Builder_BuildServe
 	s.ctx.SketchLocation = paths.New(args.SketchLocation)
 	s.ctx.CustomBuildProperties = strings.Split(args.CustomBuildProperties, ",")
 	s.ctx.ArduinoAPIVersion = args.ArduinoAPIVersion
-	s.ctx.FQBN = args.FQBN
+	if fqbn, err := cores.ParseFQBN(args.FQBN); err != nil {
+		return fmt.Errorf("parsing fqbn: %s", err)
+	} else {
+		s.ctx.FQBN = fqbn
+	}
 	s.ctx.Verbose = args.Verbose
 	s.ctx.BuildCachePath = paths.New(args.BuildCachePath)
 	s.ctx.BuildPath = paths.New(args.BuildPath)

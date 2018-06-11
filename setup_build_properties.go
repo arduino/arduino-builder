@@ -79,7 +79,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties["runtime.hardware.path"] = filepath.Join(targetPlatform.Folder, "..")
 	buildProperties["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	buildProperties["runtime.ide.path"] = exPath
-	buildProperties["build.fqbn"] = ctx.FQBN
+	buildProperties["build.fqbn"] = ctx.FQBN.String()
 	buildProperties["ide_version"] = ctx.ArduinoAPIVersion
 	buildProperties["runtime.os"] = utils.PrettyOSName()
 

@@ -51,7 +51,7 @@ func TestCTagsRunner(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -101,7 +101,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -149,7 +149,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -196,7 +196,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}
@@ -242,7 +242,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
 		SketchLocation:          sketchLocation,
-		FQBN:                    "arduino:avr:leonardo",
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:       "10600",
 		Verbose:                 true,
 	}

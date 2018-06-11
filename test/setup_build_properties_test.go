@@ -47,7 +47,7 @@ func TestSetupBuildProperties(t *testing.T) {
 		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                "arduino:avr:uno",
+		FQBN:                parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:   "10600",
 	}
 
@@ -113,7 +113,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
 		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                "arduino:avr:uno",
+		FQBN:                parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:   "10600",
 
 		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
@@ -154,7 +154,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                "my_avr_platform:avr:custom_yun",
+		FQBN:                parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion:   "10600",
 	}
 
@@ -192,7 +192,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                "my_avr_platform:avr:custom_yun",
+		FQBN:                parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion:   "10600",
 	}
 

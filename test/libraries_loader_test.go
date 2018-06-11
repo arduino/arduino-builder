@@ -48,7 +48,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		FQBN: "arduino:avr:leonardo",
+		FQBN: parseFQBN(t, "arduino:avr:leonardo"),
 	}
 
 	commands := []types.Command{
@@ -157,7 +157,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		FQBN: "arduino:sam:arduino_due_x_dbg",
+		FQBN: parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
 	}
 
 	commands := []types.Command{
@@ -240,7 +240,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
-		FQBN: "arduino:avr:leonardo",
+		FQBN: parseFQBN(t, "arduino:avr:leonardo"),
 	}
 
 	commands := []types.Command{
@@ -269,7 +269,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "user_hardware", "downloaded_hardware"),
 		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesFolders:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
-		FQBN: "my_avr_platform:avr:custom_yun",
+		FQBN: parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
 
 	commands := []types.Command{

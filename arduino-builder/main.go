@@ -51,6 +51,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/go-errors/errors"
 )
 
@@ -296,12 +297,16 @@ func main() {
 	}
 
 	// FLAG_FQBN
-	if fqbn, err := gohasissues.Unquote(*fqbnFlag); err != nil {
+	if fqbnIn, err := gohasissues.Unquote(*fqbnFlag); err != nil {
 		printCompleteError(err)
-	} else if fqbn != "" {
-		ctx.FQBN = fqbn
+	} else if fqbnIn != "" {
+		if fqbn, err := cores.ParseFQBN(fqbnIn); err != nil {
+			printCompleteError(err)
+		} else {
+			ctx.FQBN = fqbn
+		}
 	}
-	if ctx.FQBN == "" {
+	if ctx.FQBN == nil {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_FQBN + "' is mandatory"))
 	}
 

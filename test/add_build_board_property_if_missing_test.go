@@ -34,6 +34,7 @@ import (
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
@@ -41,12 +42,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func parseFQBN(t *testing.T, fqbnIn string) *cores.FQBN {
+	fqbn, err := cores.ParseFQBN(fqbnIn)
+	require.NoError(t, err)
+	return fqbn
+}
+
 func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
 		HardwareFolders: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		FQBN:            "my_avr_platform:avr:mymega",
+		FQBN:            parseFQBN(t, "my_avr_platform:avr:mymega"),
 	}
 
 	commands := []types.Command{
@@ -77,7 +84,7 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareFolders: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		FQBN:            "my_avr_platform:avr:mymega:cpu=atmega2560",
+		FQBN:            parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
 	}
 
 	commands := []types.Command{

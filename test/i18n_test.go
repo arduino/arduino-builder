@@ -30,9 +30,9 @@
 package test
 
 import (
+	"fmt"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
-	"fmt"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
