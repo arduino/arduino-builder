@@ -38,9 +38,19 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/stretchr/testify/require"
 )
 
+func extractLibraries(ctx *types.Context) []*libraries.Library {
+	res := []*libraries.Library{}
+	for _, lib := range ctx.LibrariesManager.Libraries {
+		for _, libAlternative := range lib.Alternatives {
+			res = append(res, libAlternative)
+		}
+	}
+	return res
+}
 func TestLoadLibrariesAVR(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
@@ -69,7 +79,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
 	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
 
-	libs := ctx.Libraries
+	libs := extractLibraries(ctx)
 	require.Equal(t, 24, len(libs))
 
 	sort.Sort(ByLibraryName(libs))
@@ -134,18 +144,24 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	headerToLibraries := ctx.HeaderToLibraries
 	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
-	require.Equal(t, "Audio", headerToLibraries["Audio.h"][0].Name)
-	require.Equal(t, "FakeAudio", headerToLibraries["Audio.h"][1].Name)
-	require.Equal(t, 1, len(headerToLibraries["FakeAudio.h"]))
+
+	libs = headerToLibraries["Audio.h"]
+	require.Len(t, libs, 2)
+	sort.Sort(ByLibraryName(libs))
+	require.Equal(t, "Audio", libs[0].Name)
+	require.Equal(t, "FakeAudio", libs[1].Name)
+
+	require.Len(t, headerToLibraries["FakeAudio.h"], 1)
 	require.Equal(t, "FakeAudio", headerToLibraries["FakeAudio.h"][0].Name)
-	require.Equal(t, 1, len(headerToLibraries["Adafruit_PN532.h"]))
+
+	require.Len(t, headerToLibraries["Adafruit_PN532.h"], 1)
 	require.Equal(t, "Adafruit_PN532", headerToLibraries["Adafruit_PN532.h"][0].Name)
 
-	require.Equal(t, 2, len(headerToLibraries["IRremote.h"]))
+	require.Len(t, headerToLibraries["IRremote.h"], 2)
 
 	libs = headerToLibraries["IRremote.h"]
+	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
-
 	require.Equal(t, "IRremote", libs[0].Name)
 	require.Equal(t, "Robot_IR_Remote", libs[1].Name)
 }
@@ -178,7 +194,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "sam", "libraries")).EquivalentTo(librariesFolders[1]))
 	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
 
-	libraries := ctx.Libraries
+	libraries := extractLibraries(ctx)
 	require.Equal(t, 22, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
@@ -220,17 +236,20 @@ func TestLoadLibrariesSAM(t *testing.T) {
 
 	headerToLibraries := ctx.HeaderToLibraries
 
-	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
-	libraries = headerToLibraries["Audio.h"]
-	sort.Sort(ByLibraryName(libraries))
-	require.Equal(t, "Audio", libraries[0].Name)
-	require.Equal(t, "FakeAudio", libraries[1].Name)
+	libs := headerToLibraries["Audio.h"]
+	require.Len(t, libs, 2)
+	sort.Sort(ByLibraryName(libs))
+	require.Equal(t, "Audio", libs[0].Name)
+	require.Equal(t, "FakeAudio", libs[1].Name)
 
 	require.Equal(t, 1, len(headerToLibraries["FakeAudio.h"]))
 	require.Equal(t, "FakeAudio", headerToLibraries["FakeAudio.h"][0].Name)
-	require.Equal(t, 2, len(headerToLibraries["IRremote.h"]))
-	require.Equal(t, "Robot_IR_Remote", headerToLibraries["IRremote.h"][0].Name)
-	require.Equal(t, "IRremote", headerToLibraries["IRremote.h"][1].Name)
+
+	libs = headerToLibraries["IRremote.h"]
+	require.Len(t, libs, 2)
+	sort.Sort(ByLibraryName(libs))
+	require.Equal(t, "IRremote", libs[0].Name)
+	require.Equal(t, "Robot_IR_Remote", libs[1].Name)
 }
 
 func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
