@@ -30,13 +30,16 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/types"
 	"fmt"
+
+	"github.com/arduino/arduino-builder/types"
 )
 
 type PrintPreprocessedSource struct{}
 
 func (s *PrintPreprocessedSource) Run(ctx *types.Context) error {
-	fmt.Println(ctx.SourceGccMinusE)
+	if ctx.SourceGccMinusE != "" {
+		fmt.Println(ctx.SourceGccMinusE)
+	}
 	return nil
 }

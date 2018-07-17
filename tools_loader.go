@@ -30,14 +30,15 @@
 package builder
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type ToolsLoader struct{}
@@ -46,6 +47,11 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 	folders := ctx.ToolsFolders
 
 	tools := []*types.Tool{}
+
+	if ctx.CanUseCachedTools {
+		//fmt.Println("no fs modification, can use cached ctx")
+		return nil
+	}
 
 	for _, folder := range folders {
 		builtinToolsVersionsFile, err := findBuiltinToolsVersionsFile(folder)
@@ -81,6 +87,8 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 			}
 		}
 	}
+
+	ctx.CanUseCachedTools = true
 
 	ctx.Tools = tools
 

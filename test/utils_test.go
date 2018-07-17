@@ -70,6 +70,25 @@ func TestCommandLineParser(t *testing.T) {
 	require.Equal(t, "/tmp/sketch321469072.cpp", parts[22])
 }
 
+func TestPrintableCommand(t *testing.T) {
+	parts := []string{
+		"/path/to/dir with spaces/cmd",
+		"arg1",
+		"arg-\"with\"-quotes",
+		"specialchar-`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?-argument",
+		"arg   with spaces",
+		"arg\twith\t\ttabs",
+		"lastarg",
+	}
+	correct := "\"/path/to/dir with spaces/cmd\"" +
+		" arg1 \"arg-\\\"with\\\"-quotes\"" +
+		" \"specialchar-`~!@#$%^&*()-_=+[{]}\\\\|;:'\\\",<.>/?-argument\"" +
+		" \"arg   with spaces\" \"arg\twith\t\ttabs\"" +
+		" lastarg"
+	result := utils.PrintableCommand(parts)
+	require.Equal(t, correct, result)
+}
+
 func TestCommandLineParserError(t *testing.T) {
 	command := "\"command missing quote"
 

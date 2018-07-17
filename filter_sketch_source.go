@@ -39,7 +39,8 @@ import (
 )
 
 type FilterSketchSource struct {
-	Source *string
+	Source            *string
+	RemoveLineMarkers bool
 }
 
 func (s *FilterSketchSource) Run(ctx *types.Context) error {
@@ -57,6 +58,9 @@ func (s *FilterSketchSource) Run(ctx *types.Context) error {
 		filename := parseLineMarker(line)
 		if filename != "" {
 			inSketch = utils.SliceContains(fileNames, filename)
+			if inSketch && s.RemoveLineMarkers {
+				continue
+			}
 		}
 
 		if inSketch {
@@ -79,7 +83,7 @@ func parseLineMarker(line string) string {
 	// https://github.com/gcc-mirror/gcc/blob/edd716b6b1caa1a5cb320a8cd7f626f30198e098/gcc/c-family/c-ppoutput.c#L413-L415
 
 	split := strings.SplitN(line, " ", 3)
-	if len(split) < 3 || split[0] != "#" {
+	if len(split) < 3 || len(split[0]) == 0 || split[0][0] != '#' {
 		return ""
 	}
 

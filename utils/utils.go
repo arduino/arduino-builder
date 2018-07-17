@@ -30,37 +30,27 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
-
-func KeysOfMapOfStringInterface(input map[string]interface{}) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
-
-func KeysOfMapOfString(input map[string]string) []string {
-	var keys []string
-	for key, _ := range input {
-		keys = append(keys, key)
-	}
-	return keys
-}
 
 func PrettyOSName() string {
 	switch osName := runtime.GOOS; osName {
@@ -229,7 +219,7 @@ func TrimSpace(value string) string {
 
 type argFilterFunc func(int, string, []string) bool
 
-func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger) (*exec.Cmd, error) {
+func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
 	parts, err := ParseCommandLine(pattern, logger)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -239,19 +229,98 @@ func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18
 	var args []string
 	for idx, part := range parts {
 		if filter(idx, part, parts) {
+			// if relativePath is specified, the overall commandline is too long for the platform
+			// try reducing the length by making the filenames relative
+			// and changing working directory to build.path
+			if relativePath != "" {
+				if _, err := os.Stat(part); !os.IsNotExist(err) {
+					tmp, err := filepath.Rel(relativePath, part)
+					if err == nil {
+						part = tmp
+					}
+				}
+			}
 			args = append(args, part)
 		}
 	}
 
-	return exec.Command(command, args...), nil
+	cmd := exec.Command(command, args...)
+
+	if relativePath != "" {
+		cmd.Dir = relativePath
+	}
+
+	return cmd, nil
 }
 
 func filterEmptyArg(_ int, arg string, _ []string) bool {
 	return arg != constants.EMPTY_STRING
 }
 
-func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
-	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger)
+func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
+	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger, relativePath)
+}
+
+func printableArgument(arg string) string {
+	if strings.ContainsAny(arg, "\"\\ \t") {
+		arg = strings.Replace(arg, "\\", "\\\\", -1)
+		arg = strings.Replace(arg, "\"", "\\\"", -1)
+		return "\"" + arg + "\""
+	} else {
+		return arg
+	}
+}
+
+// Convert a command and argument slice back to a printable string.
+// This adds basic escaping which is sufficient for debug output, but
+// probably not for shell interpretation. This essentially reverses
+// ParseCommandLine.
+func PrintableCommand(parts []string) string {
+	return strings.Join(Map(parts, printableArgument), " ")
+}
+
+const (
+	Ignore        = 0 // Redirect to null
+	Show          = 1 // Show on stdout/stderr as normal
+	ShowIfVerbose = 2 // Show if verbose is set, Ignore otherwise
+	Capture       = 3 // Capture into buffer
+)
+
+func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
+	if ctx.Verbose {
+		ctx.GetLogger().UnformattedFprintln(os.Stdout, PrintableCommand(command.Args))
+	}
+
+	if stdout == Capture {
+		buffer := &bytes.Buffer{}
+		command.Stdout = buffer
+	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
+		command.Stdout = os.Stdout
+	}
+
+	if stderr == Capture {
+		buffer := &bytes.Buffer{}
+		command.Stderr = buffer
+	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
+		command.Stderr = os.Stderr
+	}
+
+	err := command.Start()
+	if err != nil {
+		return nil, nil, i18n.WrapError(err)
+	}
+
+	err = command.Wait()
+
+	var outbytes, errbytes []byte
+	if buf, ok := command.Stdout.(*bytes.Buffer); ok {
+		outbytes = buf.Bytes()
+	}
+	if buf, ok := command.Stderr.(*bytes.Buffer); ok {
+		errbytes = buf.Bytes()
+	}
+
+	return outbytes, errbytes, i18n.WrapError(err)
 }
 
 func MapHas(aMap map[string]interface{}, key string) bool {
@@ -274,6 +343,9 @@ func SliceToMapStringBool(keys []string, value bool) map[string]bool {
 
 func AbsolutizePaths(files []string) ([]string, error) {
 	for idx, file := range files {
+		if file == "" {
+			continue
+		}
 		absFile, err := filepath.Abs(file)
 		if err != nil {
 			return nil, i18n.WrapError(err)
@@ -322,6 +394,30 @@ func FilterOutFoldersByNames(folders []os.FileInfo, names ...string) []os.FileIn
 }
 
 type CheckExtensionFunc func(ext string) bool
+
+func FindAllSubdirectories(folder string, output *[]string) error {
+	walkFunc := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip source control and hidden files and directories
+		if IsSCCSOrHiddenFile(info) {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		// Skip directories unless recurse is on, or this is the
+		// root directory
+		if info.IsDir() {
+			*output = AppendIfNotPresent(*output, path)
+		}
+		return nil
+	}
+	return gohasissues.Walk(folder, walkFunc)
+}
 
 func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
 	walkFunc := func(path string, info os.FileInfo, err error) error {
@@ -487,4 +583,122 @@ func ParseCppString(line string) (string, string, bool) {
 
 		i += width
 	}
+}
+
+func isMn(r rune) bool {
+	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
+}
+
+// Normalizes an UTF8 byte slice
+// TODO: use it more often troughout all the project (maybe on logger interface?)
+func NormalizeUTF8(buf []byte) []byte {
+	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	result, _, _ := transform.Bytes(t, buf)
+	return result
+}
+
+// CopyFile copies the contents of the file named src to the file named
+// by dst. The file will be created if it does not already exist. If the
+// destination file exists, all it's contents will be replaced by the contents
+// of the source file. The file mode will be copied from the source and
+// the copied data is synced/flushed to stable storage.
+func CopyFile(src, dst string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer func() {
+		if e := out.Close(); e != nil {
+			err = e
+		}
+	}()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return
+	}
+
+	err = out.Sync()
+	if err != nil {
+		return
+	}
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return
+	}
+	err = os.Chmod(dst, si.Mode())
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// CopyDir recursively copies a directory tree, attempting to preserve permissions.
+// Source directory must exist, destination directory must *not* exist.
+// Symlinks are ignored and skipped.
+func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) {
+	src = filepath.Clean(src)
+	dst = filepath.Clean(dst)
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if !si.IsDir() {
+		return fmt.Errorf("source is not a directory")
+	}
+
+	_, err = os.Stat(dst)
+	if err != nil && !os.IsNotExist(err) {
+		return
+	}
+	if err == nil {
+		return fmt.Errorf("destination already exists")
+	}
+
+	err = os.MkdirAll(dst, si.Mode())
+	if err != nil {
+		return
+	}
+
+	entries, err := ioutil.ReadDir(src)
+	if err != nil {
+		return
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			err = CopyDir(srcPath, dstPath, extensions)
+			if err != nil {
+				return
+			}
+		} else {
+			// Skip symlinks.
+			if entry.Mode()&os.ModeSymlink != 0 {
+				continue
+			}
+
+			if extensions != nil && !extensions(strings.ToLower(filepath.Ext(srcPath))) {
+				continue
+			}
+
+			err = CopyFile(srcPath, dstPath)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return
 }

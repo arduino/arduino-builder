@@ -33,6 +33,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
@@ -72,7 +73,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
 	jsonPath := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
-	coreHasChanged := builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, jsonPath)
+	coreHasChanged := builder_utils.TXTBuildRulesHaveChanged(realCoreFolder, targetCoreFolder, jsonPath)
 
 	if opts.Equals(prevOpts) && !coreHasChanged {
 		return nil
@@ -84,6 +85,10 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	files, err := gohasissues.ReadDir(buildPath)
 	if err != nil {
 		return i18n.WrapError(err)
+	}
+	// if build path is inside the sketch folder, also wipe ctx.AdditionalFiles
+	if strings.Contains(ctx.BuildPath, filepath.Dir(ctx.SketchLocation)) {
+		ctx.Sketch.AdditionalFiles = ctx.Sketch.AdditionalFiles[:0]
 	}
 	for _, file := range files {
 		os.RemoveAll(filepath.Join(buildPath, file.Name()))

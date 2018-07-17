@@ -37,11 +37,16 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"syscall"
 
+	"runtime/pprof"
+	"runtime/trace"
+
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
+	"github.com/arduino/arduino-builder/grpc"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
@@ -49,11 +54,12 @@ import (
 	"github.com/go-errors/errors"
 )
 
-const VERSION = "1.3.25"
+const VERSION = "1.4.0"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
 const FLAG_ACTION_DUMP_PREFS = "dump-prefs"
+const FLAG_ACTION_CODE_COMPLETE_AT = "code-complete-at"
 const FLAG_BUILD_OPTIONS_FILE = "build-options-file"
 const FLAG_HARDWARE = "hardware"
 const FLAG_TOOLS = "tools"
@@ -78,7 +84,11 @@ const FLAG_LOGGER_HUMAN = "human"
 const FLAG_LOGGER_HUMANTAGS = "humantags"
 const FLAG_LOGGER_MACHINE = "machine"
 const FLAG_VERSION = "version"
+const FLAG_DAEMON = "daemon"
 const FLAG_VID_PID = "vid-pid"
+const FLAG_JOBS = "jobs"
+const FLAG_TRACE = "trace"
+const FLAG_EXPERIMENTAL = "experimental"
 
 type foldersFlag []string
 
@@ -118,6 +128,7 @@ func (h *propertiesFlag) Set(value string) error {
 var compileFlag *bool
 var preprocessFlag *bool
 var dumpPrefsFlag *bool
+var codeCompleteAtFlag *string
 var buildOptionsFileFlag *string
 var hardwareFoldersFlag foldersFlag
 var toolsFoldersFlag foldersFlag
@@ -135,12 +146,17 @@ var debugLevelFlag *int
 var warningsLevelFlag *string
 var loggerFlag *string
 var versionFlag *bool
+var daemonFlag *bool
 var vidPidFlag *string
+var jobsFlag *int
+var traceFlag *bool
+var experimentalFeatures *bool
 
 func init() {
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
 	preprocessFlag = flag.Bool(FLAG_ACTION_PREPROCESS, false, "preprocess the given sketch")
 	dumpPrefsFlag = flag.Bool(FLAG_ACTION_DUMP_PREFS, false, "dumps build properties used when compiling")
+	codeCompleteAtFlag = flag.String(FLAG_ACTION_CODE_COMPLETE_AT, "", "output code completions for sketch at a specific location. Location format is \"file:line:col\"")
 	buildOptionsFileFlag = flag.String(FLAG_BUILD_OPTIONS_FILE, "", "Instead of specifying --"+FLAG_HARDWARE+", --"+FLAG_TOOLS+" etc every time, you can load all such options from a file")
 	flag.Var(&hardwareFoldersFlag, FLAG_HARDWARE, "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
 	flag.Var(&toolsFoldersFlag, FLAG_TOOLS, "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
@@ -158,11 +174,39 @@ func init() {
 	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_HUMANTAGS+"', '"+FLAG_LOGGER_MACHINE+"'")
 	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
+	daemonFlag = flag.Bool(FLAG_DAEMON, false, "daemonizes and serves its functions via rpc")
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
+	jobsFlag = flag.Int(FLAG_JOBS, 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
+	traceFlag = flag.Bool(FLAG_TRACE, false, "traces the whole process lifecycle")
+	experimentalFeatures = flag.Bool(FLAG_EXPERIMENTAL, false, "enables experimental features")
 }
 
 func main() {
+
 	flag.Parse()
+
+	if *traceFlag {
+		f, err := os.Create("trace.out")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		f2, err := os.Create("profile.out")
+		if err != nil {
+			panic(err)
+		}
+		defer f2.Close()
+
+		pprof.StartCPUProfile(f2)
+		defer pprof.StopCPUProfile()
+
+		err = trace.Start(f)
+		if err != nil {
+			panic(err)
+		}
+		defer trace.Stop()
+	}
 
 	if *versionFlag {
 		fmt.Println("Arduino Builder " + VERSION)
@@ -173,7 +217,27 @@ func main() {
 		return
 	}
 
+	if *jobsFlag > 0 {
+		runtime.GOMAXPROCS(*jobsFlag)
+	} else {
+		runtime.GOMAXPROCS(runtime.NumCPU())
+	}
+
 	ctx := &types.Context{}
+
+	// place here all experimental features that should live under this flag
+	if *experimentalFeatures {
+		ctx.UseArduinoPreprocessor = true
+	}
+
+	if *daemonFlag {
+		var loggerBuffer []string
+		logger := i18n.AccumulatorLogger{}
+		logger.Buffer = &loggerBuffer
+		//logger := i18n.HumanLogger{}
+		ctx.SetLogger(logger)
+		jsonrpc.RegisterAndServeJsonRPC(ctx)
+	}
 
 	if *buildOptionsFileFlag != "" {
 		buildOptions := make(properties.Map)
@@ -330,7 +394,8 @@ func main() {
 
 	if *dumpPrefsFlag {
 		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
-	} else if *preprocessFlag {
+	} else if *preprocessFlag || *codeCompleteAtFlag != "" {
+		ctx.CodeCompleteAt = *codeCompleteAtFlag
 		err = builder.RunPreprocess(ctx)
 	} else {
 		if flag.NArg() == 0 {
