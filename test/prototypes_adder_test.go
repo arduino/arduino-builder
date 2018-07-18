@@ -694,13 +694,13 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
-		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		LibrariesFolders:    paths.NewPathList("libraries", "downloaded_libraries"),
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools"),
-		SketchLocation:      sketchLocation,
-		FQBN:                parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:   "10600",
-		Verbose:             true,
+		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInLibrariesFolders: paths.NewPathList("libraries", "downloaded_libraries"),
+		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
+		SketchLocation:          sketchLocation,
+		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)

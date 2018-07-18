@@ -168,11 +168,8 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
 	}
 

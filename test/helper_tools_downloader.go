@@ -142,7 +142,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 		Library{Name: "Bridge", Version: "1.6.1"},
 		Library{Name: "CapacitiveSensor", Version: "0.5.0", VersionInLibProperties: "0.5"},
 		Library{Name: "Ethernet", Version: "1.1.1"},
-		Library{Name: "Robot IR Remote", Version: "1.0.2"},
+		Library{Name: "Robot IR Remote", Version: "2.0.0"},
 		Library{Name: "FastLED", Version: "3.1.0"},
 	}
 

@@ -73,11 +73,11 @@ func TestLoadLibrariesAVR(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := ctx.LibrariesFolders
+	librariesFolders := ctx.LibrariesManager.LibrariesDir
 	require.Equal(t, 3, len(librariesFolders))
-	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
-	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
-	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1].Path))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 
 	libs := extractLibraries(ctx)
 	require.Equal(t, 24, len(libs))
@@ -142,28 +142,23 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	require.Equal(t, "Wire", libs[idx].Name)
 
-	headerToLibraries := ctx.HeaderToLibraries
-	require.Equal(t, 2, len(headerToLibraries["Audio.h"]))
-
-	libs = headerToLibraries["Audio.h"]
+	libs = ctx.LibrariesResolver.AlternativesFor("Audio.h")
 	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
 	require.Equal(t, "Audio", libs[0].Name)
 	require.Equal(t, "FakeAudio", libs[1].Name)
 
-	require.Len(t, headerToLibraries["FakeAudio.h"], 1)
-	require.Equal(t, "FakeAudio", headerToLibraries["FakeAudio.h"][0].Name)
+	libs = ctx.LibrariesResolver.AlternativesFor("FakeAudio.h")
+	require.Len(t, libs, 1)
+	require.Equal(t, "FakeAudio", libs[0].Name)
 
-	require.Len(t, headerToLibraries["Adafruit_PN532.h"], 1)
-	require.Equal(t, "Adafruit_PN532", headerToLibraries["Adafruit_PN532.h"][0].Name)
+	libs = ctx.LibrariesResolver.AlternativesFor("Adafruit_PN532.h")
+	require.Len(t, libs, 1)
+	require.Equal(t, "Adafruit_PN532", libs[0].Name)
 
-	require.Len(t, headerToLibraries["IRremote.h"], 2)
-
-	libs = headerToLibraries["IRremote.h"]
-	require.Len(t, libs, 2)
-	sort.Sort(ByLibraryName(libs))
+	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
+	require.Len(t, libs, 1)
 	require.Equal(t, "IRremote", libs[0].Name)
-	require.Equal(t, "Robot_IR_Remote", libs[1].Name)
 }
 
 func TestLoadLibrariesSAM(t *testing.T) {
@@ -188,11 +183,11 @@ func TestLoadLibrariesSAM(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := ctx.LibrariesFolders
+	librariesFolders := ctx.LibrariesManager.LibrariesDir
 	require.Equal(t, 3, len(librariesFolders))
-	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
-	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "sam", "libraries")).EquivalentTo(librariesFolders[1]))
-	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "sam", "libraries")).EquivalentTo(librariesFolders[1].Path))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 
 	libraries := extractLibraries(ctx)
 	require.Equal(t, 22, len(libraries))
@@ -234,22 +229,19 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	idx++
 	require.Equal(t, "Wire", libraries[idx].Name)
 
-	headerToLibraries := ctx.HeaderToLibraries
-
-	libs := headerToLibraries["Audio.h"]
+	libs := ctx.LibrariesResolver.AlternativesFor("Audio.h")
 	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
 	require.Equal(t, "Audio", libs[0].Name)
 	require.Equal(t, "FakeAudio", libs[1].Name)
 
-	require.Equal(t, 1, len(headerToLibraries["FakeAudio.h"]))
-	require.Equal(t, "FakeAudio", headerToLibraries["FakeAudio.h"][0].Name)
+	libs = ctx.LibrariesResolver.AlternativesFor("FakeAudio.h")
+	require.Len(t, libs, 1)
+	require.Equal(t, "FakeAudio", libs[0].Name)
 
-	libs = headerToLibraries["IRremote.h"]
-	require.Len(t, libs, 2)
-	sort.Sort(ByLibraryName(libs))
+	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
+	require.Len(t, libs, 1)
 	require.Equal(t, "IRremote", libs[0].Name)
-	require.Equal(t, "Robot_IR_Remote", libs[1].Name)
 }
 
 func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
@@ -274,11 +266,11 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := ctx.LibrariesFolders
+	librariesFolders := ctx.LibrariesManager.LibrariesDir
 	require.Equal(t, 3, len(librariesFolders))
-	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
-	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
-	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2]))
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1].Path))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 }
 
 func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
@@ -303,10 +295,10 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 		NoError(t, err)
 	}
 
-	librariesFolders := ctx.LibrariesFolders
+	librariesFolders := ctx.LibrariesManager.LibrariesDir
 	require.Equal(t, 4, len(librariesFolders))
-	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0]))
-	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1]))
-	require.True(t, Abs(t, paths.New("user_hardware", "my_avr_platform", "avr", "libraries")).EquivalentTo(librariesFolders[2]))
-	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[3]))
+	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
+	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1].Path))
+	require.True(t, Abs(t, paths.New("user_hardware", "my_avr_platform", "avr", "libraries")).EquivalentTo(librariesFolders[2].Path))
+	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[3].Path))
 }
