@@ -658,6 +658,7 @@ func downloadAndUnpack(url string) (*paths.Path, []os.FileInfo, error) {
 	cmd := buildUnpackCmd(archiveFilePath)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
+		fmt.Println(string(out))
 		return nil, nil, i18n.WrapError(err)
 	}
 	if len(out) > 0 {
