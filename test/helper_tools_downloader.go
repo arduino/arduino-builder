@@ -676,7 +676,7 @@ func downloadAndUnpack(url string) (*paths.Path, []os.FileInfo, error) {
 
 func buildUnpackCmd(file *paths.Path) *exec.Cmd {
 	var cmd *exec.Cmd
-	if file.Ext() == "zip" {
+	if file.Ext() == ".zip" {
 		cmd = exec.Command("unzip", "-qq", file.Base())
 	} else {
 		cmd = exec.Command("tar", "xf", file.Base())
