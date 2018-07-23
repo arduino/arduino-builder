@@ -1,0 +1,2 @@
+compiler.c.extra_flags   = -DSKETCH_DEFINED_VALUE=1
+compiler.cpp.extra_flags = -DSKETCH_DEFINED_VALUE=2
