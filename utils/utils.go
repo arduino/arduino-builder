@@ -448,17 +448,24 @@ func FindFilesInFolder(files *[]string, folder string, extensions CheckExtension
 			return nil
 		}
 
-		// See if the file is readable by opening it
-		currentFile, err := os.Open(path)
-		if err != nil {
+		if !IsFileReadable(path) {
 			return nil
 		}
-		currentFile.Close()
 
 		*files = append(*files, path)
 		return nil
 	}
 	return gohasissues.Walk(folder, walkFunc)
+}
+
+func IsFileReadable(path string) bool {
+	// See if the file is readable by opening it
+	file, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	file.Close()
+	return true
 }
 
 func GetParentFolder(basefolder string, n int) string {

@@ -24,48 +24,39 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2018 Piotr Henryk Dabrowski <phd@phd.re>
  */
 
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/builder_utils"
+	"path/filepath"
+
+	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
+	properties "github.com/arduino/go-properties-map"
 )
 
-type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
+type AddBuildPropertiesFromPlatformSketchTxtFile struct{}
 
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&AddAdditionalEntriesToContext{},
-		&FailIfBuildPathEqualsSketchPath{},
-		&HardwareLoader{},
-		&PlatformKeysRewriteLoader{},
-		&RewriteHardwareKeys{},
-		&ToolsLoader{},
-		&TargetBoardResolver{},
-		&AddBuildBoardPropertyIfMissing{},
-		&LibrariesLoader{},
-		&SketchLoader{},
-		&SetupBuildProperties{},
-		&AddBuildPropertiesFromPlatformSketchTxtFile{},
-		&LoadVIDPIDSpecificProperties{},
-		&SetCustomBuildProperties{},
-		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
+func (s *AddBuildPropertiesFromPlatformSketchTxtFile) Run(ctx *types.Context) error {
+	path := filepath.Join(filepath.Dir(ctx.Sketch.MainFile.Name), constants.FILE_PLATFORM_SKETCH_TXT)
+	if !utils.IsFileReadable(path) {
+		return nil
+	}
+	if ctx.Verbose {
+		ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_SKETCH_BUILD_PROPERTIES, path)
 	}
 
-	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(commands))
-
-	for _, command := range commands {
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return i18n.WrapError(err)
-		}
+	newBuildProperties := ctx.BuildProperties.Clone()
+	sketchPlatformProperties, err := properties.SafeLoad(path)
+	if err != nil {
+		return i18n.WrapError(err)
 	}
+	newBuildProperties.Merge(sketchPlatformProperties)
+	ctx.BuildProperties = newBuildProperties
 
 	return nil
 }
