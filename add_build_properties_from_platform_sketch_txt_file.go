@@ -42,6 +42,10 @@ import (
 type AddBuildPropertiesFromPlatformSketchTxtFile struct{}
 
 func (s *AddBuildPropertiesFromPlatformSketchTxtFile) Run(ctx *types.Context) error {
+	if !ctx.UsePlatformSketchTxt {
+		return nil
+	}
+
 	path := filepath.Join(filepath.Dir(ctx.Sketch.MainFile.Name), constants.FILE_PLATFORM_SKETCH_TXT)
 	if !utils.IsFileReadable(path) {
 		return nil

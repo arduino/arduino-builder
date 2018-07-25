@@ -89,6 +89,7 @@ const FLAG_VID_PID = "vid-pid"
 const FLAG_JOBS = "jobs"
 const FLAG_TRACE = "trace"
 const FLAG_EXPERIMENTAL = "experimental"
+const FLAG_USE_PLATFORM_SKETCH_TXT = "use-platform-sketch-txt"
 
 type foldersFlag []string
 
@@ -151,6 +152,7 @@ var vidPidFlag *string
 var jobsFlag *int
 var traceFlag *bool
 var experimentalFeatures *bool
+var usePlatformSketchTxt *bool
 
 func init() {
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
@@ -179,6 +181,7 @@ func init() {
 	jobsFlag = flag.Int(FLAG_JOBS, 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
 	traceFlag = flag.Bool(FLAG_TRACE, false, "traces the whole process lifecycle")
 	experimentalFeatures = flag.Bool(FLAG_EXPERIMENTAL, false, "enables experimental features")
+	usePlatformSketchTxt = flag.Bool(FLAG_USE_PLATFORM_SKETCH_TXT, false, "allow reading additional platform build properies from an optional platform.sketch.txt file")
 }
 
 func main() {
@@ -372,6 +375,11 @@ func main() {
 		} else {
 			ctx.ArduinoAPIVersion = *coreAPIVersionFlag
 		}
+	}
+
+	// FLAG_USE_PLATFORM_SKETCH_TXT
+	if *usePlatformSketchTxt {
+		ctx.UsePlatformSketchTxt = true
 	}
 
 	if *warningsLevelFlag != "" {

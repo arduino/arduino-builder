@@ -39,10 +39,22 @@ import (
 
 func TestAddBuildBoardPropertiesFromPlatformSketchTxtFile(t *testing.T) {
 	ctx := makeDefaultContext(t)
+	ctx.UsePlatformSketchTxt = true
 
 	sketchLocation := filepath.Join("sketch_with_platform_sketch_txt", "sketch_with_platform_sketch_txt.ino")
 	ctx.SketchLocation = sketchLocation
 
 	err := builder.RunBuilder(ctx)
 	require.NoError(t, err, "Unexpected build error for "+sketchLocation)
+}
+
+func TestAddBuildBoardPropertiesFromPlatformSketchTxtFileDisabled(t *testing.T) {
+	ctx := makeDefaultContext(t)
+	ctx.UsePlatformSketchTxt = false
+
+	sketchLocation := filepath.Join("sketch_with_platform_sketch_txt", "sketch_with_platform_sketch_txt.ino")
+	ctx.SketchLocation = sketchLocation
+
+	err := builder.RunBuilder(ctx)
+	require.Error(t, err, "No expected build error for "+sketchLocation)
 }

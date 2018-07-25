@@ -64,6 +64,8 @@ type Context struct {
 	SourceGccMinusE string
 	CodeCompletions string
 
+	UsePlatformSketchTxt bool
+
 	WarningsLevel string
 
 	// Libraries handling
