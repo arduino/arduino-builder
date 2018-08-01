@@ -90,8 +90,8 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	idx++
 	require.Equal(t, "Adafruit_PN532", libs[idx].Name)
-	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].Folder))
-	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].SrcFolder))
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].InstallDir))
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].SourceDir))
 	require.Equal(t, 1, len(libs[idx].Architectures))
 	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libs[idx].Architectures[0])
 	require.False(t, libs[idx].IsLegacy)
@@ -106,8 +106,8 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	bridgeLib := libs[idx]
 	require.Equal(t, "Bridge", bridgeLib.Name)
-	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge")).EquivalentTo(bridgeLib.Folder))
-	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge/src")).EquivalentTo(bridgeLib.SrcFolder))
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge")).EquivalentTo(bridgeLib.InstallDir))
+	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge/src")).EquivalentTo(bridgeLib.SourceDir))
 	require.Equal(t, 1, len(bridgeLib.Architectures))
 	require.Equal(t, constants.LIBRARY_ALL_ARCHS, bridgeLib.Architectures[0])
 	require.Equal(t, "Arduino", bridgeLib.Author)

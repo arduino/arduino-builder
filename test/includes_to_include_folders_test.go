@@ -219,7 +219,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
-	requireEquivalentPaths(t, importedLibraries[0].SrcFolder.String(), filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI"))
+	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI"))
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform(t *testing.T) {
@@ -257,7 +257,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "SPI", importedLibraries[0].Name)
-	requireEquivalentPaths(t, importedLibraries[0].SrcFolder.String(), filepath.Join("libraries", "SPI"))
+	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("libraries", "SPI"))
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
@@ -295,7 +295,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
 	require.Equal(t, "USBHost", importedLibraries[0].Name)
-	requireEquivalentPaths(t, importedLibraries[0].SrcFolder.String(), filepath.Join("libraries", "USBHost", "src"))
+	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("libraries", "USBHost", "src"))
 }
 
 func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
