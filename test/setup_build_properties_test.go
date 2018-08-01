@@ -44,11 +44,11 @@ func TestSetupBuildProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:   "10600",
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		FQBN:              parseFQBN(t, "arduino:avr:uno"),
+		ArduinoAPIVersion: "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -110,11 +110,11 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:   "10600",
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		FQBN:              parseFQBN(t, "arduino:avr:uno"),
+		ArduinoAPIVersion: "10600",
 
 		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
 	}
@@ -151,11 +151,11 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                parseFQBN(t, "my_avr_platform:avr:custom_yun"),
-		ArduinoAPIVersion:   "10600",
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
+		ArduinoAPIVersion: "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -189,11 +189,11 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:      paths.New("sketch1", "sketch.ino"),
-		FQBN:                parseFQBN(t, "my_avr_platform:avr:custom_yun"),
-		ArduinoAPIVersion:   "10600",
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
+		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
+		ArduinoAPIVersion: "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)

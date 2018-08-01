@@ -57,7 +57,7 @@ type builderServer struct {
 }
 
 func (s *builderServer) watch() {
-	folders := []paths.PathList{s.ctx.HardwareFolders, s.ctx.ToolsFolders, s.ctx.BuiltInLibrariesFolders, s.ctx.OtherLibrariesFolders}
+	folders := []paths.PathList{s.ctx.HardwareDirs, s.ctx.ToolsDirs, s.ctx.BuiltInLibrariesDirs, s.ctx.OtherLibrariesDirs}
 
 	for _, category := range folders {
 		for _, folder := range category {
@@ -83,10 +83,10 @@ func (s *builderServer) DropCache(ctx context.Context, args *pb.VerboseParams) (
 // GetFeature returns the feature at the given point.
 func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) (*pb.Response, error) {
 
-	s.ctx.HardwareFolders = paths.NewPathList(strings.Split(args.HardwareFolders, ",")...)
-	s.ctx.ToolsFolders = paths.NewPathList(strings.Split(args.ToolsFolders, ",")...)
-	s.ctx.BuiltInLibrariesFolders = paths.NewPathList(strings.Split(args.BuiltInLibrariesFolders, ",")...)
-	s.ctx.OtherLibrariesFolders = paths.NewPathList(strings.Split(args.OtherLibrariesFolders, ",")...)
+	s.ctx.HardwareDirs = paths.NewPathList(strings.Split(args.HardwareFolders, ",")...)
+	s.ctx.ToolsDirs = paths.NewPathList(strings.Split(args.ToolsFolders, ",")...)
+	s.ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(args.BuiltInLibrariesFolders, ",")...)
+	s.ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(args.OtherLibrariesFolders, ",")...)
 	s.ctx.SketchLocation = paths.New(args.SketchLocation)
 	s.ctx.CustomBuildProperties = strings.Split(args.CustomBuildProperties, ",")
 	s.ctx.ArduinoAPIVersion = args.ArduinoAPIVersion
@@ -127,10 +127,10 @@ func (s *builderServer) Autocomplete(ctx context.Context, args *pb.BuildParams) 
 // GetFeature returns the feature at the given point.
 func (s *builderServer) Build(args *pb.BuildParams, stream pb.Builder_BuildServer) error {
 
-	s.ctx.HardwareFolders = paths.NewPathList(strings.Split(args.HardwareFolders, ",")...)
-	s.ctx.ToolsFolders = paths.NewPathList(strings.Split(args.ToolsFolders, ",")...)
-	s.ctx.BuiltInLibrariesFolders = paths.NewPathList(strings.Split(args.BuiltInLibrariesFolders, ",")...)
-	s.ctx.OtherLibrariesFolders = paths.NewPathList(strings.Split(args.OtherLibrariesFolders, ",")...)
+	s.ctx.HardwareDirs = paths.NewPathList(strings.Split(args.HardwareFolders, ",")...)
+	s.ctx.ToolsDirs = paths.NewPathList(strings.Split(args.ToolsFolders, ",")...)
+	s.ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(args.BuiltInLibrariesFolders, ",")...)
+	s.ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(args.OtherLibrariesFolders, ",")...)
 	s.ctx.SketchLocation = paths.New(args.SketchLocation)
 	s.ctx.CustomBuildProperties = strings.Split(args.CustomBuildProperties, ",")
 	s.ctx.ArduinoAPIVersion = args.ArduinoAPIVersion

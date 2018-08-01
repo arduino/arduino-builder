@@ -45,13 +45,13 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		ToolsFolders:            paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:       "10600",
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
+		ArduinoAPIVersion:    "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -87,13 +87,13 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		ToolsFolders:            paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:       "10600",
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
+		ArduinoAPIVersion:    "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -129,13 +129,13 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		ToolsFolders:            paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:       "10600",
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
+		ArduinoAPIVersion:    "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -167,13 +167,13 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		ToolsFolders:            paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          paths.New("sketch1", "sketch.ino"),
-		FQBN:                    parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
-		ArduinoAPIVersion:       "10600",
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		FQBN:                 parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
+		ArduinoAPIVersion:    "10600",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)

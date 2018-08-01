@@ -78,7 +78,7 @@ func TestLoadTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
@@ -121,7 +121,7 @@ func TestLoadTools(t *testing.T) {
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList("downloaded_board_manager_stuff"),
+		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
@@ -147,8 +147,8 @@ func TestLoadLotsOfTools(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:     paths.NewPathList("downloaded_board_manager_stuff"),
-		BuiltInToolsFolders: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		HardwareDirs:     paths.NewPathList("downloaded_board_manager_stuff"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))

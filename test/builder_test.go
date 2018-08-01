@@ -46,14 +46,14 @@ import (
 
 func prepareBuilderTestContext(t *testing.T, sketchPath *paths.Path, fqbn string) *types.Context {
 	return &types.Context{
-		SketchLocation:          sketchPath,
-		FQBN:                    parseFQBN(t, fqbn),
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 false,
+		SketchLocation:       sketchPath,
+		FQBN:                 parseFQBN(t, fqbn),
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              false,
 	}
 }
 
@@ -241,8 +241,8 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := prepareBuilderTestContext(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
-	ctx.HardwareFolders = append(ctx.HardwareFolders, paths.New("downloaded_board_manager_stuff"))
-	ctx.ToolsFolders = append(ctx.ToolsFolders, paths.New("downloaded_board_manager_stuff"))
+	ctx.HardwareDirs = append(ctx.HardwareDirs, paths.New("downloaded_board_manager_stuff"))
+	ctx.ToolsDirs = append(ctx.ToolsDirs, paths.New("downloaded_board_manager_stuff"))
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -276,8 +276,8 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := prepareBuilderTestContext(t, paths.New("sketch_no_functions", "main.ino"), "RedBearLab:avr:blend")
-	ctx.HardwareFolders = append(ctx.HardwareFolders, paths.New("downloaded_board_manager_stuff"))
-	ctx.ToolsFolders = append(ctx.ToolsFolders, paths.New("downloaded_board_manager_stuff"))
+	ctx.HardwareDirs = append(ctx.HardwareDirs, paths.New("downloaded_board_manager_stuff"))
+	ctx.ToolsDirs = append(ctx.ToolsDirs, paths.New("downloaded_board_manager_stuff"))
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -292,8 +292,8 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := prepareBuilderTestContext(t, paths.New("sketch_with_backup_files", "sketch.ino"), "arduino:avr:uno")
-	ctx.HardwareFolders = append(ctx.HardwareFolders, paths.New("downloaded_board_manager_stuff"))
-	ctx.ToolsFolders = append(ctx.ToolsFolders, paths.New("downloaded_board_manager_stuff"))
+	ctx.HardwareDirs = append(ctx.HardwareDirs, paths.New("downloaded_board_manager_stuff"))
+	ctx.ToolsDirs = append(ctx.ToolsDirs, paths.New("downloaded_board_manager_stuff"))
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()

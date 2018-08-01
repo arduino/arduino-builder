@@ -41,7 +41,7 @@ import (
 
 func TestLoadPlatformKeysRewrite(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
 	}
 
 	commands := []types.Command{

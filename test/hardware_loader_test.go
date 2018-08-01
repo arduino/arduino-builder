@@ -43,7 +43,7 @@ import (
 
 func TestLoadHardware(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
 	}
 
 	commands := []types.Command{
@@ -87,7 +87,7 @@ func TestLoadHardware(t *testing.T) {
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
 	}
 
 	commands := []types.Command{
@@ -157,7 +157,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList("downloaded_board_manager_stuff"),
+		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
 
 	commands := []types.Command{
@@ -205,7 +205,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 
 func TestLoadLotsOfHardware(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
 	}
 
 	commands := []types.Command{

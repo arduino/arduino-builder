@@ -46,14 +46,14 @@ func TestCTagsRunner(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          sketchLocation,
-		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -96,14 +96,14 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          sketchLocation,
-		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -144,14 +144,14 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          sketchLocation,
-		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -191,14 +191,14 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch.ino"))
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          sketchLocation,
-		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -237,14 +237,14 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "template_and_shift.cpp"))
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          sketchLocation,
-		FQBN:                    parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:       "10600",
-		Verbose:                 true,
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)

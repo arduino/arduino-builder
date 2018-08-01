@@ -119,7 +119,7 @@ func TestTryBuild019(t *testing.T) {
 
 func TestTryBuild020(t *testing.T) {
 	ctx := makeDefaultContext(t)
-	ctx.OtherLibrariesFolders = paths.NewPathList("dependent_libraries", "libraries")
+	ctx.OtherLibrariesDirs = paths.NewPathList("dependent_libraries", "libraries")
 	tryPreprocessWithContext(t, ctx, "sketch_with_dependend_libraries", "sketch.ino")
 }
 
@@ -222,14 +222,14 @@ func makeDefaultContext(t *testing.T) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"),
-		BuiltInToolsFolders:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("downloaded_libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		FQBN:              parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion: "10607",
-		Verbose:           true,
-		DebugPreprocessor: true,
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "downloaded_board_manager_stuff"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10607",
+		Verbose:              true,
+		DebugPreprocessor:    true,
 	}
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()

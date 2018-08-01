@@ -40,15 +40,15 @@ import (
 
 func TestCreateBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders:       paths.NewPathList("hardware", "hardware2"),
-		ToolsFolders:          paths.NewPathList("tools"),
-		OtherLibrariesFolders: paths.NewPathList("libraries"),
-		SketchLocation:        paths.New("sketchLocation"),
-		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
-		ArduinoAPIVersion:     "ideVersion",
-		Verbose:               true,
-		BuildPath:             paths.New("buildPath"),
-		DebugLevel:            5,
+		HardwareDirs:       paths.NewPathList("hardware", "hardware2"),
+		ToolsDirs:          paths.NewPathList("tools"),
+		OtherLibrariesDirs: paths.NewPathList("libraries"),
+		SketchLocation:     paths.New("sketchLocation"),
+		FQBN:               parseFQBN(t, "my:nice:fqbn"),
+		ArduinoAPIVersion:  "ideVersion",
+		Verbose:            true,
+		BuildPath:          paths.New("buildPath"),
+		DebugLevel:         5,
 	}
 
 	create := builder.CreateBuildOptionsMap{}

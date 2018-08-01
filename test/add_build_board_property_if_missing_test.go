@@ -52,8 +52,8 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		FQBN:            parseFQBN(t, "my_avr_platform:avr:mymega"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		FQBN:         parseFQBN(t, "my_avr_platform:avr:mymega"),
 	}
 
 	commands := []types.Command{
@@ -83,8 +83,8 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareFolders: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		FQBN:            parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		FQBN:         parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
 	}
 
 	commands := []types.Command{

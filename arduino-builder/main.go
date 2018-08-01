@@ -259,9 +259,9 @@ func main() {
 	if hardwareFolders, err := toSliceOfUnquoted(hardwareFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(hardwareFolders) > 0 {
-		ctx.HardwareFolders = paths.NewPathList(hardwareFolders...)
+		ctx.HardwareDirs = paths.NewPathList(hardwareFolders...)
 	}
-	if len(ctx.HardwareFolders) == 0 {
+	if len(ctx.HardwareDirs) == 0 {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_HARDWARE + "' is mandatory"))
 	}
 
@@ -269,9 +269,9 @@ func main() {
 	if toolsFolders, err := toSliceOfUnquoted(toolsFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(toolsFolders) > 0 {
-		ctx.ToolsFolders = paths.NewPathList(toolsFolders...)
+		ctx.ToolsDirs = paths.NewPathList(toolsFolders...)
 	}
-	if len(ctx.ToolsFolders) == 0 {
+	if len(ctx.ToolsDirs) == 0 {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_TOOLS + "' is mandatory"))
 	}
 
@@ -279,14 +279,14 @@ func main() {
 	if librariesFolders, err := toSliceOfUnquoted(librariesFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(librariesFolders) > 0 {
-		ctx.OtherLibrariesFolders = paths.NewPathList(librariesFolders...)
+		ctx.OtherLibrariesDirs = paths.NewPathList(librariesFolders...)
 	}
 
 	// FLAG_BUILT_IN_LIBRARIES
 	if librariesBuiltInFolders, err := toSliceOfUnquoted(librariesBuiltInFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(librariesBuiltInFolders) > 0 {
-		ctx.BuiltInLibrariesFolders = paths.NewPathList(librariesBuiltInFolders...)
+		ctx.BuiltInLibrariesDirs = paths.NewPathList(librariesBuiltInFolders...)
 	}
 
 	// FLAG_PREFS

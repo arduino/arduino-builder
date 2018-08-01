@@ -41,16 +41,16 @@ import (
 
 func TestStoreBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
-		HardwareFolders:         paths.NewPathList("hardware"),
-		ToolsFolders:            paths.NewPathList("tools"),
-		BuiltInLibrariesFolders: paths.NewPathList("built-in libraries"),
-		OtherLibrariesFolders:   paths.NewPathList("libraries"),
-		SketchLocation:          paths.New("sketchLocation"),
-		FQBN:                    parseFQBN(t, "my:nice:fqbn"),
-		ArduinoAPIVersion:       "ideVersion",
-		CustomBuildProperties:   []string{"custom=prop"},
-		Verbose:                 true,
-		DebugLevel:              5,
+		HardwareDirs:          paths.NewPathList("hardware"),
+		ToolsDirs:             paths.NewPathList("tools"),
+		BuiltInLibrariesDirs:  paths.NewPathList("built-in libraries"),
+		OtherLibrariesDirs:    paths.NewPathList("libraries"),
+		SketchLocation:        paths.New("sketchLocation"),
+		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
+		ArduinoAPIVersion:     "ideVersion",
+		CustomBuildProperties: []string{"custom=prop"},
+		Verbose:               true,
+		DebugLevel:            5,
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
