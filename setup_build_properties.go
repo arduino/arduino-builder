@@ -73,10 +73,10 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 
 	buildProperties["build.core"] = ctx.BuildCore
-	buildProperties["build.core.path"] = filepath.Join(actualPlatform.Folder, "cores", buildProperties["build.core"])
-	buildProperties["build.system.path"] = filepath.Join(actualPlatform.Folder, "system")
-	buildProperties["runtime.platform.path"] = targetPlatform.Folder
-	buildProperties["runtime.hardware.path"] = filepath.Join(targetPlatform.Folder, "..")
+	buildProperties["build.core.path"] = actualPlatform.InstallDir.Join("cores", buildProperties["build.core"]).String()
+	buildProperties["build.system.path"] = actualPlatform.InstallDir.Join("system").String()
+	buildProperties["runtime.platform.path"] = targetPlatform.InstallDir.String()
+	buildProperties["runtime.hardware.path"] = targetPlatform.InstallDir.Join("..").String()
 	buildProperties["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	buildProperties["runtime.ide.path"] = exPath
 	buildProperties["build.fqbn"] = ctx.FQBN.String()
@@ -95,7 +95,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		} else {
 			variantPlatform = targetPlatform
 		}
-		buildProperties["build.variant.path"] = filepath.Join(variantPlatform.Folder, "variants", variant)
+		buildProperties["build.variant.path"] = variantPlatform.InstallDir.Join("variants", variant).String()
 	}
 
 	for _, tool := range ctx.AllTools {
