@@ -52,8 +52,8 @@ func (s ByToolIDAndVersion) Less(i, j int) bool {
 	if s[i].Tool.Name != s[j].Tool.Name {
 		return s[i].Tool.Name < s[j].Tool.Name
 	}
-	if s[i].Version != s[j].Version {
-		return s[i].Version < s[j].Version
+	if !s[i].Version.Equal(s[j].Version) {
+		return s[i].Version.LessThan(s[j].Version)
 	}
 	return s[i].InstallDir.String() < s[j].InstallDir.String()
 }
