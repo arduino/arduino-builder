@@ -42,12 +42,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 	"github.com/go-errors/errors"
 )

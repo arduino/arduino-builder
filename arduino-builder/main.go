@@ -38,20 +38,19 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strings"
-	"syscall"
-
 	"runtime/pprof"
 	"runtime/trace"
+	"strings"
+	"syscall"
 
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/grpc"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/go-errors/errors"
 )
 

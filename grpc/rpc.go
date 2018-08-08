@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/i18n"

@@ -37,8 +37,8 @@ import (
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/stretchr/testify/require"
 )
 
