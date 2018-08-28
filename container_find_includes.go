@@ -343,11 +343,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				return i18n.WrapError(preproc_err)
 			} else {
 				include = IncludesFinderWithRegExp(ctx, string(preproc_stderr))
-				if include == "" {
-					// No include found? Bail out.
-					os.Stderr.Write(preproc_stderr)
-					return i18n.WrapError(preproc_err)
-				}
 			}
 		}
 
