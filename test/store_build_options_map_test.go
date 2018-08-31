@@ -66,7 +66,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		NoError(t, err)
 	}
 
-	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).Exist()
+	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 

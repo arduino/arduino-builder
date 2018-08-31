@@ -158,7 +158,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").Exist()
+	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").ExistCheck()
 	require.NoError(t, err)
 	require.False(t, exist)
 }

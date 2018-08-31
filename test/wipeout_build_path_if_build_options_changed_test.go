@@ -58,7 +58,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 		NoError(t, err)
 	}
 
-	exist, err := buildPath.Exist()
+	exist, err := buildPath.ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 
@@ -66,7 +66,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	NoError(t, err)
 	require.Equal(t, 0, len(files))
 
-	exist, err = buildPath.Join("should_be_deleted.txt").Exist()
+	exist, err = buildPath.Join("should_be_deleted.txt").ExistCheck()
 	require.NoError(t, err)
 	require.False(t, exist)
 }
@@ -90,7 +90,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 		NoError(t, err)
 	}
 
-	exist, err := buildPath.Exist()
+	exist, err := buildPath.ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 
@@ -98,7 +98,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	NoError(t, err)
 	require.Equal(t, 1, len(files))
 
-	exist, err = buildPath.Join("should_not_be_deleted.txt").Exist()
+	exist, err = buildPath.Join("should_not_be_deleted.txt").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 }

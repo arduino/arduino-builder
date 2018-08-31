@@ -74,7 +74,7 @@ func TestCopyOtherFiles(t *testing.T) {
 		NoError(t, err)
 	}
 
-	exist, err1 := buildPath.Join(constants.FOLDER_SKETCH, "header.h").Exist()
+	exist, err1 := buildPath.Join(constants.FOLDER_SKETCH, "header.h").ExistCheck()
 	NoError(t, err1)
 	require.True(t, exist)
 

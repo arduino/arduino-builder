@@ -56,13 +56,13 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	err = cmd.Run(ctx)
 	NoError(t, err)
 
-	exist, err := temp.Join("SPI").Exist()
+	exist, err := temp.Join("SPI").ExistCheck()
 	require.NoError(t, err)
 	require.False(t, exist)
-	exist, err = temp.Join("Bridge").Exist()
+	exist, err = temp.Join("Bridge").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-	exist, err = temp.Join("dummy_file").Exist()
+	exist, err = temp.Join("dummy_file").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 }
@@ -94,13 +94,13 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	err = cmd.Run(ctx)
 	NoError(t, err)
 
-	exist, err := temp.Join("SPI").Exist()
+	exist, err := temp.Join("SPI").ExistCheck()
 	require.NoError(t, err)
 	require.False(t, exist)
-	exist, err = temp.Join("Bridge").Exist()
+	exist, err = temp.Join("Bridge").ExistCheck()
 	require.NoError(t, err)
 	require.False(t, exist)
-	exist, err = temp.Join("dummy_file").Exist()
+	exist, err = temp.Join("dummy_file").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 }

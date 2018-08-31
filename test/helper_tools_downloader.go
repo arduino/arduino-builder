@@ -317,7 +317,7 @@ func downloadToolsMultipleVersions(tools []Tool, index map[string]interface{}) e
 
 	for _, tool := range tools {
 		if !toolAlreadyDownloadedAndUnpacked(toolsFolder, tool) {
-			if exist, _ := toolsFolder.Join(tool.Name).Exist(); exist {
+			if toolsFolder.Join(tool.Name).Exist() {
 				if err := toolsFolder.Join(tool.Name).RemoveAll(); err != nil {
 					return i18n.WrapError(err)
 				}
@@ -366,8 +366,7 @@ func allBoardsManagerCoresAlreadyDownloadedAndUnpacked(targetPath *paths.Path, c
 }
 
 func boardManagerCoreAlreadyDownloadedAndUnpacked(targetPath *paths.Path, core Core) bool {
-	exist, _ := targetPath.Join(core.Maintainer, "hardware", core.Arch, core.Version).Exist()
-	return exist
+	return targetPath.Join(core.Maintainer, "hardware", core.Arch, core.Version).Exist()
 }
 
 func allCoresAlreadyDownloadedAndUnpacked(targetPath *paths.Path, cores []Core) (bool, error) {
@@ -386,7 +385,7 @@ func allCoresAlreadyDownloadedAndUnpacked(targetPath *paths.Path, cores []Core) 
 func coreAlreadyDownloadedAndUnpacked(targetPath *paths.Path, core Core) (bool, error) {
 	corePath := targetPath.Join(core.Maintainer, core.Arch)
 
-	if exist, _ := corePath.Exist(); !exist {
+	if corePath.NotExist() {
 		return false, nil
 	}
 	platform, err := properties.LoadFromPath(corePath.Join("platform.txt"))
@@ -412,8 +411,7 @@ func allBoardsManagerToolsAlreadyDownloadedAndUnpacked(targetPath *paths.Path, t
 }
 
 func boardManagerToolAlreadyDownloadedAndUnpacked(targetPath *paths.Path, tool Tool) bool {
-	exist, _ := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version).Exist()
-	return exist
+	return targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version).Exist()
 }
 
 func allToolsAlreadyDownloadedAndUnpacked(targetPath *paths.Path, tools []Tool) bool {
@@ -426,8 +424,7 @@ func allToolsAlreadyDownloadedAndUnpacked(targetPath *paths.Path, tools []Tool) 
 }
 
 func toolAlreadyDownloadedAndUnpacked(targetPath *paths.Path, tool Tool) bool {
-	exist, _ := targetPath.Join(tool.Name, tool.Version).Exist()
-	return exist
+	return targetPath.Join(tool.Name, tool.Version).Exist()
 }
 
 func allLibrariesAlreadyDownloadedAndUnpacked(targetPath *paths.Path, libraries []Library) bool {
@@ -440,12 +437,12 @@ func allLibrariesAlreadyDownloadedAndUnpacked(targetPath *paths.Path, libraries 
 }
 
 func libraryAlreadyDownloadedAndUnpacked(targetPath *paths.Path, library Library) bool {
-	exist, _ := targetPath.Join(strings.Replace(library.Name, " ", "_", -1)).Exist()
-	if !exist {
+	libPath := targetPath.Join(strings.Replace(library.Name, " ", "_", -1))
+	if !libPath.Exist() {
 		return false
 	}
 
-	libProps, err := properties.LoadFromPath(targetPath.Join(strings.Replace(library.Name, " ", "_", -1), "library.properties"))
+	libProps, err := properties.LoadFromPath(libPath.Join("library.properties"))
 	if err != nil {
 		return false
 	}
@@ -474,7 +471,7 @@ func downloadAndUnpackCore(core Core, url string, targetPath *paths.Path) error 
 	packagerPath := targetPath.Join(core.Maintainer)
 	corePath := targetPath.Join(core.Maintainer, core.Arch)
 
-	if exist, _ := corePath.Exist(); exist {
+	if corePath.Exist() {
 		if err := corePath.RemoveAll(); err != nil {
 			return i18n.WrapError(err)
 		}
@@ -518,26 +515,27 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath *paths.
 	}
 	defer unpackFolder.RemoveAll()
 
-	if exist, _ := targetPath.Join(core.Maintainer, "hardware", core.Arch).Exist(); exist {
-		if err := targetPath.Join(core.Maintainer, "hardware", core.Arch).RemoveAll(); err != nil {
+	corePath := targetPath.Join(core.Maintainer, "hardware", core.Arch)
+	if corePath.Exist() {
+		if err := corePath.RemoveAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 	}
 
 	if len(files) == 1 && files[0].IsDir() {
-		if err := targetPath.Join(core.Maintainer, "hardware", core.Arch).MkdirAll(); err != nil {
+		if err := corePath.MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
-		err = copyRecursive(unpackFolder.Join(files[0].Name()), targetPath.Join(core.Maintainer, "hardware", core.Arch, core.Version))
+		err = copyRecursive(unpackFolder.Join(files[0].Name()), corePath.Join(core.Version))
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 	} else {
-		if err := targetPath.Join(core.Maintainer, "hardware", core.Arch, core.Version).MkdirAll(); err != nil {
+		if err := corePath.Join(core.Version).MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 		for _, file := range files {
-			err = copyRecursive(unpackFolder.Join(file.Name()), targetPath.Join(core.Maintainer, "hardware", core.Arch, core.Version, file.Name()))
+			err = copyRecursive(unpackFolder.Join(file.Name()), corePath.Join(core.Version, file.Name()))
 			if err != nil {
 				return i18n.WrapError(err)
 			}
@@ -600,28 +598,29 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath *paths.Path, delete
 	}
 	defer unpackFolder.RemoveAll()
 
+	toolPath := targetPath.Join(tool.Name)
 	if deleteIfMissing {
-		if exist, _ := targetPath.Join(tool.Name).Exist(); exist {
-			if err := targetPath.Join(tool.Name).MkdirAll(); err != nil {
+		if toolPath.Exist() {
+			if err := toolPath.MkdirAll(); err != nil {
 				return i18n.WrapError(err)
 			}
 		}
 	}
 
 	if len(files) == 1 && files[0].IsDir() {
-		if err := targetPath.Join(tool.Name).MkdirAll(); err != nil {
+		if err := toolPath.MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
-		err = copyRecursive(unpackFolder.Join(files[0].Name()), targetPath.Join(tool.Name, tool.Version))
+		err = copyRecursive(unpackFolder.Join(files[0].Name()), toolPath.Join(tool.Version))
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 	} else {
-		if err := targetPath.Join(tool.Name, tool.Version).MkdirAll(); err != nil {
+		if err := toolPath.Join(tool.Version).MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 		for _, file := range files {
-			err = copyRecursive(unpackFolder.Join(file.Name()), targetPath.Join(tool.Name, tool.Version, file.Name()))
+			err = copyRecursive(unpackFolder.Join(file.Name()), toolPath.Join(tool.Version, file.Name()))
 			if err != nil {
 				return i18n.WrapError(err)
 			}
@@ -783,13 +782,14 @@ func downloadAndUnpackLibrary(library Library, url string, targetPath *paths.Pat
 	}
 	defer unpackFolder.RemoveAll()
 
-	if exist, _ := targetPath.Join(strings.Replace(library.Name, " ", "_", -1)).Exist(); exist {
-		if err := targetPath.Join(strings.Replace(library.Name, " ", "_", -1)).RemoveAll(); err != nil {
+	libPath := targetPath.Join(strings.Replace(library.Name, " ", "_", -1))
+	if libPath.Exist() {
+		if err := libPath.RemoveAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 	}
 
-	err = copyRecursive(unpackFolder.Join(files[0].Name()), targetPath.Join(strings.Replace(library.Name, " ", "_", -1)))
+	err = copyRecursive(unpackFolder.Join(files[0].Name()), libPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
