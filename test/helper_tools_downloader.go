@@ -113,6 +113,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-mingw32.zip"},
 				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-apple-darwin.zip"},
 				OsUrl{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-armv6-linux-gnueabihf.tar.bz2"},
+				OsUrl{Os: "aarch64-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-aarch64-linux-gnu.tar.bz2"},
 			},
 		},
 		Tool{Name: "arduino-preprocessor", Version: "0.1.5",
@@ -122,6 +123,7 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 				OsUrl{Os: "i686-mingw32", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-i686-w64-mingw32.tar.bz2"},
 				OsUrl{Os: "x86_64-apple-darwin", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-x86_64-apple-darwin11.tar.bz2"},
 				OsUrl{Os: "arm-linux-gnueabihf", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-arm-linux-gnueabihf.tar.bz2"},
+				OsUrl{Os: "aarch64-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-aarch64-linux-gnu.tar.bz2"},
 			},
 		},
 	}
