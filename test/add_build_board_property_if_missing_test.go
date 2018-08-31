@@ -73,7 +73,7 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	require.NotNil(t, targetPlatform.Platform)
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
-	require.Equal(t, "mymega", targetBoard.BoardId)
+	require.Equal(t, "mymega", targetBoard.BoardID)
 	require.Equal(t, constants.EMPTY_STRING, targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MYMEGA", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
@@ -102,7 +102,7 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	targetPlatform := ctx.TargetPlatform
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
-	require.Equal(t, "mymega", targetBoard.BoardId)
+	require.Equal(t, "mymega", targetBoard.BoardID)
 	require.Equal(t, "atmega2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_MCU])
 	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 }
