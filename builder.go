@@ -151,7 +151,7 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 	} else {
 		commands = append(commands, &ContainerAddPrototypes{})
 	}
-	return runCommands(ctx, commands, true)
+	return runCommands(ctx, commands, false)
 }
 
 type Preprocess struct{}
@@ -198,12 +198,13 @@ func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 func runCommands(ctx *types.Context, commands []types.Command, progressEnabled bool) error {
 
 	ctx.Progress.PrintEnabled = progressEnabled
-	ctx.Progress.Progress = 0
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		ctx.Progress.Steps = 100.0 / float64(len(commands))
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		stepSize := 100.0 / float64(len(commands))
+		ctx.Progress.Steps = stepSize
+
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx, progressEnabled, stepSize)
 		err := command.Run(ctx)
 		if err != nil {
 			return i18n.WrapError(err)

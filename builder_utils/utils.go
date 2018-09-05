@@ -46,16 +46,21 @@ import (
 	"github.com/arduino/go-properties-map"
 )
 
-func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
+var mut sync.Mutex
 
-	if !ctx.Progress.PrintEnabled {
+func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context, progressEnabled bool, stepSize float64) {
+
+	if !progressEnabled {
 		return
 	}
 
 	log := ctx.GetLogger()
 	if log.Name() == "machine" {
+		mut.Lock()
+		ctx.Progress.Progress += stepSize
 		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(ctx.Progress.Progress, 'f', 2, 32))
-		ctx.Progress.Progress += ctx.Progress.Steps
+		log.Flush()
+		mut.Unlock()
 	}
 }
 
@@ -168,14 +173,14 @@ func compileFilesWithRecipe(ctx *types.Context, objectFiles []string, sourcePath
 	errorsChan := make(chan error)
 	doneChan := make(chan struct{})
 
-	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(sources))
+	stepSize := ctx.Progress.Steps / float64(len(sources))
 	var wg sync.WaitGroup
 	wg.Add(len(sources))
 
 	for _, source := range sources {
 		go func(source string) {
 			defer wg.Done()
-			PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+			go PrintProgressIfProgressEnabledAndMachineLogger(ctx, true, stepSize)
 			objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 			if err != nil {
 				errorsChan <- err
