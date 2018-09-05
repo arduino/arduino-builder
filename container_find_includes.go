@@ -148,8 +148,11 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
 	}
 
+	stepSize := ctx.Progress.Steps / 20.0
+	stepLimit := ctx.Progress.Progress + ctx.Progress.Steps
+
 	for !sourceFilePaths.Empty() {
-		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
+		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop(), stepSize, stepLimit)
 		if err != nil {
 			os.Remove(cachePath)
 			return i18n.WrapError(err)
@@ -290,7 +293,7 @@ func writeCache(cache *includeCache, path string) error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
+func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile, stepSize, stepLimit float64) error {
 	sourcePath := sourceFile.SourcePath(ctx)
 	depPath := sourceFile.DepfilePath(ctx)
 	objPath := sourceFile.ObjectPath(ctx)
@@ -317,6 +320,8 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	for {
 		var include string
 		cache.ExpectFile(sourcePath)
+
+		go builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx, ctx.Progress.Progress < stepLimit, stepSize)
 
 		includes := ctx.IncludeFolders
 		if library, ok := sourceFile.Origin.(*types.Library); ok && library.UtilityFolder != "" {

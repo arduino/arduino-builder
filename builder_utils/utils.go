@@ -57,8 +57,8 @@ func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context, progress
 	log := ctx.GetLogger()
 	if log.Name() == "machine" {
 		mut.Lock()
-		ctx.Progress.Progress += stepSize
 		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(ctx.Progress.Progress, 'f', 2, 32))
+		ctx.Progress.Progress += stepSize
 		log.Flush()
 		mut.Unlock()
 	}
