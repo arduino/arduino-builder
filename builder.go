@@ -201,7 +201,8 @@ func runCommands(ctx *types.Context, commands []types.Command, progressEnabled b
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		stepSize := 100.0 / float64(len(commands))
+
+		stepSize := float64(100-(6*len(ctx.ImportedLibraries))) / float64(len(commands))
 		ctx.Progress.Steps = stepSize
 
 		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx, progressEnabled, stepSize)
