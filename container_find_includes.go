@@ -343,7 +343,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				return i18n.WrapError(preproc_err)
 			} else {
 				include = IncludesFinderWithRegExp(ctx, string(preproc_stderr))
-				if include == "" {
+				if include == "" && ctx.Verbose {
 					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_FIND_INCLUDES_FAILED, sourcePath)
 				}
 			}
