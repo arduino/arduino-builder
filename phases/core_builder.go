@@ -30,6 +30,7 @@
 package phases
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -128,8 +129,10 @@ func compileCore(ctx *types.Context, buildPath string, buildCachePath string, bu
 		if ctx.Verbose {
 			if err == nil {
 				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
-			} else {
+			} else if os.IsNotExist(err) {
 				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_CORE_CACHE_UNAVAILABLE, ctx.ActualPlatform.PlatformId)
+			} else {
+				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ERROR_ARCHIVING_CORE_CACHE, targetArchivedCore, err)
 			}
 		}
 	}
