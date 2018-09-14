@@ -30,13 +30,13 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/i18n"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
+	"github.com/marcinbor85/gohex"
 )
 
 type MergeSketchWithBootloader struct{}
@@ -80,70 +80,54 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader.hex")
 
-	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath)
+	// Ignore merger errors for the first iteration
+	merge(builtSketchPath, bootloaderPath, mergedSketchPath)
 
-	return err
-}
-
-func hexLineOnlyContainsFF(line string) bool {
-	//:206FE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB1
-	if len(line) <= 11 {
-		return false
-	}
-	byteArray := []byte(line)
-	for _, char := range byteArray[9:(len(byteArray) - 2)] {
-		if char != 'F' {
-			return false
-		}
-	}
-	return true
-}
-
-func extractActualBootloader(bootloader []string) []string {
-
-	var realBootloader []string
-
-	// skip until we find a line full of FFFFFF (except address and checksum)
-	for i, row := range bootloader {
-		if hexLineOnlyContainsFF(row) {
-			realBootloader = bootloader[i:len(bootloader)]
-			break
-		}
-	}
-
-	// drop all "empty" lines
-	for i, row := range realBootloader {
-		if !hexLineOnlyContainsFF(row) {
-			realBootloader = realBootloader[i:len(realBootloader)]
-			break
-		}
-	}
-
-	if len(realBootloader) == 0 {
-		// we didn't find any line full of FFFF, thus it's a standalone bootloader
-		realBootloader = bootloader
-	}
-
-	return realBootloader
+	return nil
 }
 
 func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
-	sketch, err := utils.ReadFileToRows(builtSketchPath)
+	bootFile, err := os.Open(bootloaderPath)
 	if err != nil {
-		return i18n.WrapError(err)
+		return err
 	}
-	sketch = sketch[:len(sketch)-2]
+	defer bootFile.Close()
 
-	bootloader, err := utils.ReadFileToRows(bootloaderPath)
+	mem_boot := gohex.NewMemory()
+	err = mem_boot.ParseIntelHex(bootFile)
 	if err != nil {
-		return i18n.WrapError(err)
+		return err
 	}
 
-	realBootloader := extractActualBootloader(bootloader)
+	buildFile, err := os.Open(builtSketchPath)
+	if err != nil {
+		return err
+	}
+	defer buildFile.Close()
 
-	for _, row := range realBootloader {
-		sketch = append(sketch, row)
+	mem_sketch := gohex.NewMemory()
+	err = mem_sketch.ParseIntelHex(buildFile)
+	if err != nil {
+		return err
 	}
 
-	return utils.WriteFile(mergedSketchPath, strings.Join(sketch, "\n"))
+	mem_merge := gohex.NewMemory()
+
+	for _, segment := range mem_boot.GetDataSegments() {
+		err = mem_merge.AddBinary(segment.Address, segment.Data)
+	}
+	for _, segment := range mem_sketch.GetDataSegments() {
+		err = mem_merge.AddBinary(segment.Address, segment.Data)
+	}
+
+	mergeFile, err := os.Create(mergedSketchPath)
+	if err != nil {
+		return err
+	}
+	defer mergeFile.Close()
+
+	mem_merge.DumpIntelHex(mergeFile, 32)
+	return nil
+	//bytes := mem_merge.ToBinary(0, len, 0xFF)
+	//return utils.WriteFile(mergedSketchPath, string(bytes))
 }
