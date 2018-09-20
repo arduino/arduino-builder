@@ -12,6 +12,7 @@ install:
   - go get github.com/wadey/gocovmerge
   - go get github.com/arduino/go-properties-map
   - go get github.com/arduino/go-timeutils
+  - go get github.com/marcinbor85/gohex
 
 script:
   - go get github.com/arduino/arduino-builder/arduino-builder
