@@ -30,8 +30,11 @@
 package builder
 
 import (
+	"errors"
+	"math"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
@@ -81,12 +84,20 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader.hex")
 
 	// Ignore merger errors for the first iteration
-	merge(builtSketchPath, bootloaderPath, mergedSketchPath)
+	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath)
+	if err != nil {
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, err.Error())
+	}
 
 	return nil
 }
 
 func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
+
+	if filepath.Ext(bootloaderPath) == ".bin" {
+		bootloaderPath = strings.TrimSuffix(bootloaderPath, ".bin") + ".hex"
+	}
+
 	bootFile, err := os.Open(bootloaderPath)
 	if err != nil {
 		return err
@@ -96,7 +107,7 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	mem_boot := gohex.NewMemory()
 	err = mem_boot.ParseIntelHex(bootFile)
 	if err != nil {
-		return err
+		return errors.New(bootFile.Name() + " " + err.Error())
 	}
 
 	buildFile, err := os.Open(builtSketchPath)
@@ -108,16 +119,37 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	mem_sketch := gohex.NewMemory()
 	err = mem_sketch.ParseIntelHex(buildFile)
 	if err != nil {
-		return err
+		return errors.New(buildFile.Name() + " " + err.Error())
 	}
 
 	mem_merge := gohex.NewMemory()
+	initial_address := uint32(math.MaxUint32)
+	last_address := uint32(0)
 
 	for _, segment := range mem_boot.GetDataSegments() {
 		err = mem_merge.AddBinary(segment.Address, segment.Data)
+		if err != nil {
+			continue
+		} else {
+			if segment.Address < initial_address {
+				initial_address = segment.Address
+			}
+			if segment.Address+uint32(len(segment.Data)) > last_address {
+				last_address = segment.Address + uint32(len(segment.Data))
+			}
+		}
 	}
 	for _, segment := range mem_sketch.GetDataSegments() {
 		err = mem_merge.AddBinary(segment.Address, segment.Data)
+		if err != nil {
+			continue
+		}
+		if segment.Address < initial_address {
+			initial_address = segment.Address
+		}
+		if segment.Address+uint32(len(segment.Data)) > last_address {
+			last_address = segment.Address + uint32(len(segment.Data))
+		}
 	}
 
 	mergeFile, err := os.Create(mergedSketchPath)
@@ -126,8 +158,10 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	}
 	defer mergeFile.Close()
 
-	mem_merge.DumpIntelHex(mergeFile, 32)
-	return nil
-	//bytes := mem_merge.ToBinary(0, len, 0xFF)
-	//return utils.WriteFile(mergedSketchPath, string(bytes))
+	mem_merge.DumpIntelHex(mergeFile, 16)
+
+	mergedSketchPathBin := strings.TrimSuffix(mergedSketchPath, ".hex") + ".bin"
+
+	bytes := mem_merge.ToBinary(initial_address, last_address-initial_address, 0xFF)
+	return utils.WriteFile(mergedSketchPathBin, string(bytes))
 }
