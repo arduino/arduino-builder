@@ -30,13 +30,15 @@
 package builder
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type MergeSketchWithBootloader struct{}
@@ -52,15 +54,25 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	sketchFileName := filepath.Base(sketch.MainFile.Name)
 	logger := ctx.GetLogger()
 
-	sketchInBuildPath := filepath.Join(buildPath, sketchFileName+".hex")
-	sketchInSubfolder := filepath.Join(buildPath, constants.FOLDER_SKETCH, sketchFileName+".hex")
+	sketchInBuildPath := filepath.Join(buildPath, sketchFileName)
+	sketchInSubfolder := filepath.Join(buildPath, constants.FOLDER_SKETCH, sketchFileName)
 
+	availableExtensions := []string{".hex", ".bin"}
 	builtSketchPath := constants.EMPTY_STRING
-	if _, err := os.Stat(sketchInBuildPath); err == nil {
-		builtSketchPath = sketchInBuildPath
-	} else if _, err := os.Stat(sketchInSubfolder); err == nil {
-		builtSketchPath = sketchInSubfolder
-	} else {
+
+	extension := ""
+
+	for _, extension = range availableExtensions {
+		if _, err := os.Stat(sketchInBuildPath + extension); err == nil {
+			builtSketchPath = sketchInBuildPath + extension
+			break
+		} else if _, err := os.Stat(sketchInSubfolder + extension); err == nil {
+			builtSketchPath = sketchInSubfolder + extension
+			break
+		}
+	}
+
+	if builtSketchPath == constants.EMPTY_STRING {
 		return nil
 	}
 
@@ -78,9 +90,28 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 		return nil
 	}
 
-	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader.hex")
+	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader"+extension)
 
-	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath)
+	// make sure that sketch and bootloader have the same format
+
+	if (!strings.HasSuffix(bootloaderPath, extension)) {
+		// oops, need to retrieve the .hex version of the bootloader
+		if _, err := os.Stat(strings.TrimSuffix(bootloaderPath, ".bin") + extension); err != nil {
+			return nil
+		} else {
+			bootloaderPath = strings.TrimSuffix(bootloaderPath, ".bin") + extension
+		}
+	}
+
+	var err error
+	if extension == ".hex" {
+		err = mergeHex(builtSketchPath, bootloaderPath, mergedSketchPath)
+	} else {
+		ldscript := buildProperties[constants.BUILD_PROPERTIES_BUILD_LDSCRIPT]
+		variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
+		ldscriptPath := filepath.Join(variantFolder, ldscript)
+		err = mergeBin(builtSketchPath, ldscriptPath, bootloaderPath, mergedSketchPath)
+	}
 
 	return err
 }
@@ -127,7 +158,7 @@ func extractActualBootloader(bootloader []string) []string {
 	return realBootloader
 }
 
-func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
+func mergeHex(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	sketch, err := utils.ReadFileToRows(builtSketchPath)
 	if err != nil {
 		return i18n.WrapError(err)
@@ -146,4 +177,47 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	}
 
 	return utils.WriteFile(mergedSketchPath, strings.Join(sketch, "\n"))
+}
+
+func mergeBin(builtSketchPath, ldscriptPath, bootloaderPath, mergedSketchPath string) error {
+	// 0xFF means empty
+	// only works if the bootloader is at the beginning of the flash
+	// only works if the flash address space is mapped at 0x00
+
+	// METHOD 1: (non appliable to most architectures)
+	// remove all comments from linkerscript
+	// find NAMESPACE of .text section -> FLASH
+	// find ORIGIN of FLASH section
+
+	// METHOD 2:
+	// Round the bootloader to the next "power of 2" bytes boundary
+
+	// generate a byte[FLASH] full of 0xFF and bitwise OR with bootloader BIN
+	// merge this slice with sketch BIN
+
+	bootloader, _ := ioutil.ReadFile(bootloaderPath)
+	sketch, _ := ioutil.ReadFile(builtSketchPath)
+
+	paddedBootloaderLen := nextPowerOf2(len(bootloader))
+
+	padding := make([]byte, paddedBootloaderLen-len(bootloader))
+	for i, _ := range padding {
+		padding[i] = 0xFF
+	}
+
+	bootloader = append(bootloader, padding...)
+	sketch = append(bootloader, sketch...)
+
+	return ioutil.WriteFile(mergedSketchPath, sketch, 0644)
+}
+
+func nextPowerOf2(v int) int {
+	v--
+	v |= v >> 1
+	v |= v >> 2
+	v |= v >> 4
+	v |= v >> 8
+	v |= v >> 16
+	v++
+	return v
 }
