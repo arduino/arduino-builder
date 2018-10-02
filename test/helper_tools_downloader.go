@@ -47,7 +47,7 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/go-errors/errors"
 )
 
