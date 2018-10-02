@@ -49,7 +49,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 
 	archs := []string{targetPlatform.Platform.Architecture}
-	if overrides, ok := buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK]; ok {
+	if overrides, ok := buildProperties.GetOk(constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK); ok {
 		archs = append(archs, strings.Split(overrides, ",")...)
 	}
 

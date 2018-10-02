@@ -35,7 +35,7 @@ import (
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -49,10 +49,10 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	aPackage.Platforms = map[string]*cores.Platform{}
 
 	platform := &cores.PlatformRelease{
-		Properties: properties.Map{
+		Properties: properties.NewFromHashmap(map[string]string{
 			"name":          "A test platform",
 			"compiler.path": "{runtime.ide.path}/hardware/tools/avr/bin/",
-		},
+		}),
 	}
 	aPackage.Platforms["dummy"] = &cores.Platform{
 		Architecture: "dummy",
@@ -77,7 +77,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platform.Properties["compiler.path"])
+	require.Equal(t, "{runtime.tools.avr-gcc.path}/bin/", platform.Properties.Get("compiler.path"))
 }
 
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
@@ -90,11 +90,11 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	aPackage.Platforms = make(map[string]*cores.Platform)
 
 	platform := &cores.PlatformRelease{
-		Properties: properties.Map{
+		Properties: properties.NewFromHashmap(map[string]string{
 			"name":          "A test platform",
 			"compiler.path": "{runtime.ide.path}/hardware/tools/avr/bin/",
 			"rewriting":     "disabled",
-		},
+		}),
 	}
 	aPackage.Platforms["dummy"] = &cores.Platform{
 		Architecture: "dummy",
@@ -120,5 +120,5 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 		NoError(t, err)
 	}
 
-	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platform.Properties["compiler.path"])
+	require.Equal(t, "{runtime.ide.path}/hardware/tools/avr/bin/", platform.Properties.Get("compiler.path"))
 }

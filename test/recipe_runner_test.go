@@ -35,7 +35,7 @@ import (
 	"github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,10 +45,10 @@ import (
 // So this test is pretty useless
 func TestRecipeRunner(t *testing.T) {
 	ctx := &types.Context{}
-	buildProperties := make(properties.Map)
+	buildProperties := properties.NewMap()
 	ctx.BuildProperties = buildProperties
 
-	buildProperties["recipe.hooks.prebuild.1.pattern"] = "echo"
+	buildProperties.Set("recipe.hooks.prebuild.1.pattern", "echo")
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},

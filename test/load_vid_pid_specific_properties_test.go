@@ -64,9 +64,9 @@ func TestLoadVIDPIDSpecificPropertiesWhenNoVIDPIDAreProvided(t *testing.T) {
 
 	buildProperties := ctx.BuildProperties
 
-	require.Equal(t, "0x0037", buildProperties["pid.0"])
-	require.Equal(t, "\"Genuino Micro\"", buildProperties["vid.4.build.usb_product"])
-	require.Equal(t, "0x8037", buildProperties["build.pid"])
+	require.Equal(t, "0x0037", buildProperties.Get("pid.0"))
+	require.Equal(t, "\"Genuino Micro\"", buildProperties.Get("vid.4.build.usb_product"))
+	require.Equal(t, "0x8037", buildProperties.Get("build.pid"))
 }
 
 func TestLoadVIDPIDSpecificProperties(t *testing.T) {
@@ -96,8 +96,8 @@ func TestLoadVIDPIDSpecificProperties(t *testing.T) {
 
 	buildProperties := ctx.BuildProperties
 
-	require.Equal(t, "0x0037", buildProperties["pid.0"])
-	require.Equal(t, "\"Genuino Micro\"", buildProperties["vid.4.build.usb_product"])
-	require.Equal(t, "0x2341", buildProperties["build.vid"])
-	require.Equal(t, "0x8237", buildProperties["build.pid"])
+	require.Equal(t, "0x0037", buildProperties.Get("pid.0"))
+	require.Equal(t, "\"Genuino Micro\"", buildProperties.Get("vid.4.build.usb_product"))
+	require.Equal(t, "0x2341", buildProperties.Get("build.vid"))
+	require.Equal(t, "0x8237", buildProperties.Get("build.pid"))
 }

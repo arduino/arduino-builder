@@ -50,7 +50,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/go-errors/errors"
 )
 
@@ -240,7 +240,7 @@ func main() {
 	}
 
 	if *buildOptionsFileFlag != "" {
-		buildOptions := make(properties.Map)
+		buildOptions := properties.NewMap()
 		if _, err := os.Stat(*buildOptionsFileFlag); err == nil {
 			data, err := ioutil.ReadFile(*buildOptionsFileFlag)
 			if err != nil {

@@ -151,8 +151,8 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	}
 
 	buildProperties := ctx.BuildProperties
-	delete(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
-	delete(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
+	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
+	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
 	command := &builder.MergeSketchWithBootloader{}
 	err := command.Run(ctx)
