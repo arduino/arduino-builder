@@ -393,7 +393,7 @@ func coreAlreadyDownloadedAndUnpacked(targetPath *paths.Path, core Core) (bool, 
 		return false, i18n.WrapError(err)
 	}
 
-	if core.Version != platform["version"] {
+	if core.Version != platform.Get("version") {
 		err := corePath.RemoveAll()
 		return false, i18n.WrapError(err)
 	}
@@ -446,7 +446,7 @@ func libraryAlreadyDownloadedAndUnpacked(targetPath *paths.Path, library Library
 	if err != nil {
 		return false
 	}
-	return libProps["version"] == library.Version || libProps["version"] == library.VersionInLibProperties
+	return libProps.Get("version") == library.Version || libProps.Get("version") == library.VersionInLibProperties
 }
 
 func downloadAndUnpackCore(core Core, url string, targetPath *paths.Path) error {
