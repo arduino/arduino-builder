@@ -123,7 +123,7 @@ func makeSketch(sketchLocation string, allSketchFilePaths []string, buildLocatio
 				otherSketchFiles = append(otherSketchFiles, sketchFile)
 			}
 		} else if ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {
-			if !strings.Contains(filepath.Dir(sketchFile.Name), buildLocation) {
+			if !strings.Contains(filepath.Dir(sketchFile.Name), buildLocation) || buildLocation == "" {
 				additionalFiles = append(additionalFiles, sketchFile)
 			}
 		} else {
