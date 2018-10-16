@@ -32,8 +32,8 @@ script:
   - RES=0; I=0; for PKG in $TEST_PACKAGES; do go test -v -timeout 30m -covermode=count -coverprofile=coverage.$I.out $PKG; ((RES=RES+$?)); ((I++)); done; ( exit $RES )
 
 after_success:
-  - bin/gocovmerge coverage.*.out > coverage.out
-  - bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+  - $GOPATH/bin/gocovmerge coverage.*.out > coverage.out
+  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 env:
   global:
