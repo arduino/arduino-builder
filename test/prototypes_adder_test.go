@@ -31,14 +31,15 @@
 package test
 
 import (
-	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPrototypesAdderBridgeExample(t *testing.T) {
@@ -905,4 +906,46 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		NoError(t, err)
 	}
 	// only requires no error as result
+}
+
+func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	sketchLocation := filepath.Join("sketch_with_class_and_method_substring", "sketch_with_class_and_method_substring.ino")
+	quotedSketchLocation := utils.QuoteCppString(Abs(t, sketchLocation))
+
+	ctx := &types.Context{
+		HardwareFolders:         []string{filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"},
+		ToolsFolders:            []string{"downloaded_tools"},
+		BuiltInLibrariesFolders: []string{"downloaded_libraries"},
+		OtherLibrariesFolders:   []string{"libraries"},
+		SketchLocation:          sketchLocation,
+		FQBN:                    "arduino:avr:uno",
+		ArduinoAPIVersion:       "10600",
+		Verbose:                 true,
+	}
+
+	buildPath := SetupBuildPath(t, ctx)
+	defer os.RemoveAll(buildPath)
+
+	commands := []types.Command{
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+
+		&builder.ContainerAddPrototypes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(ctx)
+		NoError(t, err)
+	}
+
+	require.Contains(t, ctx.Source, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
 }
