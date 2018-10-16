@@ -34,7 +34,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-builder"
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-paths-helper"
@@ -53,6 +52,7 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		FQBN:         parseFQBN(t, "my_avr_platform:avr:mymega"),
+		Verbose:      true,
 	}
 
 	commands := []types.Command{
@@ -74,8 +74,8 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardID)
-	require.Equal(t, "", targetBoard.Properties.Get(constants.BUILD_PROPERTIES_BUILD_MCU))
-	require.Equal(t, "AVR_MYMEGA", targetBoard.Properties.Get(constants.BUILD_PROPERTIES_BUILD_BOARD))
+	require.Equal(t, "atmega2560", targetBoard.Properties.Get("build.mcu"))
+	require.Equal(t, "AVR_MYMEGA2560", targetBoard.Properties.Get("build.board"))
 }
 
 func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
@@ -83,7 +83,8 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		FQBN:         parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
+		FQBN:         parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega1280"),
+		Verbose:      true,
 	}
 
 	commands := []types.Command{
@@ -103,6 +104,6 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "mymega", targetBoard.BoardID)
-	require.Equal(t, "atmega2560", targetBoard.Properties.Get(constants.BUILD_PROPERTIES_BUILD_MCU))
-	require.Equal(t, "AVR_MEGA2560", targetBoard.Properties.Get(constants.BUILD_PROPERTIES_BUILD_BOARD))
+	require.Equal(t, "atmega1280", targetBoard.Properties.Get("build.mcu"))
+	require.Equal(t, "AVR_MYMEGA", targetBoard.Properties.Get("build.board"))
 }
