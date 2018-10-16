@@ -907,3 +907,44 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	}
 	// only requires no error as result
 }
+
+func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+	sketchLocation := paths.New("sketch_with_class_and_method_substring", "sketch_with_class_and_method_substring.ino")
+	quotedSketchLocation := utils.QuoteCppString(Abs(t, sketchLocation).String())
+
+	ctx := &types.Context{
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
+	}
+
+	buildPath := SetupBuildPath(t, ctx)
+	defer buildPath.RemoveAll()
+
+	commands := []types.Command{
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+
+		&builder.ContainerAddPrototypes{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(ctx)
+		NoError(t, err)
+	}
+
+	require.Contains(t, ctx.Source, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
+}

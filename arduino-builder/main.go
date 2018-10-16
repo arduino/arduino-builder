@@ -96,19 +96,8 @@ func (h *foldersFlag) String() string {
 	return fmt.Sprint(*h)
 }
 
-func (h *foldersFlag) Set(csv string) error {
-	var values []string
-	if strings.Contains(csv, string(os.PathListSeparator)) {
-		values = strings.Split(csv, string(os.PathListSeparator))
-	} else {
-		values = strings.Split(csv, ",")
-	}
-
-	for _, value := range values {
-		value = strings.TrimSpace(value)
-		*h = append(*h, value)
-	}
-
+func (h *foldersFlag) Set(folder string) error {
+	*h = append(*h, folder)
 	return nil
 }
 
