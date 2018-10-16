@@ -41,6 +41,7 @@ func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
 		&CreateBuildOptionsMap{},
 		&LoadPreviousBuildOptionsMap{},
 		&WipeoutBuildPathIfBuildOptionsChanged{},
+		&LoadPreviousOutputCacheMap{},
 		&StoreBuildOptionsMap{},
 	}
 

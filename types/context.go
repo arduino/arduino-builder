@@ -14,6 +14,11 @@ type ProgressStruct struct {
 	Progress     float64
 }
 
+type Streams struct {
+	Stdout []byte
+	Stderr []byte
+}
+
 // Context structure
 type Context struct {
 	// Build options
@@ -65,6 +70,7 @@ type Context struct {
 	CodeCompletions string
 
 	WarningsLevel string
+	OutputCache   map[string]Streams
 
 	// Libraries handling
 	Libraries                  []*Library

@@ -30,12 +30,14 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/i18n"
-	"github.com/arduino/arduino-builder/types"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-builder/types"
 )
 
 type LoadPreviousBuildOptionsMap struct{}
@@ -57,6 +59,30 @@ func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
 	}
 
 	ctx.BuildOptionsJsonPrevious = string(bytes)
+
+	return nil
+}
+
+type LoadPreviousOutputCacheMap struct{}
+
+func (s *LoadPreviousOutputCacheMap) Run(ctx *types.Context) error {
+	cachedWarningsFile := filepath.Join(ctx.BuildPath, constants.FILE_OUTPUT_CACHE)
+	ctx.OutputCache = make(map[string]types.Streams)
+
+	_, err := os.Stat(cachedWarningsFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return i18n.WrapError(err)
+	}
+
+	bytes, err := ioutil.ReadFile(cachedWarningsFile)
+	if err != nil {
+		return i18n.WrapError(err)
+	}
+
+	json.Unmarshal(bytes, &ctx.OutputCache)
 
 	return nil
 }
