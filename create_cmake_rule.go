@@ -168,10 +168,12 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	// Add SO_PATHS option for libraries not getting found by pkg_config
 	cmakelist += "set(EXTRA_LIBS_DIRS \"\" CACHE STRING \"Additional paths for dynamic libraries\")\n"
 
+	linkGroup := ""
 	for _, lib := range libs {
 		// Dynamic libraries should be discovered by pkg_config
 		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
 		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
+		linkGroup += " " + lib
 	}
 	cmakelist += "link_directories (" + strings.Join(relLinkDirectories, " ") + " ${EXTRA_LIBS_DIRS})\n"
 	for _, staticLibsFile := range staticLibsFiles {
@@ -180,19 +182,20 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		lib = strings.TrimPrefix(lib, "lib")
 		lib = strings.TrimSuffix(lib, ".a")
 		if !utils.SliceContains(libs, lib) {
-			libs = append(libs, lib)
+			linkGroup += " " + lib
 			cmakelist += "add_library (" + lib + " STATIC IMPORTED)\n"
 			location := strings.TrimPrefix(staticLibsFile, cmakeFolder)
 			cmakelist += "set_property(TARGET " + lib + " PROPERTY IMPORTED_LOCATION " + "${PROJECT_SOURCE_DIR}" + location + " )\n"
 		}
 	}
+
 	// Include source files
 	// TODO: remove .cpp and .h from libraries example folders
 	cmakelist += "file (GLOB_RECURSE SOURCES core/*.c* lib/*.c* sketch/*.c*)\n"
 
 	// Compile and link project
 	cmakelist += "add_executable (" + projectName + " ${SOURCES} ${SOURCES_LIBS})\n"
-	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed -Wl,--start-group " + strings.Join(libs, " ") + " -Wl,--end-group)\n"
+	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed -Wl,--start-group " + linkGroup + " -Wl,--end-group)\n"
 
 	utils.WriteFile(cmakeFile, cmakelist)
 
