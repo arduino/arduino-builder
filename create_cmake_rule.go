@@ -127,12 +127,12 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	// Extract CFLAGS, CPPFLAGS and LDFLAGS
 	var defines []string
 	var linkerflags []string
-	var libs []string
+	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &libs, &linkerflags, &linkDirectories, logger)
-	extractCompileFlags(ctx, constants.RECIPE_C_PATTERN, &defines, &libs, &linkerflags, &linkDirectories, logger)
-	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &libs, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_C_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
 
 	// Extract folders with .h in them for adding in include list
 	var headerFiles []string
@@ -141,9 +141,9 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	foldersContainingDotH := findUniqueFoldersRelative(headerFiles, cmakeFolder)
 
 	// Extract folders with .a in them for adding in static libs paths list
-	var staticLibsFiles []string
+	var staticLibs []string
 	isStaticLib := func(ext string) bool { return DOTAEXTENSION[ext] }
-	utils.FindFilesInFolder(&staticLibsFiles, cmakeFolder, isStaticLib, true)
+	utils.FindFilesInFolder(&staticLibs, cmakeFolder, isStaticLib, true)
 
 	// Generate the CMakeLists global file
 
@@ -169,22 +169,22 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakelist += "set(EXTRA_LIBS_DIRS \"\" CACHE STRING \"Additional paths for dynamic libraries\")\n"
 
 	linkGroup := ""
-	for _, lib := range libs {
+	for _, lib := range dynamicLibsFromGccMinusL {
 		// Dynamic libraries should be discovered by pkg_config
 		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
 		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
 		linkGroup += " " + lib
 	}
 	cmakelist += "link_directories (" + strings.Join(relLinkDirectories, " ") + " ${EXTRA_LIBS_DIRS})\n"
-	for _, staticLibsFile := range staticLibsFiles {
+	for _, staticLib := range staticLibs {
 		// Static libraries are fully configured
-		lib := filepath.Base(staticLibsFile)
+		lib := filepath.Base(staticLib)
 		lib = strings.TrimPrefix(lib, "lib")
 		lib = strings.TrimSuffix(lib, ".a")
-		if !utils.SliceContains(libs, lib) {
+		if !utils.SliceContains(dynamicLibsFromGccMinusL, lib) {
 			linkGroup += " " + lib
 			cmakelist += "add_library (" + lib + " STATIC IMPORTED)\n"
-			location := strings.TrimPrefix(staticLibsFile, cmakeFolder)
+			location := strings.TrimPrefix(staticLib, cmakeFolder)
 			cmakelist += "set_property(TARGET " + lib + " PROPERTY IMPORTED_LOCATION " + "${PROJECT_SOURCE_DIR}" + location + " )\n"
 		}
 	}
