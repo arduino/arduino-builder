@@ -168,10 +168,8 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	// Add SO_PATHS option for libraries not getting found by pkg_config
 	cmakelist += "set(EXTRA_LIBS_DIRS \"\" CACHE STRING \"Additional paths for dynamic libraries\")\n"
 
-	for i, lib := range libs {
+	for _, lib := range libs {
 		// Dynamic libraries should be discovered by pkg_config
-		lib = strings.TrimPrefix(lib, "-l")
-		libs[i] = lib
 		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
 		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
 	}
@@ -205,7 +203,7 @@ func canExportCmakeProject(ctx *types.Context) bool {
 	return ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_EXPORT_CMAKE_FLAGS] != ""
 }
 
-func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
+func extractCompileFlags(ctx *types.Context, receipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
 	command, _ := builder_utils.PrepareCommandForRecipe(ctx, ctx.BuildProperties, receipe, true)
 
 	for _, arg := range command.Args {
@@ -214,11 +212,11 @@ func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, link
 			continue
 		}
 		if strings.HasPrefix(arg, "-l") {
-			*libs = utils.AppendIfNotPresent(*libs, arg)
+			*dynamicLibs = utils.AppendIfNotPresent(*dynamicLibs, arg[2:])
 			continue
 		}
 		if strings.HasPrefix(arg, "-L") {
-			*linkDirectories = utils.AppendIfNotPresent(*linkDirectories, strings.TrimPrefix(arg, "-L"))
+			*linkDirectories = utils.AppendIfNotPresent(*linkDirectories, arg[2:])
 			continue
 		}
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "-I") && !strings.HasPrefix(arg, "-o") {
