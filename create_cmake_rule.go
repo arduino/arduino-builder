@@ -35,6 +35,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/arduino/go-properties-map"
+
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -42,7 +44,7 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 )
 
-var VALID_EXPORT_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".s": true, ".a": true}
+var VALID_EXPORT_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".s": true, ".a": true, ".properties": true}
 var DOTHEXTENSION = map[string]bool{".h": true, ".hh": true, ".hpp": true}
 var DOTAEXTENSION = map[string]bool{".a": true}
 
@@ -76,6 +78,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	coreFolder := filepath.Join(cmakeFolder, "core")
 	cmakeFile := filepath.Join(cmakeFolder, "CMakeLists.txt")
 
+	dynamicLibsFromPkgConfig := map[string]bool{}
 	extensions := func(ext string) bool { return VALID_EXPORT_EXTENSIONS[ext] }
 	staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
 	for _, library := range ctx.ImportedLibraries {
@@ -83,6 +86,19 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		libFolder := filepath.Join(libBaseFolder, library.Name)
 		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
 		utils.CopyDir(library.Folder, libFolder, extensions)
+
+		// Read cmake options if available
+		isStaticLib := true
+		if cmakeOptions, err := properties.Load(filepath.Join(libFolder, "src", mcu, "arduino_builder.properties")); err == nil {
+			// If the library can be linked dynamically do not copy the library folder
+			if pkgs, ok := cmakeOptions["cmake.pkg_config"]; ok {
+				isStaticLib = false
+				for _, pkg := range strings.Split(pkgs, " ") {
+					dynamicLibsFromPkgConfig[pkg] = true
+				}
+			}
+		}
+
 		// Remove examples folder
 		if _, err := os.Stat(filepath.Join(libFolder, "examples")); err == nil {
 			os.RemoveAll(filepath.Join(libFolder, "examples"))
@@ -92,8 +108,9 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		var files []string
 		utils.FindFilesInFolder(&files, filepath.Join(libFolder, "src"), staticLibsExtensions, true)
 		for _, file := range files {
-			if !strings.Contains(filepath.Dir(file), mcu) {
-				os.RemoveAll(filepath.Dir(file))
+			staticLibDir := filepath.Dir(file)
+			if !isStaticLib || !strings.Contains(staticLibDir, mcu) {
+				os.RemoveAll(staticLibDir)
 			}
 		}
 	}
@@ -174,6 +191,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
 		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
 		linkGroup += " " + lib
+	}
+	for lib := range dynamicLibsFromPkgConfig {
+		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
+		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
+		linkGroup += " ${" + strings.ToUpper(lib) + "_LIBRARIES}"
 	}
 	cmakelist += "link_directories (" + strings.Join(relLinkDirectories, " ") + " ${EXTRA_LIBS_DIRS})\n"
 	for _, staticLib := range staticLibs {
