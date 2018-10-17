@@ -143,8 +143,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Extract folders with .a in them for adding in static libs paths list
 	var staticLibs []string
-	isStaticLib := func(ext string) bool { return DOTAEXTENSION[ext] }
-	utils.FindFilesInFolder(&staticLibs, cmakeFolder, isStaticLib, true)
+	utils.FindFilesInFolder(&staticLibs, cmakeFolder, staticLibsExtensions, true)
 
 	// Generate the CMakeLists global file
 
