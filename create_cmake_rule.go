@@ -210,21 +210,21 @@ func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, link
 
 	for _, arg := range command.Args {
 		if strings.HasPrefix(arg, "-D") {
-			*defines = appendIfUnique(*defines, arg)
+			*defines = utils.AppendIfNotPresent(*defines, arg)
 			continue
 		}
 		if strings.HasPrefix(arg, "-l") {
-			*libs = appendIfUnique(*libs, arg)
+			*libs = utils.AppendIfNotPresent(*libs, arg)
 			continue
 		}
 		if strings.HasPrefix(arg, "-L") {
-			*linkDirectories = appendIfUnique(*linkDirectories, strings.TrimPrefix(arg, "-L"))
+			*linkDirectories = utils.AppendIfNotPresent(*linkDirectories, strings.TrimPrefix(arg, "-L"))
 			continue
 		}
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "-I") && !strings.HasPrefix(arg, "-o") {
 			// HACK : from linkerflags remove MMD (no cache is produced)
 			if !strings.HasPrefix(arg, "-MMD") {
-				*linkerflags = appendIfUnique(*linkerflags, arg)
+				*linkerflags = utils.AppendIfNotPresent(*linkerflags, arg)
 			}
 		}
 	}
@@ -240,11 +240,4 @@ func findUniqueFoldersRelative(slice []string, base string) string {
 		}
 	}
 	return strings.Join(out, " ")
-}
-
-func appendIfUnique(slice []string, element string) []string {
-	if !utils.SliceContains(slice, element) {
-		slice = append(slice, element)
-	}
-	return slice
 }
