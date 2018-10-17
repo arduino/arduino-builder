@@ -76,18 +76,19 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	coreFolder := filepath.Join(cmakeFolder, "core")
 	cmakeFile := filepath.Join(cmakeFolder, "CMakeLists.txt")
 
-	// Copy used  libraries in the correct folder
 	extensions := func(ext string) bool { return VALID_EXPORT_EXTENSIONS[ext] }
+	staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
 	for _, library := range ctx.ImportedLibraries {
+		// Copy used libraries in the correct folder
 		libFolder := filepath.Join(libBaseFolder, library.Name)
+		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
 		utils.CopyDir(library.Folder, libFolder, extensions)
 		// Remove examples folder
 		if _, err := os.Stat(filepath.Join(libFolder, "examples")); err == nil {
 			os.RemoveAll(filepath.Join(libFolder, "examples"))
 		}
-		// Remove stray folders contining incompatible libraries
-		staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
-		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+
+		// Remove stray folders contining incompatible or not needed libraries archives
 		var files []string
 		utils.FindFilesInFolder(&files, filepath.Join(libFolder, "src"), staticLibsExtensions, true)
 		for _, file := range files {
