@@ -31,9 +31,11 @@ package builder_utils
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -476,6 +478,42 @@ func ExecRecipe(ctx *types.Context, buildProperties properties.Map, recipe strin
 	return utils.ExecCommand(ctx, command, stdout, stderr)
 }
 
+func replaceFilesWithUnexpandedProps(str string, buildProperties properties.Map) string {
+
+	// Regexp to match file path
+	re := regexp.MustCompile("\\$(.+?)(/|\\\\)(.+?) ")
+	fileString := re.FindString(str)
+	if fileString == "" {
+		return str
+	}
+	path := strings.TrimSpace(strings.Trim(fileString, "$"))
+	filename := filepath.Base(path)
+
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return str
+	}
+
+	path = filepath.Join(buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH], constants.FOLDER_PREPROC, filename)
+	// if new path does not exist, read original file and create the resolved one
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// expand properties in data file
+		data := buildProperties.ExpandPropsInString(string(content))
+		// does the folder already exist? if not, create it
+		os.MkdirAll(filepath.Dir(path), 0777)
+		// write file to buildProperties[constants.BUILD_PROPERTIES_BUILD_PATH]/preproc/filename
+		ioutil.WriteFile(path, []byte(data), 0666)
+	}
+
+	// replace filename with new one (add a space because we needed it to validate the regexp and then it got stripped)
+	str = strings.Replace(str, fileString, "@"+path+" ", 1)
+
+	// repeat recursively until all occurrences are resolved
+	str = replaceFilesWithUnexpandedProps(str, buildProperties)
+
+	return str
+}
+
 const COMMANDLINE_LIMIT = 30000
 
 func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
@@ -487,6 +525,13 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map,
 
 	var err error
 	commandLine := buildProperties.ExpandPropsInString(pattern)
+
+	// handle reference files; gcc accepts files replacing commandline arguments if specified as @filename
+	// such files can't contain paths, since they must be absolute
+	// so, if pattern contains $filename, replace it with @new_filename, where the file content has been expanded
+	// and the path of new_filename is inside the build folder
+	commandLine = replaceFilesWithUnexpandedProps(commandLine, buildProperties)
+
 	if removeUnsetProperties {
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
