@@ -37,6 +37,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -311,7 +312,7 @@ func main() {
 			printCompleteError(err)
 		}
 	}
-	ctx.BuildPath = buildPath
+	ctx.BuildPath, _ = filepath.Abs(buildPath)
 
 	// FLAG_BUILD_CACHE
 	buildCachePath, err := gohasissues.Unquote(*buildCachePathFlag)
