@@ -72,7 +72,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
 	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
 	jsonPath := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
-	coreHasChanged := builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, jsonPath)
+	coreHasChanged := builder_utils.TXTBuildRulesHaveChanged(realCoreFolder, targetCoreFolder, jsonPath)
 
 	if opts.Equals(prevOpts) && !coreHasChanged {
 		return nil

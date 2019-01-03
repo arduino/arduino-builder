@@ -1,3 +1,10 @@
+# arduino-preprocessor
+# --------------------
+
+tools.arduino-preprocessor.path={runtime.tools.arduino-preprocessor.path}
+tools.arduino-preprocessor.cmd.path={path}/arduino-preprocessor
+tools.arduino-preprocessor.pattern="{cmd.path}" "{source_file}" "{codecomplete}" -- -std=gnu++11
+
 # ctags
 # ------------------------------
 tools.ctags.path={runtime.tools.ctags.path}
