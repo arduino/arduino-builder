@@ -311,8 +311,8 @@ func main() {
 		if err != nil {
 			printCompleteError(err)
 		}
+		ctx.BuildPath, _ = filepath.Abs(buildPath)
 	}
-	ctx.BuildPath, _ = filepath.Abs(buildPath)
 
 	// FLAG_BUILD_CACHE
 	buildCachePath, err := gohasissues.Unquote(*buildCachePathFlag)
