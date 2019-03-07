@@ -35,6 +35,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"strconv"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
@@ -84,7 +85,12 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader.hex")
 
 	// Ignore merger errors for the first iteration
-	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath)
+	maximumBinSize := 16000000
+	if uploadMaxSize, ok := ctx.BuildProperties[constants.PROPERTY_UPLOAD_MAX_SIZE]; ok {
+		maximumBinSize, _ = strconv.Atoi(uploadMaxSize)
+		maximumBinSize *= 2
+	}
+	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
 	if err != nil {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, err.Error())
 	}
@@ -92,7 +98,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	return nil
 }
 
-func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
+func merge(builtSketchPath, bootloaderPath, mergedSketchPath string, maximumBinSize int) error {
 
 	if filepath.Ext(bootloaderPath) == ".bin" {
 		bootloaderPath = strings.TrimSuffix(bootloaderPath, ".bin") + ".hex"
@@ -161,6 +167,11 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 	mem_merge.DumpIntelHex(mergeFile, 16)
 
 	mergedSketchPathBin := strings.TrimSuffix(mergedSketchPath, ".hex") + ".bin"
+
+	size := last_address - initial_address
+	if (size > uint32(maximumBinSize)) {
+		return nil
+	}
 
 	bytes := mem_merge.ToBinary(initial_address, last_address-initial_address, 0xFF)
 	return utils.WriteFile(mergedSketchPathBin, string(bytes))
