@@ -55,7 +55,7 @@ import (
 	"github.com/go-errors/errors"
 )
 
-const VERSION = "1.4.3"
+const VERSION = "1.4.4"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
