@@ -69,6 +69,7 @@ go get google.golang.org/grpc
 go get github.com/golang/protobuf/proto
 go get golang.org/x/net/context
 go get github.com/fsnotify/fsnotify
+go get github.com/schollz/closestmatch
 go get github.com/arduino/arduino-builder
 go build github.com/arduino/arduino-builder/arduino-builder
 ```
