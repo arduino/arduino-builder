@@ -54,7 +54,7 @@ import (
 	"github.com/go-errors/errors"
 )
 
-const VERSION = "1.4.2"
+const VERSION = "1.4.3"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
@@ -314,8 +314,8 @@ func main() {
 		if err := buildPath.MkdirAll(); err != nil {
 			printCompleteError(err)
 		}
+		ctx.BuildPath, _ = buildPath.Abs()
 	}
-	ctx.BuildPath, _ = buildPath.Abs()
 
 	// FLAG_BUILD_CACHE
 	buildCachePathUnquoted, err := gohasissues.Unquote(*buildCachePathFlag)
