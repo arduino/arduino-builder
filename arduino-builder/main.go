@@ -43,18 +43,18 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/arduino/arduino-builder"
+	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/gohasissues"
-	"github.com/arduino/arduino-builder/grpc"
+	jsonrpc "github.com/arduino/arduino-builder/grpc"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
+	paths "github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/go-errors/errors"
 )
 
-const VERSION = "1.4.1"
+const VERSION = "1.4.2"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
@@ -315,7 +315,7 @@ func main() {
 			printCompleteError(err)
 		}
 	}
-	ctx.BuildPath = buildPath
+	ctx.BuildPath, _ = buildPath.Abs()
 
 	// FLAG_BUILD_CACHE
 	buildCachePathUnquoted, err := gohasissues.Unquote(*buildCachePathFlag)
