@@ -36,6 +36,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/schollz/closestmatch"
 )
 
 func ResolveLibrary(ctx *types.Context, header string) *types.Library {
@@ -211,6 +212,10 @@ func findBestLibraryWithHeader(header string, libraries []*types.Library) *types
 		if library != nil {
 			return library
 		}
+		library = findLibWithNameBestDistance(headerName, libraries)
+		if library != nil {
+			return library
+		}
 	}
 
 	return nil
@@ -249,6 +254,28 @@ func findLibWithNameContaining(name string, libraries []*types.Library) *types.L
 			return library
 		}
 	}
+	return nil
+}
+
+func findLibWithNameBestDistance(name string, libraries []*types.Library) *types.Library {
+	// create closestmatch DB
+	var wordsToTest []string
+
+	for _, library := range libraries {
+			wordsToTest = append(wordsToTest, simplifyName(library.Name))
+	}
+	// Choose a set of bag sizes, more is more accurate but slower
+	bagSizes := []int{2}
+	// Create a closestmatch object
+	cm := closestmatch.New(wordsToTest, bagSizes)
+	closest_name := cm.Closest(name)
+
+	for _, library := range libraries {
+		if (closest_name == simplifyName(library.Name)) {
+			return library
+		}
+	}
+
 	return nil
 }
 

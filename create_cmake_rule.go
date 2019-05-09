@@ -35,6 +35,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/arduino/go-properties-map"
+
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -42,7 +44,7 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 )
 
-var VALID_EXPORT_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".s": true, ".a": true}
+var VALID_EXPORT_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".s": true, ".a": true, ".properties": true}
 var DOTHEXTENSION = map[string]bool{".h": true, ".hh": true, ".hpp": true}
 var DOTAEXTENSION = map[string]bool{".a": true}
 
@@ -76,23 +78,39 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	coreFolder := filepath.Join(cmakeFolder, "core")
 	cmakeFile := filepath.Join(cmakeFolder, "CMakeLists.txt")
 
-	// Copy used  libraries in the correct folder
+	dynamicLibsFromPkgConfig := map[string]bool{}
 	extensions := func(ext string) bool { return VALID_EXPORT_EXTENSIONS[ext] }
+	staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
 	for _, library := range ctx.ImportedLibraries {
+		// Copy used libraries in the correct folder
 		libFolder := filepath.Join(libBaseFolder, library.Name)
+		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
 		utils.CopyDir(library.Folder, libFolder, extensions)
+
+		// Read cmake options if available
+		isStaticLib := true
+		if cmakeOptions, err := properties.Load(filepath.Join(libFolder, "src", mcu, "arduino_builder.properties")); err == nil {
+			// If the library can be linked dynamically do not copy the library folder
+			if pkgs, ok := cmakeOptions["cmake.pkg_config"]; ok {
+				isStaticLib = false
+				for _, pkg := range strings.Split(pkgs, " ") {
+					dynamicLibsFromPkgConfig[pkg] = true
+				}
+			}
+		}
+
 		// Remove examples folder
 		if _, err := os.Stat(filepath.Join(libFolder, "examples")); err == nil {
 			os.RemoveAll(filepath.Join(libFolder, "examples"))
 		}
-		// Remove stray folders contining incompatible libraries
-		staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
-		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+
+		// Remove stray folders contining incompatible or not needed libraries archives
 		var files []string
 		utils.FindFilesInFolder(&files, filepath.Join(libFolder, "src"), staticLibsExtensions, true)
 		for _, file := range files {
-			if !strings.Contains(filepath.Dir(file), mcu) {
-				os.RemoveAll(filepath.Dir(file))
+			staticLibDir := filepath.Dir(file)
+			if !isStaticLib || !strings.Contains(staticLibDir, mcu) {
+				os.RemoveAll(staticLibDir)
 			}
 		}
 	}
@@ -109,10 +127,10 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Use old ctags method to generate export file
 	commands := []types.Command{
-		&ContainerMergeCopySketchFiles{},
+		//&ContainerMergeCopySketchFiles{},
 		&ContainerAddPrototypes{},
-		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
-		&SketchSaver{},
+		//&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+		//&SketchSaver{},
 	}
 
 	for _, command := range commands {
@@ -127,12 +145,12 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	// Extract CFLAGS, CPPFLAGS and LDFLAGS
 	var defines []string
 	var linkerflags []string
-	var libs []string
+	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &libs, &linkerflags, &linkDirectories, logger)
-	extractCompileFlags(ctx, constants.RECIPE_C_PATTERN, &defines, &libs, &linkerflags, &linkDirectories, logger)
-	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &libs, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_C_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
 
 	// Extract folders with .h in them for adding in include list
 	var headerFiles []string
@@ -141,9 +159,8 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	foldersContainingDotH := findUniqueFoldersRelative(headerFiles, cmakeFolder)
 
 	// Extract folders with .a in them for adding in static libs paths list
-	var staticLibsFiles []string
-	isStaticLib := func(ext string) bool { return DOTAEXTENSION[ext] }
-	utils.FindFilesInFolder(&staticLibsFiles, cmakeFolder, isStaticLib, true)
+	var staticLibs []string
+	utils.FindFilesInFolder(&staticLibs, cmakeFolder, staticLibsExtensions, true)
 
 	// Generate the CMakeLists global file
 
@@ -168,33 +185,39 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	// Add SO_PATHS option for libraries not getting found by pkg_config
 	cmakelist += "set(EXTRA_LIBS_DIRS \"\" CACHE STRING \"Additional paths for dynamic libraries\")\n"
 
-	for i, lib := range libs {
+	linkGroup := ""
+	for _, lib := range dynamicLibsFromGccMinusL {
 		// Dynamic libraries should be discovered by pkg_config
-		lib = strings.TrimPrefix(lib, "-l")
-		libs[i] = lib
 		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
 		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
+		linkGroup += " " + lib
+	}
+	for lib := range dynamicLibsFromPkgConfig {
+		cmakelist += "pkg_search_module (" + strings.ToUpper(lib) + " " + lib + ")\n"
+		relLinkDirectories = append(relLinkDirectories, "${"+strings.ToUpper(lib)+"_LIBRARY_DIRS}")
+		linkGroup += " ${" + strings.ToUpper(lib) + "_LIBRARIES}"
 	}
 	cmakelist += "link_directories (" + strings.Join(relLinkDirectories, " ") + " ${EXTRA_LIBS_DIRS})\n"
-	for _, staticLibsFile := range staticLibsFiles {
+	for _, staticLib := range staticLibs {
 		// Static libraries are fully configured
-		lib := filepath.Base(staticLibsFile)
+		lib := filepath.Base(staticLib)
 		lib = strings.TrimPrefix(lib, "lib")
 		lib = strings.TrimSuffix(lib, ".a")
-		if !utils.SliceContains(libs, lib) {
-			libs = append(libs, lib)
+		if !utils.SliceContains(dynamicLibsFromGccMinusL, lib) {
+			linkGroup += " " + lib
 			cmakelist += "add_library (" + lib + " STATIC IMPORTED)\n"
-			location := strings.TrimPrefix(staticLibsFile, cmakeFolder)
+			location := strings.TrimPrefix(staticLib, cmakeFolder)
 			cmakelist += "set_property(TARGET " + lib + " PROPERTY IMPORTED_LOCATION " + "${PROJECT_SOURCE_DIR}" + location + " )\n"
 		}
 	}
+
 	// Include source files
 	// TODO: remove .cpp and .h from libraries example folders
 	cmakelist += "file (GLOB_RECURSE SOURCES core/*.c* lib/*.c* sketch/*.c*)\n"
 
 	// Compile and link project
 	cmakelist += "add_executable (" + projectName + " ${SOURCES} ${SOURCES_LIBS})\n"
-	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed -Wl,--start-group " + strings.Join(libs, " ") + " -Wl,--end-group)\n"
+	cmakelist += "target_link_libraries( " + projectName + " -Wl,--as-needed -Wl,--start-group " + linkGroup + " -Wl,--end-group)\n"
 
 	utils.WriteFile(cmakeFile, cmakelist)
 
@@ -205,26 +228,26 @@ func canExportCmakeProject(ctx *types.Context) bool {
 	return ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_EXPORT_CMAKE_FLAGS] != ""
 }
 
-func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
+func extractCompileFlags(ctx *types.Context, receipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
 	command, _ := builder_utils.PrepareCommandForRecipe(ctx, ctx.BuildProperties, receipe, true)
 
 	for _, arg := range command.Args {
 		if strings.HasPrefix(arg, "-D") {
-			*defines = appendIfUnique(*defines, arg)
+			*defines = utils.AppendIfNotPresent(*defines, arg)
 			continue
 		}
 		if strings.HasPrefix(arg, "-l") {
-			*libs = appendIfUnique(*libs, arg)
+			*dynamicLibs = utils.AppendIfNotPresent(*dynamicLibs, arg[2:])
 			continue
 		}
 		if strings.HasPrefix(arg, "-L") {
-			*linkDirectories = appendIfUnique(*linkDirectories, strings.TrimPrefix(arg, "-L"))
+			*linkDirectories = utils.AppendIfNotPresent(*linkDirectories, arg[2:])
 			continue
 		}
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "-I") && !strings.HasPrefix(arg, "-o") {
 			// HACK : from linkerflags remove MMD (no cache is produced)
 			if !strings.HasPrefix(arg, "-MMD") {
-				*linkerflags = appendIfUnique(*linkerflags, arg)
+				*linkerflags = utils.AppendIfNotPresent(*linkerflags, arg)
 			}
 		}
 	}
@@ -240,11 +263,4 @@ func findUniqueFoldersRelative(slice []string, base string) string {
 		}
 	}
 	return strings.Join(out, " ")
-}
-
-func appendIfUnique(slice []string, element string) []string {
-	if !utils.SliceContains(slice, element) {
-		slice = append(slice, element)
-	}
-	return slice
 }

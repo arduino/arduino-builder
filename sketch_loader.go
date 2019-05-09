@@ -76,7 +76,7 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_CANT_FIND_SKETCH_IN_PATH, sketchLocation, filepath.Dir(sketchLocation))
 	}
 
-	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, logger)
+	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, ctx.BuildPath, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -100,7 +100,7 @@ func collectAllSketchFiles(from string) ([]string, error) {
 	return filePaths, i18n.WrapError(err)
 }
 
-func makeSketch(sketchLocation string, allSketchFilePaths []string, logger i18n.Logger) (*types.Sketch, error) {
+func makeSketch(sketchLocation string, allSketchFilePaths []string, buildLocation string, logger i18n.Logger) (*types.Sketch, error) {
 	sketchFilesMap := make(map[string]types.SketchFile)
 	for _, sketchFilePath := range allSketchFilePaths {
 		source, err := ioutil.ReadFile(sketchFilePath)
@@ -123,7 +123,9 @@ func makeSketch(sketchLocation string, allSketchFilePaths []string, logger i18n.
 				otherSketchFiles = append(otherSketchFiles, sketchFile)
 			}
 		} else if ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {
-			additionalFiles = append(additionalFiles, sketchFile)
+			if !strings.Contains(filepath.Dir(sketchFile.Name), buildLocation) || buildLocation == "" {
+				additionalFiles = append(additionalFiles, sketchFile)
+			}
 		} else {
 			return nil, i18n.ErrorfWithLogger(logger, constants.MSG_UNKNOWN_SKETCH_EXT, sketchFile.Name)
 		}
