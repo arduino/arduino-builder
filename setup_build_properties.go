@@ -62,6 +62,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 	if ctx.Sketch != nil {
 		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_NAME] = filepath.Base(ctx.Sketch.MainFile.Name)
+		buildProperties[constants.BUILD_PROPERTIES_BUILD_PROJECT_PATH] = filepath.Dir(ctx.Sketch.MainFile.Name)
 	}
 	buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH] = strings.ToUpper(targetPlatform.PlatformId)
 
