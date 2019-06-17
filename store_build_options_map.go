@@ -30,15 +30,25 @@
 package builder
 
 import (
+	"encoding/json"
+	"path/filepath"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"path/filepath"
 )
 
 type StoreBuildOptionsMap struct{}
 
 func (s *StoreBuildOptionsMap) Run(ctx *types.Context) error {
 	utils.WriteFile(filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE), ctx.BuildOptionsJson)
+	return nil
+}
+
+type StoreOutputCacheMap struct{}
+
+func (s *StoreOutputCacheMap) Run(ctx *types.Context) error {
+	data, _ := json.Marshal(ctx.OutputCache)
+	utils.WriteFile(filepath.Join(ctx.BuildPath, constants.FILE_OUTPUT_CACHE), string(data))
 	return nil
 }

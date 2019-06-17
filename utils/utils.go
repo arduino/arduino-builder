@@ -281,9 +281,10 @@ func PrintableCommand(parts []string) string {
 
 const (
 	Ignore        = 0 // Redirect to null
-	Show          = 1 // Show on stdout/stderr as normal
-	ShowIfVerbose = 2 // Show if verbose is set, Ignore otherwise
-	Capture       = 3 // Capture into buffer
+	Show          = 1 // Capture and print the stream
+	ShowIfVerbose = 2 // Capture and print the stream only if verbose
+	Capture       = 3 // Capture into buffer and don't print
+	Stream        = 4 // Stream data as it comes in, no capture
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
@@ -291,17 +292,17 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 		ctx.GetLogger().UnformattedFprintln(os.Stdout, PrintableCommand(command.Args))
 	}
 
-	if stdout == Capture {
+	if stdout != Stream {
 		buffer := &bytes.Buffer{}
 		command.Stdout = buffer
-	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
+	} else {
 		command.Stdout = os.Stdout
 	}
 
-	if stderr == Capture {
+	if stderr != Stream {
 		buffer := &bytes.Buffer{}
 		command.Stderr = buffer
-	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
+	} else {
 		command.Stderr = os.Stderr
 	}
 
@@ -313,11 +314,20 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	err = command.Wait()
 
 	var outbytes, errbytes []byte
+	// this operation is a no-op in case of streaming
 	if buf, ok := command.Stdout.(*bytes.Buffer); ok {
 		outbytes = buf.Bytes()
 	}
 	if buf, ok := command.Stderr.(*bytes.Buffer); ok {
 		errbytes = buf.Bytes()
+	}
+
+	if stdout == Show || (stdout == ShowIfVerbose && ctx.Verbose) {
+		ctx.GetLogger().UnformattedWrite(os.Stdout, outbytes)
+	}
+
+	if stderr == Show || (stderr == ShowIfVerbose && ctx.Verbose) {
+		ctx.GetLogger().UnformattedWrite(os.Stderr, errbytes)
 	}
 
 	return outbytes, errbytes, i18n.WrapError(err)

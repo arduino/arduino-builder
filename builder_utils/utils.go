@@ -207,6 +207,8 @@ func compileFilesWithRecipe(ctx *types.Context, objectFiles []string, sourcePath
 	}
 }
 
+var outputCacheMutex sync.Mutex
+
 func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string, buildPath string, buildProperties properties.Map, includes []string, recipe string) (string, error) {
 	logger := ctx.GetLogger()
 	properties := buildProperties.Clone()
@@ -230,12 +232,26 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath string, source string,
 	}
 
 	if !objIsUpToDate {
-		_, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+		stdout, stderr, err := ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
 			return "", i18n.WrapError(err)
 		}
-	} else if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+		outputCacheMutex.Lock()
+		ctx.OutputCache[source] = types.Streams{
+			Stderr: stderr,
+			Stdout: stdout,
+		}
+		outputCacheMutex.Unlock()
+	} else {
+		if ctx.Verbose {
+			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+		}
+		if len(ctx.OutputCache[source].Stderr) > 0 && ctx.WarningsLevel != "none" {
+			logger.UnformattedWrite(os.Stderr, ctx.OutputCache[source].Stderr)
+		}
+		if len(ctx.OutputCache[source].Stdout) > 0 && ctx.WarningsLevel != "none" {
+			logger.UnformattedWrite(os.Stdout, ctx.OutputCache[source].Stdout)
+		}
 	}
 
 	return properties[constants.BUILD_PROPERTIES_OBJECT_FILE], nil
