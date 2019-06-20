@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 )
@@ -43,7 +44,6 @@ type AdditionalSketchFilesCopier struct{}
 func (s *AdditionalSketchFilesCopier) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
-
 	err := utils.EnsureFolderExists(sketchBuildPath)
 	if err != nil {
 		return i18n.WrapError(err)
@@ -63,13 +63,15 @@ func (s *AdditionalSketchFilesCopier) Run(ctx *types.Context) error {
 			return i18n.WrapError(err)
 		}
 
-		bytes, err := ioutil.ReadFile(file.Name)
+		fileContent, err := ioutil.ReadFile(file.Name)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 
-		if targetFileChanged(bytes, targetFilePath) {
-			err := utils.WriteFileBytes(targetFilePath, bytes)
+		line := []byte(fmt.Sprintf("#line 1 \"%s\"\n", file.Name))
+		changedFileContent := bytes.Join([][]byte{line,fileContent},[]byte{})
+		if targetFileChanged(changedFileContent, targetFilePath) {
+			err := utils.WriteFileBytes(targetFilePath, changedFileContent)
 			if err != nil {
 				return i18n.WrapError(err)
 			}
