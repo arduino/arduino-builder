@@ -63,13 +63,15 @@ func (s *AdditionalSketchFilesCopier) Run(ctx *types.Context) error {
 			return i18n.WrapError(err)
 		}
 
-		bytes, err := ioutil.ReadFile(file.Name)
+		originalFileContent, err := ioutil.ReadFile(file.Name)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 
-		if targetFileChanged(bytes, targetFilePath) {
-			err := utils.WriteFileBytes(targetFilePath, bytes)
+		line := []byte("#line 1 " + utils.QuoteCppString(file.Name) + "\n")
+		changedFileContent := bytes.Join([][]byte{line,originalFileContent},[]byte{})
+		if targetFileChanged(changedFileContent, targetFilePath) {
+			err := utils.WriteFileBytes(targetFilePath, changedFileContent)
 			if err != nil {
 				return i18n.WrapError(err)
 			}
