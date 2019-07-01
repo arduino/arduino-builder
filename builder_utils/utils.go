@@ -149,6 +149,10 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 		}
 
 		for _, folder := range folders {
+			// Skip any hidden directories (.git, .tmp, etc.)
+			if strings.HasPrefix(folder.Name(), ".") {
+				continue
+			}
 			otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
 			if err != nil {
 				return nil, i18n.WrapError(err)
