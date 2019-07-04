@@ -24,48 +24,37 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
+ * Copyright 2018 Piotr Henryk Dabrowski <phd@phd.re>
  */
 
-package builder
+package test
 
 import (
-	"github.com/arduino/arduino-builder/builder_utils"
-	"github.com/arduino/arduino-builder/i18n"
-	"github.com/arduino/arduino-builder/types"
+	"path/filepath"
+	"testing"
+
+	"github.com/arduino/arduino-builder"
+	"github.com/stretchr/testify/require"
 )
 
-type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
+func TestAddBuildBoardPropertiesFromPlatformSketchTxtFile(t *testing.T) {
+	ctx := makeDefaultContext(t)
+	ctx.UsePlatformSketchTxt = true
 
-func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&AddAdditionalEntriesToContext{},
-		&FailIfBuildPathEqualsSketchPath{},
-		&HardwareLoader{},
-		&PlatformKeysRewriteLoader{},
-		&RewriteHardwareKeys{},
-		&ToolsLoader{},
-		&TargetBoardResolver{},
-		&AddBuildBoardPropertyIfMissing{},
-		&LibrariesLoader{},
-		&SketchLoader{},
-		&SetupBuildProperties{},
-		&AddBuildPropertiesFromPlatformSketchTxtFile{},
-		&LoadVIDPIDSpecificProperties{},
-		&SetCustomBuildProperties{},
-		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
-	}
+	sketchLocation := filepath.Join("sketch_with_platform_sketch_txt", "sketch_with_platform_sketch_txt.ino")
+	ctx.SketchLocation = sketchLocation
 
-	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(commands))
+	err := builder.RunBuilder(ctx)
+	require.NoError(t, err, "Unexpected build error for "+sketchLocation)
+}
 
-	for _, command := range commands {
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return i18n.WrapError(err)
-		}
-	}
+func TestAddBuildBoardPropertiesFromPlatformSketchTxtFileDisabled(t *testing.T) {
+	ctx := makeDefaultContext(t)
+	ctx.UsePlatformSketchTxt = false
 
-	return nil
+	sketchLocation := filepath.Join("sketch_with_platform_sketch_txt", "sketch_with_platform_sketch_txt.ino")
+	ctx.SketchLocation = sketchLocation
+
+	err := builder.RunBuilder(ctx)
+	require.Error(t, err, "No expected build error for "+sketchLocation)
 }
