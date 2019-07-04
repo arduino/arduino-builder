@@ -162,26 +162,27 @@ const (
 )
 
 type Library struct {
-	Folder        string
-	SrcFolder     string
-	UtilityFolder string
-	Layout        LibraryLayout
-	Name          string
-	RealName      string
-	Archs         []string
-	DotALinkage   bool
-	Precompiled   bool
-	LDflags       string
-	IsLegacy      bool
-	Version       string
-	Author        string
-	Maintainer    string
-	Sentence      string
-	Paragraph     string
-	URL           string
-	Category      string
-	License       string
-	Properties    map[string]string
+	Folder          string
+	SrcFolder       string
+	UtilityFolder   string
+	Layout          LibraryLayout
+	Name            string
+	RealName        string
+	Archs           []string
+	DotALinkage     bool
+	Precompiled     bool
+	LDflags         string
+	IsLegacy        bool
+	Version         string
+	Author          string
+	Maintainer      string
+	Sentence        string
+	Paragraph       string
+	URL             string
+	Category        string
+	License         string
+	Properties      map[string]string
+	IsBeingModified bool
 }
 
 func (library *Library) String() string {

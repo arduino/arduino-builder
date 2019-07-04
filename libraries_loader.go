@@ -30,9 +30,12 @@
 package builder
 
 import (
+	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -153,6 +156,11 @@ func makeNewLibrary(libraryFolder string, debugLevel int, logger i18n.Logger) (*
 		return nil, i18n.WrapError(err)
 	}
 
+	timeDiff, newestFile := newestAndOldestFileDifferBy(libraryFolder)
+	if timeDiff > (5*time.Minute) && time.Since(newestFile) < 24*time.Hour {
+		library.IsBeingModified = true
+	}
+
 	if debugLevel >= 0 {
 		for _, subFolder := range subFolders {
 			if utils.IsSCCSOrHiddenFile(subFolder) {
@@ -219,4 +227,23 @@ func appendPathToLibrariesFolders(librariesFolders []string, newLibrariesFolder 
 	}
 
 	return utils.AppendIfNotPresent(librariesFolders, newLibrariesFolder)
+}
+
+func newestAndOldestFileDifferBy(path string) (time.Duration, time.Time) {
+	var newestTime int64 = 0
+	var oldestTime int64 = math.MaxInt64
+
+	filepath.Walk(path,
+		func(path string, info os.FileInfo, err error) error {
+			currTime := info.ModTime().Unix()
+			if currTime > newestTime {
+				newestTime = currTime
+			}
+			if currTime < oldestTime {
+				oldestTime = currTime
+			}
+			return nil
+		})
+	duration, _ := time.ParseDuration(strconv.FormatInt(newestTime-oldestTime, 10) + "s")
+	return duration, time.Unix(newestTime, 0)
 }

@@ -98,8 +98,16 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Lib
 
 func compileLibraries(ctx *types.Context, libraries []*types.Library, buildPath string, buildProperties properties.Map, includes []string) ([]string, error) {
 	objectFiles := []string{}
+	warningLevelToBeRestored := ctx.WarningsLevel
+
 	for _, library := range libraries {
+		if library.IsBeingModified {
+			ctx.WarningsLevel = "all"
+		}
 		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
+		if library.IsBeingModified {
+			ctx.WarningsLevel = warningLevelToBeRestored
+		}
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
