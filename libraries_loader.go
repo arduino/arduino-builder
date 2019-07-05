@@ -63,6 +63,10 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(platform.Folder, constants.FOLDER_LIBRARIES))
 
+	if ctx.SketchZipped {
+		sortedLibrariesFolders = appendPathToLibrariesFolders(sortedLibrariesFolders, filepath.Join(filepath.Dir(ctx.SketchLocation), constants.FOLDER_LIBRARIES))
+	}
+
 	librariesFolders := ctx.OtherLibrariesFolders
 	librariesFolders, err = utils.AbsolutizePaths(librariesFolders)
 	if err != nil {

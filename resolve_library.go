@@ -85,6 +85,11 @@ func ResolveLibrary(ctx *types.Context, header string) *types.Library {
 
 	library = useAlreadyImportedLibraryWithSameNameIfExists(library, importedLibraries)
 
+	if ctx.SketchZipped {
+		// select embedded library, in any case
+		library = libraryContainedInSketchFolder(libraries, filepath.Dir(ctx.SketchLocation))
+	}
+
 	libraryResolutionResults[header] = types.LibraryResolutionResult{
 		Library:          library,
 		NotUsedLibraries: filterOutLibraryFrom(libraries, library),
@@ -118,6 +123,15 @@ func useAlreadyImportedLibraryWithSameNameIfExists(library *types.Library, impor
 		}
 	}
 	return library
+}
+
+func libraryContainedInSketchFolder(libraries []*types.Library, sketchFolder string) *types.Library {
+	for _, lib := range libraries {
+		if strings.Contains(lib.Folder, sketchFolder) {
+			return lib
+		}
+	}
+	return libraries[0]
 }
 
 func filterOutLibraryFrom(libraries []*types.Library, libraryToRemove *types.Library) []*types.Library {

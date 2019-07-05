@@ -88,6 +88,9 @@ type Context struct {
 	Verbose           bool
 	DebugPreprocessor bool
 
+	// inoz handling
+	SketchZipped bool
+
 	// Dry run, only create progress map
 	Progress ProgressStruct
 
