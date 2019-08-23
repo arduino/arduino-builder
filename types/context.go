@@ -103,6 +103,9 @@ type Context struct {
 
 	// Experimental: use arduino-preprocessor to create prototypes
 	UseArduinoPreprocessor bool
+
+	// Parallel processes
+	Jobs int
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {

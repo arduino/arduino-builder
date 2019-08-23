@@ -207,13 +207,14 @@ func main() {
 		return
 	}
 
-	if *jobsFlag > 0 {
-		runtime.GOMAXPROCS(*jobsFlag)
-	} else {
-		runtime.GOMAXPROCS(runtime.NumCPU())
-	}
-
 	ctx := &types.Context{}
+
+	if *jobsFlag > 0 {
+		ctx.Jobs = *jobsFlag
+	} else {
+		ctx.Jobs = runtime.NumCPU()
+	}
+	runtime.GOMAXPROCS(ctx.Jobs)
 
 	// place here all experimental features that should live under this flag
 	if *experimentalFeatures {
