@@ -52,6 +52,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/go-errors/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const VERSION = "1.4.5"
@@ -372,6 +373,9 @@ func main() {
 
 	if *debugLevelFlag > -1 {
 		ctx.DebugLevel = *debugLevelFlag
+	}
+	if ctx.DebugLevel < 10 {
+		logrus.SetOutput(ioutil.Discard)
 	}
 
 	if *quietFlag {
