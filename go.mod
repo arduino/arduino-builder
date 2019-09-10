@@ -9,4 +9,5 @@ require (
 	github.com/go-errors/errors v1.0.1
 	github.com/juju/errors v0.0.0-20190207033735-e65537c515d7 // indirect
 	github.com/sirupsen/logrus v1.4.2
+	github.com/stretchr/testify v1.3.0
 )
