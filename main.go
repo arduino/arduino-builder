@@ -245,9 +245,8 @@ func main() {
 	}
 
 	// FLAG_HARDWARE
-	if hardwareFolders, err := toSliceOfUnquoted(hardwareFoldersFlag); err != nil {
-		printCompleteError(err)
-	} else if len(hardwareFolders) > 0 {
+	hardwareFolders := toSliceOfUnquoted(hardwareFoldersFlag)
+	if len(hardwareFolders) > 0 {
 		ctx.HardwareDirs = paths.NewPathList(hardwareFolders...)
 	}
 	if len(ctx.HardwareDirs) == 0 {
@@ -255,9 +254,8 @@ func main() {
 	}
 
 	// FLAG_TOOLS
-	if toolsFolders, err := toSliceOfUnquoted(toolsFoldersFlag); err != nil {
-		printCompleteError(err)
-	} else if len(toolsFolders) > 0 {
+	toolsFolders := toSliceOfUnquoted(toolsFoldersFlag)
+	if len(toolsFolders) > 0 {
 		ctx.ToolsDirs = paths.NewPathList(toolsFolders...)
 	}
 	if len(ctx.ToolsDirs) == 0 {
@@ -265,23 +263,20 @@ func main() {
 	}
 
 	// FLAG_LIBRARIES
-	if librariesFolders, err := toSliceOfUnquoted(librariesFoldersFlag); err != nil {
-		printCompleteError(err)
-	} else if len(librariesFolders) > 0 {
+	librariesFolders := toSliceOfUnquoted(librariesFoldersFlag)
+	if len(librariesFolders) > 0 {
 		ctx.OtherLibrariesDirs = paths.NewPathList(librariesFolders...)
 	}
 
 	// FLAG_BUILT_IN_LIBRARIES
-	if librariesBuiltInFolders, err := toSliceOfUnquoted(librariesBuiltInFoldersFlag); err != nil {
-		printCompleteError(err)
-	} else if len(librariesBuiltInFolders) > 0 {
+	librariesBuiltInFolders := toSliceOfUnquoted(librariesBuiltInFoldersFlag)
+	if len(librariesBuiltInFolders) > 0 {
 		ctx.BuiltInLibrariesDirs = paths.NewPathList(librariesBuiltInFolders...)
 	}
 
 	// FLAG_PREFS
-	if customBuildProperties, err := toSliceOfUnquoted(customBuildPropertiesFlag); err != nil {
-		printCompleteError(err)
-	} else if len(customBuildProperties) > 0 {
+	customBuildProperties := toSliceOfUnquoted(customBuildPropertiesFlag)
+	if len(customBuildProperties) > 0 {
 		ctx.CustomBuildProperties = customBuildProperties
 	}
 
@@ -420,16 +415,23 @@ func toExitCode(err error) int {
 	return 1
 }
 
-func toSliceOfUnquoted(value []string) ([]string, error) {
+func toSliceOfUnquoted(value []string) []string {
 	var values []string
 	for _, v := range value {
-		v, err := gohasissues.Unquote(v)
-		if err != nil {
-			return nil, err
-		}
-		values = append(values, v)
+		values = append(values, unquote(v))
 	}
-	return values, nil
+	return values
+}
+
+func unquote(s string) string {
+	if stringStartsEndsWith(s, "'") || stringStartsEndsWith(s, "\"") {
+		s = s[1 : len(s)-1]
+	}
+	return s
+}
+
+func stringStartsEndsWith(s string, c string) bool {
+	return strings.HasPrefix(s, c) && strings.HasSuffix(s, c)
 }
 
 func printCompleteError(err error) {
