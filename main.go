@@ -319,23 +319,19 @@ func main() {
 	}
 
 	// FLAG_BUILD_CACHE
-	buildCachePathUnquoted, err := gohasissues.Unquote(*buildCachePathFlag)
-	if err != nil {
-		printCompleteError(err)
-	}
-	buildCachePath := paths.New(buildCachePathUnquoted)
-	if buildCachePath != nil {
-		// TODO: mmmmhhh... this one looks like a bug, why check existence?
-		if _, err := buildCachePath.Stat(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-
-		if err := buildCachePath.MkdirAll(); err != nil {
+	if *buildCachePathFlag != "" {
+		buildCachePathUnquoted, err := gohasissues.Unquote(*buildCachePathFlag)
+		if err != nil {
 			printCompleteError(err)
 		}
+		buildCachePath := paths.New(buildCachePathUnquoted)
+		if buildCachePath != nil {
+			if err := buildCachePath.MkdirAll(); err != nil {
+				printCompleteError(err)
+			}
+		}
+		ctx.BuildCachePath = buildCachePath
 	}
-	ctx.BuildCachePath = buildCachePath
 
 	// FLAG_VID_PID
 	if *vidPidFlag != "" {
