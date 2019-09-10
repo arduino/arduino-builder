@@ -3,7 +3,7 @@ module github.com/arduino/arduino-builder
 go 1.12
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20190828173137-fffa451acd60
+	github.com/arduino/arduino-cli v0.0.0-20190909101745-b3db7a6400cf
 	github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1
 	github.com/arduino/go-properties-orderedmap v0.0.0-20190828172252-05018b28ff6c
 	github.com/go-errors/errors v1.0.1
