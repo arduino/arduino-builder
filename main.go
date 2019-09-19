@@ -300,13 +300,13 @@ func main() {
 	}
 
 	// FLAG_BUILD_PATH
-	buildPathUnquoted, err := gohasissues.Unquote(*buildPathFlag)
-	if err != nil {
-		printCompleteError(err)
-	}
-	buildPath := paths.New(buildPathUnquoted)
-	if buildPath != nil {
-		// TODO: mmmmhhh... this one looks like a bug, why check existence?
+	if *buildPathFlag != "" {
+		buildPathUnquoted, err := gohasissues.Unquote(*buildPathFlag)
+		if err != nil {
+			printCompleteError(err)
+		}
+		buildPath := paths.New(buildPathUnquoted)
+
 		if _, err := buildPath.Stat(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -384,6 +384,7 @@ func main() {
 		ctx.SetLogger(i18n.HumanLogger{})
 	}
 
+	var err error
 	if *dumpPrefsFlag {
 		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
 	} else if *preprocessFlag || *codeCompleteAtFlag != "" {
