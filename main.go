@@ -258,9 +258,9 @@ func main() {
 	if toolsFolders, err := toSliceOfUnquoted(toolsFoldersFlag); err != nil {
 		printCompleteError(err)
 	} else if len(toolsFolders) > 0 {
-		ctx.ToolsDirs = paths.NewPathList(toolsFolders...)
+		ctx.BuiltInToolsDirs = paths.NewPathList(toolsFolders...)
 	}
-	if len(ctx.ToolsDirs) == 0 {
+	if len(ctx.BuiltInToolsDirs) == 0 {
 		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_TOOLS + "' is mandatory"))
 	}
 
