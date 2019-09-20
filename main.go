@@ -40,12 +40,12 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"runtime/trace"
+	"strconv"
 	"strings"
 	"syscall"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	jsonrpc "github.com/arduino/arduino-cli/legacy/builder/grpc"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -286,7 +286,7 @@ func main() {
 	}
 
 	// FLAG_FQBN
-	if fqbnIn, err := gohasissues.Unquote(*fqbnFlag); err != nil {
+	if fqbnIn, err := unquote(*fqbnFlag); err != nil {
 		printCompleteError(err)
 	} else if fqbnIn != "" {
 		if fqbn, err := cores.ParseFQBN(fqbnIn); err != nil {
@@ -301,7 +301,7 @@ func main() {
 
 	// FLAG_BUILD_PATH
 	if *buildPathFlag != "" {
-		buildPathUnquoted, err := gohasissues.Unquote(*buildPathFlag)
+		buildPathUnquoted, err := unquote(*buildPathFlag)
 		if err != nil {
 			printCompleteError(err)
 		}
@@ -320,7 +320,7 @@ func main() {
 
 	// FLAG_BUILD_CACHE
 	if *buildCachePathFlag != "" {
-		buildCachePathUnquoted, err := gohasissues.Unquote(*buildCachePathFlag)
+		buildCachePathUnquoted, err := unquote(*buildCachePathFlag)
 		if err != nil {
 			printCompleteError(err)
 		}
@@ -339,7 +339,7 @@ func main() {
 	}
 
 	if flag.NArg() > 0 {
-		sketchLocationUnquoted, err := gohasissues.Unquote(flag.Arg(0))
+		sketchLocationUnquoted, err := unquote(flag.Arg(0))
 		if err != nil {
 			printCompleteError(err)
 		}
@@ -424,13 +424,29 @@ func toExitCode(err error) int {
 func toSliceOfUnquoted(value []string) ([]string, error) {
 	var values []string
 	for _, v := range value {
-		v, err := gohasissues.Unquote(v)
+		v, err := unquote(v)
 		if err != nil {
 			return nil, err
 		}
 		values = append(values, v)
 	}
 	return values, nil
+}
+
+func unquote(s string) (string, error) {
+	if stringStartsEndsWith(s, "'") {
+		s = s[1 : len(s)-1]
+	}
+
+	if !stringStartsEndsWith(s, "\"") {
+		return s, nil
+	}
+
+	return strconv.Unquote(s)
+}
+
+func stringStartsEndsWith(s string, c string) bool {
+	return strings.HasPrefix(s, c) && strings.HasSuffix(s, c)
 }
 
 func printCompleteError(err error) {
