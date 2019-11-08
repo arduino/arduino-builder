@@ -1,14 +1,16 @@
 bou.ke/monkey v1.0.1/go.mod h1:FgHuK96Rv2Nlf+0u1OOVDpCMdsWyOFmeeketDHE7LIg=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/arduino/arduino-cli v0.0.0-20191002075548-cc737536689a h1:1qp4ZfXlSBsR5EPZ07hGoXbW/DVppQHuI12t53bu/Fc=
-github.com/arduino/arduino-cli v0.0.0-20191002075548-cc737536689a/go.mod h1:qXuYrcQ+SLQhjqqQSmjYI3ir2blnjhSS0bhv3W6NXCo=
+github.com/arduino/arduino-cli v0.0.0-20191108120930-bc6c82320189 h1:99f9ygNm3fRA87+CeHVm4pEvJjZJUzhKKaGCkORgijM=
+github.com/arduino/arduino-cli v0.0.0-20191108120930-bc6c82320189/go.mod h1:2WHoApmQByiIoGROOiggCcDScAdMxbqNTEiLmKSTd1w=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c h1:agh2JT96G8egU7FEb13L4dq3fnCN7lxXhJ86t69+W7s=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c/go.mod h1:HK7SpkEax/3P+0w78iRQx1sz1vCDYYw9RXwHjQTB5i8=
 github.com/arduino/go-paths-helper v1.0.1 h1:utYXLM2RfFlc9qp/MJTIYp3t6ux/xM6mWjeEb/WLK4Q=
 github.com/arduino/go-paths-helper v1.0.1/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
 github.com/arduino/go-properties-orderedmap v0.0.0-20190828172252-05018b28ff6c h1:4z4PJqNH8WGXtm9ix2muUOAP7gxTGBOdQTuKEDyCnsA=
 github.com/arduino/go-properties-orderedmap v0.0.0-20190828172252-05018b28ff6c/go.mod h1:kiSuHm7yz3chiy8rb2MphC7ECn3MlkQFAIe4SXmQg6o=
+github.com/arduino/go-properties-orderedmap v0.0.0-20191016140733-00365bfa6b40 h1:ZJCKy0Y+m/Lj0I/3BP0KNEUmd7eQ52HYcua21e76pcA=
+github.com/arduino/go-properties-orderedmap v0.0.0-20191016140733-00365bfa6b40/go.mod h1:DKjD2VXY/NZmlingh4lSFMEYCVubfeArCsGPGDwb2yk=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b h1:9hDi4F2st6dbLC3y4i02zFT5quS4X6iioWifGlVwfy4=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b/go.mod h1:uwGy5PpN4lqW97FiLnbcx+xx8jly5YuPMJWfVwwjJiQ=
 github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b h1:3PjgYG5gVPA7cipp7vIR2lF96KkEJIFBJ+ANnuv6J20=
@@ -52,6 +54,7 @@ github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORR
 github.com/h2non/filetype v1.0.8 h1:le8gpf+FQA0/DlDABbtisA1KiTS0Xi+YSC/E8yY3Y14=
 github.com/h2non/filetype v1.0.8/go.mod h1:isekKqOuhMj+s/7r3rIeTErIRy4Rub5uBWHfvMusLMU=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
+github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5/go.mod h1:W54LbzXuIE0boCoNJfwqpmkKJ1O4TCTZMetAt6jGk7Q=
