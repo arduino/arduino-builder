@@ -72,7 +72,7 @@ go get golang.org/x/net/context
 go get github.com/fsnotify/fsnotify
 go get github.com/schollz/closestmatch
 go get github.com/arduino/arduino-builder
-go build github.com/arduino/arduino-builder/arduino-builder
+go build github.com/arduino/arduino-builder
 ```
 
 ### TDD
