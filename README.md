@@ -1,3 +1,9 @@
+**DEPRECATION WARNING:** This tool is being phased out in favor of [Arduino CLI](https://github.com/arduino/arduino-cli), we recommend to use Arduino CLI for new projects.
+
+The source code of the builder has been moved in the `arduino-cli` repository (as a [`legacy` package](https://github.com/arduino/arduino-cli/legacy)) where it will be maintained and developed and eventually moved outside the legacy package once properly integrated in the Arduino CLI codebase.
+
+The `arduino-builder` is now just a wrapper of `arduino-cli`. We will continue to provide builds of this project for some time to allow a smooth transition period to our users.
+
 ## Arduino Builder [![Build Status](https://travis-ci.org/arduino/arduino-builder.svg?branch=master)](https://travis-ci.org/arduino/arduino-builder)
 
 A command line tool for compiling Arduino sketches
@@ -55,61 +61,22 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 ### Building from source
 
-You need [a recent version of Go (>=1.8.0)](https://golang.org/).
+You need [a recent version of Go (>=1.12.0)](https://golang.org/) that supports go modules.
 
-To build, run the following commands:
+The project now uses `go.mod` for dependecy management, there is no need to `go get` anything or to set `GOPATH` env vars. The build is very simple:
 
+```bash
+$ git clone https://github.com/arduino/arduino-builder.git
+$ cd arduino-builder
+$ go build
+[.....]
+$ ./arduino-builder -version
+Arduino Builder 1.5.1
+Copyright (C) 2015 Arduino LLC and contributors
+See https://www.arduino.cc/ and https://github.com/arduino/arduino-builder/graphs/contributors
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
-go get github.com/go-errors/errors
-go get github.com/stretchr/testify
-go get github.com/jstemmer/go-junit-report
-go get -u github.com/arduino/go-paths-helper
-go get -u github.com/arduino/go-properties-orderedmap
-go get -u github.com/arduino/go-timeutils
-go get google.golang.org/grpc
-go get github.com/golang/protobuf/proto
-go get golang.org/x/net/context
-go get github.com/fsnotify/fsnotify
-go get github.com/schollz/closestmatch
-go get github.com/arduino/arduino-builder
-go build github.com/arduino/arduino-builder/arduino-builder
-```
-
-### TDD
-
-In order to run the tests, type:
-
-```
-go test github.com/arduino/arduino-builder/...
-```
-
-This runs all tests, showing any failures and a summary at the end.
-Add the -v option to show each test as it is being ran. Currently,
-arduino-builder itself also generates copious output, even for
-non-failing testcases and without -v, and testing does not stop at the
-first failure, so you probably want to redirect test output so you can
-scroll back to find any failures.
-
-To run a single test, use the -run option, which accepts a regular
-expression (see also go help testflag).
-
-```
-go test github.com/arduino/arduino-builder/... -run 'TestBuilderEmptySketch'
-go test github.com/arduino/arduino-builder/... -run 'TestPrototypesAdder.*'
-```
-
-In jenkins, use
-```
-go test -v github.com/arduino/arduino-builder/... | bin/go-junit-report > report.xml
-```
-
-The first time you run the tests, some needed files (toolchains and
-source files) will be downloaded, which needs about 1GB of space (at the
-time of writing). If you have a slow connection, this download might
-exceed the default 10 minute timeout for a single test. If you run into
-this, add `-timeout 60m` or similar to the commandline to extend the
-timeout. If you are running on slower system (like a rasbperry pi),
-increasing the timeout might be needed as well.
 
 ### License and Copyright
 
