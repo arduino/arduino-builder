@@ -61,7 +61,7 @@ See [Doing continuous integration with arduino builder](https://github.com/ardui
 
 ### Building from source
 
-You need [a recent version of Go (>=1.12.0)](https://golang.org/) that supports go modules.
+You need [a version of Go >=1.13.0](https://golang.org/).
 
 The project now uses `go.mod` for dependecy management, there is no need to `go get` anything or to set `GOPATH` env vars. The build is very simple:
 

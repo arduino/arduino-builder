@@ -1,6 +1,6 @@
 module github.com/arduino/arduino-builder
 
-go 1.12
+go 1.13
 
 require (
 	github.com/arduino/arduino-cli v0.0.0-20200212094638-c1dcf01822e9
