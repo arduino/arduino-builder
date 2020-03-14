@@ -51,7 +51,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -400,20 +400,18 @@ func main() {
 	}
 
 	if err != nil {
-		err = i18n.WrapError(err)
-
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "%s\n", err)
 
 		if ctx.DebugLevel >= 10 {
-			fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
+			err = errors.WithStack(err)
+			fmt.Fprintf(os.Stderr, "%+v\n", err)
 		}
-
 		os.Exit(toExitCode(err))
 	}
 }
 
 func toExitCode(err error) int {
-	if exiterr, ok := err.(*exec.ExitError); ok {
+	if exiterr, ok := errors.Cause(err).(*exec.ExitError); ok {
 		if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 			return status.ExitStatus()
 		}
@@ -450,8 +448,8 @@ func stringStartsEndsWith(s string, c string) bool {
 }
 
 func printCompleteError(err error) {
-	err = i18n.WrapError(err)
-	fmt.Fprintln(os.Stderr, err.(*errors.Error).ErrorStack())
+	err = errors.WithStack(err)
+	fmt.Fprintf(os.Stderr, "%+v\n", err)
 	os.Exit(1)
 }
 
