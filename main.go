@@ -378,6 +378,7 @@ func main() {
 		ctx.SetLogger(i18n.NoopLogger{})
 	} else if *loggerFlag == FLAG_LOGGER_MACHINE {
 		ctx.SetLogger(i18n.MachineLogger{})
+		ctx.Progress.PrintEnabled = true
 	} else if *loggerFlag == FLAG_LOGGER_HUMANTAGS {
 		ctx.SetLogger(i18n.HumanTagsLogger{})
 	} else {
