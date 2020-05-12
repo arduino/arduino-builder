@@ -3,7 +3,7 @@ module github.com/arduino/arduino-builder
 go 1.13
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20200318111248-0866d99f71ec
+	github.com/arduino/arduino-cli v0.0.0-20200508091305-a2adf31f5f56
 	github.com/arduino/go-paths-helper v1.0.1
 	github.com/arduino/go-properties-orderedmap v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -18,7 +18,6 @@ require (
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	go.bug.st/downloader v1.2.0 // indirect
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
 	golang.org/x/sys v0.0.0-20200317113312-5766fd39f98d // indirect
 	google.golang.org/genproto v0.0.0-20200318110522-7735f76e9fa5 // indirect
