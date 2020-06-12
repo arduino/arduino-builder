@@ -3,25 +3,25 @@ module github.com/arduino/arduino-builder
 go 1.13
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20200508091305-a2adf31f5f56
-	github.com/arduino/go-paths-helper v1.0.1
-	github.com/arduino/go-properties-orderedmap v1.0.0
+	github.com/arduino/arduino-cli v0.0.0-20200612152641-f7a6d63d208a
+	github.com/arduino/go-paths-helper v1.2.0
+	github.com/arduino/go-properties-orderedmap v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/golang/protobuf v1.3.5 // indirect
-	github.com/h2non/filetype v1.0.12 // indirect
-	github.com/juju/errors v0.0.0-20190930114154-d42613fe1ab9 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/pelletier/go-toml v1.6.0 // indirect
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/h2non/filetype v1.1.0 // indirect
+	github.com/juju/errors v0.0.0-20200330140219-3fe23663418f // indirect
+	github.com/mitchellh/mapstructure v1.3.2 // indirect
+	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
-	golang.org/x/sys v0.0.0-20200317113312-5766fd39f98d // indirect
-	google.golang.org/genproto v0.0.0-20200318110522-7735f76e9fa5 // indirect
-	google.golang.org/grpc v1.28.0 // indirect
-	gopkg.in/ini.v1 v1.55.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
+	github.com/spf13/viper v1.7.0 // indirect
+	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect
+	golang.org/x/sys v0.0.0-20200610111108-226ff32320da // indirect
+	google.golang.org/genproto v0.0.0-20200611194920-44ba362f84c1 // indirect
+	google.golang.org/grpc v1.29.1 // indirect
+	gopkg.in/ini.v1 v1.57.0 // indirect
 )
