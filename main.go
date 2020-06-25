@@ -44,9 +44,9 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/arduino/arduino-builder/grpc"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	jsonrpc "github.com/arduino/arduino-cli/legacy/builder/grpc"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -226,7 +226,7 @@ func main() {
 		logger.Buffer = &loggerBuffer
 		//logger := i18n.HumanLogger{}
 		ctx.SetLogger(logger)
-		jsonrpc.RegisterAndServeJsonRPC(ctx)
+		grpc.RegisterAndServeJsonRPC(ctx)
 	}
 
 	if *buildOptionsFileFlag != "" {
