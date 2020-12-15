@@ -55,7 +55,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const VERSION = "1.5.4"
+const VERSION = "1.5.5"
 
 const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
