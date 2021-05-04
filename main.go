@@ -214,6 +214,7 @@ func main() {
 	}
 
 	ctx := &types.Context{}
+	ctx.IgnoreSketchFolderNameErrors = true
 
 	// place here all experimental features that should live under this flag
 	if *experimentalFeatures {
