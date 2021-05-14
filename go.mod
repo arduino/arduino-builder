@@ -3,7 +3,7 @@ module github.com/arduino/arduino-builder
 go 1.13
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20210510134509-e64bd910f0f4
+	github.com/arduino/arduino-cli v0.0.0-20210514123546-d710b642ef79
 	github.com/arduino/go-paths-helper v1.5.0
 	github.com/arduino/go-properties-orderedmap v1.4.0
 	github.com/fsnotify/fsnotify v1.4.9
