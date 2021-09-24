@@ -1,0 +1,6 @@
+# Used by the "Sync Labels" workflow
+# See: https://github.com/Financial-Times/github-label-sync#label-config-file
+
+- name: "topic: preprocessor"
+  color: 00ffff
+  description: Related to sketch preprocessing
