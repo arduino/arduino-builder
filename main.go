@@ -222,11 +222,7 @@ func main() {
 	}
 
 	if *daemonFlag {
-		var loggerBuffer []string
-		logger := i18n.AccumulatorLogger{}
-		logger.Buffer = &loggerBuffer
-		//logger := i18n.HumanLogger{}
-		ctx.SetLogger(logger)
+		ctx.SetLogger(i18n.NoopLogger{})
 		grpc.RegisterAndServeJsonRPC(ctx)
 	}
 
