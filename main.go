@@ -57,39 +57,6 @@ import (
 
 const VERSION = "1.6.1"
 
-const FLAG_ACTION_PREPROCESS = "preprocess"
-const FLAG_ACTION_DUMP_PREFS = "dump-prefs"
-const FLAG_ACTION_CODE_COMPLETE_AT = "code-complete-at"
-const FLAG_BUILD_OPTIONS_FILE = "build-options-file"
-const FLAG_HARDWARE = "hardware"
-const FLAG_TOOLS = "tools"
-const FLAG_BUILT_IN_LIBRARIES = "built-in-libraries"
-const FLAG_LIBRARIES = "libraries"
-const FLAG_PREFS = "prefs"
-const FLAG_FQBN = "fqbn"
-const FLAG_IDE_VERSION = "ide-version"
-const FLAG_CORE_API_VERSION = "core-api-version"
-const FLAG_BUILD_PATH = "build-path"
-const FLAG_BUILD_CACHE = "build-cache"
-const FLAG_VERBOSE = "verbose"
-const FLAG_QUIET = "quiet"
-const FLAG_DEBUG_LEVEL = "debug-level"
-const FLAG_WARNINGS = "warnings"
-const FLAG_WARNINGS_NONE = "none"
-const FLAG_WARNINGS_DEFAULT = "default"
-const FLAG_WARNINGS_MORE = "more"
-const FLAG_WARNINGS_ALL = "all"
-const FLAG_LOGGER = "logger"
-const FLAG_LOGGER_HUMAN = "human"
-const FLAG_LOGGER_HUMANTAGS = "humantags"
-const FLAG_LOGGER_MACHINE = "machine"
-const FLAG_VERSION = "version"
-const FLAG_DAEMON = "daemon"
-const FLAG_VID_PID = "vid-pid"
-const FLAG_JOBS = "jobs"
-const FLAG_TRACE = "trace"
-const FLAG_EXPERIMENTAL = "experimental"
-
 type foldersFlag []string
 
 func (h *foldersFlag) String() string {
@@ -114,61 +81,38 @@ func (h *propertiesFlag) Set(value string) error {
 	return nil
 }
 
-var preprocessFlag *bool
-var dumpPrefsFlag *bool
-var codeCompleteAtFlag *string
-var buildOptionsFileFlag *string
-var hardwareFoldersFlag foldersFlag
-var toolsFoldersFlag foldersFlag
-var librariesBuiltInFoldersFlag foldersFlag
-var librariesFoldersFlag foldersFlag
-var customBuildPropertiesFlag propertiesFlag
-var fqbnFlag *string
-var coreAPIVersionFlag *string
-var ideVersionFlag *string
-var buildPathFlag *string
-var buildCachePathFlag *string
-var verboseFlag *bool
-var quietFlag *bool
-var debugLevelFlag *int
-var warningsLevelFlag *string
-var loggerFlag *string
-var versionFlag *bool
-var daemonFlag *bool
-var vidPidFlag *string
-var jobsFlag *int
-var traceFlag *bool
-var experimentalFeatures *bool
-
-func init() {
-	preprocessFlag = flag.Bool(FLAG_ACTION_PREPROCESS, false, "preprocess the given sketch")
-	dumpPrefsFlag = flag.Bool(FLAG_ACTION_DUMP_PREFS, false, "dumps build properties used when compiling")
-	codeCompleteAtFlag = flag.String(FLAG_ACTION_CODE_COMPLETE_AT, "", "output code completions for sketch at a specific location. Location format is \"file:line:col\"")
-	buildOptionsFileFlag = flag.String(FLAG_BUILD_OPTIONS_FILE, "", "Instead of specifying --"+FLAG_HARDWARE+", --"+FLAG_TOOLS+" etc every time, you can load all such options from a file")
-	flag.Var(&hardwareFoldersFlag, FLAG_HARDWARE, "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
-	flag.Var(&toolsFoldersFlag, FLAG_TOOLS, "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
-	flag.Var(&librariesBuiltInFoldersFlag, FLAG_BUILT_IN_LIBRARIES, "Specify a built-in 'libraries' folder. These are low priority libraries. Can be added multiple times for specifying multiple built-in 'libraries' folders")
-	flag.Var(&librariesFoldersFlag, FLAG_LIBRARIES, "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
-	flag.Var(&customBuildPropertiesFlag, FLAG_PREFS, "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
-	fqbnFlag = flag.String(FLAG_FQBN, "", "fully qualified board name")
-	coreAPIVersionFlag = flag.String(FLAG_CORE_API_VERSION, "10600", "version of core APIs (used to populate ARDUINO #define)")
-	ideVersionFlag = flag.String(FLAG_IDE_VERSION, "10600", "[deprecated] use '"+FLAG_CORE_API_VERSION+"' instead")
-	buildPathFlag = flag.String(FLAG_BUILD_PATH, "", "build path")
-	buildCachePathFlag = flag.String(FLAG_BUILD_CACHE, "", "builds of 'core.a' are saved into this folder to be cached and reused")
-	verboseFlag = flag.Bool(FLAG_VERBOSE, false, "if 'true' prints lots of stuff")
-	quietFlag = flag.Bool(FLAG_QUIET, false, "if 'true' doesn't print any warnings or progress or whatever")
-	debugLevelFlag = flag.Int(FLAG_DEBUG_LEVEL, builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
-	warningsLevelFlag = flag.String(FLAG_WARNINGS, "", "Sets warnings level. Available values are '"+FLAG_WARNINGS_NONE+"', '"+FLAG_WARNINGS_DEFAULT+"', '"+FLAG_WARNINGS_MORE+"' and '"+FLAG_WARNINGS_ALL+"'")
-	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_HUMANTAGS+"', '"+FLAG_LOGGER_MACHINE+"'")
-	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
-	daemonFlag = flag.Bool(FLAG_DAEMON, false, "daemonizes and serves its functions via rpc")
-	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
-	jobsFlag = flag.Int(FLAG_JOBS, 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
-	traceFlag = flag.Bool(FLAG_TRACE, false, "traces the whole process lifecycle")
-	experimentalFeatures = flag.Bool(FLAG_EXPERIMENTAL, false, "enables experimental features")
-}
-
 func main() {
+	var hardwareFoldersFlag foldersFlag
+	var toolsFoldersFlag foldersFlag
+	var librariesBuiltInFoldersFlag foldersFlag
+	var librariesFoldersFlag foldersFlag
+	var customBuildPropertiesFlag propertiesFlag
+
+	preprocessFlag := flag.Bool("preprocess", false, "preprocess the given sketch")
+	dumpPrefsFlag := flag.Bool("dump-prefs", false, "dumps build properties used when compiling")
+	codeCompleteAtFlag := flag.String("code-complete-at", "", "output code completions for sketch at a specific location. Location format is \"file:line:col\"")
+	buildOptionsFileFlag := flag.String("build-options-file", "", "Instead of specifying --hardware, --tools etc every time, you can load all such options from a file")
+	flag.Var(&hardwareFoldersFlag, "hardware", "Specify a 'hardware' folder. Can be added multiple times for specifying multiple 'hardware' folders")
+	flag.Var(&toolsFoldersFlag, "tools", "Specify a 'tools' folder. Can be added multiple times for specifying multiple 'tools' folders")
+	flag.Var(&librariesBuiltInFoldersFlag, "built-in-libraries", "Specify a built-in 'libraries' folder. These are low priority libraries. Can be added multiple times for specifying multiple built-in 'libraries' folders")
+	flag.Var(&librariesFoldersFlag, "libraries", "Specify a 'libraries' folder. Can be added multiple times for specifying multiple 'libraries' folders")
+	flag.Var(&customBuildPropertiesFlag, "prefs", "Specify a custom preference. Can be added multiple times for specifying multiple custom preferences")
+	fqbnFlag := flag.String("fqbn", "", "fully qualified board name")
+	coreAPIVersionFlag := flag.String("core-api-version", "10600", "version of core APIs (used to populate ARDUINO #define)")
+	ideVersionFlag := flag.String("ide-version", "10600", "[deprecated] use 'core-api-version' instead")
+	buildPathFlag := flag.String("build-path", "", "build path")
+	buildCachePathFlag := flag.String("build-cache", "", "builds of 'core.a' are saved into this folder to be cached and reused")
+	verboseFlag := flag.Bool("verbose", false, "if 'true' prints lots of stuff")
+	quietFlag := flag.Bool("quiet", false, "if 'true' doesn't print any warnings or progress or whatever")
+	debugLevelFlag := flag.Int("debug-level", builder.DEFAULT_DEBUG_LEVEL, "Turns on debugging messages. The higher, the chattier")
+	warningsLevelFlag := flag.String("warnings", "", "Sets warnings level. Available values are 'none', 'default', 'more' and 'all'")
+	loggerFlag := flag.String("logger", "human", "Sets type of logger. Available values are 'human', 'humantags', 'machine'")
+	versionFlag := flag.Bool("version", false, "prints version and exits")
+	daemonFlag := flag.Bool("daemon", false, "daemonizes and serves its functions via rpc")
+	vidPidFlag := flag.String("vid-pid", "", "specify to use vid/pid specific build properties, as defined in boards.txt")
+	jobsFlag := flag.Int("jobs", 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
+	traceFlag := flag.Bool("trace", false, "traces the whole process lifecycle")
+	experimentalFeatures := flag.Bool("experimental", false, "enables experimental features")
 	// Not used anymore, kept only because the Arduino IDE still provides this flag
 	flag.Bool("compile", true, "[deprecated] this is now the default action")
 
@@ -247,7 +191,7 @@ func main() {
 		ctx.HardwareDirs = paths.NewPathList(hardwareFolders...)
 	}
 	if len(ctx.HardwareDirs) == 0 {
-		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_HARDWARE + "' is mandatory"))
+		printErrorMessageAndFlagUsage(errors.New("Parameter 'hardware' is mandatory"))
 	}
 
 	// FLAG_TOOLS
@@ -257,7 +201,7 @@ func main() {
 		ctx.BuiltInToolsDirs = paths.NewPathList(toolsFolders...)
 	}
 	if len(ctx.BuiltInToolsDirs) == 0 {
-		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_TOOLS + "' is mandatory"))
+		printErrorMessageAndFlagUsage(errors.New("Parameter 'tools' is mandatory"))
 	}
 
 	// FLAG_LIBRARIES
@@ -292,7 +236,7 @@ func main() {
 		}
 	}
 	if ctx.FQBN == nil {
-		printErrorMessageAndFlagUsage(errors.New("Parameter '" + FLAG_FQBN + "' is mandatory"))
+		printErrorMessageAndFlagUsage(errors.New("Parameter 'fqbn' is mandatory"))
 	}
 
 	// FLAG_BUILD_PATH
@@ -372,10 +316,10 @@ func main() {
 
 	if *quietFlag {
 		ctx.SetLogger(i18n.NoopLogger{})
-	} else if *loggerFlag == FLAG_LOGGER_MACHINE {
+	} else if *loggerFlag == "machine" {
 		ctx.SetLogger(i18n.MachineLogger{})
 		ctx.Progress.PrintEnabled = true
-	} else if *loggerFlag == FLAG_LOGGER_HUMANTAGS {
+	} else if *loggerFlag == "humantags" {
 		ctx.SetLogger(i18n.HumanTagsLogger{})
 	} else {
 		ctx.SetLogger(i18n.HumanLogger{})
