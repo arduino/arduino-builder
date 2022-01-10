@@ -57,7 +57,6 @@ import (
 
 const VERSION = "1.6.1"
 
-const FLAG_ACTION_COMPILE = "compile"
 const FLAG_ACTION_PREPROCESS = "preprocess"
 const FLAG_ACTION_DUMP_PREFS = "dump-prefs"
 const FLAG_ACTION_CODE_COMPLETE_AT = "code-complete-at"
@@ -115,7 +114,6 @@ func (h *propertiesFlag) Set(value string) error {
 	return nil
 }
 
-var compileFlag *bool
 var preprocessFlag *bool
 var dumpPrefsFlag *bool
 var codeCompleteAtFlag *string
@@ -143,7 +141,6 @@ var traceFlag *bool
 var experimentalFeatures *bool
 
 func init() {
-	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
 	preprocessFlag = flag.Bool(FLAG_ACTION_PREPROCESS, false, "preprocess the given sketch")
 	dumpPrefsFlag = flag.Bool(FLAG_ACTION_DUMP_PREFS, false, "dumps build properties used when compiling")
 	codeCompleteAtFlag = flag.String(FLAG_ACTION_CODE_COMPLETE_AT, "", "output code completions for sketch at a specific location. Location format is \"file:line:col\"")
