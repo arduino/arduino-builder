@@ -169,6 +169,8 @@ func init() {
 }
 
 func main() {
+	// Not used anymore, kept only because the Arduino IDE still provides this flag
+	flag.Bool("compile", true, "[deprecated] this is now the default action")
 
 	flag.Parse()
 
